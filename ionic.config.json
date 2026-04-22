@@ -1,0 +1,7 @@
+{
+  "name": "test_roles_v1",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
