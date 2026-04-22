@@ -19,6 +19,10 @@ export class DashboardPage implements OnInit {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
 
+  // 🔽 header scroll
+  hideHeader = false;
+  lastScrollTop = 0;
+
   // 👤 Datos del admin actual
   adminData: UserData | null = null;
 
@@ -100,6 +104,19 @@ export class DashboardPage implements OnInit {
   }
 
   goHome() {
-  this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
-}
+    this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
+  }
+
+    // 👇 scroll header
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+
+    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
+      this.hideHeader = true;
+    } else {
+      this.hideHeader = false;
+    }
+
+    this.lastScrollTop = scrollTop;
+  }
 }

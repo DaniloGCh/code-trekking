@@ -1,7 +1,7 @@
 <!-- src/app/pages/admin/dashboard/dashboard.page.html -->
 
-<ion-header>
-  <ion-toolbar color="danger">
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
     <ion-title>Panel Admin</ion-title>
 
     <ion-buttons slot="end">
@@ -20,7 +20,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <!-- BIENVENIDA -->
   <div class="welcome-header" *ngIf="adminData">

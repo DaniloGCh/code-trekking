@@ -1,60 +1,203 @@
-// src/app/pages/admin/dashboard/dashboard.page.scss
+/* =========================================================
+   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
+   ========================================================= */
 
+/* toolbar transparente total */
+.transparent-toolbar {
+  --background: transparent !important;
+  --border-width: 0 !important;
+  --box-shadow: none !important;
+   --padding-start: 15px;
+  --padding-end: 15px;
+}
+
+/* header oculto sin dejar rastro */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 👇 CLAVE: evita fondo negro del header container */
+ion-header {
+  background: transparent !important;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+}
+
+/* =========================================================
+   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
+   ========================================================= */
+
+ion-header {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* toolbar sin elevación (clave real en Ionic) */
+ion-toolbar {
+  --box-shadow: none !important;
+  box-shadow: none !important;
+  --border-width: 0 !important;
+}
+
+
+
+/* asegura que botones no se muevan */
+ion-buttons {
+  z-index: 2;
+}
+
+/* =========================================================
+   👀 OCULTAR HEADER CON SCROLL
+   ========================================================= */
+
+ion-header {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* estado oculto */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+/* 🌄 Fondo tipo trekking */
+ion-content {
+  --background: none;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.7)
+    ),
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
+  color: #fff;
+}
+
+/* 🧭 Header bienvenida */
 .welcome-header {
+  margin-top: 50px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 0;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 15px;
+
+  background: rgba(34, 49, 34, 0.6); /* verde oscuro translúcido */
+    /* Compatibilidad */
+  -webkit-backdrop-filter: blur(6px); /* Safari */
+  backdrop-filter: blur(6px);         /* Navegadores modernos */
 
   ion-icon {
-    font-size: 48px;
-    color: var(--ion-color-danger);
+    font-size: 40px;
+    color: #a3d977; /* verde trekking */
   }
 
   h2 {
     margin: 0;
-    font-weight: 700;
+    font-size: 1.4rem;
+    font-weight: 600;
   }
 
   p {
     margin: 0;
-    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+    color: #dcdcdc;
+  }
+}
+
+/* 🏔️ Títulos de sección */
+.section-title {
+  margin: 15px 0 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #c7f9cc; /* verde claro */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 📊 Cards estadísticas estilo trekking */
+.stat-card {
+  border-radius: 15px;
+  text-align: center;
+  color: #fff;
+    /* Compatibilidad */
+  -webkit-backdrop-filter: blur(8px); /* Safari */
+  backdrop-filter: blur(8px);         /* Navegadores modernos */
+
+  ion-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  ion-icon {
+    font-size: 28px;
+  }
+
+  h2 {
+    margin: 5px 0;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+}
+
+/* 🌿 Variantes de tarjetas */
+.stat-card.total {
+  background: rgba(85, 107, 47, 0.7); /* verde oliva */
+}
+
+.stat-card.admins {
+  background: rgba(139, 69, 19, 0.7); /* café tierra */
+}
+
+.stat-card.users {
+  background: rgba(34, 139, 34, 0.7); /* verde bosque */
+}
+
+/* 👥 Lista de usuarios */
+ion-list {
+  background: transparent;
+}
+
+/* 🪵 Items estilo natural */
+ion-item {
+  --background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 8px;
+  border-radius: 12px;
+
+  /* Compatibilidad */
+  -webkit-backdrop-filter: blur(5px); /* Safari */
+  backdrop-filter: blur(5px);         /* Navegadores modernos */
+
+  ion-label h3 {
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  ion-label p {
+    color: #dcdcdc;
     font-size: 0.85rem;
   }
 }
 
-.section-title {
-  font-weight: 700;
-  color: var(--ion-color-dark);
-  margin: 16px 0 8px;
+/* 🧍 Avatar */
+ion-avatar ion-icon {
+  color: #c7f9cc;
 }
 
-.stat-card {
-  border-radius: 12px;
-  text-align: center;
-  margin: 4px;
+/* 🔘 Botones */
+ion-button {
+  --color: #c7f9cc;
+}
 
-  ion-card-content {
-    padding: 12px 4px;
-
-    ion-icon {
-      font-size: 28px;
-    }
-
-    h2 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin: 4px 0;
-    }
-
-    p {
-      font-size: 0.75rem;
-      color: var(--ion-color-medium);
-      margin: 0;
-    }
-  }
-
-  &.total ion-icon { color: var(--ion-color-primary); }
-  &.admins ion-icon { color: var(--ion-color-danger); }
-  &.users ion-icon { color: var(--ion-color-success); }
+/* 🏷️ Badge */
+ion-badge {
+  font-weight: bold;
 }
