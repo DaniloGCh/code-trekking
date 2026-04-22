@@ -1,0 +1,97 @@
+<!-- src/app/pages/admin/dashboard/dashboard.page.html -->
+
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-title>Panel Admin</ion-title>
+
+    <ion-buttons slot="end">
+      
+      <!-- 🏠 BOTÓN HOME -->
+      <ion-button (click)="goHome()">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
+
+      <!-- 🚪 LOGOUT -->
+      <ion-button (click)="onLogout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- BIENVENIDA -->
+  <div class="welcome-header" *ngIf="adminData">
+    <ion-icon name="shield-checkmark-outline"></ion-icon>
+    <div>
+      <h2>¡Hola, {{ adminData.nombre }}!</h2>
+      <p>Panel de administración</p>
+    </div>
+  </div>
+
+  <!-- ESTADÍSTICAS -->
+  <h3 class="section-title">Estadísticas</h3>
+  <ion-grid>
+    <ion-row>
+
+      <ion-col size="4">
+        <ion-card class="stat-card total">
+          <ion-card-content>
+            <ion-icon name="people-outline"></ion-icon>
+            <h2>{{ totalUsers }}</h2>
+            <p>Total</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="4">
+        <ion-card class="stat-card admins">
+          <ion-card-content>
+            <ion-icon name="shield-outline"></ion-icon>
+            <h2>{{ totalAdmins }}</h2>
+            <p>Admins</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="4">
+        <ion-card class="stat-card users">
+          <ion-card-content>
+            <ion-icon name="person-outline"></ion-icon>
+            <h2>{{ totalRegulares }}</h2>
+            <p>Usuarios</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+  <!-- LISTA DE USUARIOS -->
+  <h3 class="section-title">Usuarios registrados</h3>
+  <ion-list>
+    <ion-item *ngFor="let user of users$ | async">
+
+      <ion-avatar slot="start">
+        <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
+      </ion-avatar>
+
+      <ion-label>
+        <h3>{{ user.nombre }}</h3>
+        <p>{{ user.email }}</p>
+      </ion-label>
+
+      <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
+        {{ user.rol === 'admin' ? 'Admin' : 'User' }}
+      </ion-badge>
+
+      <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
+        <ion-icon name="swap-horizontal-outline"></ion-icon>
+      </ion-button>
+
+    </ion-item>
+  </ion-list>
+
+</ion-content>

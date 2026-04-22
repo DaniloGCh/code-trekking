@@ -1,0 +1,52 @@
+// src/app/pages/home/home.page.scss
+
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.welcome-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0 8px;
+  gap: 8px;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .avatar-icon {
+    font-size: 80px;
+    color: var(--ion-color-primary);
+  }
+}
+
+ion-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  ion-item {
+    --padding-start: 0;
+    margin-bottom: 8px;
+
+    h3 {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.75rem;
+      color: var(--ion-color-medium);
+    }
+  }
+  .login-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+}

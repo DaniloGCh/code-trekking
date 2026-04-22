@@ -1,0 +1,73 @@
+<!-- src/app/pages/home/home.page.html -->
+
+<ion-header>
+  
+  <ion-toolbar color="primary">
+    
+    <ion-title>Inicio</ion-title>
+    
+    <ion-buttons slot="end">
+      <ion-button (click)="onLogout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- BIENVENIDA -->
+  <div class="welcome-container" *ngIf="userData">
+
+    <div class="welcome-header">
+      <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+      <h1>¡Hola, {{ userData.nombre }}!</h1>
+      <ion-badge [color]="userData.rol === 'admin' ? 'danger' : 'primary'">
+        {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
+      </ion-badge>
+    </div>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Mi cuenta</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+
+          <ion-item>
+            <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <p>Nombre</p>
+              <h3>{{ userData.nombre }}</h3>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <p>Correo</p>
+              <h3>{{ userData.email }}</h3>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <p>Rol</p>
+              <h3>{{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}</h3>
+            </ion-label>
+          </ion-item>
+
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <!-- SKELETON mientras carga -->
+  <div *ngIf="!userData">
+    <ion-skeleton-text animated style="height: 80px; border-radius: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="height: 200px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
+  </div>
+
+</ion-content>

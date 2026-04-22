@@ -1,0 +1,60 @@
+// src/app/pages/admin/dashboard/dashboard.page.scss
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+
+  ion-icon {
+    font-size: 48px;
+    color: var(--ion-color-danger);
+  }
+
+  h2 {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.85rem;
+  }
+}
+
+.section-title {
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  margin: 16px 0 8px;
+}
+
+.stat-card {
+  border-radius: 12px;
+  text-align: center;
+  margin: 4px;
+
+  ion-card-content {
+    padding: 12px 4px;
+
+    ion-icon {
+      font-size: 28px;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 4px 0;
+    }
+
+    p {
+      font-size: 0.75rem;
+      color: var(--ion-color-medium);
+      margin: 0;
+    }
+  }
+
+  &.total ion-icon { color: var(--ion-color-primary); }
+  &.admins ion-icon { color: var(--ion-color-danger); }
+  &.users ion-icon { color: var(--ion-color-success); }
+}

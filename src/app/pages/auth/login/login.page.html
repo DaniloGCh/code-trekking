@@ -1,0 +1,64 @@
+<!-- src/app/auth/login/login.page.html -->
+
+<ion-content class="ion-padding">
+
+  <div class="login-container">
+
+    <div class="login-header">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      <h1>Iniciar Sesión</h1>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+
+      <!-- EMAIL -->
+      <ion-item [class.ion-invalid]="email?.invalid && email?.touched">
+        <ion-label position="floating">Correo electrónico</ion-label>
+        <ion-input
+          type="email"
+          formControlName="email"
+          placeholder="correo@ejemplo.com">
+        </ion-input>
+        <ion-note slot="error">
+          <span *ngIf="email?.errors?.['required']">El correo es requerido</span>
+          <span *ngIf="email?.errors?.['email']">Ingresa un correo válido</span>
+        </ion-note>
+      </ion-item>
+
+      <!-- PASSWORD -->
+      <ion-item [class.ion-invalid]="password?.invalid && password?.touched">
+        <ion-label position="floating">Contraseña</ion-label>
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password">
+        </ion-input>
+        <ion-button slot="end" fill="clear" (click)="togglePassword()">
+          <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+        </ion-button>
+        <ion-note slot="error">
+          <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
+          <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+        </ion-note>
+      </ion-item>
+
+      <!-- BOTÓN LOGIN -->
+      <ion-button
+        expand="block"
+        type="submit"
+        class="ion-margin-top"
+        [disabled]="loginForm.invalid">
+        Iniciar Sesión
+      </ion-button>
+
+    </form>
+
+    <!-- IR A REGISTRO -->
+    <div class="register-link">
+      <p>¿No tienes cuenta?
+        <span (click)="goToRegister()">Regístrate aquí</span>
+      </p>
+    </div>
+
+  </div>
+
+</ion-content>
