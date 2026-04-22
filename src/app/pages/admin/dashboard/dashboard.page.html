@@ -2,10 +2,15 @@
 
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
-    <ion-title>Panel Admin</ion-title>
+    <ion-title>Admin</ion-title>
 
+    <!-- 🌤️ CLIMA CENTRADO -->
+    <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
+      <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
+      <span>{{ weatherGlobal.temperature | async }}°</span>
+    </ion-button>
     <ion-buttons slot="end">
-      
+
       <!-- 🏠 BOTÓN HOME -->
       <ion-button (click)="goHome()">
         <ion-icon slot="icon-only" name="home-outline"></ion-icon>
@@ -27,7 +32,8 @@
     <ion-icon name="shield-checkmark-outline"></ion-icon>
     <div>
       <h2>¡Hola, {{ adminData.nombre }}!</h2>
-      <p>Panel de administración</p>
+      <p>Bienvenido a tu dashboard administrativo.
+        Gestiona la plataforma de forma eficiente y segura.</p>
     </div>
   </div>
 

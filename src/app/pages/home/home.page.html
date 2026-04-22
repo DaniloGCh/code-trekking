@@ -1,20 +1,34 @@
 <!-- src/app/pages/home/home.page.html -->
 
-<ion-header>
-  
-  <ion-toolbar color="primary">
-    
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
+
     <ion-title>Inicio</ion-title>
-    
+
+    <!-- 🌤️ CLIMA CENTRADO -->
+    <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
+      <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
+      <span>{{ weatherGlobal.temperature | async }}°</span>
+    </ion-button>
+
     <ion-buttons slot="end">
+
+      <!-- 🏠 BOTÓN DASHBOARD -->
+      <ion-button (click)="goDashboard()">
+        <ion-icon slot="icon-only" name="grid-outline"></ion-icon>
+      </ion-button>
+
+      <!-- 🚪 LOGOUT -->
       <ion-button (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
+
     </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <!-- BIENVENIDA -->
   <div class="welcome-container" *ngIf="userData">
@@ -22,6 +36,8 @@
     <div class="welcome-header">
       <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
       <h1>¡Hola, {{ userData.nombre }}!</h1>
+      <p>Bienvenido a tu inicio. Explora tu información y mantente al día con la app.</p>
+      <p>Tus próxima aventura te esperan</p>
       <ion-badge [color]="userData.rol === 'admin' ? 'danger' : 'primary'">
         {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
       </ion-badge>
@@ -35,7 +51,7 @@
         <ion-list lines="none">
 
           <ion-item>
-            <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon name="person-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Nombre</p>
               <h3>{{ userData.nombre }}</h3>
@@ -43,7 +59,7 @@
           </ion-item>
 
           <ion-item>
-            <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Correo</p>
               <h3>{{ userData.email }}</h3>
@@ -51,7 +67,7 @@
           </ion-item>
 
           <ion-item>
-            <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon name="shield-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Rol</p>
               <h3>{{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}</h3>
@@ -65,9 +81,9 @@
   </div>
 
   <!-- SKELETON mientras carga -->
-  <div *ngIf="!userData">
+  <!-- <app-explore-container *ngIf="!userData">
     <ion-skeleton-text animated style="height: 80px; border-radius: 8px;"></ion-skeleton-text>
     <ion-skeleton-text animated style="height: 200px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
-  </div>
+  </app-explore-container> -->
 
 </ion-content>

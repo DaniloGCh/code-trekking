@@ -1,52 +1,185 @@
-// src/app/pages/home/home.page.scss
+/* =========================================================
+   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
+   ========================================================= */
 
-.welcome-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* toolbar transparente total */
+.transparent-toolbar {
+  --background: transparent !important;
+  --border-width: 0 !important;
+  --box-shadow: none !important;
+   --padding-start: 15px;
+  --padding-end: 15px;
 }
 
-.welcome-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 0 8px;
-  gap: 8px;
+/* header oculto sin dejar rastro */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
 
-  h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-  }
+/* 👇 CLAVE: evita fondo negro del header container */
+ion-header {
+  background: transparent !important;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+}
+
+ion-header ion-toolbar ion-icon {
+  color: #8bd58e !important; /* verde bosque */
+}
+/* =========================================================
+   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
+   ========================================================= */
+
+ion-header {
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* toolbar sin elevación (clave real en Ionic) */
+ion-toolbar {
+  --box-shadow: none !important;
+  box-shadow: none !important;
+  --border-width: 0 !important;
+}
+
+/* asegura que botones no se muevan */
+ion-buttons {
+  z-index: 2;
+}
+
+/* =========================================================
+   👀 OCULTAR HEADER CON SCROLL
+   ========================================================= */
+
+ion-header {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* estado oculto */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+//-----------------------------------------------//
+
+/* 🌄 Fondo trekking global */
+ion-content {
+  --background: none;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.65),
+      rgba(0, 0, 0, 0.75)
+    ),
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
+
+  color: #fff;
+}
+
+/* 🧭 HEADER */
+ion-header ion-toolbar {
+  --background: rgba(34, 49, 34, 0.85); /* verde bosque */
+  --color: #fff;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+/* 🏠 CONTENEDOR GENERAL */
+.welcome-container {
+  margin: 15px;
+}
+
+/* 👋 HEADER DE BIENVENIDA */
+.welcome-header {
+  margin-top: 65px;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 20px;
+
+  background: rgba(34, 49, 34, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 
   .avatar-icon {
     font-size: 80px;
-    color: var(--ion-color-primary);
+    color: #a3d977; /* verde trekking */
+  }
+
+  h1 {
+    margin: 10px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
   }
 }
 
+
+
+ion-list {
+  background: rgba(34, 49, 34, 0.55) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-radius: 16px;
+  padding: 10px;
+}
+
+ion-item ion-icon {
+  color: rgb(0, 188, 9) !important; /* verde oscuro */
+}
+
+/* 🏷️ BADGE */
+ion-badge {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+/* 🪵 CARD PRINCIPAL */
 ion-card {
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
-  ion-item {
-    --padding-start: 0;
-    margin-bottom: 8px;
-
-    h3 {
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    p {
-      font-size: 0.75rem;
-      color: var(--ion-color-medium);
-    }
-  }
-  .login-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  color: #fff;
 }
+
+/* 🧾 LISTA */
+ion-item {
+  --background: transparent;
+  --color: #fff;
 }
+
+/* 📄 textos dentro */
+ion-label p {
+  color: #c7f9cc;
+  font-size: 0.8rem;
+}
+
+ion-label h3 {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 🎯 ICONOS */
+ion-icon {
+  color: #a3d977;
+}
+
+/* ⏳ SKELETON */
+ion-skeleton-text {
+  --background: rgba(255, 255, 255, 0.1);
+  --background-rgb: 255, 255, 255;
+}
+
+
+
+

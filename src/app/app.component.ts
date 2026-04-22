@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,10 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+
+  constructor(private weatherGlobal: WeatherGlobalService) {}
+
+  ngOnInit() {
+    this.weatherGlobal.loadWeather();
+  }
 }

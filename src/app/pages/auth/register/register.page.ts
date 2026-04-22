@@ -112,6 +112,6 @@ export class RegisterPage {
 
   // 🔙 Volver al login
   goToLogin() {
-    this.router.navigateByUrl('/auth/login');
+    this.router.navigateByUrl('/login');
   }
 }

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { UserData } from 'src/app/core/services/auth.service';
+import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 
 @Component({
   selector: 'app-home',
@@ -18,17 +19,23 @@ export class HomePage implements OnInit {
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
 
+  // 🔽 header scroll
+  hideHeader = false;
+  lastScrollTop = 0;
+
   // 👤 Datos del usuario actual
   userData: UserData | null = null;
 
-ngOnInit() {
-  this.authService.currentUser$.subscribe(async user => {
-    if (user) {
-      this.userData = await this.authService.getCurrentUserData();
-      console.log('USER DATA:', this.userData);
-    }
-  });
-}
+  constructor(public weatherGlobal: WeatherGlobalService) { }
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(async user => {
+      if (user) {
+        this.userData = await this.authService.getCurrentUserData();
+        console.log('USER DATA:', this.userData);
+      }
+    });
+  }
 
   // 🚪 CERRAR SESIÓN
   async onLogout() {
@@ -52,5 +59,26 @@ ngOnInit() {
     });
 
     await alert.present();
+  }
+
+  goDashboard() {
+    this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+  }
+
+  // 👇 scroll header
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+
+    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
+      this.hideHeader = true;
+    } else {
+      this.hideHeader = false;
+    }
+
+    this.lastScrollTop = scrollTop;
+  }
+
+  openWeatherLink() {
+    window.open('https://www.google.com/search?q=clima+santiago', '_blank');
   }
 }

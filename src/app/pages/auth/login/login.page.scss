@@ -1,0 +1,100 @@
+/* 🌄 Fondo tipo trekking */
+ion-content {
+  --background: none;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.65),
+      rgba(0, 0, 0, 0.75)
+    ),
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 📦 Contenedor principal */
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 25px;
+  border-radius: 20px;
+
+  background: rgba(34, 49, 34, 0.55); /* verde bosque translúcido */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  color: #fff;
+}
+
+/* 🧭 Header login */
+.login-header {
+  text-align: center;
+  margin-bottom: 25px;
+
+  ion-icon {
+    font-size: 70px;
+    color: #a3d977; /* verde trekking */
+  }
+
+  h1 {
+    margin: 10px 0 0;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+}
+
+/* 🧾 Inputs */
+ion-item {
+  --background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 15px;
+
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+
+  --color: #fff;
+}
+
+/* 🟥 errores */
+ion-note {
+  color: #ffb3b3;
+  font-size: 0.75rem;
+}
+
+/* 🔘 botón login */
+ion-button[type="submit"] {
+  --background: #2e7d32; /* verde bosque */
+  --border-radius: 12px;
+  font-weight: bold;
+  margin-top: 15px;
+
+  --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* 👁 botón ojo password */
+ion-button[slot="end"] {
+  --color: #c7f9cc;
+}
+
+/* 🔗 registro */
+.register-link {
+  text-align: center;
+  margin-top: 20px;
+
+  p {
+    color: #ddd;
+    font-size: 0.9rem;
+  }
+
+  span {
+    color: #a3d977;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  span:hover {
+    text-decoration: underline;
+  }
+}

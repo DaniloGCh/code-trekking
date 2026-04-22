@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AlertController, ToastController } from '@ionic/angular';
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { Observable } from 'rxjs';
+import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,6 +35,8 @@ export class DashboardPage implements OnInit {
   totalAdmins = 0;
   totalRegulares = 0;
 
+  constructor(public weatherGlobal: WeatherGlobalService) {}
+
   async ngOnInit() {
     this.adminData = await this.authService.getCurrentUserData();
 
@@ -52,7 +55,7 @@ export class DashboardPage implements OnInit {
 
     const alert = await this.alertCtrl.create({
       header: 'Cambiar rol',
-      message: `¿Cambiar el rol de <strong>${user.nombre}</strong> a <strong>${rolLabel}</strong>?`,
+      message: `¿Cambiar el rol de ${user.nombre} a ${rolLabel}?`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -118,5 +121,9 @@ export class DashboardPage implements OnInit {
     }
 
     this.lastScrollTop = scrollTop;
+  }
+
+    openWeatherLink() {
+    window.open('https://www.google.com/search?q=clima+santiago', '_blank');
   }
 }
