@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { adminGuard } from './guards/admin.guard';
 import { noAuthGuard } from './guards/no-auth.guard';
+import { authGuard } from './guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -26,13 +27,16 @@ const routes: Routes = [
     path: 'dashboard',
     loadChildren: () => import('./pages/admin/dashboard/dashboard.module').then( m => m.DashboardPageModule),
     canActivate: [adminGuard]
-  },  {
+  },
+  {
     path: 'settings',
-    loadChildren: () => import('./pages/users/settings/settings.module').then( m => m.SettingsPageModule)
+    loadChildren: () => import('./pages/users/settings/settings.module').then( m => m.SettingsPageModule),
+    canActivate: [authGuard]
   },
   {
     path: 'eventos',
-    loadChildren: () => import('./pages/eventos/eventos.module').then( m => m.EventosPageModule)
+    loadChildren: () => import('./pages/eventos/eventos.module').then( m => m.EventosPageModule),
+    canActivate: [authGuard]
   },
 
   
