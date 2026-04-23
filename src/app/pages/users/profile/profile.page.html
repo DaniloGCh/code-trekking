@@ -10,6 +10,10 @@
       <ion-button (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
+       <!-- ✅ Botón de configuración -->
+      <ion-button routerLink="/tabs/settings">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
 
     </ion-buttons>
 
@@ -92,34 +96,6 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- ACCIONES -->
-    <ion-card>
-  <ion-card-header>
-    <ion-card-title>Seguridad</ion-card-title>
-  </ion-card-header>
-
-  <ion-card-content>
-
-    <!-- 🔐 CONTRASEÑA -->
-    <ion-button expand="block" fill="outline" class="btn-trekking" (click)="onChangePassword()">
-      <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
-      Cambiar contraseña
-    </ion-button>
-
-    <!-- 🚪 LOGOUT -->
-    <ion-button expand="block" fill="outline" class="btn-logout ion-margin-top" (click)="onLogout()">
-      <ion-icon name="log-out-outline" slot="start"></ion-icon>
-      Cerrar sesión
-    </ion-button>
-
-    <!-- 💀 ELIMINAR -->
-    <ion-button expand="block" fill="outline" class="btn-delete ion-margin-top" (click)="onDeleteAccount()">
-      <ion-icon name="trash-outline" slot="start"></ion-icon>
-      Eliminar mi cuenta
-    </ion-button>
-
-  </ion-card-content>
-</ion-card>
 
   </div>
 

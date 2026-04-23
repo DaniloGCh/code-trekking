@@ -26,7 +26,11 @@ const routes: Routes = [
     path: 'dashboard',
     loadChildren: () => import('./pages/admin/dashboard/dashboard.module').then( m => m.DashboardPageModule),
     canActivate: [adminGuard]
+  },  {
+    path: 'settings',
+    loadChildren: () => import('./pages/users/settings/settings.module').then( m => m.SettingsPageModule)
   },
+
   
 ];
 @NgModule({
