@@ -6,17 +6,16 @@
     <ion-title>Inicio</ion-title>
 
     <!-- 🌤️ CLIMA CENTRADO -->
-    <!-- 🌤️ CLIMA CENTRADO -->
     <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
       <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
-      <span>{{ weatherGlobal.temperature | async }}° /</span>  
-      <span>/ {{ timeService.dateTime | async }}</span>
+      <span>{{ weatherGlobal.temperature | async }}° </span>
+      <span>| {{ timeService.dateTime | async }}</span>
     </ion-button>
 
     <ion-buttons slot="end">
 
-      <!-- 🏠 BOTÓN DASHBOARD -->
-      <ion-button (click)="goDashboard()">
+      <!-- 🏠 BOTÓN DASHBOARD - Solo visible para admin -->
+      <ion-button *ngIf="userData?.rol === 'admin'" (click)="goDashboard()">
         <ion-icon slot="icon-only" name="grid-outline"></ion-icon>
       </ion-button>
 
@@ -45,40 +44,6 @@
       </ion-badge>
     </div>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Mi cuenta</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list lines="none">
-
-          <ion-item>
-            <ion-icon name="person-outline" slot="start"></ion-icon>
-            <ion-label>
-              <p>Nombre</p>
-              <h3>{{ userData.nombre }}</h3>
-            </ion-label>
-          </ion-item>
-
-          <ion-item>
-            <ion-icon name="mail-outline" slot="start"></ion-icon>
-            <ion-label>
-              <p>Correo</p>
-              <h3>{{ userData.email }}</h3>
-            </ion-label>
-          </ion-item>
-
-          <ion-item>
-            <ion-icon name="shield-outline" slot="start"></ion-icon>
-            <ion-label>
-              <p>Rol</p>
-              <h3>{{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}</h3>
-            </ion-label>
-          </ion-item>
-
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
 
   </div>
 

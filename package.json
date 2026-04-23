@@ -23,6 +23,7 @@
     "@angular/platform-browser-dynamic": "^20.0.0",
     "@angular/router": "^20.0.0",
     "@capacitor/app": "8.1.0",
+    "@capacitor/camera": "^8.1.0",
     "@capacitor/core": "8.3.1",
     "@capacitor/haptics": "8.0.2",
     "@capacitor/keyboard": "8.0.3",

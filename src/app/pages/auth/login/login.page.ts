@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/core/services/auth.service';
-
+import { ToastController } from '@ionic/angular'; // ✅ Importado correctamente
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -19,6 +19,7 @@ export class LoginPage {
   private fb = inject(FormBuilder);
   private loadingCtrl = inject(LoadingController);
   private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController); // ✅ Inyectado correctamente
 
   // 👁️ Toggle mostrar/ocultar password
   showPassword = false;
@@ -69,6 +70,57 @@ export class LoginPage {
     }
   }
 
+  
+  
+  // ✅ OLVIDASTE TU CONTRASEÑA
+  async onForgotPassword() {
+    const alert = await this.alertCtrl.create({
+      header: 'Recuperar contraseña',
+      message: 'Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.',
+      inputs: [
+        {
+          name: 'email',
+          type: 'email',
+          placeholder: 'correo@ejemplo.com',
+          value: this.email?.value || ''
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Enviar',
+          handler: async (data) => {
+            if (!data.email) {
+              await this.showToast('Ingresa un correo válido', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({
+              message: 'Enviando correo...'
+            });
+            await loading.present();
+
+            try {
+              await this.authService.resetPassword(data.email);
+              await loading.dismiss();
+              await this.showToast('Correo enviado, revisa tu bandeja de entrada', 'success');
+            } catch (error) {
+              await loading.dismiss();
+              await this.showToast('No existe una cuenta con ese correo', 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
   // ❌ Manejo de errores de Firebase
   private async showError(errorCode: string) {
     const messages: Record<string, string> = {
@@ -89,6 +141,17 @@ export class LoginPage {
 
     await alert.present();
   }
+
+  // Y el método showToast corregido
+private async showToast(message: string, color: string = 'success') {
+  const toast = await this.toastCtrl.create({
+    message,
+    duration: 3000,
+    color,
+    position: 'bottom'
+  });
+  await toast.present();
+}
 
   // 📝 Ir a registro
   goToRegister() {

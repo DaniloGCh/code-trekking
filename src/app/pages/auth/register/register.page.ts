@@ -27,14 +27,15 @@ export class RegisterPage {
   togglePassword() { this.showPassword = !this.showPassword; }
   toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; }
 
-  // 📋 Formulario reactivo
-  registerForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3)]],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    confirmPassword: ['', [Validators.required]],
-    rol: ['user', [Validators.required]], // Por defecto 'user'
-  }, { validators: this.passwordMatchValidator });
+  // 📋 Formulario reactivo actualizado
+registerForm: FormGroup = this.fb.group({
+  nombre: ['', [Validators.required, Validators.minLength(3)]],
+  email: ['', [Validators.required, Validators.email]],
+  password: ['', [Validators.required, Validators.minLength(6)]],
+  confirmPassword: ['', [Validators.required]],
+  preguntaSeguridad: ['', [Validators.required]],       // ✅ Nuevo
+  respuestaSeguridad: ['', [Validators.required, Validators.minLength(2)]], // ✅ Nuevo
+}, { validators: this.passwordMatchValidator });
 
   // ✅ Getters para validaciones en el HTML
   get nombre() { return this.registerForm.get('nombre'); }
@@ -52,33 +53,34 @@ export class RegisterPage {
 
   // 🚀 SUBMIT REGISTRO
   async onRegister() {
-    if (this.registerForm.invalid) return;
-
-    const loading = await this.loadingCtrl.create({
-      message: 'Creando cuenta...',
-    });
-    await loading.present();
-
-    try {
-      const { email, password, nombre, rol } = this.registerForm.value;
-
-      await this.authService.register(email, password, nombre, rol);
-
-      await loading.dismiss();
-      await this.showSuccess();
-
-      // Redirigir según el rol registrado
-      if (rol === 'admin') {
-        this.router.navigateByUrl('/admin/dashboard', { replaceUrl: true });
-      } else {
-        this.router.navigateByUrl('/home', { replaceUrl: true });
-      }
-
-    } catch (error: any) {
-      await loading.dismiss();
-      await this.showError(error.code);
-    }
+  if (this.registerForm.invalid) {
+    this.registerForm.markAllAsTouched();
+    return;
   }
+
+  const loading = await this.loadingCtrl.create({ message: 'Creando cuenta...' });
+  await loading.present();
+
+  try {
+    const { email, password, nombre, preguntaSeguridad, respuestaSeguridad } = this.registerForm.value;
+
+    await this.authService.register(email, password, nombre, 'user');
+
+    // ✅ Guardar pregunta y respuesta de seguridad
+    await this.authService.updateProfile({
+      preguntaSeguridad,
+      respuestaSeguridad: respuestaSeguridad.toLowerCase().trim() // Guardamos en minúsculas
+    });
+
+    await loading.dismiss();
+    await this.showSuccess();
+    this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
+
+  } catch (error: any) {
+    await loading.dismiss();
+    await this.showError(error.code);
+  }
+}
 
   // ✅ Alert de éxito
   private async showSuccess() {
@@ -114,4 +116,18 @@ export class RegisterPage {
   goToLogin() {
     this.router.navigateByUrl('/login');
   }
+
+  // 📋 Preguntas de seguridad disponibles
+preguntasSeguridad = [
+  '¿Cuál es el nombre de tu primera mascota?',
+  '¿En qué ciudad naciste?',
+  '¿Cuál es el nombre de tu mejor amigo de infancia?',
+  '¿Cuál es tu película favorita?',
+  '¿Cuál es el apellido de soltera de tu madre?',
+  '¿Cuál fue el nombre de tu primera escuela?',
+];
+
+// ✅ Getters nuevos
+get preguntaSeguridad() { return this.registerForm.get('preguntaSeguridad'); }
+get respuestaSeguridad() { return this.registerForm.get('respuestaSeguridad'); }
 }

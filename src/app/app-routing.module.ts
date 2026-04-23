@@ -14,16 +14,20 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./pages/auth/login/login.module').then( m => m.LoginPageModule),canActivate: [noAuthGuard]
+    loadChildren: () => import('./pages/auth/login/login.module').then( m => m.LoginPageModule),
+    canActivate: [noAuthGuard]
   },
   {
     path: 'register',
-    loadChildren: () => import('./pages/auth/register/register.module').then( m => m.RegisterPageModule),canActivate: [noAuthGuard]
+    loadChildren: () => import('./pages/auth/register/register.module').then( m => m.RegisterPageModule),
+    canActivate: [noAuthGuard]
   },
   {
     path: 'dashboard',
-    loadChildren: () => import('./pages/admin/dashboard/dashboard.module').then( m => m.DashboardPageModule),canActivate: [adminGuard]
+    loadChildren: () => import('./pages/admin/dashboard/dashboard.module').then( m => m.DashboardPageModule),
+    canActivate: [adminGuard]
   },
+  
 ];
 @NgModule({
   imports: [

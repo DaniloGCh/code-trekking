@@ -1,0 +1,134 @@
+<!-- src/app/pages/profile/profile.page.html -->
+
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
+    <ion-title>Mi Perfil</ion-title>
+
+    <ion-buttons slot="end">
+
+      <!-- 🚪 LOGOUT -->
+      <ion-button (click)="onLogout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+
+  <div *ngIf="userData">
+
+    <!-- FOTO Y NOMBRE -->
+    <div class="profile-header">
+      <div class="avatar-wrapper" (click)="onChangeFoto()">
+        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img" />
+        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon"></ion-icon>
+        <div class="avatar-overlay">
+          <ion-icon name="camera-outline"></ion-icon>
+        </div>
+      </div>
+      <h2>{{ userData.nombre }}</h2>
+      <ion-badge [color]="userData.rol === 'admin' ? 'danger' : 'primary'">
+        {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
+      </ion-badge>
+    </div>
+
+    <!-- ESTADO DE ÁNIMO -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>¿Cómo te sientes hoy?</ion-card-title>
+        <ion-card-subtitle *ngIf="userData.estado">
+          Estado actual: {{ userData.estado }}
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <!-- ✅ Un solo botón que abre el selector -->
+        <!-- 🌿 ESTADO -->
+<ion-button expand="block" fill="outline" class="btn-estado" (click)="onChangeEstado()">
+  <ion-icon name="happy-outline" slot="start"></ion-icon>
+  {{ userData.estado ? 'Cambiar estado' : 'Seleccionar estado' }}
+</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- DATOS PERSONALES -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Datos personales</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+
+          <ion-item>
+            <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <p>Nombre</p>
+              <h3>{{ userData.nombre }}</h3>
+            </ion-label>
+            <ion-button slot="end" fill="clear" (click)="onEditNombre()">
+              <ion-icon name="pencil-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <p>Correo</p>
+              <h3>{{ userData.email }}</h3>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <p>Rol</p>
+              <h3>{{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}</h3>
+            </ion-label>
+          </ion-item>
+
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- ACCIONES -->
+    <ion-card>
+  <ion-card-header>
+    <ion-card-title>Seguridad</ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+
+    <!-- 🔐 CONTRASEÑA -->
+    <ion-button expand="block" fill="outline" class="btn-trekking" (click)="onChangePassword()">
+      <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+      Cambiar contraseña
+    </ion-button>
+
+    <!-- 🚪 LOGOUT -->
+    <ion-button expand="block" fill="outline" class="btn-logout ion-margin-top" (click)="onLogout()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Cerrar sesión
+    </ion-button>
+
+    <!-- 💀 ELIMINAR -->
+    <ion-button expand="block" fill="outline" class="btn-delete ion-margin-top" (click)="onDeleteAccount()">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Eliminar mi cuenta
+    </ion-button>
+
+  </ion-card-content>
+</ion-card>
+
+  </div>
+
+  <!-- SKELETON mientras carga -->
+  <div *ngIf="!userData">
+    <ion-skeleton-text animated
+      style="height: 150px; border-radius: 50%; width: 150px; margin: auto;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="height: 200px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="height: 150px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
+  </div>
+
+</ion-content>

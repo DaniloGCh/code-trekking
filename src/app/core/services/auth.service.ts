@@ -1,16 +1,40 @@
 // src/app/core/services/auth.service.ts
 
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user } from '@angular/fire/auth';
-import { Firestore,  doc, setDoc, getDoc, collection, collectionData, updateDoc } from '@angular/fire/firestore';
+import {
+  Auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  user,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  deleteUser  // ✅ Nuevo
+} from '@angular/fire/auth';
+import {
+  Firestore,
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  collectionData,
+  updateDoc,
+  deleteDoc  // ✅ Nuevo
+} from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { inject } from '@angular/core';
+import { sendPasswordResetEmail } from '@angular/fire/auth';
 
 export interface UserData {
   uid: string;
   email: string;
   nombre: string;
   rol: 'admin' | 'user';
+  fotoBase64?: string;
+  estado?: string;
+  preguntaSeguridad?: string;  // ✅ Nuevo
+  respuestaSeguridad?: string; // ✅ Nuevo
 }
 
 @Injectable({
@@ -95,8 +119,64 @@ export class AuthService {
     await updateDoc(userRef, { rol: nuevoRol });
   }
 
+  // ✅ ACTUALIZAR PERFIL (nombre, foto, estado)
+  async updateProfile(data: Partial<UserData>): Promise<void> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) return;
+    const userRef = doc(this.firestore, `usuarios/${currentUser.uid}`);
+    await updateDoc(userRef, { ...data });
+  }
+
+  // ✅ CAMBIAR CONTRASEÑA (requiere reautenticación)
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser || !currentUser.email) throw new Error('No hay usuario autenticado');
+
+    // Reautenticar antes de cambiar contraseña
+    const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+    await reauthenticateWithCredential(currentUser, credential);
+
+    // Cambiar contraseña
+    await updatePassword(currentUser, newPassword);
+  }
+
   // ✅ VERIFICAR SI HAY SESIÓN ACTIVA
   isLoggedIn(): boolean {
     return !!this.auth.currentUser;
   }
+
+  // ✅ RESET PASSWORD
+  async resetPassword(email: string): Promise<void> {
+    await sendPasswordResetEmail(this.auth, email);
+  }
+
+  // ✅ ELIMINAR CUENTA
+async deleteAccount(password: string, respuesta: string): Promise<void> {
+  const currentUser = this.auth.currentUser;
+  if (!currentUser || !currentUser.email) throw new Error('No hay usuario autenticado');
+
+  // Verificar respuesta de seguridad
+  const userRef = doc(this.firestore, `usuarios/${currentUser.uid}`);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) throw new Error('Usuario no encontrado');
+
+  const userData = userSnap.data() as UserData;
+  const respuestaGuardada = userData.respuestaSeguridad?.toLowerCase().trim();
+  const respuestaIngresada = respuesta.toLowerCase().trim();
+
+  if (respuestaGuardada !== respuestaIngresada) {
+    throw new Error('respuesta-incorrecta');
+  }
+
+  // Reautenticar con contraseña
+  const credential = EmailAuthProvider.credential(currentUser.email, password);
+  await reauthenticateWithCredential(currentUser, credential);
+
+  // Eliminar documento de Firestore
+  await deleteDoc(userRef);
+
+  // Eliminar cuenta de Firebase Auth
+  await deleteUser(currentUser);
+}
 }

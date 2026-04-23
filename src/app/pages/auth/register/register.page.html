@@ -58,6 +58,28 @@
         </ion-note>
       </ion-item>
 
+      <!-- PREGUNTA DE SEGURIDAD -->
+<ion-item [class.ion-invalid]="preguntaSeguridad?.invalid && preguntaSeguridad?.touched">
+  <ion-label position="floating">Pregunta de seguridad</ion-label>
+  <ion-select formControlName="preguntaSeguridad" placeholder="Selecciona una pregunta">
+    <ion-select-option *ngFor="let p of preguntasSeguridad" [value]="p">
+      {{ p }}
+    </ion-select-option>
+  </ion-select>
+  <ion-note slot="error">
+    <span *ngIf="preguntaSeguridad?.errors?.['required']">Selecciona una pregunta</span>
+  </ion-note>
+</ion-item>
+
+<!-- RESPUESTA DE SEGURIDAD -->
+<ion-item [class.ion-invalid]="respuestaSeguridad?.invalid && respuestaSeguridad?.touched">
+  <ion-label position="floating">Tu respuesta</ion-label>
+  <ion-input type="text" formControlName="respuestaSeguridad"></ion-input>
+  <ion-note slot="error">
+    <span *ngIf="respuestaSeguridad?.errors?.['required']">La respuesta es requerida</span>
+    <span *ngIf="respuestaSeguridad?.errors?.['minlength']">Mínimo 2 caracteres</span>
+  </ion-note>
+</ion-item>
 
       <!-- BOTÓN REGISTRO -->
       <ion-button
