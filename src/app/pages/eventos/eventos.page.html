@@ -1,0 +1,93 @@
+<!-- src/app/pages/users/eventos/eventos.page.html -->
+
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
+    <ion-title>Eventos Trekking</ion-title>
+    <ion-buttons slot="end">
+      <!-- Unirse con código -->
+      <ion-button (click)="onUnirseConCodigo()">
+        <ion-icon slot="icon-only" name="link-outline"></ion-icon>
+      </ion-button>
+      <!-- Crear evento -->
+      <ion-button (click)="goCrearEvento()">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+
+  <ng-container *ngIf="misEventos$ | async as eventos">
+
+    <!-- Sin eventos -->
+    <div class="empty-state" *ngIf="eventos.length === 0">
+      <ion-icon name="map-outline"></ion-icon>
+      <h3>No tienes eventos aún</h3>
+      <p>Crea un evento o únete con un código de invitación</p>
+    <ion-button expand="block" class="btn-crear-evento" (click)="goCrearEvento()">
+      <ion-icon name="add-outline" slot="start"></ion-icon>
+      Crear evento
+    </ion-button>
+    </div>
+
+    <!-- Lista de eventos -->
+    <ion-card *ngFor="let evento of eventos" class="evento-card">
+      <ion-card-header>
+        <div class="evento-header">
+          <div>
+            <ion-card-title>{{ evento.nombre }}</ion-card-title>
+            <ion-card-subtitle>
+              <ion-icon name="location-outline"></ion-icon>
+              {{ evento.lugar.nombre }}
+            </ion-card-subtitle>
+          </div>
+          <!-- Badge dificultad -->
+          <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+                              evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
+            {{ evento.lugar.dificultad }}
+          </ion-badge>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-list lines="none">
+          <ion-item>
+            <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>{{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-icon name="people-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>{{ evento.participantes.length }} participante(s)</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>{{ evento.lugar.altitud }} msnm</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <div class="evento-actions">
+          <ion-button fill="outline" size="small" (click)="verEvento(evento.id!)">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver detalle
+          </ion-button>
+
+          <!-- Solo el creador puede eliminar -->
+          <ion-button
+            fill="outline"
+            color="danger"
+            size="small"
+            *ngIf="evento.creadoPor.uid === currentUid"
+            (click)="onEliminarEvento(evento)">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar
+          </ion-button>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+  </ng-container>
+
+</ion-content>

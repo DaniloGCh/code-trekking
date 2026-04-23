@@ -82,4 +82,9 @@ export class HomePage implements OnInit {
   openWeatherLink() {
     window.open('https://www.google.com/search?q=clima+santiago', '_blank');
   }
+
+    // ➕ IR A CREAR EVENTO
+  goCrearEvento() {
+    this.router.navigateByUrl('/tabs/crear-evento');
+  }
 }

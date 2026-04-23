@@ -33,11 +33,6 @@ ion-header ion-toolbar ion-icon {
    🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
    ========================================================= */
 
-ion-header {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-}
-
 /* toolbar sin elevación (clave real en Ionic) */
 ion-toolbar {
   --box-shadow: none !important;
@@ -181,5 +176,36 @@ ion-skeleton-text {
 }
 
 
+/* 🌟 BOTÓN CREAR EVENTO (full width + glass amarillo) */
+.btn-crear-evento {
+  width: 100%;
 
+  /* glass */
+  --background: rgba(7, 255, 15, 0.25);
+  --color: #fff;
+  --border-color: rgba(59, 181, 37, 0.617);
+
+  border-radius: 14px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(7, 255, 15, 0.25);
+
+  transition: all 0.3s ease;
+}
+
+/* 🖱️ HOVER */
+.btn-crear-evento:hover {
+  --background: rgba(7, 255, 15, 0.25);
+  --color: #fff;
+  border: 1px solid rgba(59, 181, 37, 0.617);
+
+}
+
+/* 👆 CLICK */
+.btn-crear-evento:active {
+  --background: rgba(27, 255, 15, 0.25);
+  transform: scale(0.97);
+}
 

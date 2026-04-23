@@ -30,6 +30,10 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () => import('./pages/users/settings/settings.module').then( m => m.SettingsPageModule)
   },
+  {
+    path: 'eventos',
+    loadChildren: () => import('./pages/eventos/eventos.module').then( m => m.EventosPageModule)
+  },
 
   
 ];

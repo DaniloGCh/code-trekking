@@ -1,0 +1,238 @@
+/* =========================================================
+   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
+   ========================================================= */
+
+/* toolbar transparente total */
+.transparent-toolbar {
+  --background: transparent !important;
+  --border-width: 0 !important;
+  --box-shadow: none !important;
+   --padding-start: 15px;
+  --padding-end: 15px;
+}
+
+/* header oculto sin dejar rastro */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 👇 CLAVE: evita fondo negro del header container */
+ion-header {
+  background: transparent !important;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+}
+
+ion-header ion-toolbar ion-icon {
+  color: #8bd58e !important; /* verde bosque */
+}
+
+/* toolbar sin elevación (clave real en Ionic) */
+ion-toolbar {
+  --box-shadow: none !important;
+  box-shadow: none !important;
+  --border-width: 0 !important;
+}
+
+/* asegura que botones no se muevan */
+ion-buttons {
+  z-index: 2;
+}
+
+/* =========================================================
+   👀 OCULTAR HEADER CON SCROLL
+   ========================================================= */
+
+ion-header {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* estado oculto */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+
+/* 🌄 FONDO */
+ion-content {
+  --background: none;
+  --background: linear-gradient(
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.45)
+    ),
+    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e') no-repeat center center / cover;
+}
+
+/* 🧭 HEADER */
+ion-header ion-toolbar {
+  --background: rgba(0, 10, 0, 0.85);
+  --color: #fff;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 🔘 BOTONES HEADER */
+ion-buttons ion-button {
+  --color: #c7f9cc;
+}
+
+/* 📌 EMPTY STATE */
+.empty-state {
+  text-align: center;
+  margin-top: 80px;
+  color: #c7f9cc;
+}
+
+.empty-state ion-icon {
+  font-size: 70px;
+  margin-bottom: 10px;
+  color: #81c784;
+}
+
+.empty-state h3 {
+  margin: 10px 0;
+  font-weight: 600;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  color: #a5d6a7;
+  margin-bottom: 16px;
+}
+
+/* 🌿 BOTÓN CREAR EVENTO */
+.empty-state ion-button {
+  --background: #2e7d32;
+  --color: #fff;
+
+  transition: all 0.3s ease;
+}
+
+.empty-state ion-button:hover {
+  --background: #388e3c;
+}
+
+.empty-state ion-button:active {
+  --background: #1b5e20;
+  transform: scale(0.97);
+}
+
+/* 🪵 CARD EVENTO */
+.evento-card {
+  background: rgba(34, 49, 34, 0.55);
+  border-radius: 16px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  margin-bottom: 16px;
+  color: #fff;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* 🖱️ HOVER CARD */
+.evento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 📌 HEADER CARD */
+.evento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 🧭 TITULOS */
+ion-card-title {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+ion-card-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #a5d6a7;
+  font-size: 0.85rem;
+}
+
+/* 🎯 BADGE */
+ion-badge {
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+/* 📄 LISTA */
+ion-list {
+  background: transparent;
+}
+
+/* 📦 ITEMS */
+ion-item {
+  --background: transparent;
+  margin-bottom: 4px;
+
+  transition: all 0.2s ease;
+}
+
+/* 🖱️ HOVER ITEM */
+ion-item:hover {
+  --background: rgba(255, 255, 255, 0.05);
+}
+
+/* 🌿 ICONOS */
+ion-item ion-icon[color="primary"] {
+  color: #2e7d32 !important;
+}
+
+/* ⚙️ ACCIONES */
+.evento-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* 🌿 BOTÓN VER */
+.evento-actions ion-button:not([color="danger"]) {
+  --color: #2e7d32;
+  --border-color: #2e7d32;
+
+  transition: all 0.25s ease;
+}
+
+.evento-actions ion-button:not([color="danger"]):hover {
+  --background: #2e7d32;
+  --color: #fff;
+}
+
+.evento-actions ion-button:not([color="danger"]):active {
+  --background: #1b5e20;
+  transform: scale(0.96);
+}
+
+/* 🔥 BOTÓN ELIMINAR */
+.evento-actions ion-button[color="danger"] {
+  --color: #c62828;
+  --border-color: #c62828;
+
+  transition: all 0.25s ease;
+}
+
+.evento-actions ion-button[color="danger"]:hover {
+  --background: #c62828;
+  --color: #fff;
+}
+
+.evento-actions ion-button[color="danger"]:active {
+  --background: #8e0000;
+  transform: scale(0.96);
+}
+

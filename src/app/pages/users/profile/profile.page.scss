@@ -33,11 +33,6 @@ ion-header ion-toolbar ion-icon {
    🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
    ========================================================= */
 
-ion-header {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-}
-
 /* toolbar sin elevación (clave real en Ionic) */
 ion-toolbar {
   --box-shadow: none !important;

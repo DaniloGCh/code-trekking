@@ -23,6 +23,11 @@ const routes: Routes = [
         loadChildren: () => import('../pages/users/settings/settings.module').then(m => m.SettingsPageModule),
         canActivate: [authGuard]
       },
+      
+      {
+        path: 'eventos',
+        loadChildren: () => import('../pages/eventos/eventos.module').then(m => m.EventosPageModule)
+      },
       {
         path: 'tab1',
         loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
