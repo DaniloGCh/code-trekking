@@ -7,7 +7,8 @@
     <!-- 🌤️ CLIMA CENTRADO -->
     <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
       <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
-      <span>{{ weatherGlobal.temperature | async }}°</span>
+      <span>{{ weatherGlobal.temperature | async }}° /</span>  
+      <span>/ {{ timeService.dateTime | async }}</span>
     </ion-button>
     <ion-buttons slot="end">
 

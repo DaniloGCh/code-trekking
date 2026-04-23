@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { UserData } from 'src/app/core/services/auth.service';
+import { TimeService } from 'src/app/core/services/time.service';
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 
 @Component({
@@ -26,7 +27,7 @@ export class HomePage implements OnInit {
   // 👤 Datos del usuario actual
   userData: UserData | null = null;
 
-  constructor(public weatherGlobal: WeatherGlobalService) { }
+  constructor(public weatherGlobal: WeatherGlobalService,public timeService: TimeService) { }
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(async user => {

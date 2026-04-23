@@ -6,6 +6,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { Observable } from 'rxjs';
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
+import { TimeService } from 'src/app/core/services/time.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,7 +36,7 @@ export class DashboardPage implements OnInit {
   totalAdmins = 0;
   totalRegulares = 0;
 
-  constructor(public weatherGlobal: WeatherGlobalService) {}
+  constructor(public weatherGlobal: WeatherGlobalService, public timeService: TimeService) { }
 
   async ngOnInit() {
     this.adminData = await this.authService.getCurrentUserData();
@@ -110,7 +111,7 @@ export class DashboardPage implements OnInit {
     this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
   }
 
-    // 👇 scroll header
+  // 👇 scroll header
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
 
@@ -123,7 +124,7 @@ export class DashboardPage implements OnInit {
     this.lastScrollTop = scrollTop;
   }
 
-    openWeatherLink() {
+  openWeatherLink() {
     window.open('https://www.google.com/search?q=clima+santiago', '_blank');
   }
 }

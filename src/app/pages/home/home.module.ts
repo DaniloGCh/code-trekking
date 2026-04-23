@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule, Routes } from '@angular/router';
 import { HomePage } from './home.page';
+import { ExploreContainerComponentModule } from "src/app/explore-container/explore-container.module";
 
 const routes: Routes = [
   {
@@ -19,6 +20,7 @@ const routes: Routes = [
     CommonModule,
     IonicModule,
     RouterModule.forChild(routes),
-  ]
+    ExploreContainerComponentModule
+]
 })
 export class HomePageModule {}
