@@ -7,69 +7,60 @@
   --background: transparent !important;
   --border-width: 0 !important;
   --box-shadow: none !important;
-   --padding-start: 15px;
+  --padding-start: 15px;
   --padding-end: 15px;
 }
 
-/* header oculto sin dejar rastro */
+/* header base */
+ion-header {
+  background: transparent !important;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* header oculto */
 ion-header.hidden {
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
 }
 
-/* 👇 CLAVE: evita fondo negro del header container */
-ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-}
-
+/* iconos header */
 ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* verde bosque */
+  color: #8bd58e !important;
 }
-/* =========================================================
-   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
-   ========================================================= */
 
-/* toolbar sin elevación (clave real en Ionic) */
+/* toolbar sin sombra */
 ion-toolbar {
   --box-shadow: none !important;
   box-shadow: none !important;
   --border-width: 0 !important;
 }
 
-/* asegura que botones no se muevan */
+/* botones header */
 ion-buttons {
   z-index: 2;
 }
 
 /* =========================================================
-   👀 OCULTAR HEADER CON SCROLL
+   🌄 FONDO GENERAL
    ========================================================= */
 
-ion-header {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* estado oculto */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-
-/* 🌄 FONDO GENERAL */
 ion-content {
   --background: linear-gradient(
       rgba(0, 0, 0, 0.4),
       rgba(0, 0, 0, 0.4)
     ),
-    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e') no-repeat center center / cover;
+    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e')
+    no-repeat center center / cover;
 }
 
-/* 🧭 HEADER */
+/* =========================================================
+   🧭 HEADER TOOLBAR
+   ========================================================= */
+
 ion-header ion-toolbar {
   --background: rgba(34, 49, 34, 0.85);
   --color: #fff;
@@ -78,7 +69,10 @@ ion-header ion-toolbar {
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* 👤 PERFIL HEADER */
+/* =========================================================
+   👤 PERFIL HEADER
+   ========================================================= */
+
 .profile-header {
   margin-top: 65px;
   text-align: center;
@@ -86,7 +80,7 @@ ion-header ion-toolbar {
   color: #fff;
 }
 
-/* 🧑‍🦱 AVATAR */
+/* avatar */
 .avatar-wrapper {
   position: relative;
   width: 150px;
@@ -108,7 +102,7 @@ ion-header ion-toolbar {
   color: #c7f9cc;
 }
 
-/* 📸 overlay cámara */
+/* overlay cámara */
 .avatar-overlay {
   position: absolute;
   bottom: 0;
@@ -133,15 +127,14 @@ ion-header ion-toolbar {
   font-size: 22px;
 }
 
-/* 🌿 BADGE */
-ion-badge {
-  margin-top: 6px;
-}
+/* =========================================================
+   🪵 CARDS GLASS
+   ========================================================= */
 
-/* 🪵 CARDS estilo glass */
 ion-card {
   background: rgba(34, 49, 34, 0.55);
   border-radius: 16px;
+
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
@@ -149,101 +142,16 @@ ion-card {
   margin-bottom: 16px;
 }
 
-
-
-
-
-/* 🌿 BASE (animación para TODOS) */
-.btn-estado,
-.btn-trekking,
-.btn-logout,
-.btn-delete {
-  transition: 
-    background 0.35s ease,
- 
-    border-color 0.35s ease,
-    transform 0.15s ease;
-}
-
-/* 🌿 ESTADO */
-.btn-estado {
-  --color: #ffffff;
-  --border-color: #2e7d32;
-}
-
-.btn-estado:hover {
-  --background: #2e7d32;
-  --color: #fff;
-  --border-color: #2e7d32;
-}
-
-.btn-estado:active {
-  --background: #1b5e20;
-  --border-color: #1b5e20;
-  transform: scale(0.96);
-}
-
-/* 🔐 CONTRASEÑA */
-.btn-trekking {
-  --color: #ffffff;
-  --border-color: #2e7d32;
-}
-
-.btn-trekking:hover {
-  --background: #2e7d32;
-  --color: #fff;
-  --border-color: #2e7d32;
-}
-
-.btn-trekking:active {
-  --background: #1b5e20;
-  --border-color: #1b5e20;
-  transform: scale(0.96);
-}
-
-/* 🚪 LOGOUT */
-.btn-logout {
-  --color: #ffffff;
-  --border-color: #c62828;
-}
-
-.btn-logout:hover {
-  --background: #c62828;
-  --color: #fff;
-  --border-color: #c62828;
-}
-
-.btn-logout:active {
-  --background: #8e0000;
-  --border-color: #8e0000;
-  transform: scale(0.96);
-}
-
-/* 💀 DELETE */
-.btn-delete {
-  --color: #fdfdfd;
-  --border-color: #ff5252;
-}
-
-.btn-delete:hover {
-  --background: #ff5252;
-  --color: #fff;
-  --border-color: #ff5252;
-}
-
-.btn-delete:active {
-  --background: #b71c1c;
-  --border-color: #b71c1c;
-  transform: scale(0.96);
-}
-
-/* 📌 TITULOS */
+/* títulos */
 ion-card-title {
   color: #c7f9cc;
   font-weight: 600;
 }
 
-/* 📄 LISTA */
+/* =========================================================
+   📋 LISTAS
+   ========================================================= */
+
 ion-list {
   background: transparent;
 }
@@ -254,35 +162,7 @@ ion-item {
   margin-bottom: 6px;
 }
 
-/* 🌿 ICONOS VERDES */
-ion-item ion-icon {
-  color: #2e7d32 !important;
-}
-
-/* ✏️ BOTÓN EDIT */
-ion-item ion-button {
-  --color: #c7f9cc;
-}
-
-/* 🔘 BOTONES */
-ion-button {
-  --border-radius: 12px;
-  font-weight: 500;
-}
-
-/* 🌿 BOTÓN NORMAL */
-ion-button[color="primary"] {
-  --color: #c7f9cc;
-  --border-color: #2e7d32;
-}
-
-/* 🔥 BOTONES PELIGRO */
-ion-button[color="danger"] {
-  --color: #ff8a80;
-  --border-color: #c62828;
-}
-
-/* 🧠 TEXTO LABEL */
+/* labels */
 ion-label p {
   color: #a5d6a7;
   font-size: 0.8rem;
@@ -293,7 +173,108 @@ ion-label h3 {
   font-weight: 500;
 }
 
-/* 💀 SKELETON */
+/* iconos */
+ion-item ion-icon {
+  color: #2e7d32 !important;
+}
+
+/* botón editar */
+ion-item ion-button {
+  --color: #c7f9cc;
+}
+
+/* =========================================================
+   🏷️ BADGE
+   ========================================================= */
+
+ion-badge {
+  margin-top: 6px;
+}
+
+/* =========================================================
+   🔘 BOTONES GENERALES
+   ========================================================= */
+
+ion-button {
+  --border-radius: 12px;
+  font-weight: 500;
+}
+
+/* primario */
+ion-button[color="primary"] {
+  --color: #c7f9cc;
+  --border-color: #2e7d32;
+}
+
+/* peligro */
+ion-button[color="danger"] {
+  --color: #ff8a80;
+  --border-color: #c62828;
+}
+
+/* =========================================================
+   🌿 BOTONES PERSONALIZADOS CON ANIMACIÓN
+   ========================================================= */
+
+.btn-estado,
+.btn-trekking,
+.btn-logout,
+.btn-delete {
+  transition: background 0.35s ease, border-color 0.35s ease, transform 0.15s ease;
+}
+
+/* estado */
+.btn-estado {
+  --color: #fff;
+  --border-color: #2e7d32;
+}
+
+.btn-estado:hover {
+  --background: #2e7d32;
+  --color: #fff;
+}
+
+.btn-estado:active {
+  --background: #1b5e20;
+  transform: scale(0.96);
+}
+
+/* logout */
+.btn-logout {
+  --color: #fff;
+  --border-color: #c62828;
+}
+
+.btn-logout:hover {
+  --background: #c62828;
+  --color: #fff;
+}
+
+.btn-logout:active {
+  --background: #8e0000;
+  transform: scale(0.96);
+}
+
+/* delete */
+.btn-delete {
+  --color: #fff;
+  --border-color: #ff5252;
+}
+
+.btn-delete:hover {
+  --background: #ff5252;
+  --color: #fff;
+}
+
+.btn-delete:active {
+  --background: #b71c1c;
+  transform: scale(0.96);
+}
+
+/* =========================================================
+   ⏳ SKELETON
+   ========================================================= */
+
 ion-skeleton-text {
   --background: rgba(255, 255, 255, 0.2);
 }

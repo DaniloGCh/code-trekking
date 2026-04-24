@@ -1,49 +1,91 @@
 // src/app/pages/users/eventos/eventos.page.ts
 
+// 🔹 Decorador para definir el componente
 import { Component, OnInit, inject } from '@angular/core';
+
+// 🔹 Router para navegación entre páginas
 import { Router } from '@angular/router';
+
+// 🔹 Controladores de Ionic para UI (alertas, toast, loading)
 import { AlertController, ToastController, LoadingController, ModalController } from '@ionic/angular';
+
+// 🔹 Observable para manejar datos reactivos
 import { Observable } from 'rxjs';
+
+// 🔹 Servicio de eventos (Firestore)
 import { EventoService } from 'src/app/core/services/evento.service';
+
+// 🔹 Servicio de autenticación
 import { AuthService } from 'src/app/core/services/auth.service';
+
+// 🔹 Modelo de evento
 import { Evento } from 'src/app/core/models/evento.model';
+
+// 🔹 Firebase Auth
 import { Auth } from '@angular/fire/auth';
 
 @Component({
-  selector: 'app-eventos',
-  templateUrl: './eventos.page.html',
-  styleUrls: ['./eventos.page.scss'],
+  selector: 'app-eventos', // Nombre del selector HTML
+  templateUrl: './eventos.page.html', // Vista HTML
+  styleUrls: ['./eventos.page.scss'], // Estilos
   standalone: false,
 })
 export class EventosPage implements OnInit {
 
-  private eventoService = inject(EventoService);
-  private authService = inject(AuthService);
-  private auth = inject(Auth);
-  private router = inject(Router);
-  private alertCtrl = inject(AlertController);
-  private toastCtrl = inject(ToastController);
-  private loadingCtrl = inject(LoadingController);
+  // =========================
+  // 🔌 INYECCIÓN DE DEPENDENCIAS
+  // =========================
 
+  private eventoService = inject(EventoService); // Servicio para manejar eventos
+  private authService = inject(AuthService);     // Servicio de autenticación
+  private auth = inject(Auth);                   // Firebase Auth
+  private router = inject(Router);               // Navegación
+  private alertCtrl = inject(AlertController);   // Alertas
+  private toastCtrl = inject(ToastController);   // Toasts (mensajes cortos)
+  private loadingCtrl = inject(LoadingController); // Loading spinner
+
+  // =========================
+  // 📊 DATOS
+  // =========================
+
+  // 🔹 Observable con los eventos donde participa el usuario
   misEventos$: Observable<Evento[]> = this.eventoService.getMisEventos();
+
+  // 🔹 UID del usuario actual
   currentUid = this.auth.currentUser?.uid;
 
-    // 🔽 header scroll
-  hideHeader = false;
-  lastScrollTop = 0;
+  // =========================
+  // 🔽 CONTROL DE HEADER CON SCROLL
+  // =========================
+  hideHeader = false;     // Indica si el header está oculto
+  lastScrollTop = 0;      // Guarda la última posición del scroll
 
-  async ngOnInit() {}
+  // =========================
+  // 🚀 CICLO DE VIDA
+  // =========================
+  async ngOnInit() {
+    // Se ejecuta al inicializar el componente
+  }
 
+  // =========================
   // ➕ IR A CREAR EVENTO
+  // =========================
   goCrearEvento() {
+    // Navega a la página de creación de eventos
     this.router.navigateByUrl('/tabs/crear-evento');
   }
 
-  // 🔑 UNIRSE CON CÓDIGO
+  // =========================
+  // 🔑 UNIRSE A EVENTO CON CÓDIGO
+  // =========================
   async onUnirseConCodigo() {
+
+    // Crear alerta con input
     const alert = await this.alertCtrl.create({
       header: 'Unirse a un evento',
       message: 'Ingresa el código de invitación',
+
+      // Campo de entrada
       inputs: [
         {
           name: 'codigo',
@@ -52,30 +94,47 @@ export class EventosPage implements OnInit {
           attributes: { maxlength: 10 }
         }
       ],
+
+      // Botones del alert
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
+
         {
           text: 'Unirse',
           handler: async (data) => {
+
+            // Validar que el código no esté vacío
             if (!data.codigo || data.codigo.trim().length === 0) {
               await this.showToast('Ingresa un código válido', 'warning');
               return false;
             }
 
+            // Mostrar loading
             const loading = await this.loadingCtrl.create({ message: 'Buscando evento...' });
             await loading.present();
 
             try {
+              // Intentar unirse al evento
               const evento = await this.eventoService.unirseConCodigo(data.codigo);
+
               await loading.dismiss();
+
+              // Mostrar éxito
               await this.showToast(`¡Te uniste a ${evento?.nombre}!`, 'success');
+
             } catch (error: any) {
               await loading.dismiss();
+
+              // Manejo de errores personalizados
               const messages: Record<string, string> = {
                 'codigo-invalido': 'El código no existe o es incorrecto.',
                 'ya-participante': 'Ya eres participante de este evento.',
               };
-              await this.showToast(messages[error.message] || 'Error al unirse al evento', 'danger');
+
+              await this.showToast(
+                messages[error.message] || 'Error al unirse al evento',
+                'danger'
+              );
             }
 
             return true;
@@ -84,33 +143,52 @@ export class EventosPage implements OnInit {
       ]
     });
 
+    // Mostrar alerta
     await alert.present();
   }
 
-  // 👁️ VER DETALLE DEL EVENTO
+  // =========================
+  // 👁️ VER DETALLE DE EVENTO
+  // =========================
   verEvento(eventoId: string) {
+    // Navega al detalle del evento usando su ID
     this.router.navigateByUrl(`/tabs/evento-detalle/${eventoId}`);
   }
 
+  // =========================
   // 🗑️ ELIMINAR EVENTO
+  // =========================
   async onEliminarEvento(evento: Evento) {
+
+    // Confirmación antes de eliminar
     const alert = await this.alertCtrl.create({
       header: 'Eliminar evento',
       message: `¿Estás seguro que deseas eliminar <strong>${evento.nombre}</strong>?`,
+
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
+
         {
           text: 'Eliminar',
           handler: async () => {
+
+            // Mostrar loading
             const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
             await loading.present();
 
             try {
+              // Llamar al servicio para eliminar
               await this.eventoService.eliminarEvento(evento.id!);
+
               await loading.dismiss();
+
+              // Mostrar éxito
               await this.showToast('Evento eliminado', 'success');
+
             } catch (error) {
               await loading.dismiss();
+
+              // Mostrar error
               await this.showToast('Error al eliminar el evento', 'danger');
             }
           }
@@ -118,30 +196,43 @@ export class EventosPage implements OnInit {
       ]
     });
 
+    // Mostrar alerta
     await alert.present();
   }
 
-  // 🍞 Toast helper
+  // =========================
+  // 🍞 TOAST HELPER
+  // =========================
   private async showToast(message: string, color: string = 'success') {
+
+    // Crear toast
     const toast = await this.toastCtrl.create({
       message,
       duration: 2500,
       color,
       position: 'bottom'
     });
+
+    // Mostrar toast
     await toast.present();
   }
 
-    // 👇 scroll header
+  // =========================
+  // 👇 CONTROL DE SCROLL PARA HEADER
+  // =========================
   onScroll(event: any) {
+
     const scrollTop = event.detail.scrollTop;
 
+    // Si baja → ocultar header
     if (scrollTop > this.lastScrollTop && scrollTop > 50) {
       this.hideHeader = true;
     } else {
+      // Si sube → mostrar header
       this.hideHeader = false;
     }
 
+    // Guardar posición actual
     this.lastScrollTop = scrollTop;
   }
 }

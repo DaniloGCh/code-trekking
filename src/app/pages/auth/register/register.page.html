@@ -1,102 +1,203 @@
 <!-- src/app/auth/register/register.page.html -->
 
+<!-- 📄 Contenedor principal con padding -->
 <ion-content class="ion-padding">
 
+  <!-- 📦 Contenedor general del registro -->
   <div class="register-container">
 
+    <!-- ========================= -->
+    <!-- 👤 HEADER REGISTRO -->
+    <!-- ========================= -->
     <div class="register-header">
+
+      <!-- Icono decorativo -->
       <ion-icon name="person-add-outline"></ion-icon>
+
+      <!-- Título -->
       <h1>Crear Cuenta</h1>
     </div>
 
+    <!-- ========================= -->
+    <!-- 📝 FORMULARIO -->
+    <!-- ========================= -->
+    <!-- [formGroup]: conecta con Reactive Forms -->
+    <!-- (ngSubmit): ejecuta función al enviar -->
     <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
 
-      <!-- NOMBRE -->
+      <!-- ========================= -->
+      <!-- 👤 NOMBRE -->
+      <!-- ========================= -->
       <ion-item [class.ion-invalid]="nombre?.invalid && nombre?.touched">
+
+        <!-- Label flotante -->
         <ion-label position="floating">Nombre completo</ion-label>
+
+        <!-- Input nombre -->
         <ion-input type="text" formControlName="nombre"></ion-input>
+
+        <!-- Mensajes de error -->
         <ion-note slot="error">
-          <span *ngIf="nombre?.errors?.['required']">El nombre es requerido</span>
-          <span *ngIf="nombre?.errors?.['minlength']">Mínimo 3 caracteres</span>
+          <span *ngIf="nombre?.errors?.['required']">
+            El nombre es requerido
+          </span>
+          <span *ngIf="nombre?.errors?.['minlength']">
+            Mínimo 3 caracteres
+          </span>
         </ion-note>
       </ion-item>
 
-      <!-- EMAIL -->
+      <!-- ========================= -->
+      <!-- 📧 EMAIL -->
+      <!-- ========================= -->
       <ion-item [class.ion-invalid]="email?.invalid && email?.touched">
+
         <ion-label position="floating">Correo electrónico</ion-label>
+
         <ion-input type="email" formControlName="email"></ion-input>
+
         <ion-note slot="error">
-          <span *ngIf="email?.errors?.['required']">El correo es requerido</span>
-          <span *ngIf="email?.errors?.['email']">Ingresa un correo válido</span>
+          <span *ngIf="email?.errors?.['required']">
+            El correo es requerido
+          </span>
+          <span *ngIf="email?.errors?.['email']">
+            Ingresa un correo válido
+          </span>
         </ion-note>
       </ion-item>
 
-      <!-- PASSWORD -->
+      <!-- ========================= -->
+      <!-- 🔒 PASSWORD -->
+      <!-- ========================= -->
       <ion-item [class.ion-invalid]="password?.invalid && password?.touched">
+
         <ion-label position="floating">Contraseña</ion-label>
-        <ion-input [type]="showPassword ? 'text' : 'password'" formControlName="password">
+
+        <!-- Input dinámico (mostrar/ocultar) -->
+        <ion-input 
+          [type]="showPassword ? 'text' : 'password'" 
+          formControlName="password">
         </ion-input>
+
+        <!-- Botón mostrar/ocultar -->
         <ion-button slot="end" fill="clear" (click)="togglePassword()">
           <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </ion-button>
+
         <ion-note slot="error">
-          <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
-          <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+          <span *ngIf="password?.errors?.['required']">
+            La contraseña es requerida
+          </span>
+          <span *ngIf="password?.errors?.['minlength']">
+            Mínimo 6 caracteres
+          </span>
         </ion-note>
       </ion-item>
 
-      <!-- CONFIRMAR PASSWORD -->
+      <!-- ========================= -->
+      <!-- 🔐 CONFIRMAR PASSWORD -->
+      <!-- ========================= -->
       <ion-item [class.ion-invalid]="confirmPassword?.touched && registerForm.errors?.['passwordMismatch']">
+
         <ion-label position="floating">Confirmar contraseña</ion-label>
-        <ion-input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword">
+
+        <!-- Input dinámico -->
+        <ion-input 
+          [type]="showConfirmPassword ? 'text' : 'password'" 
+          formControlName="confirmPassword">
         </ion-input>
+
+        <!-- Botón mostrar/ocultar -->
         <ion-button slot="end" fill="clear" (click)="toggleConfirmPassword()">
           <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </ion-button>
+
+        <!-- Error si no coinciden -->
         <ion-note slot="error">
-          <span *ngIf="registerForm.errors?.['passwordMismatch']">Las contraseñas no coinciden</span>
+          <span *ngIf="registerForm.errors?.['passwordMismatch']">
+            Las contraseñas no coinciden
+          </span>
         </ion-note>
       </ion-item>
 
-      <!-- PREGUNTA DE SEGURIDAD -->
-<ion-item [class.ion-invalid]="preguntaSeguridad?.invalid && preguntaSeguridad?.touched">
-  <ion-label position="floating">Pregunta de seguridad</ion-label>
-  <ion-select formControlName="preguntaSeguridad" placeholder="Selecciona una pregunta">
-    <ion-select-option *ngFor="let p of preguntasSeguridad" [value]="p">
-      {{ p }}
-    </ion-select-option>
-  </ion-select>
-  <ion-note slot="error">
-    <span *ngIf="preguntaSeguridad?.errors?.['required']">Selecciona una pregunta</span>
-  </ion-note>
-</ion-item>
+      <!-- ========================= -->
+      <!-- ❓ PREGUNTA DE SEGURIDAD -->
+      <!-- ========================= -->
+      <ion-item [class.ion-invalid]="preguntaSeguridad?.invalid && preguntaSeguridad?.touched">
 
-<!-- RESPUESTA DE SEGURIDAD -->
-<ion-item [class.ion-invalid]="respuestaSeguridad?.invalid && respuestaSeguridad?.touched">
-  <ion-label position="floating">Tu respuesta</ion-label>
-  <ion-input type="text" formControlName="respuestaSeguridad"></ion-input>
-  <ion-note slot="error">
-    <span *ngIf="respuestaSeguridad?.errors?.['required']">La respuesta es requerida</span>
-    <span *ngIf="respuestaSeguridad?.errors?.['minlength']">Mínimo 2 caracteres</span>
-  </ion-note>
-</ion-item>
+        <ion-label position="floating">Pregunta de seguridad</ion-label>
 
-      <!-- BOTÓN REGISTRO -->
+        <!-- Select con opciones dinámicas -->
+        <ion-select 
+          formControlName="preguntaSeguridad" 
+          placeholder="Selecciona una pregunta">
+
+          <!-- Itera sobre arreglo de preguntas -->
+          <ion-select-option 
+            *ngFor="let p of preguntasSeguridad" 
+            [value]="p">
+
+            {{ p }}
+          </ion-select-option>
+
+        </ion-select>
+
+        <!-- Error -->
+        <ion-note slot="error">
+          <span *ngIf="preguntaSeguridad?.errors?.['required']">
+            Selecciona una pregunta
+          </span>
+        </ion-note>
+      </ion-item>
+
+      <!-- ========================= -->
+      <!-- ✍️ RESPUESTA DE SEGURIDAD -->
+      <!-- ========================= -->
+      <ion-item [class.ion-invalid]="respuestaSeguridad?.invalid && respuestaSeguridad?.touched">
+
+        <ion-label position="floating">Tu respuesta</ion-label>
+
+        <ion-input type="text" formControlName="respuestaSeguridad"></ion-input>
+
+        <ion-note slot="error">
+          <span *ngIf="respuestaSeguridad?.errors?.['required']">
+            La respuesta es requerida
+          </span>
+          <span *ngIf="respuestaSeguridad?.errors?.['minlength']">
+            Mínimo 2 caracteres
+          </span>
+        </ion-note>
+      </ion-item>
+
+      <!-- ========================= -->
+      <!-- 🔘 BOTÓN REGISTRO -->
+      <!-- ========================= -->
       <ion-button
         expand="block"
         type="submit"
         class="ion-margin-top"
         [disabled]="registerForm.invalid">
+
+        <!-- Se desactiva si el formulario es inválido -->
         Crear Cuenta
       </ion-button>
 
     </form>
 
-    <!-- IR A LOGIN -->
+    <!-- ========================= -->
+    <!-- 🔗 IR A LOGIN -->
+    <!-- ========================= -->
     <div class="login-link">
-      <p>¿Ya tienes cuenta?
-        <span (click)="goToLogin()">Inicia sesión aquí</span>
+
+      <p>
+        ¿Ya tienes cuenta?
+
+        <!-- Link clickeable -->
+        <span (click)="goToLogin()">
+          Inicia sesión aquí
+        </span>
       </p>
+
     </div>
 
   </div>

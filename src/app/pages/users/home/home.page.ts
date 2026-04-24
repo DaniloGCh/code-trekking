@@ -16,22 +16,30 @@ import { WeatherGlobalService } from 'src/app/core/services/weather-global.servi
 })
 export class HomePage implements OnInit {
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private alertCtrl = inject(AlertController);
+  // 🔧 Inyección de servicios necesarios
+  private authService = inject(AuthService); // Manejo de autenticación
+  private router = inject(Router); // Navegación entre páginas
+  private alertCtrl = inject(AlertController); // Alertas modales
 
-  // 🔽 header scroll
-  hideHeader = false;
-  lastScrollTop = 0;
+  // 🔽 Control del header según scroll
+  hideHeader = false; // Ocultar/mostrar header dinámicamente
+  lastScrollTop = 0; // Guarda posición anterior del scroll
 
-  // 👤 Datos del usuario actual
+  // 👤 Datos del usuario autenticado
   userData: UserData | null = null;
 
-  constructor(public weatherGlobal: WeatherGlobalService,public timeService: TimeService) { }
+  // 🌤️ Servicios públicos para clima y hora
+  constructor(
+    public weatherGlobal: WeatherGlobalService,
+    public timeService: TimeService
+  ) {}
 
+  // 🚀 Se ejecuta al iniciar el componente
   ngOnInit() {
+    // 🔐 Escucha cambios del usuario autenticado
     this.authService.currentUser$.subscribe(async user => {
       if (user) {
+        // 📥 Obtiene datos completos del usuario desde Firestore
         this.userData = await this.authService.getCurrentUserData();
         console.log('USER DATA:', this.userData);
       }
@@ -40,6 +48,7 @@ export class HomePage implements OnInit {
 
   // 🚪 CERRAR SESIÓN
   async onLogout() {
+    // 🧾 Confirmación antes de cerrar sesión
     const alert = await this.alertCtrl.create({
       header: 'Cerrar sesión',
       message: '¿Estás seguro que deseas cerrar sesión?',
@@ -52,7 +61,10 @@ export class HomePage implements OnInit {
           text: 'Cerrar sesión',
           role: 'confirm',
           handler: async () => {
+            // 🔓 Cierra sesión en Firebase Auth
             await this.authService.logout();
+
+            // 🔁 Redirige al login
             this.router.navigateByUrl('/login', { replaceUrl: true });
           }
         }
@@ -62,28 +74,33 @@ export class HomePage implements OnInit {
     await alert.present();
   }
 
+  // 🏠 Ir al dashboard
   goDashboard() {
     this.router.navigateByUrl('/dashboard', { replaceUrl: true });
   }
 
-  // 👇 scroll header
+  // 📜 Detecta scroll para ocultar/mostrar header
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
 
+    // 🔽 Si baja scroll, oculta header
     if (scrollTop > this.lastScrollTop && scrollTop > 50) {
       this.hideHeader = true;
     } else {
+      // 🔼 Si sube scroll, muestra header
       this.hideHeader = false;
     }
 
+    // 📌 Actualiza posición anterior
     this.lastScrollTop = scrollTop;
   }
 
+  // 🌤️ Abre búsqueda de clima en Google
   openWeatherLink() {
     window.open('https://www.google.com/search?q=clima+santiago', '_blank');
   }
 
-    // ➕ IR A CREAR EVENTO
+  // ➕ Navegar a crear evento
   goCrearEvento() {
     this.router.navigateByUrl('/tabs/crear-evento');
   }

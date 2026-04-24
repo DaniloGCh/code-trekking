@@ -1,0 +1,27 @@
+// src/app/pages/users/crear-evento/crear-evento.page.scss
+
+ion-item {
+  margin-bottom: 8px;
+  border-radius: 8px;
+}
+
+.lugar-info-card {
+  border-radius: 16px;
+  margin-top: 16px;
+  border-left: 4px solid var(--ion-color-primary);
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+
+    h3 {
+      font-weight: 600;
+      white-space: normal;
+    }
+
+    p {
+      font-size: 0.75rem;
+      color: var(--ion-color-medium);
+    }
+  }
+}

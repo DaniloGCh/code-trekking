@@ -23,11 +23,18 @@ const routes: Routes = [
         loadChildren: () => import('../pages/users/settings/settings.module').then(m => m.SettingsPageModule),
         canActivate: [authGuard]
       },
-      
+
       {
         path: 'eventos',
-        loadChildren: () => import('../pages/eventos/eventos.module').then(m => m.EventosPageModule),
-        canActivate: [authGuard]
+        loadChildren: () => import('../pages/users/eventos/eventos.module').then(m => m.EventosPageModule)
+      },
+      {
+        path: 'crear-evento',
+        loadChildren: () => import('../pages/users/crear-evento/crear-evento.module').then(m => m.CrearEventoPageModule)
+      },
+      {
+        path: 'evento-detalle/:id', // ✅ Corregido
+        loadChildren: () => import('../pages/users/evento-detalle/evento-detalle.module').then(m => m.EventoDetallePageModule)
       },
       {
         path: 'tab1',

@@ -1,21 +1,21 @@
-// src/app/pages/users/eventos/eventos.module.ts
+// src/app/pages/users/evento-detalle/evento-detalle.module.ts
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule, Routes } from '@angular/router';
-import { EventosPage } from './eventos.page';
+import { EventoDetallePage } from './evento-detalle.page';
 
 const routes: Routes = [
-  { path: '', component: EventosPage }
+  { path: '', component: EventoDetallePage }
 ];
 
 @NgModule({
-  declarations: [EventosPage],
+  declarations: [EventoDetallePage],
   imports: [
     CommonModule,
     IonicModule,
     RouterModule.forChild(routes),
   ]
 })
-export class EventosPageModule {}
+export class EventoDetallePageModule {}

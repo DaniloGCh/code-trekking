@@ -1,15 +1,33 @@
 <!-- src/app/pages/admin/dashboard/dashboard.page.html -->
 
-<ion-header [class.hidden]="hideHeader">
-  <ion-toolbar class="transparent-toolbar">
+<!-- ========================= -->
+<!-- 🔝 HEADER -->
+<!-- ========================= -->
+<ion-header [class.hidden]="hideHeader"> <!-- Se oculta dinámicamente al hacer scroll -->
+  <ion-toolbar class="transparent-toolbar"> <!-- Toolbar personalizada -->
+
+    <!-- 🧩 Título del panel -->
     <ion-title>Admin</ion-title>
 
-    <!-- 🌤️ CLIMA CENTRADO -->
+    <!-- ========================= -->
+    <!-- 🌤️ CLIMA + HORA -->
+    <!-- ========================= -->
+    <!-- Botón central que muestra clima y hora -->
     <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
+      
+      <!-- Icono dinámico según el clima -->
       <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
+
+      <!-- Temperatura actual -->
       <span>{{ weatherGlobal.temperature | async }}° </span>
+
+      <!-- Hora actual -->
       <span>| {{ timeService.dateTime | async }}</span>
     </ion-button>
+
+    <!-- ========================= -->
+    <!-- 🔘 BOTONES DERECHA -->
+    <!-- ========================= -->
     <ion-buttons slot="end">
 
       <!-- 🏠 BOTÓN HOME -->
@@ -17,7 +35,7 @@
         <ion-icon slot="icon-only" name="home-outline"></ion-icon>
       </ion-button>
 
-      <!-- 🚪 LOGOUT -->
+      <!-- 🚪 BOTÓN LOGOUT -->
       <ion-button (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
@@ -26,48 +44,70 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- ========================= -->
+<!-- 📄 CONTENIDO PRINCIPAL -->
+<!-- ========================= -->
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+  <!-- (ionScroll): detecta scroll -->
+  <!-- [scrollEvents]="true": habilita eventos de scroll -->
 
-  <!-- BIENVENIDA -->
+  <!-- ========================= -->
+  <!-- 👋 BIENVENIDA -->
+  <!-- ========================= -->
   <div class="welcome-header" *ngIf="adminData">
+    <!-- *ngIf: solo muestra si hay datos del admin -->
+
+    <!-- Icono decorativo -->
     <ion-icon name="shield-checkmark-outline"></ion-icon>
+
     <div>
+      <!-- Nombre del administrador -->
       <h2>¡Hola, {{ adminData.nombre }}!</h2>
-      <p>Bienvenido a tu dashboard administrativo.
-        Gestiona la plataforma de forma eficiente y segura.</p>
+
+      <!-- Mensaje de bienvenida -->
+      <p>
+        Bienvenido a tu dashboard administrativo.
+        Gestiona la plataforma de forma eficiente y segura.
+      </p>
     </div>
   </div>
 
-  <!-- ESTADÍSTICAS -->
+  <!-- ========================= -->
+  <!-- 📊 ESTADÍSTICAS -->
+  <!-- ========================= -->
   <h3 class="section-title">Estadísticas</h3>
-  <ion-grid>
+
+  <ion-grid> <!-- Sistema de grillas de Ionic -->
     <ion-row>
 
+      <!-- 🔢 TOTAL USUARIOS -->
       <ion-col size="4">
         <ion-card class="stat-card total">
           <ion-card-content>
             <ion-icon name="people-outline"></ion-icon>
-            <h2>{{ totalUsers }}</h2>
+            <h2>{{ totalUsers }}</h2> <!-- Total de usuarios -->
             <p>Total</p>
           </ion-card-content>
         </ion-card>
       </ion-col>
 
+      <!-- 🛡️ ADMINISTRADORES -->
       <ion-col size="4">
         <ion-card class="stat-card admins">
           <ion-card-content>
             <ion-icon name="shield-outline"></ion-icon>
-            <h2>{{ totalAdmins }}</h2>
+            <h2>{{ totalAdmins }}</h2> <!-- Total admins -->
             <p>Admins</p>
           </ion-card-content>
         </ion-card>
       </ion-col>
 
+      <!-- 👤 USUARIOS NORMALES -->
       <ion-col size="4">
         <ion-card class="stat-card users">
           <ion-card-content>
             <ion-icon name="person-outline"></ion-icon>
-            <h2>{{ totalRegulares }}</h2>
+            <h2>{{ totalRegulares }}</h2> <!-- Total usuarios normales -->
             <p>Usuarios</p>
           </ion-card-content>
         </ion-card>
@@ -76,24 +116,37 @@
     </ion-row>
   </ion-grid>
 
-  <!-- LISTA DE USUARIOS -->
+  <!-- ========================= -->
+  <!-- 👥 LISTA DE USUARIOS -->
+  <!-- ========================= -->
   <h3 class="section-title">Usuarios registrados</h3>
-  <ion-list>
-    <ion-item *ngFor="let user of users$ | async">
 
+  <ion-list>
+
+    <!-- 🔁 Itera sobre la lista de usuarios -->
+    <ion-item *ngFor="let user of users$ | async">
+      <!-- async: se suscribe automáticamente al observable -->
+
+      <!-- 👤 Avatar del usuario -->
       <ion-avatar slot="start">
         <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
       </ion-avatar>
 
+      <!-- 📄 Información del usuario -->
       <ion-label>
-        <h3>{{ user.nombre }}</h3>
-        <p>{{ user.email }}</p>
+        <h3>{{ user.nombre }}</h3> <!-- Nombre -->
+        <p>{{ user.email }}</p>    <!-- Email -->
       </ion-label>
 
-      <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
+      <!-- 🏷️ Rol del usuario -->
+      <ion-badge 
+        slot="end" 
+        [color]="user.rol === 'admin' ? 'danger' : 'primary'">
+        
         {{ user.rol === 'admin' ? 'Admin' : 'User' }}
       </ion-badge>
 
+      <!-- 🔄 Botón para cambiar rol -->
       <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
         <ion-icon name="swap-horizontal-outline"></ion-icon>
       </ion-button>

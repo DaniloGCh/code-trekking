@@ -1,40 +1,57 @@
-/* 🌄 Fondo tipo trekking */
+/* =========================================================
+   🌄 FONDO PRINCIPAL (ESTILO TREKKING)
+   ========================================================= */
+
 ion-content {
-  --background: none;
+  --background: none; /* Elimina el fondo por defecto de Ionic */
+
+  /* Fondo con imagen + overlay oscuro para mejorar legibilidad */
   background: linear-gradient(
-      rgba(0, 0, 0, 0.65),
-      rgba(0, 0, 0, 0.75)
+      rgba(0, 0, 0, 0.65), /* Oscurece parte superior */
+      rgba(0, 0, 0, 0.75)  /* Oscurece parte inferior */
     ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") 
+    no-repeat center/cover;
+
+  display: flex;             /* Permite centrar contenido */
+  align-items: center;       /* Centrado vertical */
+  justify-content: center;   /* Centrado horizontal */
 }
 
-/* 📦 Contenedor principal */
+/* =========================================================
+   📦 CONTENEDOR LOGIN
+   ========================================================= */
+
 .login-container {
-  width: 100%;
-  max-width: 420px;
+  width: 100%;        /* Ocupa todo el ancho disponible */
+  max-width: 420px;   /* Ancho máximo (responsive) */
   margin: auto;
   padding: 25px;
   border-radius: 20px;
 
-  background: rgba(34, 49, 34, 0.55); /* verde bosque translúcido */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* Fondo tipo glassmorphism */
+  background: rgba(34, 49, 34, 0.55); /* Verde bosque translúcido */
 
+  backdrop-filter: blur(10px);         /* Desenfoque fondo */
+  -webkit-backdrop-filter: blur(10px); /* Compatibilidad Safari */
+
+  /* Sombra para dar profundidad */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  color: #fff;
+
+  color: #fff; /* Texto blanco */
 }
 
-/* 🧭 Header login */
+/* =========================================================
+   🧭 HEADER LOGIN
+   ========================================================= */
+
 .login-header {
-  text-align: center;
+  text-align: center;  /* Centra contenido */
   margin-bottom: 25px;
 
   ion-icon {
-    font-size: 70px;
-    color: #a3d977; /* verde trekking */
+    font-size: 70px;       /* Tamaño grande del icono */
+    color: #a3d977;        /* Verde trekking */
   }
 
   h1 {
@@ -45,56 +62,73 @@ ion-content {
   }
 }
 
-/* 🧾 Inputs */
+/* =========================================================
+   🧾 INPUTS (ION-ITEM)
+   ========================================================= */
+
 ion-item {
-  --background: rgba(255, 255, 255, 0.08);
+  --background: rgba(255, 255, 255, 0.08); /* Fondo translúcido */
   border-radius: 12px;
   margin-bottom: 15px;
 
+  /* Efecto blur */
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 
-  --color: #fff;
+  --color: #fff; /* Color del texto */
 }
 
-/* 🟥 errores */
+/* =========================================================
+   🟥 MENSAJES DE ERROR
+   ========================================================= */
+
 ion-note {
-  color: #ffb3b3;
-  font-size: 0.75rem;
+  color: #ffb3b3;   /* Color rojo claro */
+  font-size: 0.75rem; /* Tamaño pequeño */
 }
 
-/* 🔘 botón login */
+/* =========================================================
+   🔘 BOTÓN LOGIN
+   ========================================================= */
+
 ion-button[type="submit"] {
-  --background: #2e7d32; /* verde bosque */
+  --background: #2e7d32; /* Verde bosque */
   --border-radius: 12px;
   font-weight: bold;
   margin-top: 15px;
 
+  /* Sombra para efecto de elevación */
   --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* 👁 botón ojo password */
+/* =========================================================
+   👁 BOTÓN MOSTRAR PASSWORD
+   ========================================================= */
+
 ion-button[slot="end"] {
-  --color: #c7f9cc;
+  --color: #c7f9cc; /* Verde claro */
 }
 
-/* 🔗 registro */
+/* =========================================================
+   🔗 LINK REGISTRO
+   ========================================================= */
+
 .register-link {
   text-align: center;
   margin-top: 20px;
 
   p {
-    color: #ddd;
+    color: #ddd;         /* Texto gris claro */
     font-size: 0.9rem;
   }
 
   span {
-    color: #a3d977;
+    color: #a3d977;      /* Verde destacado */
     font-weight: bold;
-    cursor: pointer;
+    cursor: pointer;     /* Cursor tipo link */
   }
 
   span:hover {
-    text-decoration: underline;
+    text-decoration: underline; /* Subrayado al pasar el mouse */
   }
 }

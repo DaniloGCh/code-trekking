@@ -35,9 +35,21 @@ const routes: Routes = [
   },
   {
     path: 'eventos',
-    loadChildren: () => import('./pages/eventos/eventos.module').then( m => m.EventosPageModule),
+    loadChildren: () => import('./pages/users/eventos/eventos.module').then( m => m.EventosPageModule),
     canActivate: [authGuard]
+  },  {
+    path: 'crear-evento',
+    loadChildren: () => import('./pages/users/crear-evento/crear-evento.module').then( m => m.CrearEventoPageModule)
   },
+  {
+    path: 'evento-detalle',
+    loadChildren: () => import('./pages/users/evento-detalle/evento-detalle.module').then( m => m.EventoDetallePageModule)
+  },
+  {
+    path: 'foro',
+    loadChildren: () => import('./pages/users/foro/foro.module').then( m => m.ForoPageModule)
+  },
+
 
   
 ];

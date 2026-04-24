@@ -25,3 +25,12 @@ export interface Evento {
   participantes: string[];
   creadoEn: any;
 }
+
+// ✅ Agrega esta interfaz
+export interface MensajeForo {
+  id?: string;
+  texto: string;
+  autorUid: string;
+  autorNombre: string;
+  creadoEn: any;
+}

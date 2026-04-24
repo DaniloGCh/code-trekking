@@ -1,0 +1,172 @@
+<!-- src/app/pages/users/eventos/eventos.page.html -->
+
+<!-- ========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
+<ion-header [class.hidden]="hideHeader">
+  <!-- Se oculta dinámicamente con scroll -->
+
+  <ion-toolbar class="transparent-toolbar">
+    
+    <!-- Título de la página -->
+    <ion-title>Eventos Trekking</ion-title>
+
+    <!-- Botones a la derecha -->
+    <ion-buttons slot="end">
+
+      <!-- 🔑 Botón: Unirse con código -->
+      <ion-button (click)="onUnirseConCodigo()">
+        <ion-icon slot="icon-only" name="link-outline"></ion-icon>
+      </ion-button>
+
+      <!-- ➕ Botón: Crear evento -->
+      <ion-button (click)="goCrearEvento()">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<!-- ========================= -->
+<!-- 📄 CONTENIDO -->
+<!-- ========================= -->
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+  <!-- (ionScroll): detecta scroll para ocultar header -->
+
+  <!-- ng-container evita agregar nodos extra al DOM -->
+  <ng-container class="eventos-wrapper"  *ngIf="misEventos$ | async as eventos">
+    <!-- async pipe se suscribe automáticamente al observable -->
+
+    <!-- ========================= -->
+    <!-- 🚫 ESTADO VACÍO -->
+    <!-- ========================= -->
+    <div class="empty-state" *ngIf="eventos.length === 0">
+
+      <!-- Icono ilustrativo -->
+      <ion-icon name="map-outline"></ion-icon>
+
+      <!-- Mensaje -->
+      <h3>No tienes eventos aún</h3>
+      <p>Crea un evento o únete con un código de invitación</p>
+
+      <!-- Botón para crear evento -->
+      <ion-button 
+        expand="block" 
+        class="btn-crear-evento" 
+        (click)="goCrearEvento()">
+
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Crear evento
+      </ion-button>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 📋 LISTA DE EVENTOS -->
+    <!-- ========================= -->
+
+    <!-- Itera sobre cada evento -->
+    <ion-card *ngFor="let evento of eventos" class="evento-card first-space">
+
+      <!-- 🔝 HEADER DEL CARD -->
+      <ion-card-header>
+
+        <div class="evento-header">
+
+          <!-- Info principal -->
+          <div>
+
+            <!-- Nombre del evento -->
+            <ion-card-title>{{ evento.nombre }}</ion-card-title>
+            <br>
+
+            <!-- Lugar -->
+            <ion-card-subtitle>
+              <ion-icon name="location-outline"></ion-icon>
+              {{ evento.lugar.nombre }}
+            </ion-card-subtitle>
+
+          </div>
+
+          <!-- 🏷️ Badge de dificultad -->
+          <ion-badge 
+            [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+                     evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
+
+            {{ evento.lugar.dificultad }}
+          </ion-badge>
+
+        </div>
+      </ion-card-header>
+
+      <!-- 📦 CONTENIDO DEL CARD -->
+      <ion-card-content>
+
+        <!-- Lista de detalles -->
+        <ion-list lines="none">
+
+          <!-- 📅 Fecha y hora -->
+          <ion-item>
+            <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+
+            <!-- fecha.toDate(): convierte timestamp de Firebase -->
+            <ion-label>
+              {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+            </ion-label>
+          </ion-item>
+
+          <!-- 👥 Participantes -->
+          <ion-item>
+            <ion-icon name="people-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              {{ evento.participantes.length }} participante(s)
+            </ion-label>
+          </ion-item>
+
+          <!-- ⛰️ Altitud -->
+          <ion-item>
+            <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              {{ evento.lugar.altitud }} msnm
+            </ion-label>
+          </ion-item>
+
+        </ion-list>
+
+        <!-- ========================= -->
+        <!-- 🎮 ACCIONES DEL EVENTO -->
+        <!-- ========================= -->
+        <div class="evento-actions">
+
+          <!-- 👁️ Ver detalle -->
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="verEvento(evento.id!)">
+
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver detalle
+          </ion-button>
+
+          <!-- 🗑️ Eliminar (solo creador) -->
+          <ion-button
+            fill="outline"
+            color="danger"
+            size="small"
+
+            *ngIf="evento.creadoPor.uid === currentUid"
+
+            (click)="onEliminarEvento(evento)">
+
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar
+          </ion-button>
+
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+  </ng-container>
+
+</ion-content>

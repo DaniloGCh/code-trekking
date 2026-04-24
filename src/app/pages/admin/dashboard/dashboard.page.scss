@@ -4,30 +4,31 @@
 
 /* toolbar transparente total */
 .transparent-toolbar {
-  --background: transparent !important;
-  --border-width: 0 !important;
-  --box-shadow: none !important;
-   --padding-start: 15px;
-  --padding-end: 15px;
+  --background: transparent !important;   /* Fondo completamente transparente */
+  --border-width: 0 !important;           /* Sin borde */
+  --box-shadow: none !important;          /* Sin sombra */
+  --padding-start: 15px;                  /* Espaciado interno izquierdo */
+  --padding-end: 15px;                    /* Espaciado interno derecho */
 }
 
 /* header oculto sin dejar rastro */
 ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
+  transform: translateY(-100%); /* Mueve el header hacia arriba fuera de la vista */
+  opacity: 0;                   /* Lo hace invisible */
+  pointer-events: none;         /* Evita interacción (clics, etc.) */
 }
 
 /* 👇 CLAVE: evita fondo negro del header container */
 ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
+  background: transparent !important; /* Elimina fondo por defecto */
+  position: absolute;                 /* Permite superposición sobre el contenido */
+  width: 100%;                       /* Ocupa todo el ancho */
+  z-index: 10;                       /* Se mantiene sobre otros elementos */
 }
 
+/* 🎨 Color de iconos del header */
 ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* verde bosque */
+  color: #8bd58e !important; /* Verde estilo naturaleza */
 }
   
 /* =========================================================
@@ -36,16 +37,14 @@ ion-header ion-toolbar ion-icon {
 
 /* toolbar sin elevación (clave real en Ionic) */
 ion-toolbar {
-  --box-shadow: none !important;
-  box-shadow: none !important;
-  --border-width: 0 !important;
+  --box-shadow: none !important; /* Elimina sombra interna de Ionic */
+  box-shadow: none !important;   /* Elimina sombra estándar */
+  --border-width: 0 !important;  /* Sin borde */
 }
-
-
 
 /* asegura que botones no se muevan */
 ion-buttons {
-  z-index: 2;
+  z-index: 2; /* Mantiene los botones por encima de otros elementos */
 }
 
 /* =========================================================
@@ -54,55 +53,70 @@ ion-buttons {
 
 ion-header {
   transition: transform 0.3s ease, opacity 0.3s ease;
+  /* Animación suave al ocultar/mostrar */
 }
 
 /* estado oculto */
 ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
+  transform: translateY(-100%); /* Se desliza hacia arriba */
+  opacity: 0;                   /* Se desvanece */
 }
 
-/* 🌄 Fondo tipo trekking */
+/* =========================================================
+   🌄 FONDO PRINCIPAL (ESTILO TREKKING)
+   ========================================================= */
+
 ion-content {
-  --background: none;
+  --background: none; /* Elimina fondo por defecto de Ionic */
+
+  /* Fondo con imagen + overlay oscuro */
   background: linear-gradient(
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 0, 0, 0.7)
+      rgba(0, 0, 0, 0.55), /* Oscurece parte superior */
+      rgba(0, 0, 0, 0.7)   /* Oscurece parte inferior */
     ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
-  color: #fff;
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") 
+    no-repeat center/cover;
+
+  color: #fff; /* Texto en blanco */
 }
 
-/* 🧭 HEADER */
+/* =========================================================
+   🧭 HEADER VISUAL
+   ========================================================= */
+
 ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85); /* verde bosque */
-  --color: #fff;
+  --background: rgba(34, 49, 34, 0.85); /* Verde oscuro translúcido */
+  --color: #fff;                        /* Texto blanco */
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);           /* Efecto desenfoque */
+  -webkit-backdrop-filter: blur(8px);   /* Compatibilidad Safari */
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Línea sutil */
 }
 
+/* =========================================================
+   👋 HEADER DE BIENVENIDA
+   ========================================================= */
 
-/* 🧭 Header bienvenida */
 .welcome-header {
-  margin-top: 65px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
+  margin-top: 65px;        /* Espacio para no chocar con header */
+  display: flex;           /* Layout flexible */
+  align-items: center;     /* Alineación vertical */
+  gap: 15px;               /* Espacio entre elementos */
   margin-bottom: 20px;
   padding: 15px;
   border-radius: 15px;
 
-  background: rgba(34, 49, 34, 0.6); /* verde oscuro translúcido */
-    /* Compatibilidad */
-  -webkit-backdrop-filter: blur(6px); /* Safari */
-  backdrop-filter: blur(6px);         /* Navegadores modernos */
+  background: rgba(34, 49, 34, 0.6); /* Fondo verde translúcido */
 
+  /* Compatibilidad blur */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+
+  /* 🎯 Estilos internos */
   ion-icon {
     font-size: 40px;
-    color: #a3d977; /* verde trekking */
+    color: #a3d977; /* Verde trekking */
   }
 
   h2 {
@@ -118,27 +132,34 @@ ion-header ion-toolbar {
   }
 }
 
-/* 🏔️ Títulos de sección */
+/* =========================================================
+   🏔️ TÍTULOS DE SECCIÓN
+   ========================================================= */
+
 .section-title {
   margin: 15px 0 10px;
   font-size: 1.2rem;
   font-weight: bold;
-  color: #c7f9cc; /* verde claro */
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  color: #c7f9cc; /* Verde claro */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Sombra de texto */
 }
 
-/* 📊 Cards estadísticas estilo trekking */
+/* =========================================================
+   📊 TARJETAS DE ESTADÍSTICAS
+   ========================================================= */
+
 .stat-card {
   border-radius: 15px;
   text-align: center;
   color: #fff;
-    /* Compatibilidad */
-  -webkit-backdrop-filter: blur(8px); /* Safari */
-  backdrop-filter: blur(8px);         /* Navegadores modernos */
+
+  /* Efecto glassmorphism */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 
   ion-card-content {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Apila elementos verticalmente */
     align-items: center;
     gap: 5px;
   }
@@ -159,35 +180,41 @@ ion-header ion-toolbar {
   }
 }
 
-/* 🌿 Variantes de tarjetas */
+/* 🌿 Variantes de tarjetas (colores distintos) */
+
 .stat-card.total {
-  background: rgba(85, 107, 47, 0.7); /* verde oliva */
+  background: rgba(85, 107, 47, 0.7); /* Verde oliva */
 }
 
 .stat-card.admins {
-  background: rgba(139, 69, 19, 0.7); /* café tierra */
+  background: rgba(139, 69, 19, 0.7); /* Café tierra */
 }
 
 .stat-card.users {
-  background: rgba(34, 139, 34, 0.7); /* verde bosque */
+  background: rgba(34, 139, 34, 0.7); /* Verde bosque */
 }
 
-/* 👥 Lista de usuarios */
+/* =========================================================
+   👥 LISTA DE USUARIOS
+   ========================================================= */
+
 ion-list {
-  background: transparent;
+  background: transparent; /* Sin fondo */
   margin: 15px;
 }
 
 /* 🪵 Items estilo natural */
+
 ion-item {
-  --background: rgba(163, 87, 0, 0.26);
+  --background: rgba(163, 87, 0, 0.26); /* Fondo translúcido cálido */
   margin-bottom: 8px;
   border-radius: 12px;
 
-  /* Compatibilidad */
-  -webkit-backdrop-filter: blur(5px); /* Safari */
-  backdrop-filter: blur(5px);         /* Navegadores modernos */
+  /* Efecto blur */
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 
+  /* Texto */
   ion-label h3 {
     font-weight: 600;
     color: #ffffff;
@@ -199,23 +226,33 @@ ion-item {
   }
 }
 
-/* 🧍 Avatar */
+/* =========================================================
+   🧍 AVATAR
+   ========================================================= */
+
 ion-avatar ion-icon {
-  color: #c7f9cc;
+  color: #c7f9cc; /* Verde claro */
 }
 
-/* 🔘 Botones */
+/* =========================================================
+   🔘 BOTONES
+   ========================================================= */
+
 ion-button {
-  --color: #c7f9cc;
+  --color: #c7f9cc; /* Color verde claro */
 }
 
-/* 🏷️ Badge */
+/* =========================================================
+   🏷️ BADGES
+   ========================================================= */
+
 ion-badge {
   font-weight: bold;
 }
 
+/* 🔧 Ajuste adicional de títulos */
 .section-title {
-  margin: 20px 0 10px 15px;
+  margin: 20px 0 10px 15px; /* Espaciado lateral */
   padding-left: 5px;
   font-weight: 600;
 }
