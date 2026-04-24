@@ -1,5 +1,3 @@
-// src/app/pages/users/settings/settings.page.ts
-
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';

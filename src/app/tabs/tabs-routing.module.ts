@@ -26,15 +26,23 @@ const routes: Routes = [
 
       {
         path: 'eventos',
-        loadChildren: () => import('../pages/users/eventos/eventos.module').then(m => m.EventosPageModule)
+        loadChildren: () => import('../pages/users/eventos/eventos.module').then(m => m.EventosPageModule),
+        canActivate: [authGuard]
       },
       {
         path: 'crear-evento',
-        loadChildren: () => import('../pages/users/crear-evento/crear-evento.module').then(m => m.CrearEventoPageModule)
+        loadChildren: () => import('../pages/users/crear-evento/crear-evento.module').then(m => m.CrearEventoPageModule),
+        canActivate: [authGuard]
       },
       {
         path: 'evento-detalle/:id', // ✅ Corregido
-        loadChildren: () => import('../pages/users/evento-detalle/evento-detalle.module').then(m => m.EventoDetallePageModule)
+        loadChildren: () => import('../pages/users/evento-detalle/evento-detalle.module').then(m => m.EventoDetallePageModule),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'foro/:eventoId/:organizadorUid',
+        loadChildren: () => import('../pages/users/foro/foro.module').then(m => m.ForoPageModule),
+        canActivate: [authGuard]
       },
       {
         path: 'tab1',
@@ -44,10 +52,7 @@ const routes: Routes = [
         path: 'tab2',
         loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
       },
-      {
-        path: 'tab3',
-        loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
-      },
+
       {
         path: '',
         redirectTo: 'home',   // ✅ AQUÍ ES LA CLAVE

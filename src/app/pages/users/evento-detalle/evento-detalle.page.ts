@@ -31,23 +31,39 @@ export class EventoDetallePage implements OnInit {
   currentUid = this.auth.currentUser?.uid;
   esCreadoPor = false;
 
-  async ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) return;
+  // ✅ Agrega esta propiedad
+mensajesNuevos = 0;
 
-    const loading = await this.loadingCtrl.create({ message: 'Cargando evento...' });
-    await loading.present();
+hideHeader = false;     // Indica si el header está oculto
+  lastScrollTop = 0;      // Guarda la última posición del scroll
 
-    try {
-      this.evento = await this.eventoService.getEventoById(id);
-      this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
-      await loading.dismiss();
-    } catch (error) {
-      await loading.dismiss();
-      await this.showToast('Error al cargar el evento', 'danger');
-      this.goBack();
+
+async ngOnInit() {
+  const id = this.route.snapshot.paramMap.get('id');
+  if (!id) return;
+
+  const loading = await this.loadingCtrl.create({ message: 'Cargando evento...' });
+  await loading.present();
+
+  try {
+    this.evento = await this.eventoService.getEventoById(id);
+    this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
+
+    // ✅ Contar mensajes nuevos
+    if (this.evento && this.currentUid) {
+      this.mensajesNuevos = await this.eventoService.contarMensajesNuevos(
+        this.evento.id!,
+        this.currentUid
+      );
     }
+
+    await loading.dismiss();
+  } catch (error) {
+    await loading.dismiss();
+    await this.showToast('Error al cargar el evento', 'danger');
+    this.goBack();
   }
+}
 
   // 📋 COPIAR CÓDIGO AL PORTAPAPELES
   async onCopiarCodigo() {
@@ -146,5 +162,31 @@ export class EventoDetallePage implements OnInit {
       position: 'bottom'
     });
     await toast.present();
+  }
+
+  // ✅ Navegar al foro pasando eventoId y organizadorUid
+// ✅ Actualiza irAlForo() para marcar como visto
+irAlForo() {
+  if (this.currentUid) {
+    this.eventoService.marcarForoVisto(this.evento!.id!, this.currentUid);
+    this.mensajesNuevos = 0; // Limpiar badge al entrar
+  }
+  this.router.navigateByUrl(`/tabs/foro/${this.evento!.id}/${this.evento!.creadoPor.uid}`);
+}
+
+  onScroll(event: any) {
+
+    const scrollTop = event.detail.scrollTop;
+
+    // Si baja → ocultar header
+    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
+      this.hideHeader = true;
+    } else {
+      // Si sube → mostrar header
+      this.hideHeader = false;
+    }
+
+    // Guardar posición actual
+    this.lastScrollTop = scrollTop;
   }
 }

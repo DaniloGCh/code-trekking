@@ -1,27 +1,117 @@
-// src/app/pages/users/crear-evento/crear-evento.page.scss
 
-ion-item {
-  margin-bottom: 8px;
-  border-radius: 8px;
+
+/* 🌄 FONDO */
+ion-content {
+  --background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee') no-repeat center center / cover;
 }
 
-.lugar-info-card {
+/* 🧾 FORM GLASS (EFECTO BORROSO) */
+form {
+  margin-top: 20px;
+  background: rgba(34, 49, 34, 0.35);
+  padding: 16px;
   border-radius: 16px;
-  margin-top: 16px;
-  border-left: 4px solid var(--ion-color-primary);
 
-  ion-item {
-    --padding-start: 0;
-    --inner-padding-end: 0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
-    h3 {
-      font-weight: 600;
-      white-space: normal;
-    }
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
-    p {
-      font-size: 0.75rem;
-      color: var(--ion-color-medium);
-    }
-  }
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* 🧭 HEADER */
+ion-header ion-toolbar {
+  --background: rgba(34, 49, 34, 0.85);
+  --color: #fff;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 📝 FORM ITEMS GLASS */
+ion-item {
+  --background: rgba(34, 49, 34, 0.45);
+  border-radius: 12px;
+  margin-bottom: 10px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #fff;
+}
+
+/* 📌 LABELS */
+ion-label {
+  color: #c7f9cc !important;
+}
+
+/* ✍️ INPUT TEXT */
+ion-input,
+ion-textarea,
+ion-select {
+  color: #fff;
+}
+
+/* ⚠️ ERROR */
+ion-note {
+  color: #ffcccb;
+}
+
+/* 📅 BOTÓN DATETIME */
+ion-datetime-button {
+  margin: 8px 0;
+}
+
+/* 📦 CARD LUGAR */
+.lugar-info-card {
+  background: rgba(34, 49, 34, 0.55);
+  border-radius: 16px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #fff;
+}
+
+/* 📄 LISTA */
+ion-list {
+  background: transparent;
+}
+
+/* 📦 ITEMS CARD */
+ion-card ion-item {
+  --background: transparent;
+}
+
+/* 🌿 BOTÓN CREAR */
+ion-button[type="submit"] {
+  --background: #2e7d32;
+  --color: #fff;
+
+  border-radius: 14px;
+
+  transition: all 0.3s ease;
+}
+
+/* 🖱️ HOVER */
+ion-button[type="submit"]:hover {
+  --background: #388e3c;
+  transform: scale(1.02);
+}
+
+/* 👆 ACTIVE */
+ion-button[type="submit"]:active {
+  --background: #1b5e20;
+  transform: scale(0.97);
+}
+
+/* 🎯 BADGE */
+ion-badge {
+  border-radius: 10px;
+  padding: 6px 10px;
 }

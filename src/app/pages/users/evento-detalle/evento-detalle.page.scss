@@ -1,66 +1,244 @@
-// src/app/pages/users/evento-detalle/evento-detalle.page.scss
+/* =========================================================
+   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
+   ========================================================= */
 
+/* toolbar transparente total */
+.transparent-toolbar {
+  --background: transparent !important; /* Elimina fondo del toolbar */
+  --border-width: 0 !important;        /* Quita bordes */
+  --box-shadow: none !important;       /* Quita sombra */
+  --padding-start: 15px;               /* Espacio interno izquierda */
+  --padding-end: 15px;                 /* Espacio interno derecha */
+}
+
+/* header oculto sin dejar rastro */
+ion-header.hidden {
+  transform: translateY(-100%); /* Lo mueve hacia arriba fuera de pantalla */
+  opacity: 0;                   /* Lo hace invisible */
+  pointer-events: none;         /* Evita interacción */
+}
+
+/* 👇 CLAVE: evita fondo negro del header container */
+ion-header {
+  background: transparent !important; /* Quita fondo negro por defecto */
+  position: absolute;                /* Permite superponer sobre contenido */
+  width: 100%;
+  z-index: 10;                       /* Lo mantiene por encima del contenido */
+}
+
+/* Color de iconos en header */
+ion-header ion-toolbar ion-icon {
+  color: #8bd58e !important; /* Verde bosque */
+}
+
+/* toolbar sin elevación (clave real en Ionic) */
+ion-toolbar {
+  --box-shadow: none !important;
+  box-shadow: none !important;
+  --border-width: 0 !important;
+}
+
+/* asegura que botones no se muevan */
+ion-buttons {
+  z-index: 2;
+}
+
+/* =========================================================
+   👀 OCULTAR HEADER CON SCROLL (ANIMACIÓN)
+   ========================================================= */
+
+ion-header {
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Animación suave */
+}
+
+/* estado oculto */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+
+/* =========================================================
+   🌄 FONDO PRINCIPAL
+   ========================================================= */
+.evento-header h1{
+ margin-top: 80px;
+}
+
+ion-content {
+  --background: none;
+
+  /* Fondo con imagen + overlay oscuro */
+  --background: linear-gradient(
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.45)
+    ),
+    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e') 
+    no-repeat center center / cover;
+}
+
+/* =========================================================
+   🧭 HEADER ESTILO VISUAL
+   ========================================================= */
+
+ion-header ion-toolbar {
+  --background: rgba(0, 10, 0, 0.85); /* Verde oscuro translúcido */
+  --color: #fff;
+
+  backdrop-filter: blur(8px);         /* Blur moderno */
+  -webkit-backdrop-filter: blur(8px); /* Compatibilidad Safari */
+}
+
+
+/* 🌄 FONDO */
+ion-content {
+  --background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e') no-repeat center center / cover;
+}
+
+/* 🧭 HEADER */
+ion-header ion-toolbar {
+  --background: rgba(34, 49, 34, 0.85);
+  --color: #fff;
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 🌿 TITULO EVENTO */
 .evento-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0 16px;
-  gap: 8px;
-
-  h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0;
-    flex: 1;
-  }
+  text-align: center;
+  margin: 10px 0 20px 0;
+  color: #fff;
 }
 
-.codigo-card {
-  border-radius: 16px;
-  border-left: 4px solid var(--ion-color-primary);
-
-  .codigo-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--ion-color-light);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
-
-    .codigo-text {
-      font-size: 1.6rem;
-      font-weight: 800;
-      letter-spacing: 4px;
-      color: var(--ion-color-primary);
-      font-family: monospace;
-    }
-  }
+.evento-header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
+/* 🎯 BADGE */
+ion-badge {
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* 🪵 CARDS GLASS */
 ion-card {
+  background: rgba(34, 49, 34, 0.55);
   border-radius: 16px;
-  margin-bottom: 12px;
 
-  ion-item {
-    --padding-start: 0;
-    --inner-padding-end: 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
-    h3 {
-      font-weight: 600;
-      white-space: normal;
-    }
-
-    p {
-      font-size: 0.75rem;
-      color: var(--ion-color-medium);
-    }
-  }
+  color: #fff;
+  margin-bottom: 16px;
 }
 
+/* 📌 TITULOS DE CARD */
+ion-card-title {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* 🌿 SUBTITULOS */
+ion-card-subtitle {
+  color: #a5d6a7;
+}
+
+/* 📄 LISTA */
+ion-list {
+  background: transparent;
+}
+
+/* 📦 ITEMS */
+ion-item {
+  --background: transparent;
+  margin-bottom: 6px;
+
+  transition: all 0.25s ease;
+}
+
+/* 🖱️ HOVER ITEMS */
+ion-item:hover {
+  --background: rgba(255, 255, 255, 0.05);
+}
+
+/* 🌿 ICONOS */
+ion-item ion-icon[color="primary"] {
+  color: #2e7d32 !important;
+}
+
+/* 👥 PARTICIPANTES */
+ion-avatar ion-icon {
+  color: #c7f9cc;
+}
+
+/* 🧭 ACCIONES */
 .acciones {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 8px 0 24px;
+  margin-top: 20px;
+}
+
+/* 🌿 BOTÓN FORO */
+.foro-btn-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.foro-btn-wrapper ion-button {
+  --background: #2e7d32;
+  --color: #fff;
+
+  transition: all 0.3s ease;
+}
+
+.foro-btn-wrapper ion-button:hover {
+  --background: #388e3c;
+}
+
+.foro-btn-wrapper ion-button:active {
+  --background: #1b5e20;
+  transform: scale(0.97);
+}
+
+/* 🔴 BADGE FORO */
+.foro-badge {
+  position: absolute;
+  top: -5px;
+  right: 10px;
+
+  border-radius: 50%;
+  font-size: 0.75rem;
+}
+
+/* ⚠️ BOTÓN SALIR */
+ion-button[color="warning"] {
+  --color: #ffb74d;
+  --border-color: #ffb74d;
+}
+
+ion-button[color="warning"]:hover {
+  --background: #ffb74d;
+  --color: #000;
+}
+
+/* 🔥 BOTÓN ELIMINAR */
+ion-button[color="danger"] {
+  --color: #ff5252;
+  --border-color: #ff5252;
+}
+
+ion-button[color="danger"]:hover {
+  --background: #ff5252;
+  --color: #fff;
+}
+
+/* 👆 CLICK EFECTO GENERAL */
+ion-button:active {
+  transform: scale(0.97);
 }

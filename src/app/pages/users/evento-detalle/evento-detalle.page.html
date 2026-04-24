@@ -1,7 +1,7 @@
 <!-- src/app/pages/users/evento-detalle/evento-detalle.page.html -->
 
-<ion-header>
-  <ion-toolbar color="primary">
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
     <ion-buttons slot="start">
       <ion-button (click)="goBack()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
@@ -17,7 +17,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" *ngIf="evento">
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true" *ngIf="evento">
 
   <!-- CABECERA DEL EVENTO -->
   <div class="evento-header">
@@ -127,31 +127,67 @@
   </ion-card>
 
   <!-- PARTICIPANTES -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="people-outline" color="primary"></ion-icon>
-        Participantes ({{ evento.participantes.length }})
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list lines="none">
-        <ion-item *ngFor="let uid of evento.participantes">
-          <ion-icon name="person-circle-outline" slot="start" color="medium"></ion-icon>
-          <ion-label>
-            <h3>{{ uid === currentUid ? 'Tú' : 'Participante' }}</h3>
-            <p *ngIf="uid === evento.creadoPor.uid">Organizador</p>
-          </ion-label>
-          <ion-badge slot="end" color="primary" *ngIf="uid === evento.creadoPor.uid">
-            Org.
-          </ion-badge>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+<!-- PARTICIPANTES -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>
+      <ion-icon name="people-outline" color="primary"></ion-icon>
+      Participantes ({{ evento.participantesInfo.length || evento.participantes.length }})
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-list lines="none">
+      <ion-item *ngFor="let participante of evento.participantesInfo">
+
+        <ion-avatar slot="start">
+          <ion-icon
+            name="person-circle-outline"
+            style="font-size: 40px;"
+            [color]="participante.uid === evento.creadoPor.uid ? 'primary' : 'medium'">
+          </ion-icon>
+        </ion-avatar>
+
+        <ion-label>
+          <h3>
+            {{ participante.uid === currentUid ? participante.nombre + ' (Tú)' : participante.nombre }}
+          </h3>
+          <p>{{ participante.uid === evento.creadoPor.uid ? 'Organizador' : 'Participante' }}</p>
+        </ion-label>
+
+        <!-- Badge organizador -->
+        <ion-badge
+          slot="end"
+          [color]="participante.uid === evento.creadoPor.uid ? 'primary' : 'medium'">
+          {{ participante.uid === evento.creadoPor.uid ? 'Org.' : 'Part.' }}
+        </ion-badge>
+
+      </ion-item>
+    </ion-list>
+  </ion-card-content>
+</ion-card>
 
   <!-- ACCIONES -->
   <div class="acciones">
+
+    <!-- Agregar en la sección de acciones -->
+<!-- Botón foro con badge de mensajes nuevos -->
+<div class="foro-btn-wrapper">
+  <ion-button
+    expand="block"
+    color="primary"
+    (click)="irAlForo()">
+    <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+    Foro del evento
+  </ion-button>
+
+  <!-- ✅ Badge de mensajes nuevos -->
+  <ion-badge
+    color="danger"
+    class="foro-badge"
+    *ngIf="mensajesNuevos > 0">
+    {{ mensajesNuevos > 99 ? '99+' : mensajesNuevos }}
+  </ion-badge>
+</div>
 
     <!-- Salir del evento (solo si no es el creador) -->
     <ion-button

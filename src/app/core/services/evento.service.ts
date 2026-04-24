@@ -67,39 +67,27 @@ export class EventoService {
   // =========================
   // ✅ CREAR EVENTO
   // =========================
-  async crearEvento(evento: Omit<Evento, 'id' | 'codigoInvitacion' | 'participantes' | 'creadoEn'>): Promise<string> {
+async crearEvento(evento: Omit<Evento, 'id' | 'codigoInvitacion' | 'participantes' | 'participantesInfo' | 'creadoEn'>): Promise<string> {
+  const currentUser = this.auth.currentUser;
+  if (!currentUser) throw new Error('No hay usuario autenticado');
 
-    // Obtener usuario actual autenticado
-    const currentUser = this.auth.currentUser;
+  // Obtener nombre del creador
+  const userData = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
+  const nombre = (userData.data() as any)?.nombre || 'Usuario';
 
-    // Validar que exista un usuario logueado
-    if (!currentUser) throw new Error('No hay usuario autenticado');
+  const eventosRef = collection(this.firestore, 'eventos');
 
-    // Referencia a la colección "eventos"
-    const eventosRef = collection(this.firestore, 'eventos');
+  const nuevoEvento: Omit<Evento, 'id'> = {
+    ...evento,
+    codigoInvitacion: this.generarCodigo(),
+    participantes: [currentUser.uid],
+    participantesInfo: [{ uid: currentUser.uid, nombre }], // ✅ Guarda nombre del creador
+    creadoEn: new Date(),
+  };
 
-    // Construcción del nuevo evento
-    const nuevoEvento: Omit<Evento, 'id'> = {
-
-      // Copia los datos recibidos
-      ...evento,
-
-      // Genera código de invitación único
-      codigoInvitacion: this.generarCodigo(),
-
-      // Agrega al creador como primer participante
-      participantes: [currentUser.uid],
-
-      // Fecha de creación
-      creadoEn: new Date(),
-    };
-
-    // Guarda el evento en Firestore
-    const docRef = await addDoc(eventosRef, nuevoEvento);
-
-    // Retorna el ID del documento creado
-    return docRef.id;
-  }
+  const docRef = await addDoc(eventosRef, nuevoEvento);
+  return docRef.id;
+}
 
   // =========================
   // ✅ OBTENER EVENTOS DEL USUARIO
@@ -138,45 +126,35 @@ getMisEventos(): Observable<Evento[]> {
   // =========================
   // ✅ UNIRSE A EVENTO POR CÓDIGO
   // =========================
-  async unirseConCodigo(codigo: string): Promise<Evento | null> {
+ async unirseConCodigo(codigo: string): Promise<Evento | null> {
+  const currentUser = this.auth.currentUser;
+  if (!currentUser) throw new Error('No hay usuario autenticado');
 
-    // Obtener usuario actual
-    const currentUser = this.auth.currentUser;
+  const eventosRef = collection(this.firestore, 'eventos');
+  const q = query(eventosRef, where('codigoInvitacion', '==', codigo.toUpperCase().trim()));
+  const snapshot = await getDocs(q);
 
-    // Validar autenticación
-    if (!currentUser) throw new Error('No hay usuario autenticado');
+  if (snapshot.empty) throw new Error('codigo-invalido');
 
-    // Referencia a la colección de eventos
-    const eventosRef = collection(this.firestore, 'eventos');
+  const eventoDoc = snapshot.docs[0];
+  const evento = { id: eventoDoc.id, ...eventoDoc.data() } as Evento;
 
-    // Buscar evento por código (normalizado a mayúsculas y sin espacios)
-    const q = query(eventosRef, where('codigoInvitacion', '==', codigo.toUpperCase().trim()));
-
-    // Ejecutar consulta
-    const snapshot = await getDocs(q);
-
-    // Validar si existe el evento
-    if (snapshot.empty) throw new Error('codigo-invalido');
-
-    // Obtener el primer resultado
-    const eventoDoc = snapshot.docs[0];
-
-    // Construir objeto evento
-    const evento = { id: eventoDoc.id, ...eventoDoc.data() } as Evento;
-
-    // Verificar si el usuario ya es participante
-    if (evento.participantes.includes(currentUser.uid)) {
-      throw new Error('ya-participante');
-    }
-
-    // Agregar usuario al array de participantes
-    await updateDoc(doc(this.firestore, `eventos/${eventoDoc.id}`), {
-      participantes: arrayUnion(currentUser.uid) // arrayUnion evita duplicados
-    });
-
-    // Retornar el evento
-    return evento;
+  if (evento.participantes.includes(currentUser.uid)) {
+    throw new Error('ya-participante');
   }
+
+  // Obtener nombre del usuario que se une
+  const userData = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
+  const nombre = (userData.data() as any)?.nombre || 'Usuario';
+
+  // ✅ Actualizar ambos arrays
+  await updateDoc(doc(this.firestore, `eventos/${eventoDoc.id}`), {
+    participantes: arrayUnion(currentUser.uid),
+    participantesInfo: arrayUnion({ uid: currentUser.uid, nombre })
+  });
+
+  return evento;
+}
 
   // =========================
   // ✅ ELIMINAR EVENTO
@@ -238,6 +216,32 @@ async enviarMensaje(eventoId: string, mensaje: Omit<MensajeForo, 'id'>): Promise
 async eliminarMensaje(eventoId: string, mensajeId: string): Promise<void> {
   const mensajeRef = doc(this.firestore, `eventos/${eventoId}/foro/${mensajeId}`);
   await deleteDoc(mensajeRef);
+}
+
+// ✅ CONTAR MENSAJES NUEVOS DESDE ÚLTIMA VISITA
+async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
+  const key = `foro_ultima_visita_${eventoId}_${uid}`;
+  const ultimaVisita = localStorage.getItem(key);
+
+  const foroRef = collection(this.firestore, `eventos/${eventoId}/foro`);
+
+  // ✅ Solo un filtro, sin necesidad de índice
+  const snapshot = await getDocs(query(foroRef));
+  const mensajes = snapshot.docs.map(d => d.data());
+
+  return mensajes.filter(m => {
+    const esMio = m['autorUid'] === uid;
+    const esNuevo = ultimaVisita
+      ? m['creadoEn'].toDate() > new Date(ultimaVisita)
+      : true;
+    return !esMio && esNuevo;
+  }).length;
+}
+
+// ✅ MARCAR FORO COMO VISTO
+marcarForoVisto(eventoId: string, uid: string) {
+  const key = `foro_ultima_visita_${eventoId}_${uid}`;
+  localStorage.setItem(key, new Date().toISOString());
 }
   
 }

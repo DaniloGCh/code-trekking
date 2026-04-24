@@ -24,6 +24,10 @@ export class CrearEventoPage implements OnInit {
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
 
+    // 🔽 Control del header según scroll
+  hideHeader = false; // Ocultar/mostrar header dinámicamente
+  lastScrollTop = 0; // Guarda posición anterior del scroll
+
   // 📍 Lista de lugares desde Firestore
   lugares$: Observable<Lugar[]> = this.eventoService.getLugares();
 
@@ -145,5 +149,21 @@ onHoraChange(event: any) {
       position: 'bottom'
     });
     await toast.present();
+  }
+
+    // 📜 Detecta scroll para ocultar/mostrar header
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+
+    // 🔽 Si baja scroll, oculta header
+    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
+      this.hideHeader = true;
+    } else {
+      // 🔼 Si sube scroll, muestra header
+      this.hideHeader = false;
+    }
+
+    // 📌 Actualiza posición anterior
+    this.lastScrollTop = scrollTop;
   }
 }

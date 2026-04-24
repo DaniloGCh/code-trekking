@@ -41,7 +41,7 @@ export class HomePage implements OnInit {
       if (user) {
         // 📥 Obtiene datos completos del usuario desde Firestore
         this.userData = await this.authService.getCurrentUserData();
-        console.log('USER DATA:', this.userData);
+
       }
     });
   }

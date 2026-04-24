@@ -8,6 +8,11 @@ export interface Lugar {
   dificultad: 'Baja' | 'Media' | 'Alta';
 }
 
+export interface Participante {
+  uid: string;
+  nombre: string;
+}
+
 export interface Evento {
   id?: string;
   nombre: string;
@@ -22,7 +27,8 @@ export interface Evento {
   };
   codigoInvitacion: string;
   privado: boolean;
-  participantes: string[];
+  participantes: string[];           // ✅ Se mantiene para queries
+  participantesInfo: Participante[]; // ✅ Nuevo: array con uid y nombre
   creadoEn: any;
 }
 

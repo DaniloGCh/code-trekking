@@ -64,3 +64,56 @@
   color: #a3d977;
 }
 
+/* 🧭 TAB BAR GLASS TREKKING */
+ion-tab-bar {
+  --background: rgba(20, 35, 20, 0.85);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  height: 65px;
+}
+
+/* 📌 TAB BUTTON */
+ion-tab-button {
+  --color: #a5d6a7;
+  --color-selected: #ffffff;
+
+  transition: all 0.3s ease;
+}
+
+/* 🌿 ICONOS */
+ion-tab-button ion-icon {
+  font-size: 22px;
+  transition: all 0.3s ease;
+}
+
+/* ✨ TAB ACTIVO */
+ion-tab-button.tab-selected {
+  --color: #ffffff;
+
+  background: rgba(46, 125, 50, 0.35);
+  border-radius: 14px;
+  margin: 6px 4px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  transform: translateY(-2px);
+}
+
+/* 🔥 ICONO ACTIVO MÁS GRANDE */
+ion-tab-button.tab-selected ion-icon {
+  transform: scale(1.2);
+}
+
+/* 🌿 EFECTO HOVER (desktop) */
+ion-tab-button:hover {
+  --color: #c7f9cc;
+}
+
+ion-tab-button.tab-selected {
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+}

@@ -1,7 +1,7 @@
 <!-- src/app/pages/users/crear-evento/crear-evento.page.html -->
 
-<ion-header>
-  <ion-toolbar color="primary">
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
     <ion-buttons slot="start">
       <ion-button (click)="goBack()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
@@ -11,10 +11,25 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <ng-container *ngIf="lugares$ | async as lugares">
     <form [formGroup]="eventoForm" (ngSubmit)="onCrearEvento(lugares)">
+
+            <!-- LUGAR -->
+      <ion-item [class.ion-invalid]="lugarId?.invalid && lugarId?.touched">
+        <ion-label position="floating">Lugar de trekking</ion-label>
+        <ion-select
+          placeholder="Selecciona un lugar"
+          (ionChange)="onLugarChange($event, lugares)">
+          <ion-select-option *ngFor="let lugar of lugares" [value]="lugar.id">
+            {{ lugar.nombre }} — {{ lugar.dificultad }}
+          </ion-select-option>
+        </ion-select>
+        <ion-note slot="error">
+          <span *ngIf="lugarId?.errors?.['required']">Selecciona un lugar</span>
+        </ion-note>
+      </ion-item>
 
       <!-- NOMBRE DEL EVENTO -->
       <ion-item [class.ion-invalid]="nombre?.invalid && nombre?.touched">
@@ -38,7 +53,8 @@
 
     <!-- FECHA -->
 <ion-item [class.ion-invalid]="fecha?.invalid && fecha?.touched">
-  <ion-label position="floating">Fecha del evento</ion-label>
+  
+  <ion-label position="floating">Fecha del evento </ion-label>
   <ion-input
     readonly
     [value]="fechaSeleccionada"
@@ -93,20 +109,6 @@
   </ng-template>
 </ion-modal>
 
-      <!-- LUGAR -->
-      <ion-item [class.ion-invalid]="lugarId?.invalid && lugarId?.touched">
-        <ion-label position="floating">Lugar de trekking</ion-label>
-        <ion-select
-          placeholder="Selecciona un lugar"
-          (ionChange)="onLugarChange($event, lugares)">
-          <ion-select-option *ngFor="let lugar of lugares" [value]="lugar.id">
-            {{ lugar.nombre }} — {{ lugar.dificultad }}
-          </ion-select-option>
-        </ion-select>
-        <ion-note slot="error">
-          <span *ngIf="lugarId?.errors?.['required']">Selecciona un lugar</span>
-        </ion-note>
-      </ion-item>
 
       <!-- INFO DEL LUGAR SELECCIONADO -->
       <ion-card *ngIf="lugarSeleccionado" class="lugar-info-card">
