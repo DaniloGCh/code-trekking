@@ -106,7 +106,7 @@
       <ion-accordion value="usuarios">
 
         <ion-item slot="header">
-          <ion-icon name="people-outline" slot="start"></ion-icon>
+          <ion-icon name="people-outline" slot="start" color="success"></ion-icon>
           <ion-label>Ver usuarios registrados</ion-label>
         </ion-item>
 
@@ -312,7 +312,7 @@
       <ion-accordion value="lugares">
 
         <ion-item slot="header">
-          <ion-icon name="map-outline" slot="start"></ion-icon>
+          <ion-icon name="map-outline" slot="start" color="success"></ion-icon>
           <ion-label>Ver lugares registrados</ion-label>
         </ion-item>
 
@@ -427,7 +427,7 @@
     <ion-accordion-group>
       <ion-accordion value="consejos">
         <ion-item slot="header">
-          <ion-icon name="bookmark-outline" slot="start"></ion-icon>
+          <ion-icon name="bookmark-outline" slot="start" color="success"></ion-icon>
           <ion-label>Ver consejos registrados</ion-label>
         </ion-item>
         <div slot="content">
@@ -467,74 +467,120 @@
     <!-- ========================= -->
     <!-- 📘 MANUAL SUPERVIVENCIA -->
     <!-- ========================= -->
+    <h3 class="section-title">
+      Manual de supervivencia
+      <ion-button fill="clear" size="small" (click)="onNuevoManual()" *ngIf="!mostrarFormManual">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Agregar
+      </ion-button>
+    </h3>
 
-    <ion-card>
+    <!-- FORMULARIO MANUAL -->
+    <ion-card id="form-manual" *ngIf="mostrarFormManual" class="form-card">
       <ion-card-header>
-        <ion-card-title>Manual de Supervivencia</ion-card-title>
+        <ion-card-title>
+          {{ manualEditando ? '✏️ Editar paso' : '➕ Nuevo paso' }}
+        </ion-card-title>
       </ion-card-header>
 
       <ion-card-content>
+        <form [formGroup]="manualForm" (ngSubmit)="onGuardarManual()">
 
-        <ion-button expand="block" (click)="onNuevoManual()">
-          ➕ Nuevo Paso
-        </ion-button>
+          <!-- TÍTULO -->
+          <ion-item [class.ion-invalid]="mTitulo?.invalid && mTitulo?.touched">
+            <ion-label position="floating">Título</ion-label>
+            <ion-input formControlName="titulo"></ion-input>
+          </ion-item>
 
-        <!-- FORM -->
-        <div *ngIf="mostrarFormManual" id="form-manual">
+          <!-- DESCRIPCIÓN -->
+          <ion-item [class.ion-invalid]="mDescripcion?.invalid && mDescripcion?.touched">
+            <ion-label position="floating">Descripción</ion-label>
+            <ion-textarea formControlName="descripcion" rows="4"></ion-textarea>
+          </ion-item>
 
-          <form [formGroup]="manualForm" (ngSubmit)="onGuardarManual()">
+          <!-- ICONO -->
+          <ion-item>
+            <ion-label position="floating">Icono (emoji)</ion-label>
+            <ion-input formControlName="icono"></ion-input>
+          </ion-item>
 
-            <ion-item>
-              <ion-input placeholder="Título" formControlName="titulo"></ion-input>
-            </ion-item>
+          <!-- ORDEN -->
+          <ion-item>
+            <ion-label position="floating">Orden</ion-label>
+            <ion-input type="number" formControlName="orden"></ion-input>
+          </ion-item>
 
-            <ion-item>
-              <ion-textarea placeholder="Descripción" formControlName="descripcion"></ion-textarea>
-            </ion-item>
-
-            <ion-item>
-              <ion-input placeholder="Icono (emoji)" formControlName="icono"></ion-input>
-            </ion-item>
-
-            <ion-item>
-              <ion-input type="number" placeholder="Orden" formControlName="orden"></ion-input>
-            </ion-item>
-
-            <ion-button expand="block" type="submit">
-              {{ manualEditando ? 'Actualizar' : 'Guardar' }}
+          <!-- BOTONES -->
+          <div class="form-buttons">
+            <ion-button expand="block" type="submit" [disabled]="manualForm.invalid">
+              <ion-icon [name]="manualEditando ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
+              {{ manualEditando ? 'Guardar cambios' : 'Agregar paso' }}
             </ion-button>
 
-            <ion-button expand="block" fill="outline" (click)="onCancelarFormManual()">
+            <ion-button expand="block" fill="outline" color="medium" (click)="onCancelarFormManual()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
               Cancelar
             </ion-button>
+          </div>
 
-          </form>
-
-        </div>
-
-        <!-- LISTA -->
-        <ion-list>
-          <ion-item *ngFor="let paso of manual$ | async">
-
-            <ion-label>
-              <h2>{{ paso.icono }} {{ paso.titulo }}</h2>
-              <p>{{ paso.descripcion }}</p>
-              <small>Orden: {{ paso.orden }}</small>
-            </ion-label>
-
-            <ion-button fill="clear" (click)="onEditarManual(paso)">
-              ✏️
-            </ion-button>
-
-            <ion-button fill="clear" color="danger" (click)="onEliminarManual(paso)">
-              🗑️
-            </ion-button>
-
-          </ion-item>
-        </ion-list>
-
+        </form>
       </ion-card-content>
     </ion-card>
+
+    <!-- LISTA DE PASOS -->
+    <ion-accordion-group>
+      <ion-accordion value="manual">
+
+        <!-- HEADER -->
+        <ion-item slot="header">
+          <ion-icon name="book-outline" slot="start" color="success"></ion-icon>
+          <ion-label>Ver pasos del manual</ion-label>
+        </ion-item>
+
+        <!-- CONTENT -->
+        <div slot="content">
+          <ion-list>
+
+            <ng-container *ngIf="manual$ | async as pasos">
+
+              <!-- SIN DATOS -->
+              <ion-item *ngIf="pasos.length === 0">
+                <ion-label class="ion-text-center" color="medium">
+                  <p>No hay pasos registrados aún</p>
+                </ion-label>
+              </ion-item>
+
+              <!-- LISTA -->
+              <ion-item *ngFor="let paso of pasos">
+
+                <ion-icon name="document-text-outline" slot="start" color="tertiary"></ion-icon>
+
+                <ion-label class="ion-text-wrap">
+                  <h3>{{ paso.icono }} {{ paso.titulo }}</h3>
+                  <p>{{ paso.descripcion }}</p>
+                  <small>Orden: {{ paso.orden }}</small>
+                </ion-label>
+
+                <!-- EDITAR -->
+                <ion-button slot="end" fill="clear" color="primary" (click)="onEditarManual(paso)">
+                  <ion-icon name="pencil-outline"></ion-icon>
+                </ion-button>
+
+                <!-- ELIMINAR -->
+                <ion-button slot="end" fill="clear" color="danger" (click)="onEliminarManual(paso)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+
+              </ion-item>
+
+            </ng-container>
+
+          </ion-list>
+        </div>
+
+      </ion-accordion>
+
+    </ion-accordion-group>
   </ion-content>
 
 </ng-container>
