@@ -1,140 +1,100 @@
-
-
-<!-- 📄 Contenedor principal con padding -->
+<!-- 📄 LOGIN PAGE -->
 <ion-content class="ion-padding">
 
-  <!-- 📦 Contenedor general del login -->
   <div class="login-container">
 
     <!-- ========================= -->
-    <!-- 👤 HEADER LOGIN -->
+    <!-- 👤 HEADER -->
     <!-- ========================= -->
     <div class="login-header">
-      <!-- Icono decorativo -->
       <ion-icon name="person-circle-outline"></ion-icon>
-
-      <!-- Título -->
       <h1>Iniciar Sesión</h1>
     </div>
 
     <!-- ========================= -->
     <!-- 📝 FORMULARIO -->
     <!-- ========================= -->
-    <!-- [formGroup]: conecta el formulario con Reactive Forms -->
-    <!-- (ngSubmit): ejecuta función al enviar -->
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
 
-      <!-- ========================= -->
-      <!-- 📧 CAMPO EMAIL -->
-      <!-- ========================= -->
+      <!-- 📧 EMAIL -->
       <ion-item [class.ion-invalid]="email?.invalid && email?.touched">
-        <!-- Aplica clase de error si es inválido y fue tocado -->
 
-        <!-- Label flotante -->
         <ion-label position="floating">Correo electrónico</ion-label>
 
-        <!-- Input tipo email -->
-        <ion-input 
-          type="email" 
-          formControlName="email" 
+        <ion-input
+          type="email"
+          formControlName="email"
           placeholder="correo@ejemplo.com">
         </ion-input>
 
-        <!-- Mensajes de error -->
         <ion-note slot="error">
-
-          <!-- Error: campo requerido -->
           <span *ngIf="email?.errors?.['required']">
             El correo es requerido
           </span>
 
-          <!-- Error: formato inválido -->
           <span *ngIf="email?.errors?.['email']">
             Ingresa un correo válido
           </span>
-
         </ion-note>
+
       </ion-item>
 
-      <!-- ========================= -->
-      <!-- 🔒 CAMPO PASSWORD -->
-      <!-- ========================= -->
+      <!-- 🔒 PASSWORD -->
       <ion-item [class.ion-invalid]="password?.invalid && password?.touched">
 
-        <!-- Label -->
         <ion-label position="floating">Contraseña</ion-label>
 
-        <!-- Input dinámico (mostrar/ocultar contraseña) -->
-        <ion-input 
-          [type]="showPassword ? 'text' : 'password'" 
+        <ion-input
+          [type]="showPassword ? 'text' : 'password'"
           formControlName="password">
         </ion-input>
 
-        <!-- 👁️ Botón para mostrar/ocultar contraseña -->
         <ion-button slot="end" fill="clear" (click)="togglePassword()">
-
-          <!-- Cambia el icono según estado -->
           <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
-
         </ion-button>
 
-        <!-- Mensajes de error -->
         <ion-note slot="error">
-
-          <!-- Error: requerido -->
           <span *ngIf="password?.errors?.['required']">
             La contraseña es requerida
           </span>
 
-          <!-- Error: longitud mínima -->
           <span *ngIf="password?.errors?.['minlength']">
             Mínimo 6 caracteres
           </span>
-
         </ion-note>
+
       </ion-item>
 
-      <!-- ========================= -->
-      <!-- 🔘 BOTÓN LOGIN -->
-      <!-- ========================= -->
-      <ion-button 
-        expand="block" 
-        type="submit" 
-        class="ion-margin-top" 
+      <!-- 🔘 LOGIN -->
+      <ion-button
+        expand="block"
+        type="submit"
+        class="ion-margin-top"
         [disabled]="loginForm.invalid">
-        
-        <!-- Se desactiva si el formulario es inválido -->
+
         Iniciar Sesión
       </ion-button>
 
-      <!-- ========================= -->
-      <!-- 🔁 RECUPERAR CONTRASEÑA -->
-      <!-- ========================= -->
-      <ion-button 
-        expand="block" 
-        fill="clear" 
-        color="medium" 
+      <!-- 🔁 RECUPERAR -->
+      <ion-button
+        expand="block"
+        fill="clear"
+        color="medium"
         (click)="onForgotPassword()">
-        
+
         ¿Olvidaste tu contraseña?
       </ion-button>
 
     </form>
 
     <!-- ========================= -->
-    <!-- 🔗 IR A REGISTRO -->
+    <!-- 🔗 REGISTRO -->
     <!-- ========================= -->
     <div class="register-link">
-
       <p>
         ¿No tienes cuenta?
-        
-        <!-- Link clickeable -->
-        <span (click)="goToRegister()">
-          Regístrate aquí
-        </span>
+        <span (click)="goToRegister()">Regístrate aquí</span>
       </p>
-
     </div>
 
   </div>

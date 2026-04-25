@@ -1,41 +1,61 @@
-<!-- src/app/pages/users/foro/foro.page.html -->
-
+<!-- ========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
 <ion-header [class.hidden]="hideHeader">
+
   <ion-toolbar class="transparent-toolbar">
+
+    <!-- 🔙 VOLVER -->
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/eventos"></ion-back-button>
     </ion-buttons>
+
+    <!-- 📌 TÍTULO -->
     <ion-title>Foro del evento</ion-title>
+
+    <!-- 🔄 REFRESCAR -->
     <ion-buttons slot="end">
       <ion-button (click)="cargarMensajes()">
         <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
+
   </ion-toolbar>
+
 </ion-header>
 
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true" >
+<!-- ========================= -->
+<!-- 📄 CONTENIDO -->
+<!-- ========================= -->
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-  <!-- Refrescar jalando hacia abajo -->
+  <!-- 🔄 REFRESH PULL -->
   <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- CARGANDO -->
+  <!-- ========================= -->
+  <!-- ⏳ CARGANDO -->
+  <!-- ========================= -->
   <div class="loading-state" *ngIf="cargando">
     <ion-spinner name="crescent" color="primary"></ion-spinner>
     <p>Cargando mensajes...</p>
   </div>
 
-  <!-- SIN MENSAJES -->
+  <!-- ========================= -->
+  <!-- 🚫 SIN MENSAJES -->
+  <!-- ========================= -->
   <div class="empty-state" *ngIf="!cargando && mensajes.length === 0">
     <ion-icon name="chatbubbles-outline"></ion-icon>
     <h3>Sin mensajes aún</h3>
     <p>¡Sé el primero en escribir!</p>
   </div>
 
-  <!-- MENSAJES -->
+  <!-- ========================= -->
+  <!-- 💬 MENSAJES -->
+  <!-- ========================= -->
   <div class="mensajes-container" *ngIf="!cargando">
+
     <div
       *ngFor="let mensaje of mensajes"
       class="mensaje-wrapper"
@@ -43,19 +63,22 @@
 
       <div class="mensaje-bubble">
 
-        <!-- Nombre del autor (solo en mensajes de otros) -->
+        <!-- 👤 AUTOR (solo otros usuarios) -->
         <span class="autor-nombre" *ngIf="mensaje.autorUid !== currentUid">
           {{ mensaje.autorNombre }}
         </span>
 
+        <!-- 📝 TEXTO -->
         <p class="mensaje-texto">{{ mensaje.texto }}</p>
 
+        <!-- ⏱️ FOOTER MENSAJE -->
         <div class="mensaje-footer">
+
           <span class="mensaje-hora">
             {{ mensaje.creadoEn.toDate() | date:'HH:mm' }}
           </span>
 
-          <!-- Eliminar (solo organizador) -->
+          <!-- 🗑️ ELIMINAR (solo organizador) -->
           <ion-button
             *ngIf="currentUid === organizadorUid"
             fill="clear"
@@ -63,22 +86,27 @@
             color="danger"
             class="btn-eliminar"
             (click)="onEliminarMensaje(mensaje)">
+
             <ion-icon name="trash-outline"></ion-icon>
+
           </ion-button>
+
         </div>
 
       </div>
-    </div>
-  </div>
 
-  
+    </div>
+
+  </div>
 
 </ion-content>
 
-<!-- INPUT DE MENSAJE -->
+<!-- ========================= -->
+<!-- ✍️ FOOTER INPUT -->
+<!-- ========================= -->
 <ion-footer>
 
-  <!-- Emojis rápidos -->
+  <!-- 😀 EMOJIS RÁPIDOS -->
   <div class="emojis-bar">
     <span
       *ngFor="let emoji of emojis"
@@ -88,8 +116,9 @@
     </span>
   </div>
 
-  <!-- Input -->
+  <!-- ✍️ INPUT MENSAJE -->
   <div class="input-container">
+
     <ion-textarea
       [(ngModel)]="nuevoMensaje"
       placeholder="Escribe un mensaje..."
@@ -98,16 +127,17 @@
       class="mensaje-input">
     </ion-textarea>
 
+    <!-- 📤 ENVIAR -->
     <ion-button
       fill="clear"
       color="primary"
       [disabled]="!nuevoMensaje.trim()"
       (click)="onEnviarMensaje()">
+
       <ion-icon slot="icon-only" name="send"></ion-icon>
+
     </ion-button>
+
   </div>
 
-  
-
 </ion-footer>
-

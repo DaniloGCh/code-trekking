@@ -1,116 +1,90 @@
-// src/app/auth/login/login.page.ts
-
-// 🔹 Importación de Component para definir el componente
+// 🔹 Angular core
 import { Component, inject } from '@angular/core';
-
-// 🔹 Router para navegación entre páginas
 import { Router } from '@angular/router';
 
-// 🔹 Formularios reactivos (FormBuilder, FormGroup, validaciones)
+// 🔹 Formularios reactivos
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-// 🔹 Controladores de Ionic (loading y alertas)
-import { LoadingController, AlertController } from '@ionic/angular';
+// 🔹 Ionic controllers
+import { LoadingController, AlertController, ToastController } from '@ionic/angular';
 
-// 🔹 Servicio de autenticación
+// 🔹 Servicios
 import { AuthService } from 'src/app/core/services/auth.service';
 
-// 🔹 Controlador de notificaciones tipo toast
-import { ToastController } from '@ionic/angular'; // ✅ Importado correctamente
-
 @Component({
-  selector: 'app-login', // Nombre del componente
-  templateUrl: './login.page.html', // HTML asociado
-  styleUrls: ['./login.page.scss'], // Estilos
+  selector: 'app-login',
+  templateUrl: './login.page.html',
+  styleUrls: ['./login.page.scss'],
   standalone: false,
 })
 export class LoginPage {
 
-  // 🔹 Inyección de dependencias
-  private authService = inject(AuthService);       // Servicio de autenticación
-  private router = inject(Router);                 // Navegación
-  private fb = inject(FormBuilder);                // Constructor de formularios
-  private loadingCtrl = inject(LoadingController); // Loader (spinner)
-  private alertCtrl = inject(AlertController);     // Alertas
-  private toastCtrl = inject(ToastController);     // Toasts
+  // =========================
+  // 🔹 DEPENDENCIAS
+  // =========================
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+  private loadingCtrl = inject(LoadingController);
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
 
   // =========================
-  // 👁️ TOGGLE PASSWORD
+  // 👁️ PASSWORD VISIBILITY
   // =========================
-  showPassword = false; // Controla si la contraseña se muestra o no
+  showPassword = false;
 
   togglePassword() {
-    // Cambia entre true/false para mostrar u ocultar la contraseña
     this.showPassword = !this.showPassword;
   }
 
   // =========================
-  // 📋 FORMULARIO REACTIVO
+  // 📋 FORMULARIO LOGIN
   // =========================
   loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]], // Campo email con validaciones
-    password: ['', [Validators.required, Validators.minLength(6)]], // Campo password
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
   // =========================
-  // ✅ GETTERS PARA HTML
+  // 🔹 GETTERS (HTML)
   // =========================
-  get email() { return this.loginForm.get('email'); }     // Acceso fácil al control email
-  get password() { return this.loginForm.get('password'); } // Acceso fácil al control password
+  get email() { return this.loginForm.get('email'); }
+  get password() { return this.loginForm.get('password'); }
 
   // =========================
   // 🚀 LOGIN
   // =========================
   async onLogin() {
 
-    // Validar formulario
     if (this.loginForm.invalid) {
-
-      // Marca todos los campos como tocados para mostrar errores
       this.loginForm.markAllAsTouched();
       return;
     }
 
-    // Crear loading
     const loading = await this.loadingCtrl.create({
       message: 'Iniciando sesión...',
     });
 
-    // Mostrar loading
     await loading.present();
 
     try {
-
-      // Obtener valores del formulario
       const { email, password } = this.loginForm.value;
 
-      // Intentar login con Firebase
       await this.authService.login(email, password);
 
-      // Obtener rol del usuario
       const rol = await this.authService.getUserRole();
 
-      // Cerrar loading
       await loading.dismiss();
 
-      // Redirigir según rol
       if (rol === 'admin') {
-
-        // Admin → dashboard
         this.router.navigateByUrl('/dashboard', { replaceUrl: true });
-
       } else {
-
-        // Usuario normal → home
         this.router.navigateByUrl('tabs/home', { replaceUrl: true });
       }
 
     } catch (error: any) {
-
-      // Cerrar loading si hay error
       await loading.dismiss();
-
-      // Mostrar mensaje de error
       await this.showError(error.code);
     }
   }
@@ -120,56 +94,42 @@ export class LoginPage {
   // =========================
   async onForgotPassword() {
 
-    // Crear alerta con input
     const alert = await this.alertCtrl.create({
       header: 'Recuperar contraseña',
-      message: 'Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.',
+      message: 'Ingresa tu correo para restablecer tu contraseña.',
       inputs: [
         {
           name: 'email',
           type: 'email',
           placeholder: 'correo@ejemplo.com',
-
-          // Autocompleta con el email ingresado (si existe)
           value: this.email?.value || ''
         }
       ],
       buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Enviar',
           handler: async (data) => {
 
-            // Validar email
             if (!data.email) {
               await this.showToast('Ingresa un correo válido', 'warning');
               return false;
             }
 
-            // Loading mientras se envía correo
             const loading = await this.loadingCtrl.create({
               message: 'Enviando correo...'
             });
+
             await loading.present();
 
             try {
-
-              // Enviar correo de recuperación
               await this.authService.resetPassword(data.email);
 
               await loading.dismiss();
-
-              // Mensaje éxito
-              await this.showToast('Correo enviado, revisa tu bandeja de entrada', 'success');
+              await this.showToast('Correo enviado correctamente', 'success');
 
             } catch (error) {
-
               await loading.dismiss();
-
-              // Mensaje error
               await this.showToast('No existe una cuenta con ese correo', 'danger');
             }
 
@@ -179,35 +139,30 @@ export class LoginPage {
       ]
     });
 
-    // Mostrar alerta
     await alert.present();
   }
 
   // =========================
-  // ❌ MANEJO DE ERRORES
+  // ❌ ERRORES LOGIN
   // =========================
   private async showError(errorCode: string) {
 
-    // Diccionario de errores Firebase
     const messages: Record<string, string> = {
       'auth/user-not-found': 'No existe una cuenta con este correo.',
       'auth/wrong-password': 'Contraseña incorrecta.',
-      'auth/invalid-email': 'El correo no es válido.',
+      'auth/invalid-email': 'Correo inválido.',
       'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.',
-      'auth/invalid-credential': 'Credenciales inválidas. Verifica tu correo y contraseña.',
+      'auth/invalid-credential': 'Credenciales inválidas.',
     };
 
-    // Selecciona mensaje o usa uno genérico
-    const message = messages[errorCode] || 'Ocurrió un error. Intenta nuevamente.';
+    const message = messages[errorCode] || 'Error al iniciar sesión.';
 
-    // Crear alerta
     const alert = await this.alertCtrl.create({
-      header: 'Error al iniciar sesión',
+      header: 'Error',
       message,
       buttons: ['Aceptar'],
     });
 
-    // Mostrar alerta
     await alert.present();
   }
 
@@ -216,7 +171,6 @@ export class LoginPage {
   // =========================
   private async showToast(message: string, color: string = 'success') {
 
-    // Crear notificación tipo toast
     const toast = await this.toastCtrl.create({
       message,
       duration: 3000,
@@ -224,16 +178,13 @@ export class LoginPage {
       position: 'bottom'
     });
 
-    // Mostrar toast
     await toast.present();
   }
 
   // =========================
-  // 📝 IR A REGISTRO
+  // 📝 NAVEGACIÓN
   // =========================
   goToRegister() {
-
-    // Navega a la página de registro
     this.router.navigateByUrl('/register');
   }
 }

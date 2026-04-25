@@ -1,9 +1,26 @@
+// =========================
+// 📦 IMPORTS
+// =========================
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, ToastController, LoadingController, ActionSheetController } from '@ionic/angular';
-import { AuthService, UserData } from 'src/app/core/services/auth.service';
+import {
+  AlertController,
+  ToastController,
+  LoadingController,
+  ActionSheetController
+} from '@ionic/angular';
+
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Firestore, collection, getDocs, deleteDoc, doc } from '@angular/fire/firestore';
+
+import {
+  Firestore,
+  collection,
+  getDocs,
+  deleteDoc,
+  doc
+} from '@angular/fire/firestore';
+
+import { AuthService, UserData } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -13,6 +30,9 @@ import { Firestore, collection, getDocs, deleteDoc, doc } from '@angular/fire/fi
 })
 export class ProfilePage implements OnInit {
 
+  // =========================
+  // 🔌 DEPENDENCIAS
+  // =========================
   private authService = inject(AuthService);
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
@@ -21,14 +41,20 @@ export class ProfilePage implements OnInit {
   private actionSheetCtrl = inject(ActionSheetController);
   private firestore = inject(Firestore);
 
+  // =========================
+  // 📊 ESTADO
+  // =========================
   userData: UserData | null = null;
   favoritos: any[] = [];
+
+  authReady = false;
 
   hideHeader = false;
   lastScrollTop = 0;
 
-  authReady = false;
-
+  // =========================
+  // 😊 ESTADOS DE ÁNIMO
+  // =========================
   estados = [
     { label: 'Excelente 😄', value: 'Excelente 😄' },
     { label: 'Bien 🙂', value: 'Bien 🙂' },
@@ -38,28 +64,28 @@ export class ProfilePage implements OnInit {
     { label: 'Triste 😢', value: 'Triste 😢' },
   ];
 
-async ngOnInit() {
+  // =========================
+  // 🚀 CICLO DE VIDA
+  // =========================
+  async ngOnInit() {
+    this.authService.currentUser$.subscribe(async user => {
 
-  this.authService.currentUser$.subscribe(async user => {
+      this.authReady = true;
 
-    // 🔥 Marca que Firebase ya respondió (aunque sea null)
-    this.authReady = true;
+      if (user) {
+        this.userData = await this.authService.getCurrentUserData();
+        await this.loadFavoritos();
+      } else {
+        this.userData = null;
+        this.favoritos = [];
+      }
 
-    if (user) {
-      this.userData = await this.authService.getCurrentUserData();
-      await this.loadFavoritos();
-    } else {
-      this.userData = null;
-      this.favoritos = [];
-    }
-
-  });
-}
+    });
+  }
 
   // =========================
   // ⭐ FAVORITOS
   // =========================
-
   async loadFavoritos() {
     const user = this.authService['auth'].currentUser;
     if (!user) return;
@@ -74,7 +100,6 @@ async ngOnInit() {
   }
 
   async removeFavorito(eventoId: string) {
-
     const user = this.authService['auth'].currentUser;
     if (!user) return;
 
@@ -91,15 +116,22 @@ async ngOnInit() {
   }
 
   // =========================
-  // 📷 FOTO PERFIL
+  // 📷 FOTO DE PERFIL
   // =========================
-
   async onChangeFoto() {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Foto de perfil',
       buttons: [
-        { text: 'Tomar foto', icon: 'camera-outline', handler: () => this.takePicture(CameraSource.Camera) },
-        { text: 'Galería', icon: 'image-outline', handler: () => this.takePicture(CameraSource.Photos) },
+        {
+          text: 'Tomar foto',
+          icon: 'camera-outline',
+          handler: () => this.takePicture(CameraSource.Camera)
+        },
+        {
+          text: 'Galería',
+          icon: 'image-outline',
+          handler: () => this.takePicture(CameraSource.Photos)
+        },
         { text: 'Cancelar', role: 'cancel' }
       ]
     });
@@ -109,7 +141,6 @@ async ngOnInit() {
 
   private async takePicture(source: CameraSource) {
     try {
-
       const image = await Camera.getPhoto({
         quality: 70,
         allowEditing: true,
@@ -117,30 +148,28 @@ async ngOnInit() {
         source
       });
 
-      if (image.base64String) {
+      if (!image.base64String) return;
 
-        const base64 = `data:image/jpeg;base64,${image.base64String}`;
+      const base64 = `data:image/jpeg;base64,${image.base64String}`;
 
-        const loading = await this.loadingCtrl.create({ message: 'Guardando...' });
-        await loading.present();
+      const loading = await this.loadingCtrl.create({ message: 'Guardando...' });
+      await loading.present();
 
-        await this.authService.updateProfile({ fotoBase64: base64 });
+      await this.authService.updateProfile({ fotoBase64: base64 });
 
-        if (this.userData) this.userData.fotoBase64 = base64;
+      if (this.userData) this.userData.fotoBase64 = base64;
 
-        await loading.dismiss();
-        await this.showToast('Foto actualizada', 'success');
-      }
+      await loading.dismiss();
+      await this.showToast('Foto actualizada', 'success');
 
-    } catch (err) {
+    } catch {
       await this.showToast('Error al subir foto', 'danger');
     }
   }
 
   // =========================
-  // 🚪 LOGOUT
+  // 🚪 AUTH
   // =========================
-
   async onLogout() {
     await this.authService.logout();
     this.router.navigateByUrl('/login', { replaceUrl: true });
@@ -155,31 +184,8 @@ async ngOnInit() {
   }
 
   // =========================
-  // 🍞 TOAST
+  // 😊 ESTADO DE ÁNIMO
   // =========================
-
-  private async showToast(message: string, color: string = 'success') {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000,
-      color,
-      position: 'bottom'
-    });
-
-    await toast.present();
-  }
-
-  // =========================
-  // 📜 SCROLL
-  // =========================
-
-  onScroll(event: any) {
-    const scrollTop = event.detail.scrollTop;
-    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
-    this.lastScrollTop = scrollTop;
-  }
-
-  // 😊 CAMBIAR ESTADO DE ÁNIMO
   async onChangeEstado() {
     const alert = await this.alertCtrl.create({
       header: '¿Cómo te sientes hoy?',
@@ -205,11 +211,9 @@ async ngOnInit() {
           handler: async (selected) => {
             if (!selected) return false;
 
-            if (selected === 'custom') {
-              await this.showCustomEstadoInput();
-            } else {
-              await this.saveEstado(selected);
-            }
+            selected === 'custom'
+              ? await this.showCustomEstadoInput()
+              : await this.saveEstado(selected);
 
             return true;
           }
@@ -220,11 +224,9 @@ async ngOnInit() {
     await alert.present();
   }
 
-  // ✏️ INPUT ESTADO PERSONALIZADO
   private async showCustomEstadoInput() {
     const alert = await this.alertCtrl.create({
       header: 'Estado personalizado',
-      message: 'Escribe cómo te sientes hoy',
       inputs: [
         {
           name: 'estadoCustom',
@@ -238,7 +240,7 @@ async ngOnInit() {
         {
           text: 'Guardar',
           handler: async (data) => {
-            if (!data.estadoCustom || data.estadoCustom.trim().length === 0) {
+            if (!data.estadoCustom?.trim()) {
               await this.showToast('Escribe un estado válido', 'warning');
               return false;
             }
@@ -253,7 +255,6 @@ async ngOnInit() {
     await alert.present();
   }
 
-  // 💾 GUARDAR ESTADO
   private async saveEstado(estado: string) {
     const loading = await this.loadingCtrl.create({
       message: 'Guardando estado...'
@@ -269,5 +270,28 @@ async ngOnInit() {
 
     await loading.dismiss();
     await this.showToast('Estado actualizado', 'success');
+  }
+
+  // =========================
+  // 🍞 TOAST
+  // =========================
+  private async showToast(message: string, color: string = 'success') {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+
+    await toast.present();
+  }
+
+  // =========================
+  // 📜 SCROLL
+  // =========================
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
+    this.lastScrollTop = scrollTop;
   }
 }

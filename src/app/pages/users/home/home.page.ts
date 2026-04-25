@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
+
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { TimeService } from 'src/app/core/services/time.service';
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -14,24 +15,38 @@ import { Subscription } from 'rxjs';
 })
 export class HomePage implements OnInit, OnDestroy {
 
+  // =========================
+  // 🔌 DEPENDENCIAS
+  // =========================
   private authService = inject(AuthService);
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
 
+  // =========================
+  // 📊 ESTADO DE AUTENTICACIÓN
+  // =========================
   authReady = false;
+  userData: UserData | null = null;
+
+  private authSub?: Subscription;
+
+  // =========================
+  // 🎨 UI STATE
+  // =========================
   hideHeader = false;
   lastScrollTop = 0;
 
-  userData: UserData | null = null;
-
-  // ✅ FIX: declarar la suscripción correctamente
-  private authSub?: Subscription;
-
+  // =========================
+  // 🌦️ SERVICIOS UI
+  // =========================
   constructor(
     public weatherGlobal: WeatherGlobalService,
     public timeService: TimeService
   ) {}
 
+  // =========================
+  // 🚀 INIT
+  // =========================
   ngOnInit() {
     this.authSub = this.authService.currentUser$.subscribe(async user => {
 
@@ -46,13 +61,16 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ limpiar memoria (IMPORTANTE)
+  // =========================
+  // 🧹 DESTROY
+  // =========================
   ngOnDestroy() {
-    if (this.authSub) {
-      this.authSub.unsubscribe();
-    }
+    this.authSub?.unsubscribe();
   }
 
+  // =========================
+  // 🚪 AUTH ACTIONS
+  // =========================
   async onLogout() {
     const alert = await this.alertCtrl.create({
       header: 'Cerrar sesión',
@@ -73,6 +91,9 @@ export class HomePage implements OnInit, OnDestroy {
     await alert.present();
   }
 
+  // =========================
+  // 🧭 NAVIGATION
+  // =========================
   goDashboard() {
     this.router.navigateByUrl('/dashboard', { replaceUrl: true });
   }
@@ -89,13 +110,21 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigateByUrl('/register');
   }
 
-  onScroll(event: any) {
-    const scrollTop = event.detail.scrollTop;
-    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
-    this.lastScrollTop = scrollTop;
-  }
-
+  // =========================
+  // 🌤️ WEATHER ACTION
+  // =========================
   openWeatherLink() {
     window.open('https://www.google.com/search?q=clima+santiago', '_blank');
+  }
+
+  // =========================
+  // 📜 SCROLL UI
+  // =========================
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+
+    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
+
+    this.lastScrollTop = scrollTop;
   }
 }

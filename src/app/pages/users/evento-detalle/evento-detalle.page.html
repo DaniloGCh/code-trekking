@@ -1,49 +1,66 @@
-<!-- src/app/pages/users/evento-detalle/evento-detalle.page.html -->
-
+<!-- ========================= -->
+<!-- 📌 HEADER -->
+<!-- ========================= -->
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
+
     <ion-buttons slot="start">
       <ion-button (click)="goBack()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
+
     <ion-title>Detalle del Evento</ion-title>
-    <!-- Compartir -->
+
     <ion-buttons slot="end">
       <ion-button (click)="onCompartir()">
         <ion-icon slot="icon-only" name="share-social-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
 
+<!-- ========================= -->
+<!-- 📌 CONTENIDO PRINCIPAL -->
+<!-- ========================= -->
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true" *ngIf="evento">
 
-  <!-- CABECERA DEL EVENTO -->
+  <!-- ========================= -->
+  <!-- 🏷️ CABECERA EVENTO -->
+  <!-- ========================= -->
   <div class="evento-header">
     <h1>{{ evento.nombre }}</h1>
+
     <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
                         evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
       {{ evento.lugar.dificultad }}
     </ion-badge>
   </div>
 
-  <!-- CÓDIGO DE INVITACIÓN -->
+  <!-- ========================= -->
+  <!-- 🔑 CÓDIGO INVITACIÓN -->
+  <!-- ========================= -->
   <ion-card class="codigo-card">
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="key-outline" color="primary"></ion-icon>
         Código de invitación
       </ion-card-title>
-      <ion-card-subtitle>Comparte este código para invitar a otros</ion-card-subtitle>
+      <ion-card-subtitle>
+        Comparte este código para invitar a otros
+      </ion-card-subtitle>
     </ion-card-header>
+
     <ion-card-content>
       <div class="codigo-container">
         <span class="codigo-text">{{ evento.codigoInvitacion }}</span>
+
         <ion-button fill="clear" (click)="onCopiarCodigo()">
           <ion-icon name="copy-outline"></ion-icon>
         </ion-button>
       </div>
+
       <ion-button class="btn-compartir" expand="block" (click)="onCompartir()">
         <ion-icon name="share-social-outline" slot="start"></ion-icon>
         Compartir invitación
@@ -51,11 +68,14 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- INFORMACIÓN DEL EVENTO -->
+  <!-- ========================= -->
+  <!-- 📄 INFORMACIÓN EVENTO -->
+  <!-- ========================= -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Información del evento</ion-card-title>
     </ion-card-header>
+
     <ion-card-content>
       <ion-list lines="none">
 
@@ -87,17 +107,19 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- INFORMACIÓN DEL LUGAR -->
-  <!-- INFORMACIÓN DEL LUGAR -->
+  <!-- ========================= -->
+  <!-- 📍 INFORMACIÓN LUGAR -->
+  <!-- ========================= -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="location-outline" color="primary"></ion-icon>
         {{ evento.lugar.nombre }}
       </ion-card-title>
+
       <ion-card-subtitle>
         <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
-                          evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
+                            evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
           {{ evento.lugar.dificultad }}
         </ion-badge>
       </ion-card-subtitle>
@@ -106,7 +128,6 @@
     <ion-card-content>
       <ion-list lines="none">
 
-        <!-- INFORMACIÓN GENERAL -->
         <ion-item>
           <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
           <ion-label class="ion-text-wrap">
@@ -115,16 +136,14 @@
           </ion-label>
         </ion-item>
 
-        <!-- PUNTO DE INICIO -->
         <ion-item>
           <ion-icon name="navigate-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="ion-text-wrap">
+          <ion-label>
             <p>Punto de inicio</p>
             <h3>{{ evento.lugar.puntoInicio }}</h3>
           </ion-label>
         </ion-item>
 
-        <!-- ALTITUD Y DISTANCIA -->
         <ion-item>
           <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
           <ion-label>
@@ -136,12 +155,11 @@
         <ion-item>
           <ion-icon name="map-outline" slot="start" color="primary"></ion-icon>
           <ion-label>
-            <p>Distancia del recorrido</p>
+            <p>Distancia</p>
             <h3>{{ evento.lugar.distanciaKm }} km</h3>
           </ion-label>
         </ion-item>
 
-        <!-- TIEMPO ESTIMADO -->
         <ion-item>
           <ion-icon name="time-outline" slot="start" color="primary"></ion-icon>
           <ion-label>
@@ -150,37 +168,38 @@
           </ion-label>
         </ion-item>
 
-        <!-- TEMPORADA -->
         <ion-item>
           <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
           <ion-label>
-            <p>Temporada recomendada</p>
+            <p>Temporada</p>
             <h3>{{ evento.lugar.temporada }}</h3>
           </ion-label>
         </ion-item>
 
-        <!-- REQUIERE PERMISO -->
         <ion-item>
-          <ion-icon [name]="evento.lugar.requierePermiso ? 'alert-circle-outline' : 'checkmark-circle-outline'"
-            slot="start" [color]="evento.lugar.requierePermiso ? 'warning' : 'success'">
+          <ion-icon
+            [name]="evento.lugar.requierePermiso ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start"
+            [color]="evento.lugar.requierePermiso ? 'warning' : 'success'">
           </ion-icon>
+
           <ion-label>
-            <p>Permiso especial</p>
+            <p>Permiso</p>
             <h3>{{ evento.lugar.requierePermiso ? 'Requiere permiso' : 'No requiere permiso' }}</h3>
           </ion-label>
         </ion-item>
 
-        <!-- EQUIPAMIENTO -->
         <ion-item>
           <ion-icon name="backpack-outline" slot="start" color="primary"></ion-icon>
           <ion-label class="ion-text-wrap">
-            <p>Equipamiento necesario</p>
+            <p>Equipamiento</p>
+
             <div class="equipamiento-chips">
-              <ion-chip *ngFor="let equipo of evento.lugar.equipamiento" color="whith" outline="true"
-                style="margin: 2px;">
+              <ion-chip *ngFor="let equipo of evento.lugar.equipamiento" outline>
                 {{ equipo }}
               </ion-chip>
             </div>
+
           </ion-label>
         </ion-item>
 
@@ -188,8 +207,9 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- PARTICIPANTES -->
-  <!-- PARTICIPANTES -->
+  <!-- ========================= -->
+  <!-- 👥 PARTICIPANTES -->
+  <!-- ========================= -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>
@@ -197,12 +217,15 @@
         Participantes ({{ evento.participantesInfo.length || evento.participantes.length }})
       </ion-card-title>
     </ion-card-header>
+
     <ion-card-content>
       <ion-list lines="none">
+
         <ion-item *ngFor="let participante of evento.participantesInfo">
 
           <ion-avatar slot="start">
-            <ion-icon name="person-circle-outline" style="font-size: 40px;"
+            <ion-icon name="person-circle-outline"
+              style="font-size: 40px;"
               [color]="participante.uid === evento.creadoPor.uid ? 'primary' : 'medium'">
             </ion-icon>
           </ion-avatar>
@@ -214,42 +237,52 @@
             <p>{{ participante.uid === evento.creadoPor.uid ? 'Organizador' : 'Participante' }}</p>
           </ion-label>
 
-          <!-- Badge organizador -->
-          <ion-badge slot="end" [color]="participante.uid === evento.creadoPor.uid ? 'primary' : 'medium'">
+          <ion-badge slot="end"
+            [color]="participante.uid === evento.creadoPor.uid ? 'primary' : 'medium'">
             {{ participante.uid === evento.creadoPor.uid ? 'Org.' : 'Part.' }}
           </ion-badge>
 
         </ion-item>
+
       </ion-list>
     </ion-card-content>
   </ion-card>
 
-  <!-- ACCIONES -->
+  <!-- ========================= -->
+  <!-- ⚡ ACCIONES -->
+  <!-- ========================= -->
   <div class="acciones">
 
-    <!-- Agregar en la sección de acciones -->
-    <!-- Botón foro con badge de mensajes nuevos -->
     <ion-card class="button-end">
+
+      <!-- Foro -->
       <div class="foro-btn-wrapper">
+
         <ion-button expand="block" (click)="irAlForo()">
           <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
           Foro del evento
         </ion-button>
 
-        <!-- ✅ Badge de mensajes nuevos -->
         <ion-badge color="danger" class="foro-badge" *ngIf="mensajesNuevos > 0">
           {{ mensajesNuevos > 99 ? '99+' : mensajesNuevos }}
         </ion-badge>
+
       </div>
 
-      <!-- Salir del evento (solo si no es el creador) -->
-      <ion-button expand="block" fill="outline" color="warning" *ngIf="!esCreadoPor" (click)="onSalirEvento()">
+      <!-- Salir -->
+      <ion-button expand="block" fill="outline" color="warning"
+        *ngIf="!esCreadoPor"
+        (click)="onSalirEvento()">
+
         <ion-icon name="exit-outline" slot="start"></ion-icon>
         Salir del evento
       </ion-button>
 
-      <!-- Eliminar evento (solo el creador) -->
-      <ion-button class="btn-eliminar-evento-full" expand="block" color="danger" *ngIf="esCreadoPor"
+      <!-- Eliminar -->
+      <ion-button class="btn-eliminar-evento-full"
+        expand="block"
+        color="danger"
+        *ngIf="esCreadoPor"
         (click)="onEliminarEvento()">
 
         <ion-icon name="trash-outline" slot="start"></ion-icon>
@@ -257,7 +290,6 @@
       </ion-button>
 
     </ion-card>
-
 
   </div>
 

@@ -1,14 +1,14 @@
-// src/app/pages/users/evento-detalle/evento-detalle.page.ts
-
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
-import { EventoService } from 'src/app/core/services/evento.service';
-import { AuthService, UserData } from 'src/app/core/services/auth.service';
-import { Evento } from 'src/app/core/models/evento.model';
+
 import { Auth } from '@angular/fire/auth';
+
+import { EventoService } from 'src/app/core/services/evento.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { Evento } from 'src/app/core/models/evento.model';
 
 @Component({
   selector: 'app-evento-detalle',
@@ -18,6 +18,9 @@ import { Auth } from '@angular/fire/auth';
 })
 export class EventoDetallePage implements OnInit {
 
+  // =========================
+  // 🔹 INYECCIÓN DE DEPENDENCIAS
+  // =========================
   private eventoService = inject(EventoService);
   private authService = inject(AuthService);
   private auth = inject(Auth);
@@ -27,68 +30,82 @@ export class EventoDetallePage implements OnInit {
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
 
+  // =========================
+  // 📦 ESTADO DEL COMPONENTE
+  // =========================
   evento: Evento | null = null;
   currentUid = this.auth.currentUser?.uid;
   esCreadoPor = false;
+  mensajesNuevos = 0;
 
-  // ✅ Agrega esta propiedad
-mensajesNuevos = 0;
+  hideHeader = false;
+  lastScrollTop = 0;
 
-hideHeader = false;     // Indica si el header está oculto
-  lastScrollTop = 0;      // Guarda la última posición del scroll
+  // =========================
+  // 🚀 INICIALIZACIÓN
+  // =========================
+  async ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) return;
 
+    const loading = await this.loadingCtrl.create({
+      message: 'Cargando evento...'
+    });
 
-async ngOnInit() {
-  const id = this.route.snapshot.paramMap.get('id');
-  if (!id) return;
+    await loading.present();
 
-  const loading = await this.loadingCtrl.create({ message: 'Cargando evento...' });
-  await loading.present();
+    try {
+      this.evento = await this.eventoService.getEventoById(id);
+      this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
 
-  try {
-    this.evento = await this.eventoService.getEventoById(id);
-    this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
+      if (this.evento && this.currentUid) {
+        this.mensajesNuevos = await this.eventoService.contarMensajesNuevos(
+          this.evento.id!,
+          this.currentUid
+        );
+      }
 
-    // ✅ Contar mensajes nuevos
-    if (this.evento && this.currentUid) {
-      this.mensajesNuevos = await this.eventoService.contarMensajesNuevos(
-        this.evento.id!,
-        this.currentUid
-      );
+      await loading.dismiss();
+
+    } catch (error) {
+      await loading.dismiss();
+      await this.showToast('Error al cargar el evento', 'danger');
+      this.goBack();
     }
-
-    await loading.dismiss();
-  } catch (error) {
-    await loading.dismiss();
-    await this.showToast('Error al cargar el evento', 'danger');
-    this.goBack();
   }
-}
 
-  // 📋 COPIAR CÓDIGO AL PORTAPAPELES
+  // =========================
+  // 📋 CÓDIGO INVITACIÓN
+  // =========================
   async onCopiarCodigo() {
     if (!this.evento) return;
+
     await Clipboard.write({ string: this.evento.codigoInvitacion });
     await this.showToast('Código copiado al portapapeles', 'success');
   }
 
+  // =========================
   // 🔗 COMPARTIR EVENTO
+  // =========================
   async onCompartir() {
     if (!this.evento) return;
 
     try {
       await Share.share({
         title: `¡Te invito al evento: ${this.evento.nombre}!`,
-        text: `Únete a mi evento de trekking "${this.evento.nombre}" en ${this.evento.lugar.nombre}.\n\nUsa el código de invitación: ${this.evento.codigoInvitacion}\n\nFecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las ${this.evento.hora}`,
+        text: `Únete a "${this.evento.nombre}" en ${this.evento.lugar.nombre}.
+Código: ${this.evento.codigoInvitacion}
+Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las ${this.evento.hora}`,
         dialogTitle: 'Compartir evento',
       });
-    } catch (error) {
-      // Si Share no está disponible copiar al portapapeles
+    } catch {
       await this.onCopiarCodigo();
     }
   }
 
+  // =========================
   // 🚪 SALIR DEL EVENTO
+  // =========================
   async onSalirEvento() {
     const alert = await this.alertCtrl.create({
       header: 'Salir del evento',
@@ -98,15 +115,23 @@ async ngOnInit() {
         {
           text: 'Salir',
           handler: async () => {
-            const loading = await this.loadingCtrl.create({ message: 'Saliendo...' });
+            const loading = await this.loadingCtrl.create({
+              message: 'Saliendo...'
+            });
+
             await loading.present();
 
             try {
-              await this.eventoService.salirEvento(this.evento!.id!, this.currentUid!);
+              await this.eventoService.salirEvento(
+                this.evento!.id!,
+                this.currentUid!
+              );
+
               await loading.dismiss();
               await this.showToast('Saliste del evento', 'success');
               this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
-            } catch (error) {
+
+            } catch {
               await loading.dismiss();
               await this.showToast('Error al salir del evento', 'danger');
             }
@@ -118,25 +143,32 @@ async ngOnInit() {
     await alert.present();
   }
 
+  // =========================
   // 🗑️ ELIMINAR EVENTO
+  // =========================
   async onEliminarEvento() {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar evento',
-      message: `¿Estás seguro que deseas eliminar <strong>${this.evento?.nombre}</strong>? Esta acción es irreversible.`,
+      message: `¿Eliminar <strong>${this.evento?.nombre}</strong>? Esta acción es irreversible.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           handler: async () => {
-            const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
+            const loading = await this.loadingCtrl.create({
+              message: 'Eliminando...'
+            });
+
             await loading.present();
 
             try {
               await this.eventoService.eliminarEvento(this.evento!.id!);
+
               await loading.dismiss();
               await this.showToast('Evento eliminado', 'success');
               this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
-            } catch (error) {
+
+            } catch {
               await loading.dismiss();
               await this.showToast('Error al eliminar el evento', 'danger');
             }
@@ -148,12 +180,39 @@ async ngOnInit() {
     await alert.present();
   }
 
-  // 🔙 Volver
+  // =========================
+  // 🔙 NAVEGACIÓN
+  // =========================
   goBack() {
     this.router.navigateByUrl('/tabs/eventos');
   }
 
-  // 🍞 Toast helper
+  irAlForo() {
+    if (this.currentUid) {
+      this.eventoService.marcarForoVisto(this.evento!.id!, this.currentUid);
+      this.mensajesNuevos = 0;
+    }
+
+    this.router.navigateByUrl(
+      `/tabs/foro/${this.evento!.id}/${this.evento!.creadoPor.uid}`
+    );
+  }
+
+  // =========================
+  // 📜 SCROLL HEADER
+  // =========================
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+
+    this.hideHeader =
+      scrollTop > this.lastScrollTop && scrollTop > 50;
+
+    this.lastScrollTop = scrollTop;
+  }
+
+  // =========================
+  // 🍞 TOAST HELPER
+  // =========================
   private async showToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,
@@ -161,32 +220,7 @@ async ngOnInit() {
       color,
       position: 'bottom'
     });
+
     await toast.present();
-  }
-
-  // ✅ Navegar al foro pasando eventoId y organizadorUid
-// ✅ Actualiza irAlForo() para marcar como visto
-irAlForo() {
-  if (this.currentUid) {
-    this.eventoService.marcarForoVisto(this.evento!.id!, this.currentUid);
-    this.mensajesNuevos = 0; // Limpiar badge al entrar
-  }
-  this.router.navigateByUrl(`/tabs/foro/${this.evento!.id}/${this.evento!.creadoPor.uid}`);
-}
-
-  onScroll(event: any) {
-
-    const scrollTop = event.detail.scrollTop;
-
-    // Si baja → ocultar header
-    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
-      this.hideHeader = true;
-    } else {
-      // Si sube → mostrar header
-      this.hideHeader = false;
-    }
-
-    // Guardar posición actual
-    this.lastScrollTop = scrollTop;
   }
 }

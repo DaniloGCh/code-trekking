@@ -1,76 +1,56 @@
 <!-- src/app/pages/admin/dashboard/dashboard.page.html -->
 
 <ng-container *ngIf="adminData?.rol === 'admin'; else noAcceso">
+
   <!-- ========================= -->
   <!-- 🔝 HEADER -->
   <!-- ========================= -->
-  <ion-header [class.hidden]="hideHeader"> <!-- Se oculta dinámicamente al hacer scroll -->
-    <ion-toolbar class="transparent-toolbar"> <!-- Toolbar personalizada -->
+  <ion-header [class.hidden]="hideHeader">
+    <ion-toolbar class="transparent-toolbar">
 
-      <!-- 🧩 Título del panel -->
       <ion-title>Admin</ion-title>
 
-      <!-- ========================= -->
       <!-- 🌤️ CLIMA + HORA -->
-      <!-- ========================= -->
-      <!-- Botón central que muestra clima y hora -->
       <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
-
-        <!-- Icono dinámico según el clima -->
         <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
-
-        <!-- Temperatura actual -->
         <span>{{ weatherGlobal.temperature | async }}° </span>
-
-        <!-- Hora actual -->
         <span>| {{ timeService.dateTime | async }}</span>
       </ion-button>
 
-      <!-- ========================= -->
-      <!-- 🔘 BOTONES DERECHA -->
-      <!-- ========================= -->
+      <!-- 🔘 ACCIONES -->
       <ion-buttons slot="end">
 
-        <!-- 🏠 BOTÓN HOME -->
         <ion-button (click)="goHome()">
           <ion-icon slot="icon-only" name="home-outline"></ion-icon>
         </ion-button>
 
-        <!-- 🚪 BOTÓN LOGOUT -->
         <ion-button (click)="onLogout()">
           <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
         </ion-button>
 
       </ion-buttons>
+
     </ion-toolbar>
   </ion-header>
 
   <!-- ========================= -->
-  <!-- 📄 CONTENIDO PRINCIPAL -->
+  <!-- 📄 CONTENIDO -->
   <!-- ========================= -->
   <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
-    <!-- (ionScroll): detecta scroll -->
-    <!-- [scrollEvents]="true": habilita eventos de scroll -->
 
-    <!-- ========================= -->
     <!-- 👋 BIENVENIDA -->
-    <!-- ========================= -->
     <div class="welcome-header" *ngIf="adminData">
-      <!-- *ngIf: solo muestra si hay datos del admin -->
 
-      <!-- Icono decorativo -->
       <ion-icon name="shield-checkmark-outline"></ion-icon>
 
       <div>
-        <!-- Nombre del administrador -->
         <h2>¡Hola, {{ adminData.nombre }}!</h2>
-
-        <!-- Mensaje de bienvenida -->
         <p>
           Bienvenido a tu dashboard administrativo.
           Gestiona la plataforma de forma eficiente y segura.
         </p>
       </div>
+
     </div>
 
     <!-- ========================= -->
@@ -78,37 +58,34 @@
     <!-- ========================= -->
     <h3 class="section-title">Estadísticas</h3>
 
-    <ion-grid> <!-- Sistema de grillas de Ionic -->
+    <ion-grid>
       <ion-row>
 
-        <!-- 🔢 TOTAL USUARIOS -->
         <ion-col size="4">
           <ion-card class="stat-card total">
             <ion-card-content>
               <ion-icon name="people-outline"></ion-icon>
-              <h2>{{ totalUsers }}</h2> <!-- Total de usuarios -->
+              <h2>{{ totalUsers }}</h2>
               <p>Total</p>
             </ion-card-content>
           </ion-card>
         </ion-col>
 
-        <!-- 🛡️ ADMINISTRADORES -->
         <ion-col size="4">
           <ion-card class="stat-card admins">
             <ion-card-content>
               <ion-icon name="shield-outline"></ion-icon>
-              <h2>{{ totalAdmins }}</h2> <!-- Total admins -->
+              <h2>{{ totalAdmins }}</h2>
               <p>Admins</p>
             </ion-card-content>
           </ion-card>
         </ion-col>
 
-        <!-- 👤 USUARIOS NORMALES -->
         <ion-col size="4">
           <ion-card class="stat-card users">
             <ion-card-content>
               <ion-icon name="person-outline"></ion-icon>
-              <h2>{{ totalRegulares }}</h2> <!-- Total usuarios normales -->
+              <h2>{{ totalRegulares }}</h2>
               <p>Usuarios</p>
             </ion-card-content>
           </ion-card>
@@ -118,19 +95,17 @@
     </ion-grid>
 
     <!-- ========================= -->
-    <!-- 👥 LISTA DE USUARIOS -->
+    <!-- 👥 USUARIOS -->
     <!-- ========================= -->
     <ion-accordion-group>
 
       <ion-accordion value="usuarios">
 
-        <!-- HEADER DEL ACORDEÓN -->
         <ion-item slot="header">
           <ion-icon name="people-outline" slot="start"></ion-icon>
           <ion-label>Ver usuarios registrados</ion-label>
         </ion-item>
 
-        <!-- CONTENIDO -->
         <div slot="content">
 
           <ion-list>
@@ -165,20 +140,28 @@
     </ion-accordion-group>
 
     <!-- ========================= -->
-    <!-- 📍 GESTIÓN DE LUGARES -->
+    <!-- 📍 LUGARES -->
     <!-- ========================= -->
     <h3 class="section-title">
       Gestión de lugares
-      <ion-button fill="clear" size="small" (click)="onNuevoLugar()" *ngIf="!mostrarFormLugar">
+
+      <ion-button
+        *ngIf="!mostrarFormLugar"
+        fill="clear"
+        size="small"
+        (click)="onNuevoLugar()">
+
         <ion-icon name="add-circle-outline" slot="start"></ion-icon>
         Agregar
       </ion-button>
+
     </h3>
 
     <!-- ========================= -->
     <!-- 📋 FORMULARIO LUGAR -->
     <!-- ========================= -->
     <ion-card id="form-lugar" *ngIf="mostrarFormLugar" class="form-card">
+
       <ion-card-header>
         <ion-card-title>
           {{ lugarEditando ? '✏️ Editar lugar' : '➕ Nuevo lugar' }}
@@ -186,9 +169,9 @@
       </ion-card-header>
 
       <ion-card-content>
+
         <form [formGroup]="lugarForm" (ngSubmit)="onGuardarLugar()">
 
-          <!-- NOMBRE -->
           <!-- NOMBRE -->
           <ion-item [class.ion-invalid]="fNombre?.invalid && fNombre?.touched">
             <ion-label position="floating">Nombre del lugar</ion-label>
@@ -212,116 +195,97 @@
           <!-- PUNTO DE INICIO -->
           <ion-item [class.ion-invalid]="fPuntoInicio?.invalid && fPuntoInicio?.touched">
             <ion-label position="floating">Punto de inicio</ion-label>
-            <ion-input type="text" formControlName="puntoInicio" placeholder="Ej: Sector Farellones"></ion-input>
-            <ion-note slot="error">
-              <span *ngIf="fPuntoInicio?.errors?.['required']">El punto de inicio es requerido</span>
-            </ion-note>
+            <ion-input type="text" formControlName="puntoInicio"></ion-input>
           </ion-item>
 
-          <!-- ALTITUD Y DISTANCIA -->
+          <!-- ALTITUD / DISTANCIA -->
           <ion-grid class="ion-no-padding">
             <ion-row>
+
               <ion-col size="6">
-                <ion-item [class.ion-invalid]="fAltitud?.invalid && fAltitud?.touched">
+                <ion-item>
                   <ion-label position="floating">Altitud (msnm)</ion-label>
                   <ion-input type="number" formControlName="altitud"></ion-input>
-                  <ion-note slot="error">
-                    <span *ngIf="fAltitud?.errors?.['required']">Requerido</span>
-                  </ion-note>
                 </ion-item>
               </ion-col>
+
               <ion-col size="6">
-                <ion-item [class.ion-invalid]="fDistanciaKm?.invalid && fDistanciaKm?.touched">
+                <ion-item>
                   <ion-label position="floating">Distancia (km)</ion-label>
                   <ion-input type="number" formControlName="distanciaKm"></ion-input>
-                  <ion-note slot="error">
-                    <span *ngIf="fDistanciaKm?.errors?.['required']">Requerido</span>
-                  </ion-note>
                 </ion-item>
               </ion-col>
+
             </ion-row>
           </ion-grid>
 
-          <!-- TIEMPO ESTIMADO -->
-          <ion-item [class.ion-invalid]="fTiempoEstimadoHoras?.invalid && fTiempoEstimadoHoras?.touched">
+          <!-- TIEMPO -->
+          <ion-item>
             <ion-label position="floating">Tiempo estimado (horas)</ion-label>
-            <ion-input type="number" formControlName="tiempoEstimadoHoras" placeholder="Ej: 6.5"></ion-input>
-            <ion-note slot="error">
-              <span *ngIf="fTiempoEstimadoHoras?.errors?.['required']">El tiempo es requerido</span>
-              <span *ngIf="fTiempoEstimadoHoras?.errors?.['min']">Mínimo 0.5 horas</span>
-            </ion-note>
+            <ion-input type="number" formControlName="tiempoEstimadoHoras"></ion-input>
           </ion-item>
 
-          <!-- DIFICULTAD Y RIESGO -->
+          <!-- SELECTS -->
           <ion-grid class="ion-no-padding">
             <ion-row>
+
               <ion-col size="6">
-                <ion-item [class.ion-invalid]="fDificultad?.invalid && fDificultad?.touched">
+                <ion-item>
                   <ion-label position="floating">Dificultad</ion-label>
-                  <ion-select formControlName="dificultad" placeholder="Selecciona">
+                  <ion-select formControlName="dificultad">
                     <ion-select-option value="Baja">Baja 🟢</ion-select-option>
                     <ion-select-option value="Media">Media 🟡</ion-select-option>
                     <ion-select-option value="Alta">Alta 🔴</ion-select-option>
                   </ion-select>
-                  <ion-note slot="error">
-                    <span *ngIf="fDificultad?.errors?.['required']">Requerido</span>
-                  </ion-note>
                 </ion-item>
               </ion-col>
+
               <ion-col size="6">
-                <ion-item [class.ion-invalid]="fCalificacionRiesgo?.invalid && fCalificacionRiesgo?.touched">
+                <ion-item>
                   <ion-label position="floating">Riesgo</ion-label>
-                  <ion-select formControlName="calificacionRiesgo" placeholder="Selecciona">
+                  <ion-select formControlName="calificacionRiesgo">
                     <ion-select-option value="Bajo">Bajo 🟢</ion-select-option>
                     <ion-select-option value="Moderado">Moderado 🟡</ion-select-option>
                     <ion-select-option value="Alto">Alto 🟠</ion-select-option>
                     <ion-select-option value="Extremo">Extremo 🔴</ion-select-option>
                   </ion-select>
-                  <ion-note slot="error">
-                    <span *ngIf="fCalificacionRiesgo?.errors?.['required']">Requerido</span>
-                  </ion-note>
                 </ion-item>
               </ion-col>
+
             </ion-row>
           </ion-grid>
 
           <!-- TEMPORADA -->
-          <ion-item [class.ion-invalid]="fTemporada?.invalid && fTemporada?.touched">
-            <ion-label position="floating">Temporada recomendada</ion-label>
-            <ion-select formControlName="temporada" placeholder="Selecciona temporada">
+          <ion-item>
+            <ion-label position="floating">Temporada</ion-label>
+            <ion-select formControlName="temporada">
               <ion-select-option value="Verano">Verano ☀️</ion-select-option>
               <ion-select-option value="Invierno">Invierno ❄️</ion-select-option>
               <ion-select-option value="Primavera">Primavera 🌸</ion-select-option>
               <ion-select-option value="Otoño">Otoño 🍂</ion-select-option>
               <ion-select-option value="Todo el año">Todo el año 📅</ion-select-option>
             </ion-select>
-            <ion-note slot="error">
-              <span *ngIf="fTemporada?.errors?.['required']">La temporada es requerida</span>
-            </ion-note>
           </ion-item>
 
           <!-- EQUIPAMIENTO -->
-          <ion-item [class.ion-invalid]="fEquipamiento?.invalid && fEquipamiento?.touched">
-            <ion-label position="floating">Equipamiento necesario</ion-label>
-            <ion-select formControlName="equipamiento" [multiple]="true" placeholder="Selecciona equipamiento">
+          <ion-item>
+            <ion-label position="floating">Equipamiento</ion-label>
+            <ion-select formControlName="equipamiento" [multiple]="true">
               <ion-select-option *ngFor="let equipo of equipamientoOpciones" [value]="equipo">
                 {{ equipo }}
               </ion-select-option>
             </ion-select>
-            <ion-note slot="error">
-              <span *ngIf="fEquipamiento?.errors?.['required']">Selecciona al menos uno</span>
-            </ion-note>
           </ion-item>
 
-          <!-- REQUIERE PERMISO -->
+          <!-- PERMISO -->
           <ion-item>
-            <ion-label>¿Requiere permiso especial?</ion-label>
+            <ion-label>¿Requiere permiso?</ion-label>
             <ion-toggle formControlName="requierePermiso" slot="end"></ion-toggle>
-
           </ion-item>
 
           <!-- BOTONES -->
           <div class="form-buttons">
+
             <ion-button expand="block" type="submit" [disabled]="lugarForm.invalid">
               <ion-icon [name]="lugarEditando ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
               {{ lugarEditando ? 'Guardar cambios' : 'Agregar lugar' }}
@@ -331,43 +295,39 @@
               <ion-icon name="close-outline" slot="start"></ion-icon>
               Cancelar
             </ion-button>
+
           </div>
 
         </form>
+
       </ion-card-content>
+
     </ion-card>
 
     <!-- ========================= -->
-    <!-- 📍 LISTA DE LUGARES -->
+    <!-- 📍 LISTA LUGARES -->
     <!-- ========================= -->
-    <!-- ========================= -->
-    <!-- 📍 ACORDEÓN LISTA DE LUGARES -->
-    <!-- ========================= -->
-
     <ion-accordion-group>
 
       <ion-accordion value="lugares">
 
-        <!-- HEADER -->
-        <ion-item slot="header" >
+        <ion-item slot="header">
           <ion-icon name="map-outline" slot="start"></ion-icon>
           <ion-label>Ver lugares registrados</ion-label>
         </ion-item>
 
-        <!-- CONTENIDO -->
         <div slot="content">
 
           <ion-list>
+
             <ng-container *ngIf="lugares$ | async as lugares">
 
-              <!-- Sin lugares -->
               <ion-item *ngIf="lugares.length === 0">
                 <ion-label class="ion-text-center" color="medium">
                   <p>No hay lugares registrados aún</p>
                 </ion-label>
               </ion-item>
 
-              <!-- Lista de lugares -->
               <ion-item *ngFor="let lugar of lugares">
 
                 <ion-label>
@@ -375,18 +335,18 @@
                   <p>{{ lugar.altitud }} msnm · {{ lugar.informacion }}</p>
                 </ion-label>
 
-                <!-- Badge dificultad -->
-                <ion-badge slot="end" [color]="lugar.dificultad === 'Alta' ? 'danger' :
-                       lugar.dificultad === 'Media' ? 'warning' : 'success'">
+                <ion-badge slot="end"
+                  [color]="lugar.dificultad === 'Alta' ? 'danger' :
+                          lugar.dificultad === 'Media' ? 'warning' : 'success'">
+
                   {{ lugar.dificultad }}
+
                 </ion-badge>
 
-                <!-- Editar -->
                 <ion-button slot="end" fill="clear" color="primary" (click)="onEditarLugar(lugar)">
                   <ion-icon name="pencil-outline"></ion-icon>
                 </ion-button>
 
-                <!-- Eliminar -->
                 <ion-button slot="end" fill="clear" color="danger" (click)="onEliminarLugar(lugar)">
                   <ion-icon name="trash-outline"></ion-icon>
                 </ion-button>
@@ -394,6 +354,7 @@
               </ion-item>
 
             </ng-container>
+
           </ion-list>
 
         </div>
@@ -401,12 +362,14 @@
       </ion-accordion>
 
     </ion-accordion-group>
+
   </ion-content>
 
 </ng-container>
 
-<!-- ✅ Pantalla de acceso denegado si no es admin -->
+<!-- 🚫 NO ACCESO -->
 <ng-template #noAcceso>
+
   <ion-header>
     <ion-toolbar class="transparent-toolbar">
       <ion-title>Error</ion-title>
@@ -414,14 +377,18 @@
   </ion-header>
 
   <ion-content class="ion-padding">
+
     <div class="no-acceso">
       <ion-icon name="close-circle-outline" color="danger"></ion-icon>
       <h2>Error</h2>
       <p>Upps ha ocurrido un error, vuelve al inicio.</p>
+
       <ion-button expand="block" (click)="goHome()">
         <ion-icon name="home-outline" slot="start"></ion-icon>
         Volver al inicio
       </ion-button>
     </div>
+
   </ion-content>
+
 </ng-template>

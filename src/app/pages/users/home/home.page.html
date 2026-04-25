@@ -1,22 +1,28 @@
+<!-- ========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
 
+    <!-- 🔹 TÍTULO -->
     <ion-title>Inicio</ion-title>
 
+    <!-- 🌤️ CLIMA + HORA -->
     <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
       <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
-      <span>{{ weatherGlobal.temperature | async }}° </span>
+      <span>{{ weatherGlobal.temperature | async }}°</span>
       <span>| {{ timeService.dateTime | async }}</span>
     </ion-button>
 
+    <!-- 🔘 ACCIONES DERECHA -->
     <ion-buttons slot="end">
 
-      <!-- 🏠 Dashboard solo admin -->
+      <!-- 🏠 Dashboard (solo admin) -->
       <ion-button *ngIf="userData?.rol === 'admin'" (click)="goDashboard()">
         <ion-icon slot="icon-only" name="grid-outline"></ion-icon>
       </ion-button>
 
-      <!-- 🚪 Logout solo si hay usuario -->
+      <!-- 🚪 Logout (usuario logueado) -->
       <ion-button *ngIf="userData" (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
@@ -26,13 +32,19 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- ========================= -->
+<!-- 📄 CONTENIDO -->
+<!-- ========================= -->
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-  <!-- 🔐 LOGUEADO -->
+  <!-- ========================= -->
+  <!-- 🔐 USUARIO LOGUEADO -->
+  <!-- ========================= -->
   <ng-container *ngIf="authReady && userData; else noAuth">
 
     <div class="welcome-container">
 
+      <!-- 👋 HEADER BIENVENIDA -->
       <div class="welcome-header">
 
         <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
@@ -43,12 +55,14 @@
 
         <p>Tus próxima aventura te esperan</p>
 
+        <!-- 🏷️ ROL ADMIN -->
         <ion-badge *ngIf="userData?.rol === 'admin'" color="danger">
           Administrador
         </ion-badge>
 
       </div>
 
+      <!-- ➕ CREAR EVENTO -->
       <ion-button expand="block" class="btn-crear-evento" (click)="goCrearEvento()">
         <ion-icon name="add-outline" slot="start"></ion-icon>
         Crear evento
@@ -58,11 +72,14 @@
 
   </ng-container>
 
-  <!-- 🚫 NO LOGUEADO -->
+  <!-- ========================= -->
+  <!-- 🚫 USUARIO NO LOGUEADO -->
+  <!-- ========================= -->
   <ng-template #noAuth>
 
     <div class="welcome-container">
 
+      <!-- 👋 HEADER -->
       <div class="welcome-header">
 
         <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
@@ -73,10 +90,12 @@
 
       </div>
 
+      <!-- 🔑 LOGIN -->
       <ion-button expand="block" class="btn-iniciar" (click)="goLogin()">
         Iniciar sesión
       </ion-button>
 
+      <!-- 📝 REGISTER -->
       <ion-button expand="block" fill="outline" (click)="goRegister()">
         Registrarse
       </ion-button>

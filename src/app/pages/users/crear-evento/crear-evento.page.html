@@ -1,157 +1,257 @@
-<!-- src/app/pages/users/crear-evento/crear-evento.page.html -->
 
+<!-- ========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
+
     <ion-buttons slot="start">
       <ion-button (click)="goBack()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
+
     <ion-title>Crear Evento</ion-title>
+
   </ion-toolbar>
 </ion-header>
 
+<!-- ========================= -->
+<!-- 📄 CONTENIDO PRINCIPAL -->
+<!-- ========================= -->
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <ng-container *ngIf="lugares$ | async as lugares">
-    <form class="evento-form" [formGroup]="eventoForm" (ngSubmit)="onCrearEvento(lugares)">
 
-            <!-- LUGAR -->
+    <form
+      class="evento-form"
+      [formGroup]="eventoForm"
+      (ngSubmit)="onCrearEvento(lugares)"
+    >
+
+      <!-- ========================= -->
+      <!-- 📍 LUGAR -->
+      <!-- ========================= -->
       <ion-item [class.ion-invalid]="lugarId?.invalid && lugarId?.touched">
+
         <ion-label position="floating">Lugar de trekking</ion-label>
+
         <ion-select
           placeholder="Selecciona un lugar"
-          (ionChange)="onLugarChange($event, lugares)">
-          <ion-select-option *ngFor="let lugar of lugares" [value]="lugar.id">
+          (ionChange)="onLugarChange($event, lugares)"
+        >
+          <ion-select-option
+            *ngFor="let lugar of lugares"
+            [value]="lugar.id"
+          >
             {{ lugar.nombre }} — {{ lugar.dificultad }}
           </ion-select-option>
         </ion-select>
+
         <ion-note slot="error">
-          <span *ngIf="lugarId?.errors?.['required']">Selecciona un lugar</span>
+          <span *ngIf="lugarId?.errors?.['required']">
+            Selecciona un lugar
+          </span>
         </ion-note>
+
       </ion-item>
 
-      <!-- NOMBRE DEL EVENTO -->
+      <!-- ========================= -->
+      <!-- 📝 NOMBRE EVENTO -->
+      <!-- ========================= -->
       <ion-item [class.ion-invalid]="nombre?.invalid && nombre?.touched">
+
         <ion-label position="floating">Nombre del evento</ion-label>
-        <ion-input type="text" formControlName="nombre" placeholder="Ej: Trekking grupal El Plomo"></ion-input>
+
+        <ion-input
+          type="text"
+          formControlName="nombre"
+          placeholder="Ej: Trekking grupal El Plomo"
+        ></ion-input>
+
         <ion-note slot="error">
-          <span *ngIf="nombre?.errors?.['required']">El nombre es requerido</span>
-          <span *ngIf="nombre?.errors?.['minlength']">Mínimo 3 caracteres</span>
+          <span *ngIf="nombre?.errors?.['required']">
+            El nombre es requerido
+          </span>
+          <span *ngIf="nombre?.errors?.['minlength']">
+            Mínimo 3 caracteres
+          </span>
         </ion-note>
+
       </ion-item>
 
-      <!-- DESCRIPCIÓN -->
+      <!-- ========================= -->
+      <!-- 📄 DESCRIPCIÓN -->
+      <!-- ========================= -->
       <ion-item [class.ion-invalid]="descripcion?.invalid && descripcion?.touched">
+
         <ion-label position="floating">Descripción</ion-label>
-        <ion-textarea formControlName="descripcion" rows="3" placeholder="Describe el evento..."></ion-textarea>
+
+        <ion-textarea
+          formControlName="descripcion"
+          rows="3"
+          placeholder="Describe el evento..."
+        ></ion-textarea>
+
         <ion-note slot="error">
-          <span *ngIf="descripcion?.errors?.['required']">La descripción es requerida</span>
-          <span *ngIf="descripcion?.errors?.['minlength']">Mínimo 10 caracteres</span>
+          <span *ngIf="descripcion?.errors?.['required']">
+            La descripción es requerida
+          </span>
+          <span *ngIf="descripcion?.errors?.['minlength']">
+            Mínimo 10 caracteres
+          </span>
         </ion-note>
+
       </ion-item>
 
-    <!-- FECHA -->
-<ion-item [class.ion-invalid]="fecha?.invalid && fecha?.touched">
-  
-  <ion-label position="floating">Fecha del evento </ion-label>
-  <ion-input
-    readonly
-    [value]="fechaSeleccionada"
-    placeholder="Selecciona una fecha">
-  </ion-input>
-  <ion-note slot="error">
-    <span *ngIf="fecha?.errors?.['required']">La fecha es requerida</span>
-  </ion-note>
-</ion-item>
+      <!-- ========================= -->
+      <!-- 📅 FECHA -->
+      <!-- ========================= -->
+      <ion-item [class.ion-invalid]="fecha?.invalid && fecha?.touched">
 
-<ion-datetime-button datetime="fecha" style="margin: 8px 0;">
-</ion-datetime-button>
+        <ion-label position="floating">Fecha del evento</ion-label>
 
-<ion-modal [keepContentsMounted]="true">
-  <ng-template>
-    <ion-datetime
-      id="fecha"
-      presentation="date"
-      [min]="fechaMinima"
-      locale="es-CL"
-      (ionChange)="onFechaChange($event)">
-      <span slot="title">Selecciona la fecha</span>
-    </ion-datetime>
-  </ng-template>
-</ion-modal>
+        <ion-input
+          readonly
+          [value]="fechaSeleccionada"
+          placeholder="Selecciona una fecha"
+        ></ion-input>
 
-      <!-- HORA -->
-<ion-item [class.ion-invalid]="hora?.invalid && hora?.touched" class="ion-margin-top">
-  <ion-label position="floating">Hora del evento</ion-label>
-  <ion-input
-    readonly
-    [value]="horaSeleccionada"
-    placeholder="Selecciona una hora">
-  </ion-input>
-  <ion-note slot="error">
-    <span *ngIf="hora?.errors?.['required']">La hora es requerida</span>
-  </ion-note>
-</ion-item>
+        <ion-note slot="error">
+          <span *ngIf="fecha?.errors?.['required']">
+            La fecha es requerida
+          </span>
+        </ion-note>
 
-<ion-datetime-button datetime="hora" style="margin: 8px 0;">
-</ion-datetime-button>
+      </ion-item>
 
-<ion-modal [keepContentsMounted]="true">
-  <ng-template>
-    <ion-datetime
-      id="hora"
-      presentation="time"
-      locale="es-CL"
-      (ionChange)="onHoraChange($event)">
-      <span slot="title">Selecciona la hora</span>
-    </ion-datetime>
-  </ng-template>
-</ion-modal>
+      <ion-datetime-button datetime="fecha"></ion-datetime-button>
 
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime
+            id="fecha"
+            presentation="date"
+            [min]="fechaMinima"
+            locale="es-CL"
+            (ionChange)="onFechaChange($event)"
+          >
+            <span slot="title">Selecciona la fecha</span>
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
 
-      <!-- INFO DEL LUGAR SELECCIONADO -->
+      <!-- ========================= -->
+      <!-- ⏰ HORA -->
+      <!-- ========================= -->
+      <ion-item [class.ion-invalid]="hora?.invalid && hora?.touched" class="ion-margin-top">
+
+        <ion-label position="floating">Hora del evento</ion-label>
+
+        <ion-input
+          readonly
+          [value]="horaSeleccionada"
+          placeholder="Selecciona una hora"
+        ></ion-input>
+
+        <ion-note slot="error">
+          <span *ngIf="hora?.errors?.['required']">
+            La hora es requerida
+          </span>
+        </ion-note>
+
+      </ion-item>
+
+      <ion-datetime-button datetime="hora"></ion-datetime-button>
+
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime
+            id="hora"
+            presentation="time"
+            locale="es-CL"
+            (ionChange)="onHoraChange($event)"
+          >
+            <span slot="title">Selecciona la hora</span>
+          </ion-datetime>
+        </ng-template>
+      </ion-modal>
+
+      <!-- ========================= -->
+      <!-- 🏔️ INFO LUGAR SELECCIONADO -->
+      <!-- ========================= -->
       <ion-card *ngIf="lugarSeleccionado" class="lugar-info-card">
+
         <ion-card-header>
-          <ion-card-title>{{ lugarSeleccionado.nombre }}</ion-card-title>
+          <ion-card-title>
+            {{ lugarSeleccionado.nombre }}
+          </ion-card-title>
+
           <ion-card-subtitle>
-            <ion-badge [color]="lugarSeleccionado.dificultad === 'Alta' ? 'danger' :
-                                lugarSeleccionado.dificultad === 'Media' ? 'warning' : 'success'">
+            <ion-badge
+              [color]="
+                lugarSeleccionado.dificultad === 'Alta'
+                  ? 'danger'
+                  : lugarSeleccionado.dificultad === 'Media'
+                  ? 'warning'
+                  : 'success'
+              "
+            >
               {{ lugarSeleccionado.dificultad }}
             </ion-badge>
           </ion-card-subtitle>
         </ion-card-header>
+
         <ion-card-content>
+
           <ion-list lines="none">
+
             <ion-item>
-              <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
+              <ion-icon
+                name="trending-up-outline"
+                slot="start"
+                color="primary"
+              ></ion-icon>
+
               <ion-label>
                 <p>Altitud</p>
                 <h3>{{ lugarSeleccionado.altitud }} msnm</h3>
               </ion-label>
             </ion-item>
+
             <ion-item>
-              <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
+              <ion-icon
+                name="information-circle-outline"
+                slot="start"
+                color="primary"
+              ></ion-icon>
+
               <ion-label class="ion-text-wrap">
                 <p>Información</p>
                 <h3>{{ lugarSeleccionado.informacion }}</h3>
               </ion-label>
             </ion-item>
+
           </ion-list>
+
         </ion-card-content>
       </ion-card>
 
-      <!-- BOTÓN CREAR -->
+      <!-- ========================= -->
+      <!-- 🚀 BOTÓN CREAR EVENTO -->
+      <!-- ========================= -->
       <ion-button
         expand="block"
         type="submit"
         class="ion-margin-top"
-        [disabled]="eventoForm.invalid">
+        [disabled]="eventoForm.invalid"
+      >
         <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
         Crear Evento
       </ion-button>
 
     </form>
+
   </ng-container>
 
 </ion-content>

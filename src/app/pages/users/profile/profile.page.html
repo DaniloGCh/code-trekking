@@ -1,5 +1,6 @@
-<!-- 👤 SOLO SE MUESTRA SI EL USUARIO ESTÁ LOGUEADO -->
-
+<!-- ========================= -->
+<!-- 👤 HEADER -->
+<!-- ========================= -->
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
 
@@ -7,10 +8,12 @@
 
     <ion-buttons slot="end">
 
-  <ion-button class="btn-settings" routerLink="/tabs/settings">
-  <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-</ion-button>
+      <!-- ⚙️ SETTINGS -->
+      <ion-button class="btn-settings" routerLink="/tabs/settings">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
 
+      <!-- 🚪 LOGOUT -->
       <ion-button *ngIf="userData" (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
@@ -20,22 +23,35 @@
   </ion-toolbar>
 </ion-header>
 
+<!-- ========================= -->
+<!-- 👤 USUARIO LOGUEADO -->
+<!-- ========================= -->
 <ng-container *ngIf="authReady && userData; else noAuth">
 
   <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-    <!-- 🖼️ ENCABEZADO PERFIL -->
+    <!-- ========================= -->
+    <!-- 🖼️ PERFIL HEADER -->
+    <!-- ========================= -->
     <div class="profile-header">
 
+      <!-- 🖼️ AVATAR -->
       <div class="avatar-wrapper" (click)="onChangeFoto()">
 
-        <img *ngIf="userData.fotoBase64"
-     [src]="userData.fotoBase64"
-     class="avatar-img"
-     alt="Foto de perfil del usuario" />
+        <img
+          *ngIf="userData.fotoBase64"
+          [src]="userData.fotoBase64"
+          class="avatar-img"
+          alt="Foto de perfil del usuario"
+        />
 
-        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon"></ion-icon>
+        <ion-icon
+          *ngIf="!userData.fotoBase64"
+          name="person-circle-outline"
+          class="avatar-icon">
+        </ion-icon>
 
+        <!-- 📷 OVERLAY -->
         <div class="avatar-overlay">
           <ion-icon name="camera-outline"></ion-icon>
         </div>
@@ -50,8 +66,11 @@
 
     </div>
 
-    <!-- 😊 ESTADO -->
+    <!-- ========================= -->
+    <!-- 😊 ESTADO DEL USUARIO -->
+    <!-- ========================= -->
     <ion-card>
+
       <ion-card-header>
         <ion-card-title>¿Cómo te sientes hoy?</ion-card-title>
 
@@ -66,9 +85,12 @@
           {{ userData.estado ? 'Cambiar estado' : 'Seleccionar estado' }}
         </ion-button>
       </ion-card-content>
+
     </ion-card>
 
-    <!-- 🧾 DATOS -->
+    <!-- ========================= -->
+    <!-- 🧾 DATOS PERSONALES -->
+    <!-- ========================= -->
     <ion-card>
 
       <ion-card-header>
@@ -109,81 +131,92 @@
 
     </ion-card>
 
-    <!-- ⭐ FAVORITOS (ACORDEÓN) -->
-  <ion-accordion-group class="accordion_fav">
+    <!-- ========================= -->
+    <!-- ⭐ FAVORITOS -->
+    <!-- ========================= -->
+    <ion-accordion-group class="accordion_fav">
 
-  <ion-accordion value="favoritos">
+      <ion-accordion value="favoritos">
 
-    <!-- HEADER -->
-    <ion-item slot="header">
-      <ion-icon name="star" slot="start" color="warning"></ion-icon>
-      <ion-label>Eventos favoritos</ion-label>
-    </ion-item>
-
-    <!-- CONTENIDO -->
-    <div slot="content">
-
-      <ion-list>
-
-        <!-- Sin favoritos -->
-        <ion-item *ngIf="favoritos.length === 0">
-          <ion-label class="ion-text-center" color="medium">
-            <p>No tienes eventos favoritos aún</p>
-          </ion-label>
+        <!-- 📌 HEADER -->
+        <ion-item slot="header">
+          <ion-icon name="star" slot="start" color="warning"></ion-icon>
+          <ion-label>Eventos favoritos</ion-label>
         </ion-item>
 
-        <!-- Lista de favoritos -->
-        <ion-item *ngFor="let fav of favoritos">
+        <!-- 📦 CONTENIDO -->
+        <div slot="content">
 
-          <ion-label>
-            <h3>{{ fav.nombre }}</h3>
-            <p>Código: {{ fav.eventoId }}</p>
-          </ion-label>
+          <ion-list>
 
-          <!-- ⭐ Icono estrella -->
-          <ion-icon name="star" color="warning" slot="end"></ion-icon>
+            <!-- 🚫 VACÍO -->
+            <ion-item *ngIf="favoritos.length === 0">
+              <ion-label class="ion-text-center" color="medium">
+                <p>No tienes eventos favoritos aún</p>
+              </ion-label>
+            </ion-item>
 
-          <!-- 👁️ Ver evento -->
-          <ion-button slot="end" fill="clear" color="primary"
-            (click)="verEvento(fav.eventoId)">
-            <ion-icon name="eye-outline"></ion-icon>
-          </ion-button>
+            <!-- ⭐ LISTA -->
+            <ion-item *ngFor="let fav of favoritos">
 
-          <!-- 🗑️ Quitar favorito -->
-          <ion-button slot="end" fill="clear" color="danger"
-            (click)="removeFavorito(fav.eventoId)">
-            <ion-icon name="trash-outline"></ion-icon>
-          </ion-button>
+              <ion-label>
+                <h3>{{ fav.nombre }}</h3>
+                <p>Código: {{ fav.eventoId }}</p>
+              </ion-label>
 
-        </ion-item>
+              <!-- ⭐ ICONO -->
+              <ion-icon name="star" color="warning" slot="end"></ion-icon>
 
-      </ion-list>
+              <!-- 👁️ VER -->
+              <ion-button slot="end" fill="clear" color="primary"
+                (click)="verEvento(fav.eventoId)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
 
-    </div>
+              <!-- 🗑️ ELIMINAR -->
+              <ion-button slot="end" fill="clear" color="danger"
+                (click)="removeFavorito(fav.eventoId)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
 
-  </ion-accordion>
+            </ion-item>
 
-</ion-accordion-group>
+          </ion-list>
+
+        </div>
+
+      </ion-accordion>
+
+    </ion-accordion-group>
 
   </ion-content>
 
 </ng-container>
 
+<!-- ========================= -->
 <!-- 🚫 NO AUTH -->
+<!-- ========================= -->
 <ng-template #noAuth>
 
   <ion-content class="welcome-container">
 
     <div class="welcome-header">
+
       <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
+
       <h1>Bienvenido</h1>
+
       <p>Inicia sesión para ver tu perfil</p>
+
     </div>
 
     <ion-button expand="block" class="btn-login" (click)="goLogin()">
-  Iniciar sesión
-</ion-button>
-    <ion-button expand="block" fill="outline" color="success" (click)="goRegister()">Registrarse</ion-button>
+      Iniciar sesión
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="success" (click)="goRegister()">
+      Registrarse
+    </ion-button>
 
   </ion-content>
 
