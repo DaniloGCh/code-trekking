@@ -269,14 +269,15 @@
 
     <!-- Eliminar evento (solo el creador) -->
     <ion-button
-      expand="block"
-      
-      color="danger"
-      *ngIf="esCreadoPor"
-      (click)="onEliminarEvento()">
-      <ion-icon name="trash-outline" slot="start"></ion-icon>
-      Eliminar evento
-    </ion-button>
+  class="btn-eliminar-evento-full"
+  expand="block"
+  color="danger"
+  *ngIf="esCreadoPor"
+  (click)="onEliminarEvento()">
+  
+  <ion-icon name="trash-outline" slot="start"></ion-icon>
+  Eliminar evento
+</ion-button>
 
   </div>
 

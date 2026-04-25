@@ -227,20 +227,41 @@ ion-button[color="warning"]:hover {
   --color: #000;
 }
 
-/* 🔥 BOTÓN ELIMINAR */
-ion-button[color="danger"] {
-  --color: #ed0000;
-  --border-color: #ff5252;
-}
-
-ion-button[color="danger"]:hover {
-  --background: #ff0000;
+/* 💀 BOTÓN ELIMINAR EVENTO (FULL WIDTH) */
+.btn-eliminar-evento-full {
+  --background: rgba(198, 40, 40, 0.85);
   --color: #fff;
+
+  border-radius: 14px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  transition: all 0.3s ease;
 }
 
-/* 👆 CLICK EFECTO GENERAL */
-ion-button:active {
-  transform: scale(0.97);
+/* 🖱️ HOVER */
+.btn-eliminar-evento-full:hover {
+  --background: #e53935;
+
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* 👇 CLICK */
+.btn-eliminar-evento-full:active {
+  --background: #8e0000;
+  transform: scale(0.96);
+}
+
+/* 🗑️ ICONO */
+.btn-eliminar-evento-full ion-icon {
+  transition: all 0.3s ease;
+}
+
+/* ✨ ICONO ANIMADO */
+.btn-eliminar-evento-full:hover ion-icon {
+  transform: scale(1.2) rotate(-8deg);
 }
 
 .btn-compartir {
