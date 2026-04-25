@@ -12,6 +12,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LugarService } from 'src/app/core/services/lugar.service';
 import { Lugar } from 'src/app/core/models/evento.model';
 
+import { ConsejoService } from 'src/app/core/services/consejo.service';
+import { Consejo } from 'src/app/core/models/evento.model';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -30,11 +33,13 @@ export class DashboardPage implements OnInit {
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
   private fb = inject(FormBuilder);
+  private consejoService = inject(ConsejoService);
+
 
   constructor(
     public weatherGlobal: WeatherGlobalService,
     public timeService: TimeService
-  ) {}
+  ) { }
 
   // =========================
   // 📜 UI STATE
@@ -58,6 +63,16 @@ export class DashboardPage implements OnInit {
   totalUsers = 0;
   totalAdmins = 0;
   totalRegulares = 0;
+
+  // 📝 Consejos
+  consejos$: Observable<Consejo[]> = this.consejoService.getConsejos();
+  mostrarFormConsejo = false;
+  consejoEditando: Consejo | null = null;
+
+  consejoForm: FormGroup = this.fb.group({
+    titulo: ['', [Validators.required, Validators.minLength(3)]],
+    descripcion: ['', [Validators.required, Validators.minLength(10)]],
+  });
 
   // =========================
   // 📍 LUGARES
@@ -92,6 +107,8 @@ export class DashboardPage implements OnInit {
   get fPuntoInicio() { return this.lugarForm.get('puntoInicio'); }
   get fRequierePermiso() { return this.lugarForm.get('requierePermiso'); }
   get fCalificacionRiesgo() { return this.lugarForm.get('calificacionRiesgo'); }
+  get cTitulo() { return this.consejoForm.get('titulo'); }
+  get cDescripcion() { return this.consejoForm.get('descripcion'); }
 
   // =========================
   // 🎒 EQUIPAMIENTO
@@ -231,6 +248,97 @@ export class DashboardPage implements OnInit {
       ]
     });
 
+    await alert.present();
+  }
+
+  // ➕ NUEVO CONSEJO
+  onNuevoConsejo() {
+    this.consejoEditando = null;
+    this.consejoForm.reset();
+    this.mostrarFormConsejo = true;
+    setTimeout(() => {
+      document.getElementById('form-consejo')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
+  // ✏️ EDITAR CONSEJO
+  onEditarConsejo(consejo: Consejo) {
+    this.consejoEditando = consejo;
+    this.consejoForm.patchValue({
+      titulo: consejo.titulo,
+      descripcion: consejo.descripcion,
+    });
+    this.mostrarFormConsejo = true;
+    setTimeout(() => {
+      document.getElementById('form-consejo')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
+  // 💾 GUARDAR CONSEJO
+  async onGuardarConsejo() {
+    if (this.consejoForm.invalid) {
+      this.consejoForm.markAllAsTouched();
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({
+      message: this.consejoEditando ? 'Actualizando consejo...' : 'Agregando consejo...'
+    });
+    await loading.present();
+
+    try {
+      const datos = {
+        titulo: this.consejoForm.value.titulo.trim(),
+        descripcion: this.consejoForm.value.descripcion.trim(),
+      };
+
+      if (this.consejoEditando) {
+        await this.consejoService.editarConsejo(this.consejoEditando.id!, datos);
+        await this.showToast('Consejo actualizado correctamente', 'success');
+      } else {
+        await this.consejoService.agregarConsejo(datos);
+        await this.showToast('Consejo agregado correctamente', 'success');
+      }
+
+      this.onCancelarFormConsejo();
+    } catch (error) {
+      await this.showToast('Error al guardar el consejo', 'danger');
+    } finally {
+      await loading.dismiss();
+    }
+  }
+
+  // ❌ CANCELAR FORMULARIO CONSEJO
+  onCancelarFormConsejo() {
+    this.mostrarFormConsejo = false;
+    this.consejoEditando = null;
+    this.consejoForm.reset();
+  }
+
+  // 🗑️ ELIMINAR CONSEJO
+  async onEliminarConsejo(consejo: Consejo) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar consejo',
+      message: `¿Estás seguro que deseas eliminar <strong>${consejo.titulo}</strong>?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
+            await loading.present();
+            try {
+              await this.consejoService.eliminarConsejo(consejo.id!);
+              await this.showToast('Consejo eliminado', 'success');
+            } catch (error) {
+              await this.showToast('Error al eliminar el consejo', 'danger');
+            } finally {
+              await loading.dismiss();
+            }
+          }
+        }
+      ]
+    });
     await alert.present();
   }
 

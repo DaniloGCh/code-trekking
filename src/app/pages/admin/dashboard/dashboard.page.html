@@ -97,6 +97,10 @@
     <!-- ========================= -->
     <!-- 👥 USUARIOS -->
     <!-- ========================= -->
+    <h3 class="section-title">
+      Usuarios registrados
+    </h3>
+
     <ion-accordion-group>
 
       <ion-accordion value="usuarios">
@@ -145,11 +149,7 @@
     <h3 class="section-title">
       Gestión de lugares
 
-      <ion-button
-        *ngIf="!mostrarFormLugar"
-        fill="clear"
-        size="small"
-        (click)="onNuevoLugar()">
+      <ion-button *ngIf="!mostrarFormLugar" fill="clear" size="small" (click)="onNuevoLugar()">
 
         <ion-icon name="add-circle-outline" slot="start"></ion-icon>
         Agregar
@@ -335,8 +335,7 @@
                   <p>{{ lugar.altitud }} msnm · {{ lugar.informacion }}</p>
                 </ion-label>
 
-                <ion-badge slot="end"
-                  [color]="lugar.dificultad === 'Alta' ? 'danger' :
+                <ion-badge slot="end" [color]="lugar.dificultad === 'Alta' ? 'danger' :
                           lugar.dificultad === 'Media' ? 'warning' : 'success'">
 
                   {{ lugar.dificultad }}
@@ -363,6 +362,107 @@
 
     </ion-accordion-group>
 
+    <!-- ========================= -->
+    <!-- 📝 GESTIÓN DE CONSEJOS -->
+    <!-- ========================= -->
+    <h3 class="section-title">
+      Consejos de trekking
+      <ion-button fill="clear" size="small" (click)="onNuevoConsejo()" *ngIf="!mostrarFormConsejo">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Agregar
+      </ion-button>
+    </h3>
+
+
+    <!-- FORMULARIO CONSEJO -->
+    <ion-card id="form-consejo" *ngIf="mostrarFormConsejo" class="form-card">
+      <ion-card-header>
+        <ion-card-title>
+          {{ consejoEditando ? '✏️ Editar consejo' : '➕ Nuevo consejo' }}
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form [formGroup]="consejoForm" (ngSubmit)="onGuardarConsejo()">
+
+          <!-- TÍTULO -->
+          <ion-item [class.ion-invalid]="cTitulo?.invalid && cTitulo?.touched">
+            <ion-label position="floating">Título del consejo</ion-label>
+            <ion-input type="text" formControlName="titulo"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="cTitulo?.errors?.['required']">El título es requerido</span>
+              <span *ngIf="cTitulo?.errors?.['minlength']">Mínimo 3 caracteres</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- DESCRIPCIÓN -->
+          <ion-item [class.ion-invalid]="cDescripcion?.invalid && cDescripcion?.touched">
+            <ion-label position="floating">Descripción</ion-label>
+            <ion-textarea formControlName="descripcion" rows="4"></ion-textarea>
+            <ion-note slot="error">
+              <span *ngIf="cDescripcion?.errors?.['required']">La descripción es requerida</span>
+              <span *ngIf="cDescripcion?.errors?.['minlength']">Mínimo 10 caracteres</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- BOTONES -->
+          <div class="form-buttons">
+            <ion-button expand="block" type="submit" [disabled]="consejoForm.invalid">
+              <ion-icon [name]="consejoEditando ? 'save-outline' : 'add-circle-outline'" slot="start">
+              </ion-icon>
+              {{ consejoEditando ? 'Guardar cambios' : 'Agregar consejo' }}
+            </ion-button>
+
+            <ion-button expand="block" fill="outline" color="medium" (click)="onCancelarFormConsejo()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Cancelar
+            </ion-button>
+          </div>
+
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- LISTA DE CONSEJOS -->
+    <ion-accordion-group>
+      <ion-accordion value="consejos">
+        <ion-item slot="header">
+          <ion-icon name="bookmark-outline" slot="start"></ion-icon>
+          <ion-label>Ver consejos registrados</ion-label>
+        </ion-item>
+        <div slot="content">
+          <ion-list>
+            <ng-container *ngIf="consejos$ | async as consejos">
+              <!-- Sin consejos -->
+              <ion-item *ngIf="consejos.length === 0">
+                <ion-label class="ion-text-center" color="medium">
+                  <p>No hay consejos registrados aún</p>
+                </ion-label>
+              </ion-item>
+              <!-- Lista -->
+              <ion-item *ngFor="let consejo of consejos">
+                <ion-icon name="bulb-outline" slot="start" color="warning"></ion-icon>
+                <ion-label class="ion-text-wrap">
+                  <h3>{{ consejo.titulo }}</h3>
+                  <p>{{ consejo.descripcion }}</p>
+                </ion-label>
+
+                <!-- Editar -->
+                <ion-button slot="end" fill="clear" color="primary" (click)="onEditarConsejo(consejo)">
+                  <ion-icon name="pencil-outline"></ion-icon>
+                </ion-button>
+
+                <!-- Eliminar -->
+                <ion-button slot="end" fill="clear" color="danger" (click)="onEliminarConsejo(consejo)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+
+              </ion-item>
+            </ng-container>
+          </ion-list>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
   </ion-content>
 
 </ng-container>

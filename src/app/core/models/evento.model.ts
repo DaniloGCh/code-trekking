@@ -47,3 +47,11 @@ export interface MensajeForo {
   autorNombre: string;
   creadoEn: any;
 }
+
+// ✅ Agrega esta interfaz
+export interface Consejo {
+  id?: string;
+  titulo: string;
+  descripcion: string;
+  creadoEn?: any;
+}
