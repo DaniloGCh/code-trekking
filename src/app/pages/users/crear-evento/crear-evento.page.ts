@@ -107,23 +107,31 @@ onHoraChange(event: any) {
       const lugar = lugares.find(l => l.id === lugarId)!;
 
       await this.eventoService.crearEvento({
-        nombre,
-        descripcion,
-        fecha: new Date(fecha),
-        hora,
-        lugarId,
-        lugar: {
-          nombre: lugar.nombre,
-          informacion: lugar.informacion,
-          altitud: lugar.altitud,
-          dificultad: lugar.dificultad,
-        },
-        creadoPor: {
-          uid: userData!.uid,
-          nombre: userData!.nombre,
-        },
-        privado: true,
-      });
+  nombre,
+  descripcion,
+  fecha: new Date(fecha),
+  hora,
+  lugarId,
+  lugar: {
+    id: lugar.id,
+    nombre: lugar.nombre,
+    informacion: lugar.informacion,
+    altitud: lugar.altitud,
+    dificultad: lugar.dificultad,
+    distanciaKm: lugar.distanciaKm,           // ✅ Nuevo
+    tiempoEstimadoHoras: lugar.tiempoEstimadoHoras, // ✅ Nuevo
+    temporada: lugar.temporada,               // ✅ Nuevo
+    equipamiento: lugar.equipamiento,         // ✅ Nuevo
+    puntoInicio: lugar.puntoInicio,           // ✅ Nuevo
+    requierePermiso: lugar.requierePermiso,   // ✅ Nuevo
+    calificacionRiesgo: lugar.calificacionRiesgo, // ✅ Nuevo
+  },
+  creadoPor: {
+    uid: userData!.uid,
+    nombre: userData!.nombre,
+  },
+  privado: true,
+});
 
       await loading.dismiss();
       await this.showToast('¡Evento creado exitosamente!', 'success');

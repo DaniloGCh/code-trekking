@@ -6,6 +6,13 @@ export interface Lugar {
   informacion: string;
   altitud: number;
   dificultad: 'Baja' | 'Media' | 'Alta';
+  distanciaKm: number;               // ✅ Nuevo
+  tiempoEstimadoHoras: number;       // ✅ Nuevo
+  temporada: string;                 // ✅ Nuevo
+  equipamiento: string[];            // ✅ Nuevo
+  puntoInicio: string;               // ✅ Nuevo
+  requierePermiso: boolean;          // ✅ Nuevo
+  calificacionRiesgo: 'Bajo' | 'Moderado' | 'Alto' | 'Extremo'; // ✅ Nuevo
 }
 
 export interface Participante {

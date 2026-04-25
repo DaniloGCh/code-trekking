@@ -26,7 +26,7 @@ const routes: Routes = [
   {
     path: 'dashboard',
     loadChildren: () => import('./pages/admin/dashboard/dashboard.module').then( m => m.DashboardPageModule),
-    canActivate: [adminGuard]
+    //canActivate: [adminGuard]
   },
   {
     path: 'settings',
@@ -37,7 +37,8 @@ const routes: Routes = [
     path: 'eventos',
     loadChildren: () => import('./pages/users/eventos/eventos.module').then( m => m.EventosPageModule),
     canActivate: [authGuard]
-  },  {
+  },
+  {
     path: 'crear-evento',
     loadChildren: () => import('./pages/users/crear-evento/crear-evento.module').then( m => m.CrearEventoPageModule)
   },

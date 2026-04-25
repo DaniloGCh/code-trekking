@@ -256,3 +256,266 @@ ion-badge {
   padding-left: 5px;
   font-weight: 600;
 }
+
+
+/* 🚫 CONTENEDOR */
+.no-acceso {
+  text-align: center;
+  margin-top: 100px;
+  color: #fff;
+
+  background: rgba(60, 0, 0, 0.45);
+  padding: 30px 20px;
+  border-radius: 18px;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+
+  animation: fadeIn 0.5s ease;
+}
+
+/* 🔒 ICONO */
+.no-acceso ion-icon {
+  font-size: 70px;
+  color: #ef5350;
+  margin-bottom: 10px;
+}
+
+/* 🧾 TITULO */
+.no-acceso h2 {
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+/* 📄 TEXTO */
+.no-acceso p {
+  font-size: 0.95rem;
+  color: #ffcdd2;
+  margin-bottom: 20px;
+}
+
+/* 🏠 BOTÓN */
+.no-acceso ion-button {
+  --background: #c62828;
+  --color: #fff;
+
+  transition: all 0.3s ease;
+}
+
+/* 🖱️ HOVER */
+.no-acceso ion-button:hover {
+  --background: #e53935;
+}
+
+/* 👇 CLICK */
+.no-acceso ion-button:active {
+  --background: #8e0000;
+  transform: scale(0.96);
+}
+
+/* ✨ ANIMACIÓN */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 📍 TÍTULO SECCIÓN */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 20px;
+  margin-bottom: 10px;
+
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ➕ BOTÓN AGREGAR */
+.section-title ion-button {
+  --color: #81c784;
+
+  transition: all 0.25s ease;
+}
+
+.section-title ion-button:hover {
+  transform: scale(1.05);
+}
+
+/* 🪟 CARD FORMULARIO */
+.form-card {
+  background: rgba(34, 49, 34, 0.55);
+  border-radius: 16px;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  margin-bottom: 20px;
+  color: #fff;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+
+  animation: fadeSlide 0.4s ease;
+}
+
+/* ✨ ANIMACIÓN FORM */
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-card-title {
+  color: #c7f9cc;
+  font-weight: 600;
+}
+
+/* 📦 INPUTS */
+ion-item {
+  --background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 8px;
+  border-radius: 12px;
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  transition: all 0.2s ease;
+}
+
+/* 🖱️ HOVER INPUT */
+ion-item:hover {
+  --background: rgba(255, 255, 255, 0.08);
+}
+
+/* ❌ ERROR */
+ion-item.ion-invalid {
+  --border-color: #ef5350;
+}
+
+/* 🔽 SELECT */
+ion-select {
+  color: #fff;
+}
+
+/* 📝 LABEL */
+ion-label {
+  color: #c7f9cc !important;
+}
+
+/* ⚙️ BOTONES FORM */
+.form-buttons {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ✅ GUARDAR */
+.form-buttons ion-button:first-child {
+  --background: #2e7d32;
+  --color: #fff;
+
+  transition: all 0.3s ease;
+}
+
+.form-buttons ion-button:first-child:hover {
+  --background: #388e3c;
+}
+
+.form-buttons ion-button:first-child:active {
+  --background: #1b5e20;
+  transform: scale(0.97);
+}
+
+/* ❌ CANCELAR */
+.form-buttons ion-button:last-child {
+  --color: #ccc;
+  --border-color: #ccc;
+
+  transition: all 0.3s ease;
+}
+
+.form-buttons ion-button:last-child:hover {
+  --background: rgba(255, 255, 255, 0.1);
+}
+
+/* 📍 LISTA */
+ion-list {
+  background: transparent;
+}
+
+/* 📦 ITEM LUGAR */
+ion-list ion-item {
+  background: rgba(34, 49, 34, 0.45);
+  border-radius: 14px;
+
+  margin-bottom: 10px;
+  padding: 8px;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  color: #fff;
+
+  transition: all 0.25s ease;
+}
+
+/* 🖱️ HOVER ITEM */
+ion-list ion-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* 🧾 TEXTO */
+ion-list ion-label h3 {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+ion-list ion-label p {
+  font-size: 0.85rem;
+  color: #a5d6a7;
+}
+
+/* 🎯 BADGE */
+ion-badge {
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+/* ✏️ EDITAR */
+ion-button[color="primary"] {
+  --color: #81c784;
+
+  transition: all 0.2s ease;
+}
+
+ion-button[color="primary"]:hover {
+  transform: scale(1.1);
+}
+
+/* 🗑️ ELIMINAR */
+ion-button[color="danger"] {
+  --color: #ef5350;
+
+  transition: all 0.2s ease;
+}
+
+ion-button[color="danger"]:hover {
+  transform: scale(1.1);
+}

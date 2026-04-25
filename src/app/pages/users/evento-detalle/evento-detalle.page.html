@@ -88,43 +88,110 @@
   </ion-card>
 
   <!-- INFORMACIÓN DEL LUGAR -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="location-outline" color="primary"></ion-icon>
-        {{ evento.lugar.nombre }}
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list lines="none">
+<!-- INFORMACIÓN DEL LUGAR -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>
+      <ion-icon name="location-outline" color="primary"></ion-icon>
+      {{ evento.lugar.nombre }}
+    </ion-card-title>
+    <ion-card-subtitle>
+      <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+                          evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
+        {{ evento.lugar.dificultad }}
+      </ion-badge>
+    </ion-card-subtitle>
+  </ion-card-header>
 
-        <ion-item>
-          <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
-          <ion-label>
-            <p>Altitud</p>
-            <h3>{{ evento.lugar.altitud }} msnm</h3>
-          </ion-label>
-        </ion-item>
+  <ion-card-content>
+    <ion-list lines="none">
 
-        <ion-item>
-          <ion-icon name="flag-outline" slot="start" color="primary"></ion-icon>
-          <ion-label>
-            <p>Dificultad</p>
-            <h3>{{ evento.lugar.dificultad }}</h3>
-          </ion-label>
-        </ion-item>
+      <!-- INFORMACIÓN GENERAL -->
+      <ion-item>
+        <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
+        <ion-label class="ion-text-wrap">
+          <p>Información</p>
+          <h3>{{ evento.lugar.informacion }}</h3>
+        </ion-label>
+      </ion-item>
 
-        <ion-item>
-          <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="ion-text-wrap">
-            <p>Información</p>
-            <h3>{{ evento.lugar.informacion }}</h3>
-          </ion-label>
-        </ion-item>
+      <!-- PUNTO DE INICIO -->
+      <ion-item>
+        <ion-icon name="navigate-outline" slot="start" color="primary"></ion-icon>
+        <ion-label class="ion-text-wrap">
+          <p>Punto de inicio</p>
+          <h3>{{ evento.lugar.puntoInicio }}</h3>
+        </ion-label>
+      </ion-item>
 
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+      <!-- ALTITUD Y DISTANCIA -->
+      <ion-item>
+        <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <p>Altitud</p>
+          <h3>{{ evento.lugar.altitud }} msnm</h3>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-icon name="map-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <p>Distancia del recorrido</p>
+          <h3>{{ evento.lugar.distanciaKm }} km</h3>
+        </ion-label>
+      </ion-item>
+
+      <!-- TIEMPO ESTIMADO -->
+      <ion-item>
+        <ion-icon name="time-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <p>Tiempo estimado</p>
+          <h3>{{ evento.lugar.tiempoEstimadoHoras }} horas</h3>
+        </ion-label>
+      </ion-item>
+
+      <!-- TEMPORADA -->
+      <ion-item>
+        <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <p>Temporada recomendada</p>
+          <h3>{{ evento.lugar.temporada }}</h3>
+        </ion-label>
+      </ion-item>
+
+      <!-- REQUIERE PERMISO -->
+      <ion-item>
+        <ion-icon
+          [name]="evento.lugar.requierePermiso ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+          slot="start"
+          [color]="evento.lugar.requierePermiso ? 'warning' : 'success'">
+        </ion-icon>
+        <ion-label>
+          <p>Permiso especial</p>
+          <h3>{{ evento.lugar.requierePermiso ? 'Requiere permiso' : 'No requiere permiso' }}</h3>
+        </ion-label>
+      </ion-item>
+
+      <!-- EQUIPAMIENTO -->
+      <ion-item>
+        <ion-icon name="backpack-outline" slot="start" color="primary"></ion-icon>
+        <ion-label class="ion-text-wrap">
+          <p>Equipamiento necesario</p>
+          <div class="equipamiento-chips">
+            <ion-chip
+              *ngFor="let equipo of evento.lugar.equipamiento"
+              color="whith"
+              outline="true"
+              style="margin: 2px;">
+              {{ equipo }}
+            </ion-chip>
+          </div>
+        </ion-label>
+      </ion-item>
+
+    </ion-list>
+  </ion-card-content>
+</ion-card>
 
   <!-- PARTICIPANTES -->
 <!-- PARTICIPANTES -->
