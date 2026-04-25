@@ -1,31 +1,96 @@
 /* =========================================================
    🌄 FONDO GENERAL
    ========================================================= */
-
 ion-content {
   --background: linear-gradient(
       rgba(0, 0, 0, 0.65),
       rgba(0, 0, 0, 0.75)
     ),
-    url('https://images.unsplash.com/photo-1630603334774-c8ae1c1f1fce?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')
-    no-repeat center center / cover;
+    url('https://images.unsplash.com/photo-1630603334774-c8ae1c1f1fce?q=80&w=1032&auto=format&fit=crop')
+    no-repeat center / cover;
 
   color: #fff;
 }
 
 /* =========================================================
-   📦 CONTENEDOR PRINCIPAL
+   🧊 HEADER GLASS
    ========================================================= */
+.toolbar-glass {
+  --background: rgba(46, 125, 50, 0.45);
+  --color: #fff;
 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.toolbar-glass ion-button {
+  --color: #c7f9cc;
+}
+
+.toolbar-glass ion-title {
+  font-weight: 600;
+}
+
+/* =========================================================
+   📦 CONTENEDOR
+   ========================================================= */
 .manual-container {
   margin: 70px 15px;
   animation: fadeIn 0.4s ease;
 }
 
 /* =========================================================
-   🪵 CARD PRINCIPAL (PASO)
+   📄 STEP (PRINCIPAL)
    ========================================================= */
+.step-container {
+  margin: 80px 16px 20px;
+  padding: 20px;
+  border-radius: 16px;
 
+  background: rgba(34, 49, 34, 0.45);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+
+  color: #fff;
+
+  .icon {
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #a5d6a7;
+    margin-bottom: 5px;
+  }
+
+  h3 {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #c7f9cc;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #e0f2e9;
+    text-align: justify;
+  }
+}
+
+/* =========================================================
+   🪵 CARD PASO (si lo usas)
+   ========================================================= */
 .paso-card {
   background: rgba(34, 49, 34, 0.55);
   border-radius: 16px;
@@ -34,21 +99,19 @@ ion-content {
   -webkit-backdrop-filter: blur(12px);
 
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
-
   color: #fff;
+
   margin-bottom: 20px;
-
   transition: transform 0.25s ease;
-}
 
-.paso-card:hover {
-  transform: translateY(-2px);
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
 
 /* =========================================================
-   🧭 HEADER DEL PASO
+   🧭 HEADER PASO
    ========================================================= */
-
 .paso-header {
   display: flex;
   align-items: center;
@@ -58,12 +121,10 @@ ion-content {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* emoji/icono */
 .paso-icon {
   font-size: 28px;
 }
 
-/* título */
 .paso-titulo {
   font-size: 1.1rem;
   font-weight: 600;
@@ -73,66 +134,44 @@ ion-content {
 /* =========================================================
    📄 DESCRIPCIÓN
    ========================================================= */
-
 .paso-descripcion {
   margin-top: 10px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   line-height: 1.5;
   color: #e0f2e9;
 }
 
 /* =========================================================
-   🔘 CONTROLES (NEXT / PREV)
+   🧊 FOOTER GLASS (BOTONES MANTENIDOS)
    ========================================================= */
+.footer-glass {
+  --background: rgba(46, 125, 50, 0.18);
+  --color: #fff;
 
-.manual-controls {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-  gap: 10px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.manual-controls ion-button {
-  --border-radius: 12px;
+.footer-glass ion-button {
+  --color: #d8f3dc;
   font-weight: 500;
 }
 
-/* botón anterior */
-.btn-prev {
-  --background: rgba(255, 255, 255, 0.08);
-  --color: #c7f9cc;
+.footer-glass ion-button[disabled] {
+  opacity: 0.4;
 }
 
-/* botón siguiente */
-.btn-next {
-  --background: #2e7d32;
-  --color: #fff;
-}
-
-.btn-next:hover {
-  --background: #388e3c;
+.footer-glass ion-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #c7f9cc;
 }
 
 /* =========================================================
-   🚪 BOTÓN CERRAR (MODAL)
+   ✨ ANIMACIÓN
    ========================================================= */
-
-.btn-close {
-  --background: rgba(198, 40, 40, 0.85);
-  --color: #fff;
-  --border-radius: 12px;
-
-  margin-bottom: 15px;
-}
-
-.btn-close:hover {
-  --background: #e53935;
-}
-
-/* =========================================================
-   ✨ ANIMACIONES
-   ========================================================= */
-
 @keyframes fadeIn {
   from {
     opacity: 0;
