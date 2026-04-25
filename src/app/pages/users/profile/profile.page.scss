@@ -42,12 +42,9 @@ ion-buttons {
    ========================================================= */
 
 ion-content {
-  --background: linear-gradient(
-      rgba(0, 0, 0, 0.4),
-      rgba(0, 0, 0, 0.4)
-    ),
-    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e')
-    no-repeat center/cover;
+  --background: linear-gradient(rgba(0, 0, 0, 0.4),
+      rgba(0, 0, 0, 0.4)),
+    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e') no-repeat center/cover;
 }
 
 /* =========================================================
@@ -267,6 +264,7 @@ ion-button[color="danger"] {
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -298,4 +296,10 @@ ion-button[color="danger"] {
 
 ion-skeleton-text {
   --background: rgba(255, 255, 255, 0.2);
+}
+
+.refresh-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px 0;
 }

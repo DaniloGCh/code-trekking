@@ -271,7 +271,7 @@ export class DashboardPage implements OnInit {
           text: 'Salir',
           handler: async () => {
             await this.authService.logout();
-            this.router.navigateByUrl('/login', { replaceUrl: true });
+            this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
           }
         }
       ]

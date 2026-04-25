@@ -38,17 +38,10 @@
       <!-- 🖼️ AVATAR -->
       <div class="avatar-wrapper" (click)="onChangeFoto()">
 
-        <img
-          *ngIf="userData.fotoBase64"
-          [src]="userData.fotoBase64"
-          class="avatar-img"
-          alt="Foto de perfil del usuario"
-        />
+        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img"
+          alt="Foto de perfil del usuario" />
 
-        <ion-icon
-          *ngIf="!userData.fotoBase64"
-          name="person-circle-outline"
-          class="avatar-icon">
+        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon">
         </ion-icon>
 
         <!-- 📷 OVERLAY -->
@@ -147,6 +140,12 @@
         <!-- 📦 CONTENIDO -->
         <div slot="content">
 
+          <div class="refresh-container">
+            <ion-button fill="clear" size="small" (click)="loadFavoritos()">
+              <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            </ion-button>
+          </div>
+
           <ion-list>
 
             <!-- 🚫 VACÍO -->
@@ -168,14 +167,12 @@
               <ion-icon name="star" color="warning" slot="end"></ion-icon>
 
               <!-- 👁️ VER -->
-              <ion-button slot="end" fill="clear" color="primary"
-                (click)="verEvento(fav.eventoId)">
+              <ion-button slot="end" fill="clear" color="primary" (click)="verEvento(fav.eventoId)">
                 <ion-icon name="eye-outline"></ion-icon>
               </ion-button>
 
               <!-- 🗑️ ELIMINAR -->
-              <ion-button slot="end" fill="clear" color="danger"
-                (click)="removeFavorito(fav.eventoId)">
+              <ion-button slot="end" fill="clear" color="danger" (click)="removeFavorito(fav.eventoId)">
                 <ion-icon name="trash-outline"></ion-icon>
               </ion-button>
 

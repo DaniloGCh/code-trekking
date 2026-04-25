@@ -82,7 +82,7 @@ export class HomePage implements OnInit, OnDestroy {
           role: 'confirm',
           handler: async () => {
             await this.authService.logout();
-            this.router.navigateByUrl('/login', { replaceUrl: true });
+            this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
           }
         }
       ]
