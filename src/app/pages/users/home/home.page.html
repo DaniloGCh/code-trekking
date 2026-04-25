@@ -68,7 +68,37 @@
         Crear evento
       </ion-button>
 
-    </div>
+      <div class="consejos-section" *ngIf="consejos.length > 0">
+
+        <h2 class="consejos-section2">💡 Consejos</h2>
+
+        <swiper-container slides-per-view="1" space-between="0" centered-slides="false" loop="true"
+          autoplay-delay="10000" autoplay-disable-on-interaction="false">
+
+          <swiper-slide *ngFor="let c of consejos">
+
+            <ion-card class="consejo-card">
+
+              <ion-card-header>
+                <ion-card-title>{{ c.titulo }}</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ c.descripcion }}
+              </ion-card-content>
+
+            </ion-card>
+
+          </swiper-slide>
+
+        </swiper-container>
+
+      </div>  <!--Fin Consejos -->
+
+
+    </div> <!--Fin Welcome -->
+
+
 
   </ng-container>
 

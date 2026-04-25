@@ -315,3 +315,18 @@ ion-skeleton-text {
   --background: #1b5e20;
   transform: scale(0.97);
 }
+
+//CONSEJOS SECCION
+.consejos-section h2{
+  margin: 15px 15px;
+}
+
+
+/* ========================= */
+/* 📦 CARD A PANTALLA COMPLETA */
+/* ========================= */
+.consejo-card {
+  width: 100%;
+  margin: 0;
+  border-radius: 18px;
+}

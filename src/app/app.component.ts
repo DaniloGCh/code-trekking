@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 import { TimeService } from 'src/app/core/services/time.service';
+
+
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',

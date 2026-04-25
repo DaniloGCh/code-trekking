@@ -6,6 +6,8 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule, Routes } from '@angular/router';
 import { HomePage } from './home.page';
 import { ExploreContainerComponentModule } from "src/app/explore-container/explore-container.module";
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 
 const routes: Routes = [
   {
@@ -21,6 +23,7 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
     ExploreContainerComponentModule
-]
+],
+schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class HomePageModule {}

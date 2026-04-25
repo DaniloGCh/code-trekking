@@ -7,6 +7,12 @@ import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { TimeService } from 'src/app/core/services/time.service';
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 
+import { ConsejoService } from 'src/app/core/services/consejo.service';
+import { Consejo } from 'src/app/core/models/evento.model';
+
+import { ModalController } from '@ionic/angular';
+
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -15,6 +21,8 @@ import { WeatherGlobalService } from 'src/app/core/services/weather-global.servi
 })
 export class HomePage implements OnInit, OnDestroy {
 
+
+  consejos: Consejo[] = [];
   // =========================
   // 🔌 DEPENDENCIAS
   // =========================
@@ -41,13 +49,18 @@ export class HomePage implements OnInit, OnDestroy {
   // =========================
   constructor(
     public weatherGlobal: WeatherGlobalService,
-    public timeService: TimeService
-  ) {}
+    public timeService: TimeService,
+    private consejoService: ConsejoService,
+    private modalCtrl: ModalController
+  ) { }
 
   // =========================
   // 🚀 INIT
   // =========================
   ngOnInit() {
+    this.consejoService.getConsejos().subscribe(data => {
+      this.consejos = this.shuffleArray(data);
+    });
     this.authSub = this.authService.currentUser$.subscribe(async user => {
 
       this.authReady = true;
@@ -60,6 +73,14 @@ export class HomePage implements OnInit, OnDestroy {
 
     });
   }
+
+   // 🔀 AQUÍ VA LA FUNCIÓN (IMPORTANTE)
+  shuffleArray(array: any[]) {
+    return array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+  } 
 
   // =========================
   // 🧹 DESTROY
