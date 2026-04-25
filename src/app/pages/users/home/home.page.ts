@@ -1,10 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
-import { AuthService } from 'src/app/core/services/auth.service';
-import { UserData } from 'src/app/core/services/auth.service';
+import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { TimeService } from 'src/app/core/services/time.service';
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -12,16 +12,20 @@ import { WeatherGlobalService } from 'src/app/core/services/weather-global.servi
   styleUrls: ['./home.page.scss'],
   standalone: false,
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
 
   private authService = inject(AuthService);
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
 
+  authReady = false;
   hideHeader = false;
   lastScrollTop = 0;
 
   userData: UserData | null = null;
+
+  // ✅ FIX: declarar la suscripción correctamente
+  private authSub?: Subscription;
 
   constructor(
     public weatherGlobal: WeatherGlobalService,
@@ -29,13 +33,24 @@ export class HomePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe(async user => {
+    this.authSub = this.authService.currentUser$.subscribe(async user => {
+
+      this.authReady = true;
+
       if (user) {
         this.userData = await this.authService.getCurrentUserData();
       } else {
         this.userData = null;
       }
+
     });
+  }
+
+  // ✅ limpiar memoria (IMPORTANTE)
+  ngOnDestroy() {
+    if (this.authSub) {
+      this.authSub.unsubscribe();
+    }
   }
 
   async onLogout() {
@@ -76,9 +91,7 @@ export class HomePage implements OnInit {
 
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
-
     this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
-
     this.lastScrollTop = scrollTop;
   }
 
