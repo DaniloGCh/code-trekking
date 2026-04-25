@@ -26,7 +26,7 @@ const routes: Routes = [
   {
     path: 'dashboard',
     loadChildren: () => import('./pages/admin/dashboard/dashboard.module').then( m => m.DashboardPageModule),
-    //canActivate: [adminGuard]
+    canActivate: [adminGuard]
   },
   {
     path: 'settings',

@@ -376,15 +376,15 @@
 <ng-template #noAcceso>
   <ion-header>
     <ion-toolbar class="transparent-toolbar">
-      <ion-title>Acceso denegado</ion-title>
+      <ion-title>Error</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-content class="ion-padding">
     <div class="no-acceso">
-      <ion-icon name="lock-closed-outline"></ion-icon>
-      <h2>Sin permisos</h2>
-      <p>No tienes permisos para acceder a este panel.</p>
+      <ion-icon name="close-circle-outline" color="danger"></ion-icon>
+      <h2>Error</h2>
+      <p>Upps ha ocurrido un error, vuelve al inicio.</p>
       <ion-button expand="block" (click)="goHome()">
         <ion-icon name="home-outline" slot="start"></ion-icon>
         Volver al inicio
