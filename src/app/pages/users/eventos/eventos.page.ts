@@ -71,81 +71,106 @@ export class EventosPage implements OnInit {
   // ➕ IR A CREAR EVENTO
   // =========================
   goCrearEvento() {
-    // Navega a la página de creación de eventos
-    this.router.navigateByUrl('/tabs/crear-evento');
+
+  // 🔐 Validar si hay usuario logueado
+  const user = this.auth.currentUser;
+
+  if (!user) {
+
+    // 🚫 Si no está logueado, mostrar mensaje
+    this.showToast(
+      'Debes iniciar sesión para crear evento',
+      'warning'
+    );
+
+    return;
   }
+
+  // ✅ Si está logueado, navegar
+  this.router.navigateByUrl('/tabs/crear-evento');
+}
 
   // =========================
   // 🔑 UNIRSE A EVENTO CON CÓDIGO
   // =========================
-  async onUnirseConCodigo() {
+ async onUnirseConCodigo() {
 
-    // Crear alerta con input
-    const alert = await this.alertCtrl.create({
-      header: 'Unirse a un evento',
-      message: 'Ingresa el código de invitación',
+  // 🔐 Validar usuario autenticado
+  const user = this.auth.currentUser;
 
-      // Campo de entrada
-      inputs: [
-        {
-          name: 'codigo',
-          type: 'text',
-          placeholder: 'Ej: TRK-ABC123',
-          attributes: { maxlength: 10 }
-        }
-      ],
+  if (!user) {
 
-      // Botones del alert
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
+    // 🚫 Si no está logueado, mostrar aviso
+    await this.showToast(
+      'Debes iniciar sesión para unirte a un evento',
+      'warning'
+    );
 
-        {
-          text: 'Unirse',
-          handler: async (data) => {
-
-            // Validar que el código no esté vacío
-            if (!data.codigo || data.codigo.trim().length === 0) {
-              await this.showToast('Ingresa un código válido', 'warning');
-              return false;
-            }
-
-            // Mostrar loading
-            const loading = await this.loadingCtrl.create({ message: 'Buscando evento...' });
-            await loading.present();
-
-            try {
-              // Intentar unirse al evento
-              const evento = await this.eventoService.unirseConCodigo(data.codigo);
-
-              await loading.dismiss();
-
-              // Mostrar éxito
-              await this.showToast(`¡Te uniste a ${evento?.nombre}!`, 'success');
-
-            } catch (error: any) {
-              await loading.dismiss();
-
-              // Manejo de errores personalizados
-              const messages: Record<string, string> = {
-                'codigo-invalido': 'El código no existe o es incorrecto.',
-                'ya-participante': 'Ya eres participante de este evento.',
-              };
-
-              await this.showToast(
-                messages[error.message] || 'Error al unirse al evento',
-                'danger'
-              );
-            }
-
-            return true;
-          }
-        }
-      ]
-    });
-
-    // Mostrar alerta
-    await alert.present();
+    return;
   }
+
+  // ✅ Si está logueado, continuar flujo normal
+
+  const alert = await this.alertCtrl.create({
+    header: 'Unirse a un evento',
+    message: 'Ingresa el código de invitación',
+
+    inputs: [
+      {
+        name: 'codigo',
+        type: 'text',
+        placeholder: 'Ej: TRK-ABC123',
+        attributes: { maxlength: 10 }
+      }
+    ],
+
+    buttons: [
+      { text: 'Cancelar', role: 'cancel' },
+
+      {
+        text: 'Unirse',
+        handler: async (data) => {
+
+          if (!data.codigo || data.codigo.trim().length === 0) {
+            await this.showToast('Ingresa un código válido', 'warning');
+            return false;
+          }
+
+          const loading = await this.loadingCtrl.create({
+            message: 'Buscando evento...'
+          });
+          await loading.present();
+
+          try {
+            const evento = await this.eventoService.unirseConCodigo(data.codigo);
+
+            await loading.dismiss();
+
+            await this.showToast(`¡Te uniste a ${evento?.nombre}!`, 'success');
+
+          } catch (error: any) {
+
+            await loading.dismiss();
+
+            const messages: Record<string, string> = {
+              'codigo-invalido': 'El código no existe o es incorrecto.',
+              'ya-participante': 'Ya eres participante de este evento.',
+            };
+
+            await this.showToast(
+              messages[error.message] || 'Error al unirse al evento',
+              'danger'
+            );
+          }
+
+          return true;
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+}
 
   // =========================
   // 👁️ VER DETALLE DE EVENTO

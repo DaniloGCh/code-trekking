@@ -1,13 +1,9 @@
 
-
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
 
-    <!-- 🏷️ Título principal de la página -->
     <ion-title>Inicio</ion-title>
 
-    <!-- 🌤️ Componente de clima + hora en el header -->
-    <!-- Muestra icono del clima, temperatura y hora en tiempo real -->
     <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
       <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
       <span>{{ weatherGlobal.temperature | async }}° </span>
@@ -16,14 +12,13 @@
 
     <ion-buttons slot="end">
 
-      <!-- 🏠 Botón dashboard visible SOLO para administradores -->
-      <!-- Se muestra únicamente si el usuario tiene rol admin -->
+      <!-- 🏠 Dashboard solo admin -->
       <ion-button *ngIf="userData?.rol === 'admin'" (click)="goDashboard()">
         <ion-icon slot="icon-only" name="grid-outline"></ion-icon>
       </ion-button>
 
-      <!-- 🚪 Botón cerrar sesión -->
-      <ion-button (click)="onLogout()">
+      <!-- 🚪 Logout solo si hay usuario -->
+      <ion-button *ngIf="userData" (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
 
@@ -32,32 +27,28 @@
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-  <!-- 👋 Sección de bienvenida (solo si hay usuario cargado) -->
+  <!-- 👤 USUARIO LOGUEADO -->
   <div class="welcome-container" *ngIf="userData">
 
     <div class="welcome-header">
 
-      <!-- 👤 Icono de usuario -->
       <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
 
-      <!-- 🙋 Saludo personalizado -->
       <h1>¡Hola, {{ userData.nombre }}!</h1>
 
-      <!-- 📄 Texto descriptivo de bienvenida -->
       <p>Bienvenido a tu inicio. Explora tu información y mantente al día con la app.</p>
 
-      <!-- 🏕️ Mensaje motivacional -->
       <p>Tus próxima aventura te esperan</p>
 
-      <ion-badge *ngIf="userData?.rol === 'admin'" [color]="'danger'">
-        {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
+      <ion-badge *ngIf="userData?.rol === 'admin'" color="danger">
+        Administrador
       </ion-badge>
 
     </div>
 
-    <!-- ➕ Botón principal para crear evento -->
     <ion-button expand="block" class="btn-crear-evento" (click)="goCrearEvento()">
       <ion-icon name="add-outline" slot="start"></ion-icon>
       Crear evento
@@ -65,13 +56,36 @@
 
   </div>
 
+  <!-- 🚫 USUARIO NO LOGUEADO -->
+  <div class="welcome-container" *ngIf="!userData">
+
+    <div class="welcome-header">
+
+      <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
+
+      <h1>Bienvenido</h1>
+
+      <p>Inicia sesión para acceder a todas las funciones de la aplicación.</p>
+
+    </div>
+
+   <ion-button expand="block" class="btn-iniciar" (click)="goLogin()">
+  Iniciar sesión
+</ion-button>
+
+    <ion-button expand="block" fill="outline" (click)="goRegister()">
+      Registrarse
+    </ion-button>
+
+  </div>
+
   <!-- 🧊 Skeleton loader (comentado) -->
   <!-- Se usaría mientras carga la información del usuario -->
   
-  <app-explore-container *ngIf="!userData">
+  <!-- <app-explore-container *ngIf="!userData">
     <ion-skeleton-text animated style="height: 80px; border-radius: 8px;"></ion-skeleton-text>
     <ion-skeleton-text animated style="height: 200px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
-  </app-explore-container>
+  </app-explore-container> -->
  
 
 </ion-content>

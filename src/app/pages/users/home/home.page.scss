@@ -196,3 +196,122 @@ ion-skeleton-text {
 .btn-crear-evento:active {
   transform: scale(0.97);
 }
+
+/* =========================================================
+   🚫 USUARIO NO LOGUEADO - WELCOME SCREEN
+   ========================================================= */
+
+.welcome-container {
+  margin: 80px 15px;
+}
+
+/* =========================================================
+   👋 HEADER DE BIENVENIDA
+   ========================================================= */
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 25px;
+  padding: 25px;
+
+  background: rgba(34, 49, 34, 0.55);
+  border-radius: 20px;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+
+  color: #fff;
+
+  animation: fadeInUp 0.5s ease;
+}
+
+/* icono login */
+.avatar-icon {
+  font-size: 80px;
+  color: #a3d977;
+  margin-bottom: 10px;
+}
+
+/* título */
+.welcome-header h1 {
+  margin: 10px 0 5px;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* descripción */
+.welcome-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #c7f9cc;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   🔘 BOTONES
+   ========================================================= */
+
+.welcome-container ion-button {
+  margin-top: 12px;
+  --border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* botón principal */
+.welcome-container ion-button[color="primary"] {
+  --background: #2e7d32;
+  --color: #fff;
+}
+
+.welcome-container ion-button[color="primary"]:hover {
+  --background: #388e3c;
+  transform: translateY(-1px);
+}
+
+/* botón outline */
+.welcome-container ion-button[fill="outline"] {
+  --border-color: #a3d977;
+  --color: #c7f9cc;
+}
+
+.welcome-container ion-button[fill="outline"]:hover {
+  --background: rgba(163, 217, 119, 0.15);
+}
+
+/* =========================================================
+   ✨ ANIMACIÓN SUAVE
+   ========================================================= */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-iniciar {
+  --background: #2e7d32;  /* verde bosque */
+  --color: #fff;
+
+  border-radius: 12px;
+
+  transition: all 0.3s ease;
+}
+
+/* hover */
+.btn-iniciar:hover {
+  --background: #388e3c;
+}
+
+/* click */
+.btn-iniciar:active {
+  --background: #1b5e20;
+  transform: scale(0.97);
+}

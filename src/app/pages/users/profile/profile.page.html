@@ -1,104 +1,88 @@
+<!-- 👤 SOLO SE MUESTRA SI EL USUARIO ESTÁ LOGUEADO -->
 
 
-<ion-header [class.hidden]="hideHeader">
-  <ion-toolbar class="transparent-toolbar">
+  <ion-header [class.hidden]="hideHeader">
+    <ion-toolbar class="transparent-toolbar">
 
-    <!-- 🏷️ Título de la página -->
-    <ion-title>Mi Perfil</ion-title>
+      <ion-title>Mi Perfil</ion-title>
 
-    <ion-buttons slot="end">
+      <ion-buttons slot="end">
 
-      <!-- ⚙️ Botón para ir a configuración -->
-      <ion-button routerLink="/tabs/settings">
-        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-      </ion-button>
+        <ion-button routerLink="/tabs/settings">
+          <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+        </ion-button>
 
-      <!-- 🚪 Botón cerrar sesión -->
-      <ion-button (click)="onLogout()">
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-      </ion-button>
+        <ion-button (click)="onLogout()">
+          <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+        </ion-button>
 
-    </ion-buttons>
+      </ion-buttons>
 
-  </ion-toolbar>
-</ion-header>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+  <ng-container *ngIf="userData; else noAuth">
 
-  <!-- 👤 Contenido del perfil (solo si hay usuario cargado) -->
-  <div *ngIf="userData">
+  <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-    <!-- 🖼️ ENCABEZADO DEL PERFIL -->
+    <!-- 🖼️ ENCABEZADO PERFIL -->
     <div class="profile-header">
 
-      <!-- 📸 Avatar con opción de cambio de foto -->
       <div class="avatar-wrapper" (click)="onChangeFoto()">
 
-        <!-- 🖼️ Foto de perfil si existe -->
-        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img" alt="Foto de perfil del usuario" />
+        <img *ngIf="userData.fotoBase64"
+             [src]="userData.fotoBase64"
+             class="avatar-img"
+             alt="Foto de perfil" />
 
-        <!-- 👤 Icono por defecto si no hay foto -->
-        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon"></ion-icon>
+        <ion-icon *ngIf="!userData.fotoBase64"
+                  name="person-circle-outline"
+                  class="avatar-icon">
+        </ion-icon>
 
-        <!-- 📷 Overlay para indicar acción de cambiar foto -->
         <div class="avatar-overlay">
           <ion-icon name="camera-outline"></ion-icon>
         </div>
 
       </div>
 
-      <!-- 🙋 Nombre del usuario -->
       <h2>{{ userData.nombre }}</h2>
 
-      <!-- 🏷️ Badge que muestra el rol del usuario -->
       <ion-badge [color]="userData.rol === 'admin' ? 'danger' : 'primary'">
         {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
       </ion-badge>
 
     </div>
 
-    <!-- 😊 SECCIÓN ESTADO DE ÁNIMO -->
+    <!-- 😊 ESTADO -->
     <ion-card>
-
       <ion-card-header>
-
-        <!-- 🧠 Título de estado emocional -->
         <ion-card-title>¿Cómo te sientes hoy?</ion-card-title>
 
-        <!-- 📌 Estado actual si existe -->
         <ion-card-subtitle *ngIf="userData.estado">
           Estado actual: {{ userData.estado }}
         </ion-card-subtitle>
-
       </ion-card-header>
 
       <ion-card-content>
-
-        <!-- 🌿 Botón para seleccionar o cambiar estado -->
-        <ion-button expand="block"  class="btn-estado" (click)="onChangeEstado()">
+        <ion-button expand="block" class="btn-estado" (click)="onChangeEstado()">
           <ion-icon name="happy-outline" slot="start"></ion-icon>
           {{ userData.estado ? 'Cambiar estado' : 'Seleccionar estado' }}
         </ion-button>
-
       </ion-card-content>
-
     </ion-card>
 
-    <!-- 🧾 SECCIÓN DATOS PERSONALES -->
+    <!-- 🧾 DATOS -->
     <ion-card>
 
       <ion-card-header>
-
-        <!-- 📄 Título sección datos -->
         <ion-card-title>Datos personales</ion-card-title>
-
       </ion-card-header>
 
       <ion-card-content>
 
         <ion-list lines="none">
 
-          <!-- 👤 Nombre -->
           <ion-item>
             <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
 
@@ -107,13 +91,11 @@
               <h3>{{ userData.nombre }}</h3>
             </ion-label>
 
-            <!-- ✏️ Botón editar nombre -->
             <ion-button slot="end" fill="clear" (click)="onEditNombre()">
               <ion-icon name="pencil-outline"></ion-icon>
             </ion-button>
           </ion-item>
 
-          <!-- 📧 Email -->
           <ion-item>
             <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
 
@@ -123,7 +105,6 @@
             </ion-label>
           </ion-item>
 
-          <!-- 🛡️ Rol del usuario -->
           <ion-item>
             <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
 
@@ -139,20 +120,33 @@
 
     </ion-card>
 
-  </div>
+  </ion-content>
 
-  <!-- ⏳ SKELETON LOADING (mientras carga usuario) -->
-  <div *ngIf="!userData">
+</ng-container>
 
-    <!-- 🖼️ Skeleton avatar -->
-    <ion-skeleton-text animated
-      style="height: 150px; border-radius: 50%; width: 150px; margin: auto;">
-    </ion-skeleton-text>
+<!-- 🚫 VISTA CUANDO NO HAY LOGIN -->
+<ng-template #noAuth>
 
-    <!-- 📄 Skeleton datos -->
-    <ion-skeleton-text animated style="height: 200px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
-    <ion-skeleton-text animated style="height: 150px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
+  <ion-content class="welcome-container">
 
-  </div>
+    <div class="welcome-header">
 
-</ion-content>
+      <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
+
+      <h1>Bienvenido</h1>
+
+      <p>Inicia sesión para acceder a tu perfil y todas las funciones de la aplicación.</p>
+
+    </div>
+
+    <ion-button expand="block" class="btn-iniciar" (click)="goLogin()">
+      Iniciar sesión
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" (click)="goRegister()">
+      Registrarse
+    </ion-button>
+
+  </ion-content>
+
+</ng-template>

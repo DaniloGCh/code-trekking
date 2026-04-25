@@ -12,11 +12,12 @@ const routes: Routes = [
         path: 'home',
         loadChildren: () =>
           import('../pages/users/home/home.module').then(m => m.HomePageModule)
+        //canActivate: [authGuard]
       },
       {
         path: 'profile',
         loadChildren: () => import('../pages/users/profile/profile.module').then(m => m.ProfilePageModule),
-        canActivate: [authGuard]
+        //canActivate: [authGuard]
       },
       {
         path: 'settings',
@@ -27,7 +28,7 @@ const routes: Routes = [
       {
         path: 'eventos',
         loadChildren: () => import('../pages/users/eventos/eventos.module').then(m => m.EventosPageModule),
-        canActivate: [authGuard]
+        //canActivate: [authGuard]
       },
       {
         path: 'crear-evento',
@@ -46,11 +47,13 @@ const routes: Routes = [
       },
       {
         path: 'tab1',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule),
+        canActivate: [authGuard]
       },
       {
         path: 'tab2',
-        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule),
+        canActivate: [authGuard]
       },
 
       {

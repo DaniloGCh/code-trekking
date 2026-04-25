@@ -22,7 +22,7 @@ export class ProfilePage implements OnInit {
   private actionSheetCtrl = inject(ActionSheetController);
 
   userData: UserData | null = null;
-  
+
   // 🔽 header scroll
   hideHeader = false;
   lastScrollTop = 0;
@@ -30,11 +30,11 @@ export class ProfilePage implements OnInit {
   // 😊 Opciones de estado de ánimo
   estados = [
     { label: 'Excelente 😄', value: 'Excelente 😄' },
-    { label: 'Bien 🙂',      value: 'Bien 🙂' },
-    { label: 'Normal 😐',    value: 'Normal 😐' },
-    { label: 'Cansado 😴',   value: 'Cansado 😴' },
+    { label: 'Bien 🙂', value: 'Bien 🙂' },
+    { label: 'Normal 😐', value: 'Normal 😐' },
+    { label: 'Cansado 😴', value: 'Cansado 😴' },
     { label: 'Estresado 😤', value: 'Estresado 😤' },
-    { label: 'Triste 😢',    value: 'Triste 😢' },
+    { label: 'Triste 😢', value: 'Triste 😢' },
   ];
 
   async ngOnInit() {
@@ -134,95 +134,95 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-// 😊 CAMBIAR ESTADO DE ÁNIMO
-async onChangeEstado() {
-  const alert = await this.alertCtrl.create({
-    header: '¿Cómo te sientes hoy?',
-    inputs: [
-      // ✅ Opciones predefinidas
-      ...this.estados.map(e => ({
-        type: 'radio' as const,
-        label: e.label,
-        value: e.value,
-        checked: this.userData?.estado === e.value
-      })),
-      // ✅ Opción personalizada
-      {
-        type: 'radio' as const,
-        label: '✏️ Escribir mi propio estado',
-        value: 'custom',
-        checked: this.userData?.estado !== '' &&
-                 !this.estados.some(e => e.value === this.userData?.estado)
-      }
-    ],
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Siguiente',
-        handler: async (selected) => {
-          if (!selected) return false;
-
-          if (selected === 'custom') {
-            // Mostrar input para escribir estado personalizado
-            await this.showCustomEstadoInput();
-          } else {
-            await this.saveEstado(selected);
-          }
-          return true;
+  // 😊 CAMBIAR ESTADO DE ÁNIMO
+  async onChangeEstado() {
+    const alert = await this.alertCtrl.create({
+      header: '¿Cómo te sientes hoy?',
+      inputs: [
+        // ✅ Opciones predefinidas
+        ...this.estados.map(e => ({
+          type: 'radio' as const,
+          label: e.label,
+          value: e.value,
+          checked: this.userData?.estado === e.value
+        })),
+        // ✅ Opción personalizada
+        {
+          type: 'radio' as const,
+          label: '✏️ Escribir mi propio estado',
+          value: 'custom',
+          checked: this.userData?.estado !== '' &&
+            !this.estados.some(e => e.value === this.userData?.estado)
         }
-      }
-    ]
-  });
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Siguiente',
+          handler: async (selected) => {
+            if (!selected) return false;
 
-  await alert.present();
-}
-
-// ✏️ Input para estado personalizado
-private async showCustomEstadoInput() {
-  const alert = await this.alertCtrl.create({
-    header: 'Estado personalizado',
-    message: 'Escribe cómo te sientes hoy',
-    inputs: [
-      {
-        name: 'estadoCustom',
-        type: 'text',
-        placeholder: 'Ej: Con mucha energía 💪',
-        value: !this.estados.some(e => e.value === this.userData?.estado)
-               ? this.userData?.estado || ''
-               : '',
-        attributes: { maxlength: 50 }
-      }
-    ],
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Guardar',
-        handler: async (data) => {
-          if (!data.estadoCustom || data.estadoCustom.trim().length === 0) {
-            await this.showToast('Escribe algo para tu estado', 'warning');
-            return false;
+            if (selected === 'custom') {
+              // Mostrar input para escribir estado personalizado
+              await this.showCustomEstadoInput();
+            } else {
+              await this.saveEstado(selected);
+            }
+            return true;
           }
-          await this.saveEstado(data.estadoCustom.trim());
-          return true;
         }
-      }
-    ]
-  });
+      ]
+    });
 
-  await alert.present();
-}
+    await alert.present();
+  }
 
-// 💾 Guardar estado en Firestore
-private async saveEstado(estado: string) {
-  const loading = await this.loadingCtrl.create({ message: 'Guardando estado...' });
-  await loading.present();
+  // ✏️ Input para estado personalizado
+  private async showCustomEstadoInput() {
+    const alert = await this.alertCtrl.create({
+      header: 'Estado personalizado',
+      message: 'Escribe cómo te sientes hoy',
+      inputs: [
+        {
+          name: 'estadoCustom',
+          type: 'text',
+          placeholder: 'Ej: Con mucha energía 💪',
+          value: !this.estados.some(e => e.value === this.userData?.estado)
+            ? this.userData?.estado || ''
+            : '',
+          attributes: { maxlength: 50 }
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Guardar',
+          handler: async (data) => {
+            if (!data.estadoCustom || data.estadoCustom.trim().length === 0) {
+              await this.showToast('Escribe algo para tu estado', 'warning');
+              return false;
+            }
+            await this.saveEstado(data.estadoCustom.trim());
+            return true;
+          }
+        }
+      ]
+    });
 
-  await this.authService.updateProfile({ estado });
-  if (this.userData) this.userData.estado = estado;
+    await alert.present();
+  }
 
-  await loading.dismiss();
-  await this.showToast('Estado actualizado', 'success');
-}
+  // 💾 Guardar estado en Firestore
+  private async saveEstado(estado: string) {
+    const loading = await this.loadingCtrl.create({ message: 'Guardando estado...' });
+    await loading.present();
+
+    await this.authService.updateProfile({ estado });
+    if (this.userData) this.userData.estado = estado;
+
+    await loading.dismiss();
+    await this.showToast('Estado actualizado', 'success');
+  }
 
   // 🔐 CAMBIAR CONTRASEÑA
   async onChangePassword() {
@@ -321,83 +321,83 @@ private async saveEstado(estado: string) {
   }
 
   // 🗑️ ELIMINAR CUENTA
-async onDeleteAccount() {
+  async onDeleteAccount() {
 
-  // Paso 1 - Advertencia inicial
-  const confirmAlert = await this.alertCtrl.create({
-    header: '⚠️ Eliminar cuenta',
-    message: 'Esta acción es irreversible. Se eliminarán todos tus datos permanentemente. ¿Deseas continuar?',
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Continuar',
-        role: 'confirm',
-        handler: () => this.showDeleteVerification()
-      }
-    ]
-  });
-
-  await confirmAlert.present();
-}
-
-// Paso 2 - Verificación con pregunta de seguridad y contraseña
-private async showDeleteVerification() {
-  const alert = await this.alertCtrl.create({
-    header: 'Verificación de seguridad',
-    message: `${this.userData?.preguntaSeguridad}`,
-    inputs: [
-      {
-        name: 'respuesta',
-        type: 'text',
-        placeholder: 'Tu respuesta de seguridad',
-      },
-      {
-        name: 'password',
-        type: 'password',
-        placeholder: 'Tu contraseña actual',
-      }
-    ],
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Eliminar cuenta',
-        handler: async (data) => {
-          if (!data.respuesta || !data.password) {
-            await this.showToast('Completa todos los campos', 'warning');
-            return false;
-          }
-
-          const loading = await this.loadingCtrl.create({ message: 'Eliminando cuenta...' });
-          await loading.present();
-
-          try {
-            await this.authService.deleteAccount(data.password, data.respuesta);
-            await loading.dismiss();
-            await this.showToast('Cuenta eliminada correctamente', 'success');
-            this.router.navigateByUrl('/login', { replaceUrl: true });
-
-          } catch (error: any) {
-            await loading.dismiss();
-
-            const messages: Record<string, string> = {
-              'respuesta-incorrecta': 'La respuesta de seguridad es incorrecta.',
-              'auth/wrong-password': 'La contraseña es incorrecta.',
-              'auth/invalid-credential': 'Las credenciales son inválidas.',
-              'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.',
-            };
-
-            const msg = messages[error.message] || messages[error.code] || 'Error al eliminar la cuenta.';
-            await this.showToast(msg, 'danger');
-          }
-
-          return true;
+    // Paso 1 - Advertencia inicial
+    const confirmAlert = await this.alertCtrl.create({
+      header: '⚠️ Eliminar cuenta',
+      message: 'Esta acción es irreversible. Se eliminarán todos tus datos permanentemente. ¿Deseas continuar?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Continuar',
+          role: 'confirm',
+          handler: () => this.showDeleteVerification()
         }
-      }
-    ]
-  });
+      ]
+    });
 
-  await alert.present();
-}
+    await confirmAlert.present();
+  }
+
+  // Paso 2 - Verificación con pregunta de seguridad y contraseña
+  private async showDeleteVerification() {
+    const alert = await this.alertCtrl.create({
+      header: 'Verificación de seguridad',
+      message: `${this.userData?.preguntaSeguridad}`,
+      inputs: [
+        {
+          name: 'respuesta',
+          type: 'text',
+          placeholder: 'Tu respuesta de seguridad',
+        },
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Tu contraseña actual',
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar cuenta',
+          handler: async (data) => {
+            if (!data.respuesta || !data.password) {
+              await this.showToast('Completa todos los campos', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({ message: 'Eliminando cuenta...' });
+            await loading.present();
+
+            try {
+              await this.authService.deleteAccount(data.password, data.respuesta);
+              await loading.dismiss();
+              await this.showToast('Cuenta eliminada correctamente', 'success');
+              this.router.navigateByUrl('/login', { replaceUrl: true });
+
+            } catch (error: any) {
+              await loading.dismiss();
+
+              const messages: Record<string, string> = {
+                'respuesta-incorrecta': 'La respuesta de seguridad es incorrecta.',
+                'auth/wrong-password': 'La contraseña es incorrecta.',
+                'auth/invalid-credential': 'Las credenciales son inválidas.',
+                'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.',
+              };
+
+              const msg = messages[error.message] || messages[error.code] || 'Error al eliminar la cuenta.';
+              await this.showToast(msg, 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
 
   // 👇 scroll header
   onScroll(event: any) {
@@ -410,5 +410,13 @@ private async showDeleteVerification() {
     }
 
     this.lastScrollTop = scrollTop;
+  }
+
+  goLogin() {
+    this.router.navigateByUrl('/login');
+  }
+
+  goRegister() {
+    this.router.navigateByUrl('/register');
   }
 }
