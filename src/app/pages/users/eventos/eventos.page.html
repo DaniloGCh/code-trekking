@@ -150,17 +150,16 @@
 
           <!-- 🗑️ Eliminar (solo creador) -->
           <ion-button
-            fill="outline"
-            color="danger"
-            size="small"
+  class="btn-eliminar-evento"
+  fill="outline"
+  color="danger"
+  size="small"
+  *ngIf="evento.creadoPor.uid === currentUid"
+  (click)="onEliminarEvento(evento)">
 
-            *ngIf="evento.creadoPor.uid === currentUid"
-
-            (click)="onEliminarEvento(evento)">
-
-            <ion-icon name="trash-outline" slot="start"></ion-icon>
-            Eliminar
-          </ion-button>
+  <ion-icon name="trash-outline" slot="start"></ion-icon>
+  Eliminar
+</ion-button>
 
         </div>
 

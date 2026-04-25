@@ -278,21 +278,35 @@ ion-item ion-icon[color="primary"] {
    🔥 BOTÓN ELIMINAR
    ========================================================= */
 
-.evento-actions ion-button[color="danger"] {
-  --color: #c62828;
-  --border-color: #c62828;
+/* 🗑️ BOTÓN ELIMINAR EVENTO */
+.btn-eliminar-evento {
+  --color: #ef5350;
+  --border-color: #ef5350;
 
   transition: all 0.25s ease;
 }
 
-/* Hover */
-.evento-actions ion-button[color="danger"]:hover {
-  --background: #c62828;
+/* 🖱️ HOVER */
+.btn-eliminar-evento:hover {
+  --background: #ef5350;
   --color: #fff;
+
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* Click */
-.evento-actions ion-button[color="danger"]:active {
-  --background: #8e0000;
+/* 👇 CLICK */
+.btn-eliminar-evento:active {
+  --background: #b71c1c;
   transform: scale(0.96);
+}
+
+/* 🧨 ICONO */
+.btn-eliminar-evento ion-icon {
+  transition: transform 0.25s ease;
+}
+
+/* ✨ EFECTO ICONO */
+.btn-eliminar-evento:hover ion-icon {
+  transform: scale(1.2) rotate(-5deg);
 }

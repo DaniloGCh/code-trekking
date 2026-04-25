@@ -44,7 +44,7 @@
           <ion-icon name="copy-outline"></ion-icon>
         </ion-button>
       </div>
-      <ion-button expand="block" fill="outline" (click)="onCompartir()">
+      <ion-button class="btn-compartir" expand="block" (click)="onCompartir()">
         <ion-icon name="share-social-outline" slot="start"></ion-icon>
         Compartir invitación
       </ion-button>
@@ -241,7 +241,7 @@
 <div class="foro-btn-wrapper">
   <ion-button
     expand="block"
-    color="primary"
+   
     (click)="irAlForo()">
     <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
     Foro del evento
@@ -270,7 +270,7 @@
     <!-- Eliminar evento (solo el creador) -->
     <ion-button
       expand="block"
-      fill="outline"
+      
       color="danger"
       *ngIf="esCreadoPor"
       (click)="onEliminarEvento()">

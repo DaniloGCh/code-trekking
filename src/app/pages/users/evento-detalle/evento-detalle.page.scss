@@ -192,17 +192,17 @@ ion-avatar ion-icon {
 
 .foro-btn-wrapper ion-button {
   --background: #2e7d32;
-  --color: #fff;
+  --color: #000000;
 
   transition: all 0.3s ease;
 }
 
 .foro-btn-wrapper ion-button:hover {
-  --background: #388e3c;
+  --background: #10df1e;
 }
 
 .foro-btn-wrapper ion-button:active {
-  --background: #1b5e20;
+  --background: #10df1e;
   transform: scale(0.97);
 }
 
@@ -229,16 +229,41 @@ ion-button[color="warning"]:hover {
 
 /* 🔥 BOTÓN ELIMINAR */
 ion-button[color="danger"] {
-  --color: #ff5252;
+  --color: #ed0000;
   --border-color: #ff5252;
 }
 
 ion-button[color="danger"]:hover {
-  --background: #ff5252;
+  --background: #ff0000;
   --color: #fff;
 }
 
 /* 👆 CLICK EFECTO GENERAL */
 ion-button:active {
+  transform: scale(0.97);
+}
+
+.btn-compartir {
+  --background: #2e7d32;
+}
+
+/* 🔗 BOTÓN COMPARTIR */
+.btn-compartir {
+  --background: #2e7d32;
+  --color: #000000;
+
+  transition: all 0.3s ease;
+}
+
+/* 🖱️ HOVER */
+.btn-compartir:hover {
+  --background: #23cf2c;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* 👇 CLICK (ACTIVE) */
+.btn-compartir:active {
+  --background: #23cf2c;
   transform: scale(0.97);
 }
