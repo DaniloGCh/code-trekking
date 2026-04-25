@@ -23,6 +23,8 @@ import { Evento } from 'src/app/core/models/evento.model';
 
 // 🔹 Firebase Auth
 import { Auth } from '@angular/fire/auth';
+import { Firestore, collection, doc, setDoc, deleteDoc, getDocs } from '@angular/fire/firestore';
+
 
 @Component({
   selector: 'app-eventos', // Nombre del selector HTML
@@ -43,6 +45,7 @@ export class EventosPage implements OnInit {
   private alertCtrl = inject(AlertController);   // Alertas
   private toastCtrl = inject(ToastController);   // Toasts (mensajes cortos)
   private loadingCtrl = inject(LoadingController); // Loading spinner
+  private firestore = inject(Firestore);
 
   // =========================
   // 📊 DATOS
@@ -52,7 +55,7 @@ export class EventosPage implements OnInit {
   misEventos$: Observable<Evento[]> = this.eventoService.getMisEventos();
 
   // 🔹 UID del usuario actual
-  currentUid = this.auth.currentUser?.uid;
+currentUid: string | null = null;
 
   // =========================
   // 🔽 CONTROL DE HEADER CON SCROLL
@@ -60,13 +63,19 @@ export class EventosPage implements OnInit {
   hideHeader = false;     // Indica si el header está oculto
   lastScrollTop = 0;      // Guarda la última posición del scroll
 
+
+  favoritos: string[] = [];
   // =========================
   // 🚀 CICLO DE VIDA
   // =========================
   async ngOnInit() {
-    // Se ejecuta al inicializar el componente
+    this.loadFavoritos();
+    this.authService.currentUser$.subscribe(user => {
+  this.currentUid = user?.uid || null;
+});// Se ejecuta al inicializar el componente
   }
 
+  
   // =========================
   // ➕ IR A CREAR EVENTO
   // =========================
@@ -260,4 +269,56 @@ export class EventosPage implements OnInit {
     // Guardar posición actual
     this.lastScrollTop = scrollTop;
   }
+
+
+  async loadFavoritos() {
+
+  const user = this.auth.currentUser;
+  if (!user) return;
+
+  const ref = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
+  const snap = await getDocs(ref);
+
+  this.favoritos = snap.docs.map(doc => doc.id);
+}
+
+isFavorito(eventoId: string): boolean {
+  return this.favoritos.includes(eventoId);
+}
+
+async toggleFavorito(evento: any) {
+
+  const user = this.auth.currentUser;
+
+  if (!user) {
+    this.showToast('Debes iniciar sesión para guardar favoritos', 'warning');
+    return;
+  }
+
+  const favRef = doc(this.firestore, `usuarios/${user.uid}/favoritos/${evento.id}`);
+
+  if (this.isFavorito(evento.id)) {
+
+    // ❌ eliminar favorito
+    await deleteDoc(favRef);
+
+    this.favoritos = this.favoritos.filter(id => id !== evento.id);
+
+    this.showToast('Eliminado de favoritos', 'medium');
+
+  } else {
+
+    // ⭐ agregar favorito
+    await setDoc(favRef, {
+      eventoId: evento.id,
+      nombre: evento.nombre,
+      fecha: new Date()
+    });
+
+    this.favoritos.push(evento.id);
+
+    this.showToast('Agregado a favoritos ⭐', 'success');
+  }
+}
+
 }

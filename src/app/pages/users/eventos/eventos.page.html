@@ -7,7 +7,7 @@
   <!-- Se oculta dinámicamente con scroll -->
 
   <ion-toolbar class="transparent-toolbar">
-    
+
     <!-- Título de la página -->
     <ion-title>Eventos Trekking</ion-title>
 
@@ -23,7 +23,9 @@
       <ion-button (click)="goCrearEvento()">
         <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
       </ion-button>
-      
+
+
+
 
     </ion-buttons>
   </ion-toolbar>
@@ -36,7 +38,7 @@
   <!-- (ionScroll): detecta scroll para ocultar header -->
 
   <!-- ng-container evita agregar nodos extra al DOM -->
-  <ng-container class="eventos-wrapper"  *ngIf="misEventos$ | async as eventos">
+  <ng-container class="eventos-wrapper" *ngIf="misEventos$ | async as eventos">
     <!-- async pipe se suscribe automáticamente al observable -->
 
     <!-- ========================= -->
@@ -52,10 +54,7 @@
       <p>Crea un evento o únete con un código de invitación</p>
 
       <!-- Botón para crear evento -->
-      <ion-button 
-        expand="block" 
-        class="btn-crear-evento" 
-        (click)="goCrearEvento()">
+      <ion-button expand="block" class="btn-crear-evento" (click)="goCrearEvento()">
 
         <ion-icon name="add-outline" slot="start"></ion-icon>
         Crear evento
@@ -90,8 +89,7 @@
           </div>
 
           <!-- 🏷️ Badge de dificultad -->
-          <ion-badge 
-            [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+          <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
                      evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
 
             {{ evento.lugar.dificultad }}
@@ -140,27 +138,28 @@
         <div class="evento-actions">
 
           <!-- 👁️ Ver detalle -->
-          <ion-button 
-            fill="outline" 
-            size="small" 
-            (click)="verEvento(evento.id!)">
+          <ion-button fill="outline" size="small" (click)="verEvento(evento.id!)">
 
             <ion-icon name="eye-outline" slot="start"></ion-icon>
             Ver detalle
           </ion-button>
 
           <!-- 🗑️ Eliminar (solo creador) -->
-          <ion-button
-  class="btn-eliminar-evento"
-  fill="outline"
-  color="danger"
-  size="small"
-  *ngIf="evento.creadoPor.uid === currentUid"
-  (click)="onEliminarEvento(evento)">
+          <ion-button class="btn-eliminar-evento" fill="outline" color="danger" size="small"
+            *ngIf="evento.creadoPor.uid === currentUid" (click)="onEliminarEvento(evento)">
 
-  <ion-icon name="trash-outline" slot="start"></ion-icon>
-  Eliminar
-</ion-button>
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar
+          </ion-button>
+
+          <!-- ⭐ Botón favoritos -->
+          <ion-button fill="clear" color="warning" (click)="toggleFavorito(evento)">
+
+            <ion-icon [name]="isFavorito(evento.id!) ? 'star' : 'star-outline'"
+              [color]="isFavorito(evento.id!) ? 'warning' : ''">
+            </ion-icon>
+
+          </ion-button>
 
         </div>
 
