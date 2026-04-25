@@ -1,27 +1,27 @@
 <!-- 👤 SOLO SE MUESTRA SI EL USUARIO ESTÁ LOGUEADO -->
 
 
-  <ion-header [class.hidden]="hideHeader">
-    <ion-toolbar class="transparent-toolbar">
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
 
-      <ion-title>Mi Perfil</ion-title>
+    <ion-title>Mi Perfil</ion-title>
 
-      <ion-buttons slot="end">
+    <ion-buttons slot="end">
 
-        <ion-button routerLink="/tabs/settings">
-          <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-        </ion-button>
+      <ion-button *ngIf="userData" routerLink="/tabs/settings">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
 
-        <ion-button (click)="onLogout()">
-          <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-        </ion-button>
+      <ion-button *ngIf="userData" (click)="onLogout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
 
-      </ion-buttons>
+    </ion-buttons>
 
-    </ion-toolbar>
-  </ion-header>
+  </ion-toolbar>
+</ion-header>
 
-  <ng-container *ngIf="userData; else noAuth">
+<ng-container *ngIf="userData; else noAuth">
 
   <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
@@ -30,14 +30,9 @@
 
       <div class="avatar-wrapper" (click)="onChangeFoto()">
 
-        <img *ngIf="userData.fotoBase64"
-             [src]="userData.fotoBase64"
-             class="avatar-img"
-             alt="Foto de perfil" />
+        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img" alt="Foto de perfil" />
 
-        <ion-icon *ngIf="!userData.fotoBase64"
-                  name="person-circle-outline"
-                  class="avatar-icon">
+        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon">
         </ion-icon>
 
         <div class="avatar-overlay">
