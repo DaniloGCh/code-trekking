@@ -2,82 +2,53 @@
    🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
    ========================================================= */
 
-/* toolbar transparente total */
 .transparent-toolbar {
-  --background: transparent !important;   /* Fondo completamente transparente */
-  --border-width: 0 !important;           /* Sin borde */
-  --box-shadow: none !important;          /* Sin sombra */
-  --padding-start: 15px;                  /* Espaciado interno izquierdo */
-  --padding-end: 15px;                    /* Espaciado interno derecho */
+  --background: transparent !important;
+  --border-width: 0 !important;
+  --box-shadow: none !important;
+  --padding-start: 15px;
+  --padding-end: 15px;
 }
-
-/* header oculto sin dejar rastro */
-ion-header.hidden {
-  transform: translateY(-100%); /* Mueve el header hacia arriba fuera de la vista */
-  opacity: 0;                   /* Lo hace invisible */
-  pointer-events: none;         /* Evita interacción (clics, etc.) */
-}
-
-/* 👇 CLAVE: evita fondo negro del header container */
-ion-header {
-  background: transparent !important; /* Elimina fondo por defecto */
-  position: absolute;                 /* Permite superposición sobre el contenido */
-  width: 100%;                       /* Ocupa todo el ancho */
-  z-index: 10;                       /* Se mantiene sobre otros elementos */
-}
-
-/* 🎨 Color de iconos del header */
-ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* Verde estilo naturaleza */
-}
-  
-/* =========================================================
-   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
-   ========================================================= */
-
-/* toolbar sin elevación (clave real en Ionic) */
-ion-toolbar {
-  --box-shadow: none !important; /* Elimina sombra interna de Ionic */
-  box-shadow: none !important;   /* Elimina sombra estándar */
-  --border-width: 0 !important;  /* Sin borde */
-}
-
-/* asegura que botones no se muevan */
-ion-buttons {
-  z-index: 2; /* Mantiene los botones por encima de otros elementos */
-}
-
-/* =========================================================
-   👀 OCULTAR HEADER CON SCROLL
-   ========================================================= */
 
 ion-header {
+  background: transparent !important;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
   transition: transform 0.3s ease, opacity 0.3s ease;
-  /* Animación suave al ocultar/mostrar */
 }
 
-/* estado oculto */
 ion-header.hidden {
-  transform: translateY(-100%); /* Se desliza hacia arriba */
-  opacity: 0;                   /* Se desvanece */
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* QUITAR SOMBRA TOOLBAR */
+ion-toolbar {
+  --box-shadow: none !important;
+  box-shadow: none !important;
+  --border-width: 0 !important;
+}
+
+ion-header ion-toolbar ion-icon {
+  color: #8bd58e !important;
 }
 
 /* =========================================================
-   🌄 FONDO PRINCIPAL (ESTILO TREKKING)
+   🌄 FONDO PRINCIPAL
    ========================================================= */
 
 ion-content {
-  --background: none; /* Elimina fondo por defecto de Ionic */
-
-  /* Fondo con imagen + overlay oscuro */
+  --background: none;
   background: linear-gradient(
-      rgba(0, 0, 0, 0.55), /* Oscurece parte superior */
-      rgba(0, 0, 0, 0.7)   /* Oscurece parte inferior */
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.7)
     ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") 
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470")
     no-repeat center/cover;
 
-  color: #fff; /* Texto en blanco */
+  color: #fff;
 }
 
 /* =========================================================
@@ -85,38 +56,35 @@ ion-content {
    ========================================================= */
 
 ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85); /* Verde oscuro translúcido */
-  --color: #fff;                        /* Texto blanco */
+  --background: rgba(34, 49, 34, 0.85);
+  --color: #fff;
 
-  backdrop-filter: blur(8px);           /* Efecto desenfoque */
-  -webkit-backdrop-filter: blur(8px);   /* Compatibilidad Safari */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Línea sutil */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* =========================================================
-   👋 HEADER DE BIENVENIDA
+   👋 WELCOME HEADER
    ========================================================= */
 
 .welcome-header {
-  margin-top: 65px;        /* Espacio para no chocar con header */
-  display: flex;           /* Layout flexible */
-  align-items: center;     /* Alineación vertical */
-  gap: 15px;               /* Espacio entre elementos */
-  margin-bottom: 20px;
+  margin: 65px 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
   padding: 15px;
   border-radius: 15px;
 
-  background: rgba(34, 49, 34, 0.6); /* Fondo verde translúcido */
-
-  /* Compatibilidad blur */
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(34, 49, 34, 0.6);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 
-  /* 🎯 Estilos internos */
   ion-icon {
     font-size: 40px;
-    color: #a3d977; /* Verde trekking */
+    color: #a3d977;
   }
 
   h2 {
@@ -133,33 +101,45 @@ ion-header ion-toolbar {
 }
 
 /* =========================================================
-   🏔️ TÍTULOS DE SECCIÓN
+   📌 TÍTULOS DE SECCIÓN (UNIFICADO)
    ========================================================= */
 
 .section-title {
-  margin: 15px 0 10px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #c7f9cc; /* Verde claro */
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Sombra de texto */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin: 20px 0 10px 15px;
+  font-weight: 600;
+  color: #ffffff;
+
+  padding-left: 5px;
+}
+
+/* botón agregar */
+.section-title ion-button {
+  --color: #81c784;
+  transition: all 0.25s ease;
+}
+
+.section-title ion-button:hover {
+  transform: scale(1.05);
 }
 
 /* =========================================================
-   📊 TARJETAS DE ESTADÍSTICAS
+   📊 CARDS ESTADÍSTICAS
    ========================================================= */
 
 .stat-card {
   border-radius: 15px;
   text-align: center;
   color: #fff;
-
-  /* Efecto glassmorphism */
-  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
   ion-card-content {
     display: flex;
-    flex-direction: column; /* Apila elementos verticalmente */
+    flex-direction: column;
     align-items: center;
     gap: 5px;
   }
@@ -180,85 +160,60 @@ ion-header ion-toolbar {
   }
 }
 
-/* 🌿 Variantes de tarjetas (colores distintos) */
-
-.stat-card.total {
-  background: rgba(85, 107, 47, 0.7); /* Verde oliva */
-}
-
-.stat-card.admins {
-  background: rgba(139, 69, 19, 0.7); /* Café tierra */
-}
-
-.stat-card.users {
-  background: rgba(34, 139, 34, 0.7); /* Verde bosque */
-}
+.stat-card.total { background: rgba(85, 107, 47, 0.7); }
+.stat-card.admins { background: rgba(139, 69, 19, 0.7); }
+.stat-card.users { background: rgba(34, 139, 34, 0.7); }
 
 /* =========================================================
-   👥 LISTA DE USUARIOS
+   👥 LISTAS (UNIFICADO)
    ========================================================= */
 
 ion-list {
-  background: transparent; /* Sin fondo */
+  background: transparent;
   margin: 15px;
 }
 
-/* 🪵 Items estilo natural */
-
+/* item base */
 ion-item {
-  --background: rgba(163, 87, 0, 0.26); /* Fondo translúcido cálido */
+  --background: rgba(255, 255, 255, 0.05);
   margin-bottom: 8px;
   border-radius: 12px;
 
-  /* Efecto blur */
-  -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 
-  /* Texto */
-  ion-label h3 {
-    font-weight: 600;
-    color: #ffffff;
-  }
-
-  ion-label p {
-    color: #dcdcdc;
-    font-size: 0.85rem;
-  }
+  transition: all 0.2s ease;
 }
 
-/* =========================================================
-   🧍 AVATAR
-   ========================================================= */
-
-ion-avatar ion-icon {
-  color: #c7f9cc; /* Verde claro */
+ion-item:hover {
+  --background: rgba(255, 255, 255, 0.08);
 }
 
-/* =========================================================
-   🔘 BOTONES
-   ========================================================= */
-
-ion-button {
-  --color: #c7f9cc; /* Color verde claro */
-}
-
-/* =========================================================
-   🏷️ BADGES
-   ========================================================= */
-
-ion-badge {
-  font-weight: bold;
-}
-
-/* 🔧 Ajuste adicional de títulos */
-.section-title {
-  margin: 20px 0 10px 15px; /* Espaciado lateral */
-  padding-left: 5px;
+/* textos */
+ion-label h3 {
   font-weight: 600;
+  color: #fff;
 }
 
+ion-label p {
+  color: #a5d6a7;
+  font-size: 0.85rem;
+}
 
-/* 🚫 CONTENEDOR */
+/* avatar */
+ion-avatar ion-icon {
+  color: #c7f9cc;
+}
+
+/* botones globales */
+ion-button {
+  --color: #c7f9cc;
+}
+
+/* =========================================================
+   🚫 NO ACCESO
+   ========================================================= */
+
 .no-acceso {
   text-align: center;
   margin-top: 100px;
@@ -272,86 +227,26 @@ ion-badge {
   -webkit-backdrop-filter: blur(12px);
 
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-
-  animation: fadeIn 0.5s ease;
 }
 
-/* 🔒 ICONO */
 .no-acceso ion-icon {
   font-size: 70px;
   color: #ef5350;
-  margin-bottom: 10px;
 }
 
-/* 🧾 TITULO */
 .no-acceso h2 {
-  font-weight: 600;
   margin: 10px 0;
 }
 
-/* 📄 TEXTO */
 .no-acceso p {
   font-size: 0.95rem;
   color: #ffcdd2;
-  margin-bottom: 20px;
 }
 
-/* 🏠 BOTÓN */
-.no-acceso ion-button {
-  --background: #c62828;
-  --color: #fff;
+/* =========================================================
+   📋 FORMULARIOS
+   ========================================================= */
 
-  transition: all 0.3s ease;
-}
-
-/* 🖱️ HOVER */
-.no-acceso ion-button:hover {
-  --background: #e53935;
-}
-
-/* 👇 CLICK */
-.no-acceso ion-button:active {
-  --background: #8e0000;
-  transform: scale(0.96);
-}
-
-/* ✨ ANIMACIÓN */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 📍 TÍTULO SECCIÓN */
-.section-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  margin-top: 20px;
-  margin-bottom: 10px;
-
-  font-weight: 600;
-  color: #ffffff;
-}
-
-/* ➕ BOTÓN AGREGAR */
-.section-title ion-button {
-  --color: #81c784;
-
-  transition: all 0.25s ease;
-}
-
-.section-title ion-button:hover {
-  transform: scale(1.05);
-}
-
-/* 🪟 CARD FORMULARIO */
 .form-card {
   background: rgba(34, 49, 34, 0.55);
   border-radius: 16px;
@@ -361,62 +256,13 @@ ion-badge {
 
   margin-bottom: 20px;
   color: #fff;
-
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
-
-  animation: fadeSlide 0.4s ease;
 }
 
-/* ✨ ANIMACIÓN FORM */
-@keyframes fadeSlide {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-ion-card-title {
-  color: #c7f9cc;
-  font-weight: 600;
-}
-
-/* 📦 INPUTS */
-ion-item {
-  --background: rgba(255, 255, 255, 0.05);
-  margin-bottom: 8px;
-  border-radius: 12px;
-
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  transition: all 0.2s ease;
-}
-
-/* 🖱️ HOVER INPUT */
-ion-item:hover {
-  --background: rgba(255, 255, 255, 0.08);
-}
-
-/* ❌ ERROR */
 ion-item.ion-invalid {
   --border-color: #ef5350;
 }
 
-/* 🔽 SELECT */
-ion-select {
-  color: #fff;
-}
-
-/* 📝 LABEL */
-ion-label {
-  color: #c7f9cc !important;
-}
-
-/* ⚙️ BOTONES FORM */
+/* botones form */
 .form-buttons {
   margin-top: 15px;
   display: flex;
@@ -424,98 +270,27 @@ ion-label {
   gap: 10px;
 }
 
-/* ✅ GUARDAR */
 .form-buttons ion-button:first-child {
   --background: #2e7d32;
-  --color: #fff;
-
-  transition: all 0.3s ease;
 }
 
-.form-buttons ion-button:first-child:hover {
-  --background: #388e3c;
-}
-
-.form-buttons ion-button:first-child:active {
-  --background: #1b5e20;
-  transform: scale(0.97);
-}
-
-/* ❌ CANCELAR */
 .form-buttons ion-button:last-child {
   --color: #ccc;
-  --border-color: #ccc;
-
-  transition: all 0.3s ease;
 }
 
-.form-buttons ion-button:last-child:hover {
-  --background: rgba(255, 255, 255, 0.1);
+/* =========================================================
+   🧊 ACORDEÓN
+   ========================================================= */
+
+ion-accordion-group {
+  margin: 12px;
 }
 
-/* 📍 LISTA */
-ion-list {
-  background: transparent;
-}
+ion-accordion {
+  margin: 12px 0;
+  border-radius: 16px;
+  overflow: hidden;
 
-/* 📦 ITEM LUGAR */
-ion-list ion-item {
-  background: rgba(34, 49, 34, 0.45);
-  border-radius: 14px;
-
-  margin-bottom: 10px;
-  padding: 8px;
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  color: #fff;
-
-  transition: all 0.25s ease;
-}
-
-/* 🖱️ HOVER ITEM */
-ion-list ion-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-}
-
-/* 🧾 TEXTO */
-ion-list ion-label h3 {
-  font-weight: 600;
-  color: #ffffff;
-}
-
-ion-list ion-label p {
-  font-size: 0.85rem;
-  color: #a5d6a7;
-}
-
-/* 🎯 BADGE */
-ion-badge {
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 6px 10px;
-}
-
-/* ✏️ EDITAR */
-ion-button[color="primary"] {
-  --color: #81c784;
-
-  transition: all 0.2s ease;
-}
-
-ion-button[color="primary"]:hover {
-  transform: scale(1.1);
-}
-
-/* 🗑️ ELIMINAR */
-ion-button[color="danger"] {
-  --color: #ef5350;
-
-  transition: all 0.2s ease;
-}
-
-ion-button[color="danger"]:hover {
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }

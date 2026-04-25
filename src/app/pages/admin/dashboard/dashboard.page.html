@@ -120,38 +120,49 @@
     <!-- ========================= -->
     <!-- 👥 LISTA DE USUARIOS -->
     <!-- ========================= -->
-    <h3 class="section-title">Usuarios registrados</h3>
+    <ion-accordion-group>
 
-    <ion-list>
+      <ion-accordion value="usuarios">
 
-      <!-- 🔁 Itera sobre la lista de usuarios -->
-      <ion-item *ngFor="let user of users$ | async">
-        <!-- async: se suscribe automáticamente al observable -->
+        <!-- HEADER DEL ACORDEÓN -->
+        <ion-item slot="header">
+          <ion-icon name="people-outline" slot="start"></ion-icon>
+          <ion-label>Ver usuarios registrados</ion-label>
+        </ion-item>
 
-        <!-- 👤 Avatar del usuario -->
-        <ion-avatar slot="start">
-          <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
-        </ion-avatar>
+        <!-- CONTENIDO -->
+        <div slot="content">
 
-        <!-- 📄 Información del usuario -->
-        <ion-label>
-          <h3>{{ user.nombre }}</h3> <!-- Nombre -->
-          <p>{{ user.email }}</p> <!-- Email -->
-        </ion-label>
+          <ion-list>
 
-        <!-- 🏷️ Rol del usuario -->
-        <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
+            <ion-item *ngFor="let user of users$ | async">
 
-          {{ user.rol === 'admin' ? 'Admin' : 'User' }}
-        </ion-badge>
+              <ion-avatar slot="start">
+                <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
+              </ion-avatar>
 
-        <!-- 🔄 Botón para cambiar rol -->
-        <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
-          <ion-icon name="swap-horizontal-outline"></ion-icon>
-        </ion-button>
+              <ion-label>
+                <h3>{{ user.nombre }}</h3>
+                <p>{{ user.email }}</p>
+              </ion-label>
 
-      </ion-item>
-    </ion-list>
+              <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
+                {{ user.rol === 'admin' ? 'Admin' : 'User' }}
+              </ion-badge>
+
+              <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
+                <ion-icon name="swap-horizontal-outline"></ion-icon>
+              </ion-button>
+
+            </ion-item>
+
+          </ion-list>
+
+        </div>
+
+      </ion-accordion>
+
+    </ion-accordion-group>
 
     <!-- ========================= -->
     <!-- 📍 GESTIÓN DE LUGARES -->
@@ -167,207 +178,229 @@
     <!-- ========================= -->
     <!-- 📋 FORMULARIO LUGAR -->
     <!-- ========================= -->
-   <ion-card id="form-lugar" *ngIf="mostrarFormLugar" class="form-card">
-  <ion-card-header>
-    <ion-card-title>
-      {{ lugarEditando ? '✏️ Editar lugar' : '➕ Nuevo lugar' }}
-    </ion-card-title>
-  </ion-card-header>
+    <ion-card id="form-lugar" *ngIf="mostrarFormLugar" class="form-card">
+      <ion-card-header>
+        <ion-card-title>
+          {{ lugarEditando ? '✏️ Editar lugar' : '➕ Nuevo lugar' }}
+        </ion-card-title>
+      </ion-card-header>
 
-  <ion-card-content>
-    <form [formGroup]="lugarForm" (ngSubmit)="onGuardarLugar()">
+      <ion-card-content>
+        <form [formGroup]="lugarForm" (ngSubmit)="onGuardarLugar()">
 
-      <!-- NOMBRE -->
-      <!-- NOMBRE -->
-<ion-item [class.ion-invalid]="fNombre?.invalid && fNombre?.touched">
-  <ion-label position="floating">Nombre del lugar</ion-label>
-  <ion-input type="text" formControlName="nombre"></ion-input>
-  <ion-note slot="error">
-    <span *ngIf="fNombre?.errors?.['required']">El nombre es requerido</span>
-    <span *ngIf="fNombre?.errors?.['minlength']">Mínimo 3 caracteres</span>
-  </ion-note>
-</ion-item>
+          <!-- NOMBRE -->
+          <!-- NOMBRE -->
+          <ion-item [class.ion-invalid]="fNombre?.invalid && fNombre?.touched">
+            <ion-label position="floating">Nombre del lugar</ion-label>
+            <ion-input type="text" formControlName="nombre"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="fNombre?.errors?.['required']">El nombre es requerido</span>
+              <span *ngIf="fNombre?.errors?.['minlength']">Mínimo 3 caracteres</span>
+            </ion-note>
+          </ion-item>
 
-<!-- INFORMACIÓN -->
-<ion-item [class.ion-invalid]="fInformacion?.invalid && fInformacion?.touched">
-  <ion-label position="floating">Información general</ion-label>
-  <ion-textarea formControlName="informacion" rows="3"></ion-textarea>
-  <ion-note slot="error">
-    <span *ngIf="fInformacion?.errors?.['required']">La información es requerida</span>
-    <span *ngIf="fInformacion?.errors?.['minlength']">Mínimo 10 caracteres</span>
-  </ion-note>
-</ion-item>
+          <!-- INFORMACIÓN -->
+          <ion-item [class.ion-invalid]="fInformacion?.invalid && fInformacion?.touched">
+            <ion-label position="floating">Información general</ion-label>
+            <ion-textarea formControlName="informacion" rows="3"></ion-textarea>
+            <ion-note slot="error">
+              <span *ngIf="fInformacion?.errors?.['required']">La información es requerida</span>
+              <span *ngIf="fInformacion?.errors?.['minlength']">Mínimo 10 caracteres</span>
+            </ion-note>
+          </ion-item>
 
-<!-- PUNTO DE INICIO -->
-<ion-item [class.ion-invalid]="fPuntoInicio?.invalid && fPuntoInicio?.touched">
-  <ion-label position="floating">Punto de inicio</ion-label>
-  <ion-input type="text" formControlName="puntoInicio" placeholder="Ej: Sector Farellones"></ion-input>
-  <ion-note slot="error">
-    <span *ngIf="fPuntoInicio?.errors?.['required']">El punto de inicio es requerido</span>
-  </ion-note>
-</ion-item>
+          <!-- PUNTO DE INICIO -->
+          <ion-item [class.ion-invalid]="fPuntoInicio?.invalid && fPuntoInicio?.touched">
+            <ion-label position="floating">Punto de inicio</ion-label>
+            <ion-input type="text" formControlName="puntoInicio" placeholder="Ej: Sector Farellones"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="fPuntoInicio?.errors?.['required']">El punto de inicio es requerido</span>
+            </ion-note>
+          </ion-item>
 
-<!-- ALTITUD Y DISTANCIA -->
-<ion-grid class="ion-no-padding">
-  <ion-row>
-    <ion-col size="6">
-      <ion-item [class.ion-invalid]="fAltitud?.invalid && fAltitud?.touched">
-        <ion-label position="floating">Altitud (msnm)</ion-label>
-        <ion-input type="number" formControlName="altitud"></ion-input>
-        <ion-note slot="error">
-          <span *ngIf="fAltitud?.errors?.['required']">Requerido</span>
-        </ion-note>
-      </ion-item>
-    </ion-col>
-    <ion-col size="6">
-      <ion-item [class.ion-invalid]="fDistanciaKm?.invalid && fDistanciaKm?.touched">
-        <ion-label position="floating">Distancia (km)</ion-label>
-        <ion-input type="number" formControlName="distanciaKm"></ion-input>
-        <ion-note slot="error">
-          <span *ngIf="fDistanciaKm?.errors?.['required']">Requerido</span>
-        </ion-note>
-      </ion-item>
-    </ion-col>
-  </ion-row>
-</ion-grid>
+          <!-- ALTITUD Y DISTANCIA -->
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col size="6">
+                <ion-item [class.ion-invalid]="fAltitud?.invalid && fAltitud?.touched">
+                  <ion-label position="floating">Altitud (msnm)</ion-label>
+                  <ion-input type="number" formControlName="altitud"></ion-input>
+                  <ion-note slot="error">
+                    <span *ngIf="fAltitud?.errors?.['required']">Requerido</span>
+                  </ion-note>
+                </ion-item>
+              </ion-col>
+              <ion-col size="6">
+                <ion-item [class.ion-invalid]="fDistanciaKm?.invalid && fDistanciaKm?.touched">
+                  <ion-label position="floating">Distancia (km)</ion-label>
+                  <ion-input type="number" formControlName="distanciaKm"></ion-input>
+                  <ion-note slot="error">
+                    <span *ngIf="fDistanciaKm?.errors?.['required']">Requerido</span>
+                  </ion-note>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
 
-<!-- TIEMPO ESTIMADO -->
-<ion-item [class.ion-invalid]="fTiempoEstimadoHoras?.invalid && fTiempoEstimadoHoras?.touched">
-  <ion-label position="floating">Tiempo estimado (horas)</ion-label>
-  <ion-input type="number" formControlName="tiempoEstimadoHoras" placeholder="Ej: 6.5"></ion-input>
-  <ion-note slot="error">
-    <span *ngIf="fTiempoEstimadoHoras?.errors?.['required']">El tiempo es requerido</span>
-    <span *ngIf="fTiempoEstimadoHoras?.errors?.['min']">Mínimo 0.5 horas</span>
-  </ion-note>
-</ion-item>
+          <!-- TIEMPO ESTIMADO -->
+          <ion-item [class.ion-invalid]="fTiempoEstimadoHoras?.invalid && fTiempoEstimadoHoras?.touched">
+            <ion-label position="floating">Tiempo estimado (horas)</ion-label>
+            <ion-input type="number" formControlName="tiempoEstimadoHoras" placeholder="Ej: 6.5"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="fTiempoEstimadoHoras?.errors?.['required']">El tiempo es requerido</span>
+              <span *ngIf="fTiempoEstimadoHoras?.errors?.['min']">Mínimo 0.5 horas</span>
+            </ion-note>
+          </ion-item>
 
-<!-- DIFICULTAD Y RIESGO -->
-<ion-grid class="ion-no-padding">
-  <ion-row>
-    <ion-col size="6">
-      <ion-item [class.ion-invalid]="fDificultad?.invalid && fDificultad?.touched">
-        <ion-label position="floating">Dificultad</ion-label>
-        <ion-select formControlName="dificultad" placeholder="Selecciona">
-          <ion-select-option value="Baja">Baja 🟢</ion-select-option>
-          <ion-select-option value="Media">Media 🟡</ion-select-option>
-          <ion-select-option value="Alta">Alta 🔴</ion-select-option>
-        </ion-select>
-        <ion-note slot="error">
-          <span *ngIf="fDificultad?.errors?.['required']">Requerido</span>
-        </ion-note>
-      </ion-item>
-    </ion-col>
-    <ion-col size="6">
-      <ion-item [class.ion-invalid]="fCalificacionRiesgo?.invalid && fCalificacionRiesgo?.touched">
-        <ion-label position="floating">Riesgo</ion-label>
-        <ion-select formControlName="calificacionRiesgo" placeholder="Selecciona">
-          <ion-select-option value="Bajo">Bajo 🟢</ion-select-option>
-          <ion-select-option value="Moderado">Moderado 🟡</ion-select-option>
-          <ion-select-option value="Alto">Alto 🟠</ion-select-option>
-          <ion-select-option value="Extremo">Extremo 🔴</ion-select-option>
-        </ion-select>
-        <ion-note slot="error">
-          <span *ngIf="fCalificacionRiesgo?.errors?.['required']">Requerido</span>
-        </ion-note>
-      </ion-item>
-    </ion-col>
-  </ion-row>
-</ion-grid>
+          <!-- DIFICULTAD Y RIESGO -->
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col size="6">
+                <ion-item [class.ion-invalid]="fDificultad?.invalid && fDificultad?.touched">
+                  <ion-label position="floating">Dificultad</ion-label>
+                  <ion-select formControlName="dificultad" placeholder="Selecciona">
+                    <ion-select-option value="Baja">Baja 🟢</ion-select-option>
+                    <ion-select-option value="Media">Media 🟡</ion-select-option>
+                    <ion-select-option value="Alta">Alta 🔴</ion-select-option>
+                  </ion-select>
+                  <ion-note slot="error">
+                    <span *ngIf="fDificultad?.errors?.['required']">Requerido</span>
+                  </ion-note>
+                </ion-item>
+              </ion-col>
+              <ion-col size="6">
+                <ion-item [class.ion-invalid]="fCalificacionRiesgo?.invalid && fCalificacionRiesgo?.touched">
+                  <ion-label position="floating">Riesgo</ion-label>
+                  <ion-select formControlName="calificacionRiesgo" placeholder="Selecciona">
+                    <ion-select-option value="Bajo">Bajo 🟢</ion-select-option>
+                    <ion-select-option value="Moderado">Moderado 🟡</ion-select-option>
+                    <ion-select-option value="Alto">Alto 🟠</ion-select-option>
+                    <ion-select-option value="Extremo">Extremo 🔴</ion-select-option>
+                  </ion-select>
+                  <ion-note slot="error">
+                    <span *ngIf="fCalificacionRiesgo?.errors?.['required']">Requerido</span>
+                  </ion-note>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
 
-<!-- TEMPORADA -->
-<ion-item [class.ion-invalid]="fTemporada?.invalid && fTemporada?.touched">
-  <ion-label position="floating">Temporada recomendada</ion-label>
-  <ion-select formControlName="temporada" placeholder="Selecciona temporada">
-    <ion-select-option value="Verano">Verano ☀️</ion-select-option>
-    <ion-select-option value="Invierno">Invierno ❄️</ion-select-option>
-    <ion-select-option value="Primavera">Primavera 🌸</ion-select-option>
-    <ion-select-option value="Otoño">Otoño 🍂</ion-select-option>
-    <ion-select-option value="Todo el año">Todo el año 📅</ion-select-option>
-  </ion-select>
-  <ion-note slot="error">
-    <span *ngIf="fTemporada?.errors?.['required']">La temporada es requerida</span>
-  </ion-note>
-</ion-item>
+          <!-- TEMPORADA -->
+          <ion-item [class.ion-invalid]="fTemporada?.invalid && fTemporada?.touched">
+            <ion-label position="floating">Temporada recomendada</ion-label>
+            <ion-select formControlName="temporada" placeholder="Selecciona temporada">
+              <ion-select-option value="Verano">Verano ☀️</ion-select-option>
+              <ion-select-option value="Invierno">Invierno ❄️</ion-select-option>
+              <ion-select-option value="Primavera">Primavera 🌸</ion-select-option>
+              <ion-select-option value="Otoño">Otoño 🍂</ion-select-option>
+              <ion-select-option value="Todo el año">Todo el año 📅</ion-select-option>
+            </ion-select>
+            <ion-note slot="error">
+              <span *ngIf="fTemporada?.errors?.['required']">La temporada es requerida</span>
+            </ion-note>
+          </ion-item>
 
-<!-- EQUIPAMIENTO -->
-<ion-item [class.ion-invalid]="fEquipamiento?.invalid && fEquipamiento?.touched">
-  <ion-label position="floating">Equipamiento necesario</ion-label>
-  <ion-select formControlName="equipamiento" [multiple]="true" placeholder="Selecciona equipamiento">
-    <ion-select-option *ngFor="let equipo of equipamientoOpciones" [value]="equipo">
-      {{ equipo }}
-    </ion-select-option>
-  </ion-select>
-  <ion-note slot="error">
-    <span *ngIf="fEquipamiento?.errors?.['required']">Selecciona al menos uno</span>
-  </ion-note>
-</ion-item>
+          <!-- EQUIPAMIENTO -->
+          <ion-item [class.ion-invalid]="fEquipamiento?.invalid && fEquipamiento?.touched">
+            <ion-label position="floating">Equipamiento necesario</ion-label>
+            <ion-select formControlName="equipamiento" [multiple]="true" placeholder="Selecciona equipamiento">
+              <ion-select-option *ngFor="let equipo of equipamientoOpciones" [value]="equipo">
+                {{ equipo }}
+              </ion-select-option>
+            </ion-select>
+            <ion-note slot="error">
+              <span *ngIf="fEquipamiento?.errors?.['required']">Selecciona al menos uno</span>
+            </ion-note>
+          </ion-item>
 
-<!-- REQUIERE PERMISO -->
-<ion-item>
-  <ion-label>¿Requiere permiso especial?</ion-label>
-  <ion-toggle formControlName="requierePermiso" slot="end"></ion-toggle>
-  
-</ion-item>
+          <!-- REQUIERE PERMISO -->
+          <ion-item>
+            <ion-label>¿Requiere permiso especial?</ion-label>
+            <ion-toggle formControlName="requierePermiso" slot="end"></ion-toggle>
 
-<!-- BOTONES -->
-<div class="form-buttons">
-  <ion-button expand="block" type="submit" [disabled]="lugarForm.invalid">
-    <ion-icon [name]="lugarEditando ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
-    {{ lugarEditando ? 'Guardar cambios' : 'Agregar lugar' }}
-  </ion-button>
+          </ion-item>
 
-  <ion-button expand="block" fill="outline" color="medium" (click)="onCancelarForm()">
-    <ion-icon name="close-outline" slot="start"></ion-icon>
-    Cancelar
-  </ion-button>
-</div>
+          <!-- BOTONES -->
+          <div class="form-buttons">
+            <ion-button expand="block" type="submit" [disabled]="lugarForm.invalid">
+              <ion-icon [name]="lugarEditando ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
+              {{ lugarEditando ? 'Guardar cambios' : 'Agregar lugar' }}
+            </ion-button>
 
-    </form>
-  </ion-card-content>
-</ion-card>
+            <ion-button expand="block" fill="outline" color="medium" (click)="onCancelarForm()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Cancelar
+            </ion-button>
+          </div>
+
+        </form>
+      </ion-card-content>
+    </ion-card>
 
     <!-- ========================= -->
     <!-- 📍 LISTA DE LUGARES -->
     <!-- ========================= -->
-    <ion-list>
-      <ng-container *ngIf="lugares$ | async as lugares">
+    <!-- ========================= -->
+    <!-- 📍 ACORDEÓN LISTA DE LUGARES -->
+    <!-- ========================= -->
 
-        <!-- Sin lugares -->
-        <ion-item *ngIf="lugares.length === 0">
-          <ion-label class="ion-text-center" color="medium">
-            <p>No hay lugares registrados aún</p>
-          </ion-label>
+    <ion-accordion-group>
+
+      <ion-accordion value="lugares">
+
+        <!-- HEADER -->
+        <ion-item slot="header" >
+          <ion-icon name="map-outline" slot="start"></ion-icon>
+          <ion-label>Ver lugares registrados</ion-label>
         </ion-item>
 
-        <!-- Lista de lugares -->
-        <ion-item *ngFor="let lugar of lugares">
+        <!-- CONTENIDO -->
+        <div slot="content">
 
-          <ion-label>
-            <h3>{{ lugar.nombre }}</h3>
-            <p>{{ lugar.altitud }} msnm · {{ lugar.informacion }}</p>
-          </ion-label>
+          <ion-list>
+            <ng-container *ngIf="lugares$ | async as lugares">
 
-          <!-- Badge dificultad -->
-          <ion-badge slot="end" [color]="lugar.dificultad === 'Alta' ? 'danger' :
-                 lugar.dificultad === 'Media' ? 'warning' : 'success'">
-            {{ lugar.dificultad }}
-          </ion-badge>
+              <!-- Sin lugares -->
+              <ion-item *ngIf="lugares.length === 0">
+                <ion-label class="ion-text-center" color="medium">
+                  <p>No hay lugares registrados aún</p>
+                </ion-label>
+              </ion-item>
 
-          <!-- Editar -->
-          <ion-button slot="end" fill="clear" color="primary" (click)="onEditarLugar(lugar)">
-            <ion-icon name="pencil-outline"></ion-icon>
-          </ion-button>
+              <!-- Lista de lugares -->
+              <ion-item *ngFor="let lugar of lugares">
 
-          <!-- Eliminar -->
-          <ion-button slot="end" fill="clear" color="danger" (click)="onEliminarLugar(lugar)">
-            <ion-icon name="trash-outline"></ion-icon>
-          </ion-button>
+                <ion-label>
+                  <h3>{{ lugar.nombre }}</h3>
+                  <p>{{ lugar.altitud }} msnm · {{ lugar.informacion }}</p>
+                </ion-label>
 
-        </ion-item>
+                <!-- Badge dificultad -->
+                <ion-badge slot="end" [color]="lugar.dificultad === 'Alta' ? 'danger' :
+                       lugar.dificultad === 'Media' ? 'warning' : 'success'">
+                  {{ lugar.dificultad }}
+                </ion-badge>
 
-      </ng-container>
-    </ion-list>
+                <!-- Editar -->
+                <ion-button slot="end" fill="clear" color="primary" (click)="onEditarLugar(lugar)">
+                  <ion-icon name="pencil-outline"></ion-icon>
+                </ion-button>
 
+                <!-- Eliminar -->
+                <ion-button slot="end" fill="clear" color="danger" (click)="onEliminarLugar(lugar)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+
+              </ion-item>
+
+            </ng-container>
+          </ion-list>
+
+        </div>
+
+      </ion-accordion>
+
+    </ion-accordion-group>
   </ion-content>
 
 </ng-container>

@@ -35,7 +35,12 @@
       <div class="avatar-wrapper" (click)="onChangeFoto()">
 
         <!-- 🖼️ Foto de perfil si existe -->
-        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img" />
+        <img
+  *ngIf="userData.fotoBase64"
+  [src]="userData.fotoBase64"
+  class="avatar-img"
+  alt="Foto de perfil del usuario"
+/>
 
         <!-- 👤 Icono por defecto si no hay foto -->
         <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon"></ion-icon>
@@ -75,7 +80,7 @@
       <ion-card-content>
 
         <!-- 🌿 Botón para seleccionar o cambiar estado -->
-        <ion-button expand="block" fill="outline" class="btn-estado" (click)="onChangeEstado()">
+        <ion-button expand="block"  class="btn-estado" (click)="onChangeEstado()">
           <ion-icon name="happy-outline" slot="start"></ion-icon>
           {{ userData.estado ? 'Cambiar estado' : 'Seleccionar estado' }}
         </ion-button>

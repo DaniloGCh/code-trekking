@@ -1,21 +1,20 @@
 /* =========================================================
-   🌄 FONDO PRINCIPAL (ESTILO TREKKING)
+   🌄 FONDO PRINCIPAL (LOGIN TREKKING)
    ========================================================= */
 
 ion-content {
-  --background: none; /* Elimina el fondo por defecto de Ionic */
+  --background: none;
 
-  /* Fondo con imagen + overlay oscuro para mejorar legibilidad */
   background: linear-gradient(
-      rgba(0, 0, 0, 0.65), /* Oscurece parte superior */
-      rgba(0, 0, 0, 0.75)  /* Oscurece parte inferior */
+      rgba(0, 0, 0, 0.65),
+      rgba(0, 0, 0, 0.75)
     ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") 
-    no-repeat center/cover;
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470")
+    no-repeat center / cover;
 
-  display: flex;             /* Permite centrar contenido */
-  align-items: center;       /* Centrado vertical */
-  justify-content: center;   /* Centrado horizontal */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* =========================================================
@@ -23,22 +22,18 @@ ion-content {
    ========================================================= */
 
 .login-container {
-  width: 100%;        /* Ocupa todo el ancho disponible */
-  max-width: 420px;   /* Ancho máximo (responsive) */
+  width: 100%;
+  max-width: 420px;
   margin: auto;
   padding: 25px;
   border-radius: 20px;
 
-  /* Fondo tipo glassmorphism */
-  background: rgba(34, 49, 34, 0.55); /* Verde bosque translúcido */
+  background: rgba(34, 49, 34, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
-  backdrop-filter: blur(10px);         /* Desenfoque fondo */
-  -webkit-backdrop-filter: blur(10px); /* Compatibilidad Safari */
-
-  /* Sombra para dar profundidad */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-
-  color: #fff; /* Texto blanco */
+  color: #fff;
 }
 
 /* =========================================================
@@ -46,45 +41,43 @@ ion-content {
    ========================================================= */
 
 .login-header {
-  text-align: center;  /* Centra contenido */
+  text-align: center;
   margin-bottom: 25px;
 
   ion-icon {
-    font-size: 70px;       /* Tamaño grande del icono */
-    color: #a3d977;        /* Verde trekking */
+    font-size: 70px;
+    color: #a3d977;
   }
 
   h1 {
     margin: 10px 0 0;
     font-size: 1.6rem;
     font-weight: 600;
-    color: #ffffff;
   }
 }
 
 /* =========================================================
-   🧾 INPUTS (ION-ITEM)
+   🧾 INPUTS
    ========================================================= */
 
 ion-item {
-  --background: rgba(255, 255, 255, 0.08); /* Fondo translúcido */
-  border-radius: 12px;
-  margin-bottom: 15px;
+  --background: rgba(255, 255, 255, 0.08);
+  --color: #fff;
 
-  /* Efecto blur */
+  margin-bottom: 15px;
+  border-radius: 12px;
+
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-
-  --color: #fff; /* Color del texto */
 }
 
 /* =========================================================
-   🟥 MENSAJES DE ERROR
+   🟥 ERRORES
    ========================================================= */
 
 ion-note {
-  color: #ffb3b3;   /* Color rojo claro */
-  font-size: 0.75rem; /* Tamaño pequeño */
+  color: #ffb3b3;
+  font-size: 0.75rem;
 }
 
 /* =========================================================
@@ -92,21 +85,21 @@ ion-note {
    ========================================================= */
 
 ion-button[type="submit"] {
-  --background: #2e7d32; /* Verde bosque */
+  --background: #2e7d32;
   --border-radius: 12px;
+
   font-weight: bold;
   margin-top: 15px;
 
-  /* Sombra para efecto de elevación */
   --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* =========================================================
-   👁 BOTÓN MOSTRAR PASSWORD
+   👁 BOTÓN PASSWORD
    ========================================================= */
 
 ion-button[slot="end"] {
-  --color: #c7f9cc; /* Verde claro */
+  --color: #c7f9cc;
 }
 
 /* =========================================================
@@ -118,17 +111,17 @@ ion-button[slot="end"] {
   margin-top: 20px;
 
   p {
-    color: #ddd;         /* Texto gris claro */
+    color: #ddd;
     font-size: 0.9rem;
   }
 
   span {
-    color: #a3d977;      /* Verde destacado */
+    color: #a3d977;
     font-weight: bold;
-    cursor: pointer;     /* Cursor tipo link */
+    cursor: pointer;
   }
 
   span:hover {
-    text-decoration: underline; /* Subrayado al pasar el mouse */
+    text-decoration: underline;
   }
 }

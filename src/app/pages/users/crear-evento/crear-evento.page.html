@@ -14,7 +14,7 @@
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <ng-container *ngIf="lugares$ | async as lugares">
-    <form [formGroup]="eventoForm" (ngSubmit)="onCrearEvento(lugares)">
+    <form class="evento-form" [formGroup]="eventoForm" (ngSubmit)="onCrearEvento(lugares)">
 
             <!-- LUGAR -->
       <ion-item [class.ion-invalid]="lugarId?.invalid && lugarId?.touched">

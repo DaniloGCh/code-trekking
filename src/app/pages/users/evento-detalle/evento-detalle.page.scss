@@ -4,131 +4,93 @@
 
 /* toolbar transparente total */
 .transparent-toolbar {
-  --background: transparent !important; /* Elimina fondo del toolbar */
-  --border-width: 0 !important;        /* Quita bordes */
-  --box-shadow: none !important;       /* Quita sombra */
-  --padding-start: 15px;               /* Espacio interno izquierda */
-  --padding-end: 15px;                 /* Espacio interno derecha */
+  --background: transparent !important;
+  --border-width: 0 !important;
+  --box-shadow: none !important;
+  --padding-start: 15px;
+  --padding-end: 15px;
 }
 
-/* header oculto sin dejar rastro */
-ion-header.hidden {
-  transform: translateY(-100%); /* Lo mueve hacia arriba fuera de pantalla */
-  opacity: 0;                   /* Lo hace invisible */
-  pointer-events: none;         /* Evita interacción */
-}
-
-/* 👇 CLAVE: evita fondo negro del header container */
+/* header base */
 ion-header {
-  background: transparent !important; /* Quita fondo negro por defecto */
-  position: absolute;                /* Permite superponer sobre contenido */
+  background: transparent !important;
+  position: absolute;
   width: 100%;
-  z-index: 10;                       /* Lo mantiene por encima del contenido */
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Color de iconos en header */
+/* header oculto */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* iconos header */
 ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* Verde bosque */
+  color: #8bd58e !important;
 }
 
-/* toolbar sin elevación (clave real en Ionic) */
+/* toolbar sin sombra */
 ion-toolbar {
   --box-shadow: none !important;
   box-shadow: none !important;
   --border-width: 0 !important;
 }
 
-/* asegura que botones no se muevan */
+/* botones header */
 ion-buttons {
   z-index: 2;
-}
-
-/* =========================================================
-   👀 OCULTAR HEADER CON SCROLL (ANIMACIÓN)
-   ========================================================= */
-
-ion-header {
-  transition: transform 0.3s ease, opacity 0.3s ease; /* Animación suave */
-}
-
-/* estado oculto */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
 }
 
 
 /* =========================================================
    🌄 FONDO PRINCIPAL
    ========================================================= */
-.evento-header h1{
- margin-top: 80px;
-}
 
-ion-content {
-  --background: none;
-
-  /* Fondo con imagen + overlay oscuro */
-  --background: linear-gradient(
-      rgba(0, 0, 0, 0.45),
-      rgba(0, 0, 0, 0.45)
-    ),
-    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e') 
-    no-repeat center center / cover;
-}
-
-/* =========================================================
-   🧭 HEADER ESTILO VISUAL
-   ========================================================= */
-
-ion-header ion-toolbar {
-  --background: rgba(0, 10, 0, 0.85); /* Verde oscuro translúcido */
-  --color: #fff;
-
-  backdrop-filter: blur(8px);         /* Blur moderno */
-  -webkit-backdrop-filter: blur(8px); /* Compatibilidad Safari */
-}
-
-
-/* 🌄 FONDO */
 ion-content {
   --background: linear-gradient(
       rgba(0, 0, 0, 0.55),
       rgba(0, 0, 0, 0.55)
     ),
-    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e') no-repeat center center / cover;
+    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e')
+    no-repeat center center / cover;
 }
 
-/* 🧭 HEADER */
-ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85);
-  --color: #fff;
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
+/* =========================================================
+   🌿 TITULO EVENTO
+   ========================================================= */
 
-/* 🌿 TITULO EVENTO */
 .evento-header {
+  margin-top: 85px;
   text-align: center;
-  margin: 10px 0 20px 0;
   color: #fff;
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
 }
 
-.evento-header h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
 
-/* 🎯 BADGE */
+/* =========================================================
+   🎯 BADGE
+   ========================================================= */
+
 ion-badge {
   padding: 6px 10px;
   border-radius: 10px;
   font-weight: 600;
 }
 
-/* 🪵 CARDS GLASS */
+
+/* =========================================================
+   🪵 CARDS GLASS
+   ========================================================= */
+
 ion-card {
   background: rgba(34, 49, 34, 0.55);
   border-radius: 16px;
@@ -140,51 +102,52 @@ ion-card {
   margin-bottom: 16px;
 }
 
-/* 📌 TITULOS DE CARD */
+
+/* títulos cards */
 ion-card-title {
-  color: #ffffff;
+  color: #fff;
   font-weight: 600;
 }
 
-/* 🌿 SUBTITULOS */
+/* subtítulos */
 ion-card-subtitle {
   color: #a5d6a7;
 }
 
-/* 📄 LISTA */
+
+/* =========================================================
+   📄 LISTAS E ITEMS
+   ========================================================= */
+
 ion-list {
   background: transparent;
 }
 
-/* 📦 ITEMS */
 ion-item {
   --background: transparent;
   margin-bottom: 6px;
-
-  transition: all 0.25s ease;
+  transition: 0.25s ease;
 }
 
-/* 🖱️ HOVER ITEMS */
 ion-item:hover {
   --background: rgba(255, 255, 255, 0.05);
 }
 
-/* 🌿 ICONOS */
+/* iconos */
 ion-item ion-icon[color="primary"] {
   color: #2e7d32 !important;
 }
 
-/* 👥 PARTICIPANTES */
+/* avatars */
 ion-avatar ion-icon {
   color: #c7f9cc;
 }
 
-/* 🧭 ACCIONES */
-.acciones {
-  margin-top: 20px;
-}
 
-/* 🌿 BOTÓN FORO */
+/* =========================================================
+   💬 FORO
+   ========================================================= */
+
 .foro-btn-wrapper {
   position: relative;
   margin-bottom: 12px;
@@ -192,31 +155,33 @@ ion-avatar ion-icon {
 
 .foro-btn-wrapper ion-button {
   --background: #2e7d32;
-  --color: #000000;
+  --color: #000;
 
-  transition: all 0.3s ease;
+  transition: 0.3s ease;
 }
 
 .foro-btn-wrapper ion-button:hover {
-  --background: #10df1e;
+  --background: #23cf2c;
 }
 
 .foro-btn-wrapper ion-button:active {
-  --background: #10df1e;
   transform: scale(0.97);
 }
 
-/* 🔴 BADGE FORO */
+/* badge foro */
 .foro-badge {
   position: absolute;
   top: -5px;
   right: 10px;
-
   border-radius: 50%;
   font-size: 0.75rem;
 }
 
-/* ⚠️ BOTÓN SALIR */
+
+/* =========================================================
+   ⚠️ BOTÓN SALIR
+   ========================================================= */
+
 ion-button[color="warning"] {
   --color: #ffb74d;
   --border-color: #ffb74d;
@@ -227,8 +192,14 @@ ion-button[color="warning"]:hover {
   --color: #000;
 }
 
-/* 💀 BOTÓN ELIMINAR EVENTO (FULL WIDTH) */
+
+/* =========================================================
+   💀 BOTÓN ELIMINAR EVENTO
+   ========================================================= */
+
 .btn-eliminar-evento-full {
+  margin: 0 15px;
+
   --background: rgba(198, 40, 40, 0.85);
   --color: #fff;
 
@@ -237,54 +208,55 @@ ion-button[color="warning"]:hover {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
-  transition: all 0.3s ease;
+  transition: 0.3s ease;
 }
 
-/* 🖱️ HOVER */
 .btn-eliminar-evento-full:hover {
   --background: #e53935;
-
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
 }
 
-/* 👇 CLICK */
 .btn-eliminar-evento-full:active {
   --background: #8e0000;
   transform: scale(0.96);
 }
 
-/* 🗑️ ICONO */
 .btn-eliminar-evento-full ion-icon {
-  transition: all 0.3s ease;
+  transition: 0.3s ease;
 }
 
-/* ✨ ICONO ANIMADO */
 .btn-eliminar-evento-full:hover ion-icon {
   transform: scale(1.2) rotate(-8deg);
 }
 
+
+/* =========================================================
+   🔗 BOTÓN COMPARTIR
+   ========================================================= */
+
 .btn-compartir {
   --background: #2e7d32;
+  --color: #000;
+
+  transition: 0.3s ease;
 }
 
-/* 🔗 BOTÓN COMPARTIR */
-.btn-compartir {
-  --background: #2e7d32;
-  --color: #000000;
-
-  transition: all 0.3s ease;
-}
-
-/* 🖱️ HOVER */
 .btn-compartir:hover {
   --background: #23cf2c;
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
-/* 👇 CLICK (ACTIVE) */
 .btn-compartir:active {
-  --background: #23cf2c;
   transform: scale(0.97);
+}
+
+
+/* =========================================================
+   📦 ACCIONES
+   ========================================================= */
+
+.acciones ion-button {
+  margin: 12px;
 }

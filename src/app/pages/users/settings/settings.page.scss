@@ -2,111 +2,97 @@
    🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
    ========================================================= */
 
-/* toolbar transparente total */
+/* toolbar transparente */
 .transparent-toolbar {
   --background: transparent !important;
   --border-width: 0 !important;
   --box-shadow: none !important;
-   --padding-start: 15px;
+  --padding-start: 15px;
   --padding-end: 15px;
 }
 
-/* header oculto sin dejar rastro */
+/* header base */
+ion-header {
+  background: transparent !important;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+/* header oculto */
 ion-header.hidden {
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
 }
 
-/* 👇 CLAVE: evita fondo negro del header container */
-ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-}
-
+/* iconos header */
 ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* verde bosque */
-}
-/* =========================================================
-   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
-   ========================================================= */
-
-ion-header {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
+  color: #8bd58e !important;
 }
 
-/* toolbar sin elevación (clave real en Ionic) */
+/* toolbar sin sombra */
 ion-toolbar {
   --box-shadow: none !important;
-  box-shadow: none !important;
   --border-width: 0 !important;
 }
 
-/* asegura que botones no se muevan */
+/* botones header */
 ion-buttons {
   z-index: 2;
 }
 
 /* =========================================================
-   👀 OCULTAR HEADER CON SCROLL
+   🌄 FONDO GENERAL
    ========================================================= */
 
-ion-header {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* estado oculto */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-
-/* 🌄 FONDO GENERAL */
 ion-content {
   --background: linear-gradient(
       rgba(0, 0, 0, 0.45),
       rgba(0, 0, 0, 0.45)
     ),
-    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e') no-repeat center center / cover;
+    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e')
+    no-repeat center/cover;
 }
 
-/* 🧭 HEADER */
+/* =========================================================
+   🧭 HEADER TOOLBAR
+   ========================================================= */
+
 ion-header ion-toolbar {
   --background: rgba(34, 49, 34, 0.85);
-  --color: #ffffff;
+  --color: #fff;
 
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* 🔙 BOTÓN BACK */
+/* botón back */
 ion-buttons ion-button {
   --color: #c7f9cc;
 }
 
-/* 📌 TITULO HEADER */
+/* título */
 ion-title {
   font-weight: 600;
 }
 
-/* 🌿 SECTION TITLE */
+/* =========================================================
+   🌿 SECTION TITLE
+   ========================================================= */
+
 .section-title {
   display: flex;
   align-items: center;
   gap: 8px;
 
-  margin: 20px 0 10px 0;
-
+  margin: 20px 0 10px 15px;
   color: #c7f9cc;
 }
 
-.section-title {
-  margin-left: 15px;
-}
 .section-title:first-of-type {
   margin-top: 75px;
 }
@@ -116,7 +102,10 @@ ion-title {
   font-weight: 600;
 }
 
-/* 🪵 CARDS estilo glass */
+/* =========================================================
+   🪵 CARDS GLASS
+   ========================================================= */
+
 ion-card {
   background: rgba(34, 49, 34, 0.55);
   border-radius: 16px;
@@ -125,54 +114,60 @@ ion-card {
   -webkit-backdrop-filter: blur(10px);
 
   margin-bottom: 16px;
-  color: #ffffff;
+  color: #fff;
 }
 
-/* ⚠️ CARD ZONA PELIGRO */
+/* card peligro */
 ion-card[color="light"] {
-    
   background: rgba(80, 0, 0, 0.4);
 }
 
-/* 📄 LISTA */
+/* =========================================================
+   📋 LISTAS
+   ========================================================= */
+
 ion-list {
   background: transparent;
 }
 
-/* 📦 ITEMS */
+/* items */
 ion-item {
   --background: transparent;
   border-radius: 12px;
-
   margin-bottom: 6px;
 
   transition: all 0.25s ease;
 }
 
-/* 🖱️ HOVER ITEMS */
+/* hover */
 ion-item:hover {
   --background: rgba(255, 255, 255, 0.08);
   transform: scale(1.01);
 }
 
-/* 👆 CLICK */
+/* active */
 ion-item:active {
   transform: scale(0.98);
 }
 
-/* 🌿 ICONOS NORMALES */
+/* =========================================================
+   🌿 ICONOS
+   ========================================================= */
+
 ion-item ion-icon[color="primary"] {
   color: #2e7d32 !important;
 }
 
-/* 🔥 ICONOS PELIGRO */
 ion-item ion-icon[color="danger"] {
   color: #ff5252 !important;
 }
 
-/* 🧠 TEXTOS */
+/* =========================================================
+   🧠 TEXTOS
+   ========================================================= */
+
 ion-label h3 {
-  color: #ffffff;
+  color: #fff;
   font-weight: 500;
 }
 
@@ -181,12 +176,12 @@ ion-label p {
   font-size: 0.85rem;
 }
 
-/* 🔥 TEXTO PELIGRO */
+/* texto peligro */
 ion-card[color="light"] ion-label h3 {
   color: #ff8a80 !important;
 }
 
-/* ✨ EFECTO DETALLE (flecha) */
+/* flecha detalle */
 ion-item::part(detail-icon) {
   color: #c7f9cc;
   opacity: 0.7;
