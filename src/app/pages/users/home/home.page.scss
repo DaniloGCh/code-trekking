@@ -330,3 +330,29 @@ ion-skeleton-text {
   margin: 0;
   border-radius: 18px;
 }
+
+.step-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.icon {
+  font-size: 50px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 18px;
+  color: var(--ion-color-medium);
+}
+
+h3 {
+  font-size: 22px;
+  margin-top: 10px;
+}
+
+p {
+  font-size: 16px;
+  margin-top: 15px;
+  line-height: 1.5;
+}

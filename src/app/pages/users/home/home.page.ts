@@ -10,7 +10,9 @@ import { WeatherGlobalService } from 'src/app/core/services/weather-global.servi
 import { ConsejoService } from 'src/app/core/services/consejo.service';
 import { Consejo } from 'src/app/core/models/evento.model';
 
+
 import { ModalController } from '@ionic/angular';
+import { ManualSupervivenciaComponent } from 'src/app/components/manual-supervivencia/manual-supervivencia.component';
 
 
 @Component({
@@ -51,7 +53,8 @@ export class HomePage implements OnInit, OnDestroy {
     public weatherGlobal: WeatherGlobalService,
     public timeService: TimeService,
     private consejoService: ConsejoService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    
   ) { }
 
   // =========================
@@ -73,6 +76,15 @@ export class HomePage implements OnInit, OnDestroy {
 
     });
   }
+
+async openManual() {
+  const modal = await this.modalCtrl.create({
+    component: ManualSupervivenciaComponent,
+    cssClass: 'manual-modal'
+  });
+
+  await modal.present();
+}
 
    // 🔀 AQUÍ VA LA FUNCIÓN (IMPORTANTE)
   shuffleArray(array: any[]) {

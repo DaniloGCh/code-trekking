@@ -463,6 +463,78 @@
         </div>
       </ion-accordion>
     </ion-accordion-group>
+
+    <!-- ========================= -->
+    <!-- 📘 MANUAL SUPERVIVENCIA -->
+    <!-- ========================= -->
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Manual de Supervivencia</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-button expand="block" (click)="onNuevoManual()">
+          ➕ Nuevo Paso
+        </ion-button>
+
+        <!-- FORM -->
+        <div *ngIf="mostrarFormManual" id="form-manual">
+
+          <form [formGroup]="manualForm" (ngSubmit)="onGuardarManual()">
+
+            <ion-item>
+              <ion-input placeholder="Título" formControlName="titulo"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-textarea placeholder="Descripción" formControlName="descripcion"></ion-textarea>
+            </ion-item>
+
+            <ion-item>
+              <ion-input placeholder="Icono (emoji)" formControlName="icono"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input type="number" placeholder="Orden" formControlName="orden"></ion-input>
+            </ion-item>
+
+            <ion-button expand="block" type="submit">
+              {{ manualEditando ? 'Actualizar' : 'Guardar' }}
+            </ion-button>
+
+            <ion-button expand="block" fill="outline" (click)="onCancelarFormManual()">
+              Cancelar
+            </ion-button>
+
+          </form>
+
+        </div>
+
+        <!-- LISTA -->
+        <ion-list>
+          <ion-item *ngFor="let paso of manual$ | async">
+
+            <ion-label>
+              <h2>{{ paso.icono }} {{ paso.titulo }}</h2>
+              <p>{{ paso.descripcion }}</p>
+              <small>Orden: {{ paso.orden }}</small>
+            </ion-label>
+
+            <ion-button fill="clear" (click)="onEditarManual(paso)">
+              ✏️
+            </ion-button>
+
+            <ion-button fill="clear" color="danger" (click)="onEliminarManual(paso)">
+              🗑️
+            </ion-button>
+
+          </ion-item>
+        </ion-list>
+
+      </ion-card-content>
+    </ion-card>
   </ion-content>
 
 </ng-container>

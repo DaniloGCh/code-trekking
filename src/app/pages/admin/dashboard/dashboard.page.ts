@@ -15,6 +15,9 @@ import { Lugar } from 'src/app/core/models/evento.model';
 import { ConsejoService } from 'src/app/core/services/consejo.service';
 import { Consejo } from 'src/app/core/models/evento.model';
 
+import { ManualService } from 'src/app/core/services/manual.service';
+import { ManualPaso } from 'src/app/core/models/evento.model';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -34,7 +37,7 @@ export class DashboardPage implements OnInit {
   private loadingCtrl = inject(LoadingController);
   private fb = inject(FormBuilder);
   private consejoService = inject(ConsejoService);
-
+  private manualService = inject(ManualService);
 
   constructor(
     public weatherGlobal: WeatherGlobalService,
@@ -74,6 +77,19 @@ export class DashboardPage implements OnInit {
     descripcion: ['', [Validators.required, Validators.minLength(10)]],
   });
 
+
+  // 📘 Manual de supervivencia
+  manual$: Observable<ManualPaso[]> = this.manualService.getPasos();
+  mostrarFormManual = false;
+  manualEditando: ManualPaso | null = null;
+
+  manualForm: FormGroup = this.fb.group({
+    titulo: ['', [Validators.required, Validators.minLength(3)]],
+    descripcion: ['', [Validators.required, Validators.minLength(10)]],
+    icono: ['🧠', [Validators.required]],
+    orden: [1, [Validators.required, Validators.min(1)]],
+  });
+
   // =========================
   // 📍 LUGARES
   // =========================
@@ -109,6 +125,10 @@ export class DashboardPage implements OnInit {
   get fCalificacionRiesgo() { return this.lugarForm.get('calificacionRiesgo'); }
   get cTitulo() { return this.consejoForm.get('titulo'); }
   get cDescripcion() { return this.consejoForm.get('descripcion'); }
+  get mTitulo() { return this.manualForm.get('titulo'); }
+  get mDescripcion() { return this.manualForm.get('descripcion'); }
+  get mIcono() { return this.manualForm.get('icono'); }
+  get mOrden() { return this.manualForm.get('orden'); }
 
   // =========================
   // 🎒 EQUIPAMIENTO
@@ -140,6 +160,107 @@ export class DashboardPage implements OnInit {
       this.totalAdmins = users.filter(u => u.rol === 'admin').length;
       this.totalRegulares = users.filter(u => u.rol === 'user').length;
     });
+  }
+
+  // =========================
+  // 📍MANUAL SUPERVIVENCIA
+  // =========================
+  onNuevoManual() {
+    this.manualEditando = null;
+    this.manualForm.reset({ icono: '🧠', orden: 1 });
+    this.mostrarFormManual = true;
+
+    setTimeout(() => {
+      document.getElementById('form-manual')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
+  onEditarManual(paso: ManualPaso) {
+    this.manualEditando = paso;
+
+    this.manualForm.patchValue({
+      titulo: paso.titulo,
+      descripcion: paso.descripcion,
+      icono: paso.icono,
+      orden: paso.orden
+    });
+
+    this.mostrarFormManual = true;
+
+    setTimeout(() => {
+      document.getElementById('form-manual')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
+  async onGuardarManual() {
+    if (this.manualForm.invalid) {
+      this.manualForm.markAllAsTouched();
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({
+      message: this.manualEditando ? 'Actualizando paso...' : 'Agregando paso...'
+    });
+
+    await loading.present();
+
+    try {
+      const datos = {
+        titulo: this.manualForm.value.titulo.trim(),
+        descripcion: this.manualForm.value.descripcion.trim(),
+        icono: this.manualForm.value.icono,
+        orden: Number(this.manualForm.value.orden),
+      };
+
+      if (this.manualEditando) {
+        await this.manualService.editarPaso(this.manualEditando.id!, datos);
+        await this.showToast('Paso actualizado correctamente', 'success');
+      } else {
+        await this.manualService.agregarPaso(datos);
+        await this.showToast('Paso agregado correctamente', 'success');
+      }
+
+      this.onCancelarFormManual();
+
+    } catch (error) {
+      await this.showToast('Error al guardar el paso', 'danger');
+    } finally {
+      await loading.dismiss();
+    }
+  }
+
+  onCancelarFormManual() {
+    this.mostrarFormManual = false;
+    this.manualEditando = null;
+    this.manualForm.reset({ icono: '🧠', orden: 1 });
+  }
+
+  async onEliminarManual(paso: ManualPaso) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar paso',
+      message: `¿Eliminar <strong>${paso.titulo}</strong>?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
+            await loading.present();
+
+            try {
+              await this.manualService.eliminarPaso(paso.id!);
+              await this.showToast('Paso eliminado', 'success');
+            } catch {
+              await this.showToast('Error al eliminar', 'danger');
+            } finally {
+              await loading.dismiss();
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   // =========================

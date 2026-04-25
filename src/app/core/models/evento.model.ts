@@ -55,3 +55,12 @@ export interface Consejo {
   descripcion: string;
   creadoEn?: any;
 }
+
+export interface ManualPaso {
+  id?: string;
+  titulo: string;
+  descripcion: string;
+  icono: string;
+  orden: number;
+  creadoEn?: any;
+}

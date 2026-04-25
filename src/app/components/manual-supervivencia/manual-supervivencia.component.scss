@@ -1,0 +1,145 @@
+/* =========================================================
+   🌄 FONDO GENERAL
+   ========================================================= */
+
+ion-content {
+  --background: linear-gradient(
+      rgba(0, 0, 0, 0.65),
+      rgba(0, 0, 0, 0.75)
+    ),
+    url('https://images.unsplash.com/photo-1630603334774-c8ae1c1f1fce?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')
+    no-repeat center center / cover;
+
+  color: #fff;
+}
+
+/* =========================================================
+   📦 CONTENEDOR PRINCIPAL
+   ========================================================= */
+
+.manual-container {
+  margin: 70px 15px;
+  animation: fadeIn 0.4s ease;
+}
+
+/* =========================================================
+   🪵 CARD PRINCIPAL (PASO)
+   ========================================================= */
+
+.paso-card {
+  background: rgba(34, 49, 34, 0.55);
+  border-radius: 16px;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+
+  color: #fff;
+  margin-bottom: 20px;
+
+  transition: transform 0.25s ease;
+}
+
+.paso-card:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   🧭 HEADER DEL PASO
+   ========================================================= */
+
+.paso-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* emoji/icono */
+.paso-icon {
+  font-size: 28px;
+}
+
+/* título */
+.paso-titulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #c7f9cc;
+}
+
+/* =========================================================
+   📄 DESCRIPCIÓN
+   ========================================================= */
+
+.paso-descripcion {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #e0f2e9;
+}
+
+/* =========================================================
+   🔘 CONTROLES (NEXT / PREV)
+   ========================================================= */
+
+.manual-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.manual-controls ion-button {
+  --border-radius: 12px;
+  font-weight: 500;
+}
+
+/* botón anterior */
+.btn-prev {
+  --background: rgba(255, 255, 255, 0.08);
+  --color: #c7f9cc;
+}
+
+/* botón siguiente */
+.btn-next {
+  --background: #2e7d32;
+  --color: #fff;
+}
+
+.btn-next:hover {
+  --background: #388e3c;
+}
+
+/* =========================================================
+   🚪 BOTÓN CERRAR (MODAL)
+   ========================================================= */
+
+.btn-close {
+  --background: rgba(198, 40, 40, 0.85);
+  --color: #fff;
+  --border-radius: 12px;
+
+  margin-bottom: 15px;
+}
+
+.btn-close:hover {
+  --background: #e53935;
+}
+
+/* =========================================================
+   ✨ ANIMACIONES
+   ========================================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
