@@ -51,8 +51,7 @@
       <!-- 🏕️ Mensaje motivacional -->
       <p>Tus próxima aventura te esperan</p>
 
-      <!-- 🏷️ Badge que indica el rol del usuario -->
-      <ion-badge [color]="userData.rol === 'admin' ? 'danger' : 'primary'">
+      <ion-badge *ngIf="userData?.rol === 'admin'" [color]="'danger'">
         {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
       </ion-badge>
 
