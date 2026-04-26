@@ -22,6 +22,9 @@ import { KitPrimerosAuxiliosService } from 'src/app/core/services/kit-primeros-a
 import { KitSupervivenciaService } from 'src/app/core/services/kit-supervivencia.service';
 import { KitPrimerosAuxilios, KitSupervivencia } from 'src/app/core/models/evento.model';
 
+import { Evento } from 'src/app/core/models/evento.model';
+import { Firestore, collection, collectionData } from '@angular/fire/firestore';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -44,6 +47,7 @@ export class DashboardPage implements OnInit {
   private manualService = inject(ManualService);
   private kitPAService = inject(KitPrimerosAuxiliosService);
   private kitSupService = inject(KitSupervivenciaService);
+  private firestore = inject(Firestore);
 
   constructor(
     public weatherGlobal: WeatherGlobalService,
@@ -69,9 +73,22 @@ export class DashboardPage implements OnInit {
   // =========================
   users$: Observable<UserData[]> = this.authService.getAllUsers();
 
+  // 🔥 NUEVO: EVENTOS
+  eventos$: Observable<Evento[]> = collectionData(
+    collection(this.firestore, 'eventos'),
+    { idField: 'id' }
+  ) as Observable<Evento[]>;
+
   totalUsers = 0;
   totalAdmins = 0;
   totalRegulares = 0;
+
+    totalEventos = 0;
+
+  // 🔥 IMPORTANTE: índice string
+  eventosPorUsuario: { [uid: string]: number } = {};
+
+
 
   // 📝 Consejos
   consejos$: Observable<Consejo[]> = this.consejoService.getConsejos();
@@ -164,14 +181,14 @@ export class DashboardPage implements OnInit {
   get mOrden() { return this.manualForm.get('orden'); }
 
   // 🩺 KIT PRIMEROS AUXILIOS
-get paNombre() { return this.paForm.get('nombre'); }
-get paDescripcion() { return this.paForm.get('descripcion'); }
-get paItems() { return this.paForm.get('items'); }
+  get paNombre() { return this.paForm.get('nombre'); }
+  get paDescripcion() { return this.paForm.get('descripcion'); }
+  get paItems() { return this.paForm.get('items'); }
 
-// 🏕️ KIT SUPERVIVENCIA
-get supNombre() { return this.supForm.get('nombre'); }
-get supDescripcion() { return this.supForm.get('descripcion'); }
-get supItems() { return this.supForm.get('items'); }
+  // 🏕️ KIT SUPERVIVENCIA
+  get supNombre() { return this.supForm.get('nombre'); }
+  get supDescripcion() { return this.supForm.get('descripcion'); }
+  get supItems() { return this.supForm.get('items'); }
 
   // =========================
   // 🎒 EQUIPAMIENTO
@@ -203,6 +220,34 @@ get supItems() { return this.supForm.get('items'); }
       this.totalAdmins = users.filter(u => u.rol === 'admin').length;
       this.totalRegulares = users.filter(u => u.rol === 'user').length;
     });
+
+    // 🔥 CALCULAR EVENTOS
+// 🔥 CORRECCIÓN AQUÍ
+    this.eventos$.subscribe(eventos => {
+
+      this.totalEventos = eventos.length;
+      this.eventosPorUsuario = {};
+
+      eventos.forEach(e => {
+
+        // 👇 ASEGURAR QUE SEA STRING
+        const uid = typeof e.creadoPor === 'string'
+          ? e.creadoPor
+          : e.creadoPor?.uid || 'desconocido';
+
+        if (!this.eventosPorUsuario[uid]) {
+          this.eventosPorUsuario[uid] = 0;
+        }
+
+        this.eventosPorUsuario[uid]++;
+      });
+
+    });
+  }
+
+  // 🔥 OBTENER CANTIDAD POR USUARIO
+  getEventosPorUsuario(uid: string): number {
+    return this.eventosPorUsuario[uid] || 0;
   }
 
   //------------------------
@@ -215,30 +260,30 @@ get supItems() { return this.supForm.get('items'); }
   }
 
   async guardarPA() {
-  if (this.paForm.invalid) {
-    this.paForm.markAllAsTouched();
-    return;
+    if (this.paForm.invalid) {
+      this.paForm.markAllAsTouched();
+      return;
+    }
+
+    const data = {
+      ...this.paForm.value,
+      items: this.paForm.value.items.split(',').map((i: string) => i.trim())
+    };
+
+    if (this.paEditando) {
+      await this.kitPAService.editarKit(this.paEditando.id!, data);
+    } else {
+      await this.kitPAService.agregarKit(data);
+    }
+
+    this.onCancelarPA(); // 👈 importante
   }
-
-  const data = {
-    ...this.paForm.value,
-    items: this.paForm.value.items.split(',').map((i: string) => i.trim())
-  };
-
-  if (this.paEditando) {
-    await this.kitPAService.editarKit(this.paEditando.id!, data);
-  } else {
-    await this.kitPAService.agregarKit(data);
-  }
-
-  this.onCancelarPA(); // 👈 importante
-}
 
   onCancelarPA() {
-  this.mostrarFormPA = false;
-  this.paEditando = null;
-  this.paForm.reset();
-}
+    this.mostrarFormPA = false;
+    this.paEditando = null;
+    this.paForm.reset();
+  }
 
   editarPA(k: KitPrimerosAuxilios) {
     this.paEditando = k;
@@ -263,29 +308,29 @@ get supItems() { return this.supForm.get('items'); }
   }
 
   async guardarSup() {
-  if (this.supForm.invalid) {
-    this.supForm.markAllAsTouched();
-    return;
+    if (this.supForm.invalid) {
+      this.supForm.markAllAsTouched();
+      return;
+    }
+
+    const data = {
+      ...this.supForm.value,
+      items: this.supForm.value.items.split(',').map((i: string) => i.trim())
+    };
+
+    if (this.supEditando) {
+      await this.kitSupService.editarKit(this.supEditando.id!, data);
+    } else {
+      await this.kitSupService.agregarKit(data);
+    }
+
+    this.onCancelarSup(); // 👈 importante
   }
-
-  const data = {
-    ...this.supForm.value,
-    items: this.supForm.value.items.split(',').map((i: string) => i.trim())
-  };
-
-  if (this.supEditando) {
-    await this.kitSupService.editarKit(this.supEditando.id!, data);
-  } else {
-    await this.kitSupService.agregarKit(data);
-  }
-
-  this.onCancelarSup(); // 👈 importante
-}
 
   onCancelarSup() {
-  this.mostrarFormSup = false;
-  this.supEditando = null;
-}
+    this.mostrarFormSup = false;
+    this.supEditando = null;
+  }
 
   editarSup(k: KitSupervivencia) {
     this.supEditando = k;

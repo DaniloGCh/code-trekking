@@ -164,6 +164,149 @@ ion-header ion-toolbar {
 .stat-card.admins { background: rgba(139, 69, 19, 0.7); }
 .stat-card.users { background: rgba(34, 139, 34, 0.7); }
 
+/* 📊 SECCIÓN */
+.stats-section {
+  margin: 20px 15px;
+}
+
+/* 🧭 TITULO */
+.stats-title {
+  color: #c7f9cc;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* 🪵 CARD */
+.stat-card {
+  text-align: center;
+
+  background: rgba(34, 49, 34, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 16px;
+  padding: 10px;
+
+  color: #fff;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+
+  transition: all 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+/* 📅 ICONO */
+.stat-icon {
+  font-size: 28px;
+  color: #81c784;
+  margin-bottom: 5px;
+}
+
+/* 🔢 NUMERO */
+.stat-card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 5px 0;
+}
+
+/* 📝 TEXTO */
+.stat-card p {
+  font-size: 0.85rem;
+  color: #c7f9cc;
+}
+
+/* 📦 CONTENEDOR */
+.usuarios-accordion-group {
+  margin: 10px 15px;
+}
+
+/* 🪵 ACORDEÓN */
+.usuarios-accordion {
+  background: rgba(34, 49, 34, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 14px;
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 📌 HEADER */
+.usuarios-header {
+  --background: transparent;
+  --color: #fff;
+  font-weight: 500;
+}
+
+.usuarios-icon {
+  color: #81c784;
+}
+
+/* 📄 CONTENIDO */
+.usuarios-content {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* 📋 LISTA */
+.usuarios-list {
+  background: transparent;
+}
+
+/* 📦 ITEM */
+.usuarios-item {
+  --background: transparent;
+  --color: #fff;
+
+  border-radius: 10px;
+  margin-bottom: 5px;
+
+  transition: all 0.2s ease;
+}
+
+.usuarios-item:hover {
+  --background: rgba(255, 255, 255, 0.05);
+}
+
+/* 👤 ICONO */
+.usuarios-user-icon {
+  color: #4caf50;
+}
+
+/* 🧾 TEXTO */
+.usuarios-label h3 {
+  font-weight: 600;
+  color: #fff;
+}
+
+.usuarios-label p {
+  color: #c7f9cc;
+  font-size: 0.8rem;
+}
+
+/* 🟢 BADGE */
+.usuarios-badge {
+  background: rgba(46, 125, 50, 0.3);
+  color: #c7f9cc;
+
+  border: 1px solid rgba(76, 175, 80, 0.5);
+
+  border-radius: 10px;
+  padding: 5px 10px;
+
+  font-weight: 600;
+}
+
+/* 🚫 EMPTY */
+.usuarios-empty p {
+  color: #a5d6a7;
+}
+
 /* =========================================================
    👥 LISTAS (UNIFICADO)
    ========================================================= */

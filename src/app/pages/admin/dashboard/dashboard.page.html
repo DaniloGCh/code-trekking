@@ -94,6 +94,81 @@
       </ion-row>
     </ion-grid>
 
+
+
+    <!-- ========================= -->
+    <!-- 📊 EVENTOS POR USUARIO -->
+    <!-- ========================= -->
+
+<ion-accordion-group class="usuarios-accordion-group">
+
+  <ion-accordion value="usuarios" class="usuarios-accordion">
+
+    <!-- 🔹 HEADER -->
+    <ion-item slot="header" class="usuarios-header">
+      <ion-icon name="people-outline" slot="start" class="usuarios-icon"></ion-icon>
+      <ion-label>Eventos por usuario</ion-label>
+    </ion-item>
+
+    <!-- 🔹 CONTENIDO -->
+    <div slot="content" class="usuarios-content">
+
+      <ion-list class="usuarios-list">
+
+        <ng-container *ngIf="users$ | async as users">
+
+          <!-- 🚫 SIN USUARIOS -->
+          <ion-item *ngIf="users.length === 0" class="usuarios-empty">
+            <ion-label class="ion-text-center">
+              <p>No hay usuarios disponibles</p>
+            </ion-label>
+          </ion-item>
+
+          <!-- 👥 LISTA -->
+          <ion-item *ngFor="let user of users" class="usuarios-item">
+
+            <ion-icon name="person-outline" slot="start" class="usuarios-user-icon"></ion-icon>
+
+            <ion-label class="usuarios-label">
+              <h3>{{ user.nombre }}</h3>
+              <p>{{ user.email }}</p>
+            </ion-label>
+
+            <ion-badge class="usuarios-badge">
+              {{ getEventosPorUsuario(user.uid) }}
+            </ion-badge>
+
+          </ion-item>
+
+        </ng-container>
+
+      </ion-list>
+
+    </div>
+
+  </ion-accordion>
+
+</ion-accordion-group>
+
+    <div class="stats-section">
+
+      <ion-col size="3">
+        <ion-card class="stat-card eventos">
+          <ion-card-content>
+
+            <div class="stat-icon">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+
+            <h2>{{ totalEventos }}</h2>
+            <p>Total de eventos</p>
+
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </div>
+
     <!-- ========================= -->
     <!-- 👥 USUARIOS -->
     <!-- ========================= -->
