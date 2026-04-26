@@ -94,6 +94,55 @@
         </swiper-container>
 
       </div> <!--Fin Consejos -->
+
+      <div class="kits-wrapper">
+
+        <!-- 🩺 KIT PRIMEROS AUXILIOS -->
+        <ng-container *ngIf="kitsPA$ | async as kitsPA">
+          <ion-card *ngIf="kitsPA.length > 0" class="kit-card kit-pa">
+
+            <ion-card-content>
+              <div *ngFor="let kit of kitsPA">
+                <h3>{{ kit.nombre }}</h3>
+                <p>{{ kit.descripcion }}</p>
+
+                <ion-chip *ngFor="let item of kit.items" class="chip-pa">
+                  {{ item }}
+                </ion-chip>
+
+                <hr />
+              </div>
+            </ion-card-content>
+
+          </ion-card>
+        </ng-container>
+
+        <!-- 🏕️ KIT SUPERVIVENCIA -->
+        <ng-container *ngIf="kitsSup$ | async as kitsSup">
+          <ion-card *ngIf="kitsSup.length > 0" class="kit-card kit-sup">
+
+            <ion-card-content>
+              <div *ngFor="let kit of kitsSup">
+                <h3>
+                  {{ kit.nombre }}
+                  <ion-badge color="success"></ion-badge>
+                </h3>
+
+                <p>{{ kit.descripcion }}</p>
+
+                <ion-chip *ngFor="let item of kit.items" class="chip-sup">
+                  {{ item }}
+                </ion-chip>
+
+                <hr />
+              </div>
+            </ion-card-content>
+
+          </ion-card>
+        </ng-container>
+
+      </div> <!-- Fin Kits -->
+
       <ion-button expand="block" fill="outline" (click)="openManual()">
         <ion-icon name="book-outline" slot="start"></ion-icon>
         Manual de emergencia

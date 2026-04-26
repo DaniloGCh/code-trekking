@@ -64,3 +64,23 @@ export interface ManualPaso {
   orden: number;
   creadoEn?: any;
 }
+
+// 🩺 KIT DE PRIMEROS AUXILIOS
+export interface KitPrimerosAuxilios {
+  id?: string;
+  nombre: string;
+  descripcion: string;
+  items: string[];
+  creadoPor?: string;
+  fechaCreacion?: any;
+}
+
+// 🏕️ KIT DE SUPERVIVENCIA
+export interface KitSupervivencia {
+  id?: string;
+  nombre: string;
+  descripcion: string;
+  items: string[];
+  creadoPor?: string;
+  fechaCreacion?: any;
+}

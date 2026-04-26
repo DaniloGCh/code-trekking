@@ -356,3 +356,80 @@ p {
   margin-top: 15px;
   line-height: 1.5;
 }
+
+/* 📦 CONTENEDOR */
+.kits-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* lado a lado */
+  gap: 15px;
+  padding: 15px;
+}
+
+/* 📱 RESPONSIVE (en celular se apilan) */
+@media (max-width: 768px) {
+  .kits-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 🪵 CARD BASE (GLASS) */
+.kit-card {
+  background: rgba(34, 49, 34, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 16px;
+  padding: 5px;
+
+  color: #fff;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+
+  transition: transform 0.25s ease;
+}
+
+.kit-card:hover {
+  transform: translateY(-3px);
+}
+
+
+/* 📄 TEXTO */
+.kit-card h3 {
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin: 7px 7px 20px 7px;
+  
+  text-align: justify;      /* 👈 esto justifica */
+  text-justify: inter-word; /* 👈 opcional (mejora el espaciado) */
+}
+
+.kit-card p {
+  font-size: 1.1rem;
+  color: #c7f9cc;
+  margin: 10px;
+  
+  text-align: justify;      /* 👈 esto justifica */
+  text-justify: inter-word; /* 👈 opcional (mejora el espaciado) */
+}
+
+/* 🔴 KIT PRIMEROS AUXILIOS */
+.chip-pa {
+  margin: 4px;
+  --color: #fbb3ac;
+  --border-color: #ff5252;
+}
+
+/* 🟢 KIT SUPERVIVENCIA */
+.chip-sup {
+  margin: 4px;
+  --color: #ffffff;
+  --border-color: #4caf50;
+}
+
+/* 🔥 separador */
+.kit-card hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 10px 0;
+}

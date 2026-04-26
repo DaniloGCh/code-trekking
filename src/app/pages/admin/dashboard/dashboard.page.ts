@@ -18,6 +18,10 @@ import { Consejo } from 'src/app/core/models/evento.model';
 import { ManualService } from 'src/app/core/services/manual.service';
 import { ManualPaso } from 'src/app/core/models/evento.model';
 
+import { KitPrimerosAuxiliosService } from 'src/app/core/services/kit-primeros-auxilios.service';
+import { KitSupervivenciaService } from 'src/app/core/services/kit-supervivencia.service';
+import { KitPrimerosAuxilios, KitSupervivencia } from 'src/app/core/models/evento.model';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -38,6 +42,8 @@ export class DashboardPage implements OnInit {
   private fb = inject(FormBuilder);
   private consejoService = inject(ConsejoService);
   private manualService = inject(ManualService);
+  private kitPAService = inject(KitPrimerosAuxiliosService);
+  private kitSupService = inject(KitSupervivenciaService);
 
   constructor(
     public weatherGlobal: WeatherGlobalService,
@@ -77,6 +83,33 @@ export class DashboardPage implements OnInit {
     descripcion: ['', [Validators.required, Validators.minLength(10)]],
   });
 
+
+  // =========================
+  // 🩺 KIT PRIMEROS AUXILIOS
+  // =========================
+  kitsPA$: Observable<KitPrimerosAuxilios[]> = this.kitPAService.getKits();
+  mostrarFormPA = false;
+  paEditando: KitPrimerosAuxilios | null = null;
+
+  paForm: FormGroup = this.fb.group({
+    nombre: ['', Validators.required],
+    descripcion: ['', Validators.required],
+    items: ['', Validators.required],
+  });
+
+  // =========================
+  // 🏕️ KIT SUPERVIVENCIA
+  // =========================
+  kitsSup$: Observable<KitSupervivencia[]> = this.kitSupService.getKits();
+  mostrarFormSup = false;
+  supEditando: KitSupervivencia | null = null;
+
+  supForm: FormGroup = this.fb.group({
+    nombre: ['', Validators.required],
+    descripcion: ['', Validators.required],
+    items: ['', Validators.required],
+    nivel: ['básico', Validators.required],
+  });
 
   // 📘 Manual de supervivencia
   manual$: Observable<ManualPaso[]> = this.manualService.getPasos();
@@ -130,6 +163,16 @@ export class DashboardPage implements OnInit {
   get mIcono() { return this.manualForm.get('icono'); }
   get mOrden() { return this.manualForm.get('orden'); }
 
+  // 🩺 KIT PRIMEROS AUXILIOS
+get paNombre() { return this.paForm.get('nombre'); }
+get paDescripcion() { return this.paForm.get('descripcion'); }
+get paItems() { return this.paForm.get('items'); }
+
+// 🏕️ KIT SUPERVIVENCIA
+get supNombre() { return this.supForm.get('nombre'); }
+get supDescripcion() { return this.supForm.get('descripcion'); }
+get supItems() { return this.supForm.get('items'); }
+
   // =========================
   // 🎒 EQUIPAMIENTO
   // =========================
@@ -160,6 +203,101 @@ export class DashboardPage implements OnInit {
       this.totalAdmins = users.filter(u => u.rol === 'admin').length;
       this.totalRegulares = users.filter(u => u.rol === 'user').length;
     });
+  }
+
+  //------------------------
+  //PRIMEROS AUXILIOS
+  //------------------------
+  onNuevoPA() {
+    this.paEditando = null;
+    this.paForm.reset();
+    this.mostrarFormPA = true;
+  }
+
+  async guardarPA() {
+  if (this.paForm.invalid) {
+    this.paForm.markAllAsTouched();
+    return;
+  }
+
+  const data = {
+    ...this.paForm.value,
+    items: this.paForm.value.items.split(',').map((i: string) => i.trim())
+  };
+
+  if (this.paEditando) {
+    await this.kitPAService.editarKit(this.paEditando.id!, data);
+  } else {
+    await this.kitPAService.agregarKit(data);
+  }
+
+  this.onCancelarPA(); // 👈 importante
+}
+
+  onCancelarPA() {
+  this.mostrarFormPA = false;
+  this.paEditando = null;
+  this.paForm.reset();
+}
+
+  editarPA(k: KitPrimerosAuxilios) {
+    this.paEditando = k;
+    this.paForm.patchValue({
+      ...k,
+      items: k.items.join(', ')
+    });
+    this.mostrarFormPA = true;
+  }
+
+  async eliminarPA(id: string) {
+    await this.kitPAService.eliminarKit(id);
+  }
+
+  //------------------------
+  //SUPERVIVENCIA
+  //------------------------
+  onNuevoSup() {
+    this.supEditando = null;
+    this.supForm.reset({ nivel: 'básico' });
+    this.mostrarFormSup = true;
+  }
+
+  async guardarSup() {
+  if (this.supForm.invalid) {
+    this.supForm.markAllAsTouched();
+    return;
+  }
+
+  const data = {
+    ...this.supForm.value,
+    items: this.supForm.value.items.split(',').map((i: string) => i.trim())
+  };
+
+  if (this.supEditando) {
+    await this.kitSupService.editarKit(this.supEditando.id!, data);
+  } else {
+    await this.kitSupService.agregarKit(data);
+  }
+
+  this.onCancelarSup(); // 👈 importante
+}
+
+  onCancelarSup() {
+  this.mostrarFormSup = false;
+  this.supEditando = null;
+}
+
+  editarSup(k: KitSupervivencia) {
+    this.supEditando = k;
+    this.supForm.patchValue({
+      ...k,
+      items: k.items.join(', ')
+    });
+    this.mostrarFormSup = true;
+  }
+
+  async eliminarSup(id: string) {
+    await this.kitSupService.eliminarKit(id);
   }
 
   // =========================

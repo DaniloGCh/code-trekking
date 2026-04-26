@@ -14,6 +14,11 @@ import { Consejo } from 'src/app/core/models/evento.model';
 import { ModalController } from '@ionic/angular';
 import { ManualSupervivenciaComponent } from 'src/app/components/manual-supervivencia/manual-supervivencia.component';
 
+import { KitPrimerosAuxiliosService } from 'src/app/core/services/kit-primeros-auxilios.service';
+import { KitSupervivenciaService } from 'src/app/core/services/kit-supervivencia.service';
+import { KitPrimerosAuxilios, KitSupervivencia } from 'src/app/core/models/evento.model';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-home',
@@ -31,6 +36,8 @@ export class HomePage implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
+  private kitPAService = inject(KitPrimerosAuxiliosService);
+  private kitSupService = inject(KitSupervivenciaService);
 
   // =========================
   // 📊 ESTADO DE AUTENTICACIÓN
@@ -46,6 +53,7 @@ export class HomePage implements OnInit, OnDestroy {
   hideHeader = false;
   lastScrollTop = 0;
 
+
   // =========================
   // 🌦️ SERVICIOS UI
   // =========================
@@ -54,8 +62,11 @@ export class HomePage implements OnInit, OnDestroy {
     public timeService: TimeService,
     private consejoService: ConsejoService,
     private modalCtrl: ModalController,
-    
+
   ) { }
+
+  kitsPA$: Observable<KitPrimerosAuxilios[]> = this.kitPAService.getKits();
+  kitsSup$: Observable<KitSupervivencia[]> = this.kitSupService.getKits();
 
   // =========================
   // 🚀 INIT
@@ -77,22 +88,22 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-async openManual() {
-  const modal = await this.modalCtrl.create({
-    component: ManualSupervivenciaComponent,
-    cssClass: 'manual-modal'
-  });
+  async openManual() {
+    const modal = await this.modalCtrl.create({
+      component: ManualSupervivenciaComponent,
+      cssClass: 'manual-modal'
+    });
 
-  await modal.present();
-}
+    await modal.present();
+  }
 
-   // 🔀 AQUÍ VA LA FUNCIÓN (IMPORTANTE)
+  // 🔀 AQUÍ VA LA FUNCIÓN (IMPORTANTE)
   shuffleArray(array: any[]) {
     return array
       .map(value => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ value }) => value);
-  } 
+  }
 
   // =========================
   // 🧹 DESTROY

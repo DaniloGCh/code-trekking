@@ -464,6 +464,242 @@
       </ion-accordion>
     </ion-accordion-group>
 
+    <h3 class="section-title">
+      Kit de primeros auxilios
+
+      <ion-button fill="clear" size="small" (click)="onNuevoPA()" *ngIf="!mostrarFormPA">
+
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Agregar
+      </ion-button>
+    </h3>
+    <!-- FORMULARIO KIT PRIMEROS AUXILIOS -->
+    <ion-card id="form-pa" *ngIf="mostrarFormPA" class="form-card">
+      <ion-card-header>
+        <ion-card-title>
+          {{ paEditando ? '✏️ Editar kit de primeros auxilios' : '➕ Nuevo kit de primeros auxilios' }}
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form [formGroup]="paForm" (ngSubmit)="guardarPA()">
+
+          <!-- NOMBRE -->
+          <ion-item [class.ion-invalid]="paNombre?.invalid && paNombre?.touched">
+            <ion-label position="floating">Nombre del kit</ion-label>
+            <ion-input type="text" formControlName="nombre"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="paNombre?.errors?.['required']">El nombre es requerido</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- DESCRIPCIÓN -->
+          <ion-item [class.ion-invalid]="paDescripcion?.invalid && paDescripcion?.touched">
+            <ion-label position="floating">Descripción</ion-label>
+            <ion-textarea formControlName="descripcion" rows="4"></ion-textarea>
+            <ion-note slot="error">
+              <span *ngIf="paDescripcion?.errors?.['required']">La descripción es requerida</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- ITEMS -->
+          <ion-item [class.ion-invalid]="paItems?.invalid && paItems?.touched">
+            <ion-label position="floating">Items (separados por coma)</ion-label>
+            <ion-input type="text" formControlName="items"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="paItems?.errors?.['required']">Debes ingresar al menos un item</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- BOTONES -->
+          <div class="form-buttons">
+            <ion-button expand="block" type="submit" [disabled]="paForm.invalid">
+              <ion-icon [name]="paEditando ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
+              {{ paEditando ? 'Guardar cambios' : 'Agregar kit' }}
+            </ion-button>
+
+            <ion-button expand="block" fill="outline" color="medium" (click)="onCancelarPA()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Cancelar
+            </ion-button>
+          </div>
+
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-accordion-group>
+      <ion-accordion value="kit-pa">
+
+        <!-- HEADER -->
+        <ion-item slot="header">
+          <ion-icon name="medkit-outline" slot="start" color="danger"></ion-icon>
+          <ion-label>Ver kits de primeros auxilios</ion-label>
+        </ion-item>
+
+        <!-- CONTENT -->
+        <div slot="content">
+          <ion-list>
+
+            <ng-container *ngIf="kitsPA$ | async as kits">
+
+              <!-- SIN DATOS -->
+              <ion-item *ngIf="kits.length === 0">
+                <ion-label class="ion-text-center" color="medium">
+                  <p>No hay kits registrados aún</p>
+                </ion-label>
+              </ion-item>
+
+              <!-- LISTA -->
+              <ion-item *ngFor="let k of kits">
+
+                <ion-icon name="medkit-outline" slot="start" color="danger"></ion-icon>
+
+                <ion-label class="ion-text-wrap">
+                  <h3>{{ k.nombre }}</h3>
+                  <p>{{ k.descripcion }}</p>
+                  <small>🧰 {{ k.items.join(', ') }}</small>
+                </ion-label>
+
+                <!-- EDITAR -->
+                <ion-button slot="end" fill="clear" color="primary" (click)="editarPA(k)">
+                  <ion-icon name="pencil-outline"></ion-icon>
+                </ion-button>
+
+                <!-- ELIMINAR -->
+                <ion-button slot="end" fill="clear" color="danger" (click)="eliminarPA(k.id!)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+
+              </ion-item>
+
+            </ng-container>
+
+          </ion-list>
+        </div>
+
+      </ion-accordion>
+    </ion-accordion-group>
+
+
+    <h3 class="section-title">
+      Kit de supervivencia
+
+      <ion-button fill="clear" size="small" (click)="onNuevoSup()" *ngIf="!mostrarFormSup">
+
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Agregar
+      </ion-button>
+    </h3>
+    <!-- FORMULARIO KIT SUPERVIVENCIA -->
+    <ion-card id="form-sup" *ngIf="mostrarFormSup" class="form-card">
+      <ion-card-header>
+        <ion-card-title>
+          {{ supEditando ? '✏️ Editar kit de supervivencia' : '➕ Nuevo kit de supervivencia' }}
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <form [formGroup]="supForm" (ngSubmit)="guardarSup()">
+
+          <!-- NOMBRE -->
+          <ion-item [class.ion-invalid]="supNombre?.invalid && supNombre?.touched">
+            <ion-label position="floating">Nombre del kit</ion-label>
+            <ion-input type="text" formControlName="nombre"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="supNombre?.errors?.['required']">El nombre es requerido</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- DESCRIPCIÓN -->
+          <ion-item [class.ion-invalid]="supDescripcion?.invalid && supDescripcion?.touched">
+            <ion-label position="floating">Descripción</ion-label>
+            <ion-textarea formControlName="descripcion" rows="4"></ion-textarea>
+            <ion-note slot="error">
+              <span *ngIf="supDescripcion?.errors?.['required']">La descripción es requerida</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- ITEMS -->
+          <ion-item [class.ion-invalid]="supItems?.invalid && supItems?.touched">
+            <ion-label position="floating">Items (separados por coma)</ion-label>
+            <ion-input type="text" formControlName="items"></ion-input>
+            <ion-note slot="error">
+              <span *ngIf="supItems?.errors?.['required']">Debes ingresar al menos un item</span>
+            </ion-note>
+          </ion-item>
+
+          <!-- BOTONES -->
+          <div class="form-buttons">
+            <ion-button expand="block" type="submit" [disabled]="supForm.invalid">
+              <ion-icon [name]="supEditando ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
+              {{ supEditando ? 'Guardar cambios' : 'Agregar kit' }}
+            </ion-button>
+
+            <ion-button expand="block" fill="outline" color="medium" (click)="onCancelarSup()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Cancelar
+            </ion-button>
+          </div>
+
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-accordion-group>
+      <ion-accordion value="kit-sup">
+
+        <!-- HEADER -->
+        <ion-item slot="header">
+          <ion-icon name="compass-outline" slot="start" color="success"></ion-icon>
+          <ion-label>Ver kits de supervivencia</ion-label>
+        </ion-item>
+
+        <!-- CONTENT -->
+        <div slot="content">
+          <ion-list>
+
+            <ng-container *ngIf="kitsSup$ | async as kits">
+
+              <!-- SIN DATOS -->
+              <ion-item *ngIf="kits.length === 0">
+                <ion-label class="ion-text-center" color="medium">
+                  <p>No hay kits registrados aún</p>
+                </ion-label>
+              </ion-item>
+
+              <!-- LISTA -->
+              <ion-item *ngFor="let k of kits">
+
+                <ion-icon name="compass-outline" slot="start" color="success"></ion-icon>
+
+                <ion-label class="ion-text-wrap">
+                  <h3>{{ k.nombre }} </h3>
+                  <p>{{ k.descripcion }}</p>
+                  <small>🎒 {{ k.items.join(', ') }}</small>
+                </ion-label>
+
+                <!-- EDITAR -->
+                <ion-button slot="end" fill="clear" color="primary" (click)="editarSup(k)">
+                  <ion-icon name="pencil-outline"></ion-icon>
+                </ion-button>
+
+                <!-- ELIMINAR -->
+                <ion-button slot="end" fill="clear" color="danger" (click)="eliminarSup(k.id!)">
+                  <ion-icon name="trash-outline"></ion-icon>
+                </ion-button>
+
+              </ion-item>
+
+            </ng-container>
+
+          </ion-list>
+        </div>
+
+      </ion-accordion>
+    </ion-accordion-group>
+
+
     <!-- ========================= -->
     <!-- 📘 MANUAL SUPERVIVENCIA -->
     <!-- ========================= -->
