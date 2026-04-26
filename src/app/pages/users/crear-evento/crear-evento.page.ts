@@ -158,7 +158,7 @@ export class CrearEventoPage implements OnInit {
           tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
           temporada: lugar.temporada,
           equipamiento: lugar.equipamiento,
-          puntoInicio: lugar.puntoInicio,
+          DireccionPuntoInicio: lugar.DireccionPuntoInicio,
           requierePermiso: lugar.requierePermiso,
           calificacionRiesgo: lugar.calificacionRiesgo,
         },

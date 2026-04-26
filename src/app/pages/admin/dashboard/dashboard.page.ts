@@ -154,14 +154,14 @@ export class DashboardPage implements OnInit {
     tiempoEstimadoHoras: ['', [Validators.required, Validators.min(0.5)]],
     temporada: ['', [Validators.required]],
     equipamiento: [[], [Validators.required]],
-    puntoInicio: ['', [Validators.required, Validators.minLength(3)]],
+    DireccionPuntoInicio: ['', [Validators.required, Validators.minLength(3)]],
     requierePermiso: [false],
     calificacionRiesgo: ['', [Validators.required]],
   });
 
   // =========================
   // 📌 GETTERS FORMULARIO
-  // =========================
+  // ========================= 
   get fNombre() { return this.lugarForm.get('nombre'); }
   get fInformacion() { return this.lugarForm.get('informacion'); }
   get fAltitud() { return this.lugarForm.get('altitud'); }
@@ -170,7 +170,7 @@ export class DashboardPage implements OnInit {
   get fTiempoEstimadoHoras() { return this.lugarForm.get('tiempoEstimadoHoras'); }
   get fTemporada() { return this.lugarForm.get('temporada'); }
   get fEquipamiento() { return this.lugarForm.get('equipamiento'); }
-  get fPuntoInicio() { return this.lugarForm.get('puntoInicio'); }
+  get fDireccionPuntoInicio() { return this.lugarForm.get('direccionPuntoInicio'); }
   get fRequierePermiso() { return this.lugarForm.get('requierePermiso'); }
   get fCalificacionRiesgo() { return this.lugarForm.get('calificacionRiesgo'); }
   get cTitulo() { return this.consejoForm.get('titulo'); }
@@ -467,7 +467,7 @@ export class DashboardPage implements OnInit {
       tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
       temporada: lugar.temporada,
       equipamiento: lugar.equipamiento,
-      puntoInicio: lugar.puntoInicio,
+      DireccionPuntoInicio: lugar.DireccionPuntoInicio,
       requierePermiso: lugar.requierePermiso,
       calificacionRiesgo: lugar.calificacionRiesgo,
     });
@@ -501,7 +501,7 @@ export class DashboardPage implements OnInit {
         tiempoEstimadoHoras: Number(this.lugarForm.value.tiempoEstimadoHoras),
         temporada: this.lugarForm.value.temporada,
         equipamiento: this.lugarForm.value.equipamiento,
-        puntoInicio: this.lugarForm.value.puntoInicio.trim(),
+        DireccionPuntoInicio: this.lugarForm.value.DireccionPuntoInicio.trim(),
         requierePermiso: this.lugarForm.value.requierePermiso,
         calificacionRiesgo: this.lugarForm.value.calificacionRiesgo,
       };

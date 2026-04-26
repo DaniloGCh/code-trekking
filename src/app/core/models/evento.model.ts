@@ -10,7 +10,7 @@ export interface Lugar {
   tiempoEstimadoHoras: number;       // ✅ Nuevo
   temporada: string;                 // ✅ Nuevo
   equipamiento: string[];            // ✅ Nuevo
-  puntoInicio: string;               // ✅ Nuevo
+  DireccionPuntoInicio: string;               // ✅ Nuevo
   requierePermiso: boolean;          // ✅ Nuevo
   calificacionRiesgo: 'Bajo' | 'Moderado' | 'Alto' | 'Extremo'; // ✅ Nuevo
 }
