@@ -70,7 +70,7 @@ ion-header ion-toolbar {
    ========================================================= */
 
 .welcome-header {
-  margin: 65px 15px 20px;
+  margin: 85px 15px 20px;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -307,6 +307,36 @@ ion-header ion-toolbar {
   color: #a5d6a7;
 }
 
+
+/* =========================
+   🔵 PANEL ESTADÍSTICAS
+========================= */
+.panel-estadisticas {
+  margin: 15px;
+  padding: 15px;
+
+  background: rgba(0, 60, 100, 0.20);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(33, 150, 243, 0.25);
+  border-radius: 16px;
+}
+/* =========================
+   🟢 PANEL GESTIÓN
+========================= */
+.panel-gestion {
+  margin: 15px;
+  padding: 15px;
+
+  background: rgba(34, 49, 34, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  border-radius: 16px;
+}
+
 /* =========================================================
    👥 LISTAS (UNIFICADO)
    ========================================================= */
@@ -436,4 +466,18 @@ ion-accordion {
 
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* =========================
+   🏷️ TÍTULOS DE SECCIÓN
+========================= */
+.section-title {
+  color: #c7f9cc;
+  font-size: 1.1rem;
+  font-weight: 600;
+
+  margin: 20px 10px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
