@@ -152,17 +152,28 @@ export class DashboardPage implements OnInit {
     tiempoEstimadoHoras: ['', [Validators.required, Validators.minLength(3)]],
     equipamiento: [[], [Validators.required]],
     DireccionPuntoInicio: ['', [Validators.required, Validators.minLength(3)]],
+    // 🆕 COORDENADAS
+    latitud: [''],
+    longitud: [''],
+
     requiereRegistroAcceso: [false],
     requierePagoEntrada: [false],
     valorEntrada: [null],
 
     requiereHorarioVisita: [false],
-
     horarioVisita: this.fb.group({
       apertura: [''],
       cierre: ['']
     }),
+
     requierePermiso: [false],
+
+    requiereMasInformacion: [false],
+    MasInformacion: this.fb.group({
+      Texto: [''],
+      URL: [''],
+      Otro: ['']
+    }),
 
   });
 
@@ -182,7 +193,8 @@ export class DashboardPage implements OnInit {
   get fRequiereRegistroAcceso() { return this.lugarForm.get('requiereRegistroAcceso'); }
   get fRequiereHorarioVisita() { return this.lugarForm.get('requiereHorarioVisita'); }
   get fHorarioVisita() { return this.lugarForm.get('horarioVisita'); }
-
+  get fRequiereMasInformacion() { return this.lugarForm.get('requiereMasInformacion'); }
+  get fMasInformacion() { return this.lugarForm.get('MasInformacion'); }
 
   get cTitulo() { return this.consejoForm.get('titulo'); }
   get cDescripcion() { return this.consejoForm.get('descripcion'); }
@@ -205,7 +217,18 @@ export class DashboardPage implements OnInit {
   // 🎒 EQUIPAMIENTO
   // =========================
   equipamientoOpciones = [
+    'Agua (2L a 3L)',
+    'Snacks',
+    'Comida',
+    'Cocinilla portátil',
+    'Kit de cocina',
+    'Encendedor o fósforos',
+    'Ropa de cambio',
+    'Zapatillas comodas de cambio',
+    'Esterilla o colchoneta',
+    'Bolsa para basura',
     'Bastones de trekking',
+    'Cuchillo (multiusos)',
     'Crampones',
     'Piolet',
     'Casco',
@@ -214,7 +237,6 @@ export class DashboardPage implements OnInit {
     'Kit primeros auxilios',
     'Ropa térmica',
     'Impermeables',
-    'Agua extra (3L+)',
     'Comida de emergencia',
     'GPS o mapa',
   ];
@@ -491,6 +513,8 @@ export class DashboardPage implements OnInit {
       tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
       equipamiento: lugar.equipamiento,
       DireccionPuntoInicio: lugar.DireccionPuntoInicio || '',
+      latitud: lugar.latitud || '',
+      longitud: lugar.longitud || '',
       requiereRegistroAcceso: lugar.requiereRegistroAcceso,
       requierePagoEntrada: lugar.requierePagoEntrada,
       requiereHorarioVisita: lugar.requiereHorarioVisita,
@@ -499,6 +523,13 @@ export class DashboardPage implements OnInit {
         cierre: lugar.horarioVisita?.cierre || ''
       },
       requierePermiso: lugar.requierePermiso,
+
+      requiereMasInformacion: lugar.requiereMasInformacion,
+      MasInformacion: {
+        Texto: lugar.MasInformacion?.Texto || '',
+        URL: lugar.MasInformacion?.URL || '',
+        Otro: lugar.MasInformacion?.Otro || ''
+      }
 
     });
 
@@ -533,7 +564,16 @@ export class DashboardPage implements OnInit {
 
         DireccionPuntoInicio: (this.lugarForm.value.DireccionPuntoInicio || '').trim(),
 
+        // 🆕 COORDENADAS
+        latitud: this.lugarForm.value.latitud ? Number(this.lugarForm.value.latitud) : undefined,
+        longitud: this.lugarForm.value.longitud ? Number(this.lugarForm.value.longitud) : undefined,
+
+
         requierePagoEntrada: this.lugarForm.value.requierePagoEntrada,
+        valorEntrada: this.lugarForm.value.requierePagoEntrada
+          ? Number(this.lugarForm.value.valorEntrada || 0)
+          : undefined,
+
         requierePermiso: this.lugarForm.value.requierePermiso,
         requiereRegistroAcceso: this.lugarForm.value.requiereRegistroAcceso,
         requiereHorarioVisita: this.lugarForm.value.requiereHorarioVisita,
@@ -545,10 +585,14 @@ export class DashboardPage implements OnInit {
           }
           : undefined,
 
-        valorEntrada: this.lugarForm.value.requierePagoEntrada
-          ? Number(this.lugarForm.value.valorEntrada || 0)
+        requiereMasInformacion: this.lugarForm.value.requiereMasInformacion,
+        MasInformacion: this.lugarForm.value.requiereMasInformacion
+          ? {
+            Texto: this.lugarForm.value.MasInformacion?.Texto || '',
+            URL: this.lugarForm.value.MasInformacion?.URL || '',
+            Otro: this.lugarForm.value.MasInformacion?.Otro || '',
+          }
           : undefined,
-
       };
 
       if (!datos.requierePagoEntrada) {
@@ -557,6 +601,10 @@ export class DashboardPage implements OnInit {
 
       if (!datos.requiereHorarioVisita) {
         delete datos.horarioVisita;
+      }
+
+      if (!datos.requiereMasInformacion) {
+        delete datos.MasInformacion;
       }
 
       if (this.lugarEditando) {
@@ -577,10 +625,10 @@ export class DashboardPage implements OnInit {
   }
 
   onCancelarForm() {
-  this.mostrarFormLugar = false;
-  this.lugarEditando = null;
-  this.lugarForm.reset
-}
+    this.mostrarFormLugar = false;
+    this.lugarEditando = null;
+    this.lugarForm.reset
+  }
 
   async onEliminarLugar(lugar: Lugar) {
     const alert = await this.alertCtrl.create({

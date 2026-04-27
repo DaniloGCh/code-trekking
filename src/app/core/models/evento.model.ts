@@ -10,6 +10,10 @@ export interface Lugar {
   tiempoEstimadoHoras: string;       // ✅ Nuevo
   equipamiento: string[];            // ✅ Nuevo
   DireccionPuntoInicio: string;               // ✅ Nuevo
+    // 🆕 COORDENADAS (PRO)
+  latitud?: number;
+  longitud?: number;
+
   requiereRegistroAcceso: boolean;          // ✅ Nuevo
   requierePagoEntrada: boolean;          // ✅ Nuevo
   valorEntrada?: number; // 👈 AGREGAR ESTO
@@ -20,6 +24,14 @@ export interface Lugar {
     cierre: string;
   };
   requierePermiso: boolean;          // ✅ Nuevo
+
+  requiereMasInformacion: boolean;
+
+  MasInformacion?: {
+    Texto: string;
+    URL: string;
+    Otro: string;
+  };
 }
 
 export interface Participante {

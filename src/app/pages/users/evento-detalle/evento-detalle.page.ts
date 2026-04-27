@@ -223,4 +223,6 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
 
     await toast.present();
   }
+
+  
 }

@@ -280,6 +280,26 @@
               <ion-input type="text" formControlName="DireccionPuntoInicio"></ion-input>
             </ion-item>
 
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+
+                <ion-col size="6">
+                  <ion-item>
+                    <ion-label position="floating">Latitud</ion-label>
+                    <ion-input type="number" formControlName="latitud"></ion-input>
+                  </ion-item>
+                </ion-col>
+
+                <ion-col size="6">
+                  <ion-item>
+                    <ion-label position="floating">Longitud</ion-label>
+                    <ion-input type="number" formControlName="longitud"></ion-input>
+                  </ion-item>
+                </ion-col>
+
+              </ion-row>
+            </ion-grid>
+
             <!-- ALTITUD / DISTANCIA -->
             <ion-grid class="ion-no-padding">
               <ion-row>
@@ -397,6 +417,45 @@
               <ion-label>¿Requiere permiso?</ion-label>
               <ion-toggle formControlName="requierePermiso" slot="end"></ion-toggle>
             </ion-item>
+
+
+            <!-- MÁS INFORMACIÓN -->
+
+                        <ion-item>
+              <ion-label>¿Tiene más información?</ion-label>
+              <ion-toggle formControlName="requiereMasInformacion" slot="end"></ion-toggle>
+            </ion-item>
+
+            <div *ngIf="lugarForm.get('requiereMasInformacion')?.value" formGroupName="MasInformacion">
+
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="floating">Texto</ion-label>
+                      <ion-input type="text" formControlName="Texto"></ion-input>
+                    </ion-item>
+                  </ion-col>
+
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="floating">URL</ion-label>
+                      <ion-input type="text" formControlName="URL"></ion-input>
+                    </ion-item>
+                  </ion-col>
+
+                   <ion-col size="12">
+                    <ion-item>
+                      <ion-label position="floating">Otro</ion-label>
+                      <ion-input type="text" formControlName="Otro"></ion-input>
+                    </ion-item>
+                  </ion-col>
+
+                </ion-row>
+              </ion-grid>
+
+            </div>
 
 
             <!-- BOTONES -->

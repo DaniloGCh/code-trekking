@@ -32,10 +32,18 @@
   <div class="evento-header">
     <h1>{{ evento.nombre }}</h1>
 
-    <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
-                        evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
-      {{ evento.lugar.dificultad }}
-    </ion-badge>
+  <ion-badge 
+    [color]="
+      evento.lugar.dificultad === 'Baja' ? 'success' :
+      evento.lugar.dificultad === 'Baja - Media' ? 'success' :
+      evento.lugar.dificultad === 'Media' ? 'warning' :
+      evento.lugar.dificultad === 'Media - Alta' ? 'warning' :
+      evento.lugar.dificultad === 'Alta' ? 'danger' :
+      evento.lugar.dificultad === 'Alta - Muy Alta' ? 'danger' : 'medium'">
+    
+    {{ evento.lugar.dificultad }}
+
+  </ion-badge>
   </div>
 
   <!-- ========================= -->
@@ -125,6 +133,7 @@
       </ion-card-subtitle>
     </ion-card-header>
 
+
     <ion-card-content>
       <ion-list lines="none">
 
@@ -136,11 +145,52 @@
           </ion-label>
         </ion-item>
 
+                <ion-item>
+
+          <ion-icon
+            [name]="evento.lugar.requiereHorarioVisita ? 'time-outline' : 'checkmark-circle-outline'"
+            slot="start"
+            [color]="evento.lugar.requiereHorarioVisita ? 'primary' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Horario de visita</p>
+
+            <h3 *ngIf="evento?.lugar?.horarioVisita?.apertura && evento?.lugar?.horarioVisita?.cierre; else noHorario">
+              {{ evento.lugar.horarioVisita?.apertura }} - {{ evento.lugar.horarioVisita?.cierre }} hrs
+            </h3>
+
+            <ng-template #noHorario>
+              <h3>No definido</h3>
+            </ng-template>
+
+          </ion-label>
+
+        </ion-item>
+
         <ion-item>
           <ion-icon name="navigate-outline" slot="start" color="primary"></ion-icon>
+
           <ion-label>
             <p>Punto de inicio</p>
-            <h3>{{ evento.lugar.DireccionPuntoInicio }}</h3>
+
+            <h3>
+              <a
+                *ngIf="evento.lugar.latitud && evento.lugar.longitud"
+                [href]="'https://www.google.com/maps?q=' + evento.lugar.latitud + ',' + evento.lugar.longitud"
+                target="_blank"
+                style="text-decoration: none; color: var(--ion-color-primary); font-weight: 600;">
+
+                {{ evento.lugar.DireccionPuntoInicio }}
+
+              </a>
+
+              <span *ngIf="!evento.lugar.latitud || !evento.lugar.longitud">
+                {{ evento.lugar.DireccionPuntoInicio }}
+              </span>
+
+            </h3>
+
           </ion-label>
         </ion-item>
 
@@ -212,32 +262,6 @@
 
         </ion-item>
 
-        <!-- ⏰ HORARIO VISITA -->
-        <ion-item>
-
-          <ion-icon
-            [name]="evento.lugar.requiereHorarioVisita ? 'time-outline' : 'checkmark-circle-outline'"
-            slot="start"
-            [color]="evento.lugar.requiereHorarioVisita ? 'primary' : 'success'">
-          </ion-icon>
-
-          <ion-label>
-            <p>Horario de visita</p>
-
-            <h3 *ngIf="evento.lugar.requiereHorarioVisita">
-              {{ evento.lugar.horarioVisita?.apertura }} - {{ evento.lugar.horarioVisita?.cierre }}
-            </h3>
-
-            <h3 *ngIf="!evento.lugar.requiereHorarioVisita">
-              Sin restricción horaria
-            </h3>
-
-          </ion-label>
-
-        </ion-item>
-
-        
-
         <ion-item>
           <ion-icon
             [name]="evento.lugar.requierePermiso ? 'alert-circle-outline' : 'checkmark-circle-outline'"
@@ -251,11 +275,61 @@
           </ion-label>
         </ion-item>
 
+               
+        <!-- ========================= -->
+        <!-- 🌐 MOSTRAR LINK EN DETALLE (USUARIO) -->
+        <!-- ========================= -->
+
+      <ion-accordion-group *ngIf="evento.lugar.requiereMasInformacion && evento.lugar.MasInformacion">
+
+        <ion-accordion value="info">
+
+          <!-- 🔹 HEADER -->
+          <ion-item slot="header">
+            <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>Más información</ion-label>
+          </ion-item>
+
+          <!-- 🔹 CONTENIDO -->
+          <div class="ion-padding" slot="content">
+
+            <h3>
+              {{ evento.lugar.MasInformacion.Texto }}
+            </h3>
+
+            <h3>
+              <a 
+                [href]="evento.lugar.MasInformacion.URL" 
+                target="_blank"
+                style="text-decoration: none; color: var(--ion-color-primary); font-weight: 600;">
+                
+                {{ evento.lugar.MasInformacion.URL }}
+              
+              </a>
+            </h3>
+
+            <h3 *ngIf="evento.lugar.MasInformacion.Otro">
+              <a 
+                [href]="evento.lugar.MasInformacion.Otro" 
+                target="_blank"
+                style="text-decoration: none; color: var(--ion-color-primary); font-weight: 600;">
+                
+                {{ evento.lugar.MasInformacion.Otro }}
+              
+              </a>
+            </h3>
+
+          </div>
+
+        </ion-accordion>
+
+      </ion-accordion-group>
+
 
         <ion-item>
           <ion-icon name="backpack-outline" slot="start" color="primary"></ion-icon>
           <ion-label class="ion-text-wrap">
-            <p>Equipamiento</p>
+            <p>Equipamiento (recomendaciones)</p>
 
             <div class="equipamiento-chips">
               <ion-chip *ngFor="let equipo of evento.lugar.equipamiento" outline>

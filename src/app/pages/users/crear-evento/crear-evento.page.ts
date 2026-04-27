@@ -123,74 +123,86 @@ export class CrearEventoPage implements OnInit {
   // =========================
   // 🚀 CREAR EVENTO
   // =========================
-  async onCrearEvento(lugares: Lugar[]) {
-    if (this.eventoForm.invalid) {
-      this.eventoForm.markAllAsTouched();
-      return;
-    }
+async onCrearEvento(lugares: Lugar[]) {
+  if (this.eventoForm.invalid) {
+    this.eventoForm.markAllAsTouched();
+    return;
+  }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Creando evento...',
+  const loading = await this.loadingCtrl.create({
+    message: 'Creando evento...',
+  });
+
+  await loading.present();
+
+  try {
+    const userData = await this.authService.getCurrentUserData();
+    const { nombre, descripcion, fecha, hora, lugarId } =
+      this.eventoForm.value;
+
+    const lugar = lugares.find((l) => l.id === lugarId)!;
+
+    await this.eventoService.crearEvento({
+      nombre,
+      descripcion,
+      fecha: new Date(fecha),
+      hora,
+      lugarId,
+
+      // 🔥 AQUÍ ESTÁ LA CLAVE
+      lugar: {
+        id: lugar.id,
+        nombre: lugar.nombre,
+        informacion: lugar.informacion,
+        altitud: lugar.altitud,
+        dificultad: lugar.dificultad,
+        distanciaKm: lugar.distanciaKm,
+        tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
+        equipamiento: lugar.equipamiento,
+        DireccionPuntoInicio: lugar.DireccionPuntoInicio,
+        latitud: lugar.latitud,
+        longitud: lugar.longitud,
+        
+        requiereRegistroAcceso: lugar.requiereRegistroAcceso,
+        requierePagoEntrada: lugar.requierePagoEntrada,
+        valorEntrada: lugar.valorEntrada,
+
+        requiereMasInformacion: lugar.requiereMasInformacion,
+        MasInformacion: lugar.requiereMasInformacion
+          ? lugar.MasInformacion
+          : undefined,
+
+        requiereHorarioVisita: lugar.requiereHorarioVisita,
+
+        // ✅ ESTO TE FALTABA
+        horarioVisita: lugar.requiereHorarioVisita
+          ? lugar.horarioVisita
+          : undefined,
+
+        requierePermiso: lugar.requierePermiso,
+      },
+
+      creadoPor: {
+        uid: userData!.uid,
+        nombre: userData!.nombre,
+      },
+
+      privado: true,
     });
 
-    await loading.present();
+    await loading.dismiss();
 
-    try {
-      const userData = await this.authService.getCurrentUserData();
-      const { nombre, descripcion, fecha, hora, lugarId } =
-        this.eventoForm.value;
+    await this.showToast('¡Evento creado exitosamente!', 'success');
 
-      const lugar = lugares.find((l) => l.id === lugarId)!;
+    this.router.navigateByUrl('/tabs/eventos', {
+      replaceUrl: true,
+    });
 
-      await this.eventoService.crearEvento({
-        nombre,
-        descripcion,
-        fecha: new Date(fecha),
-        hora,
-        lugarId,
-        lugar: {
-          id: lugar.id,
-          nombre: lugar.nombre,
-          informacion: lugar.informacion,
-          altitud: lugar.altitud,
-          dificultad: lugar.dificultad,
-          distanciaKm: lugar.distanciaKm,
-          tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
-          equipamiento: lugar.equipamiento,
-          DireccionPuntoInicio: lugar.DireccionPuntoInicio,
-          requiereRegistroAcceso: lugar.requiereRegistroAcceso,
-          requierePagoEntrada: lugar.requierePagoEntrada,
-          valorEntrada: lugar.valorEntrada,
-          requiereHorarioVisita: lugar.requiereHorarioVisita,
-          requierePermiso: lugar.requierePermiso,
-
-        },
-        creadoPor: {
-          uid: userData!.uid,
-          nombre: userData!.nombre,
-        },
-        privado: true,
-      });
-
-      await loading.dismiss();
-
-      await this.showToast(
-        '¡Evento creado exitosamente!',
-        'success'
-      );
-
-      this.router.navigateByUrl('/tabs/eventos', {
-        replaceUrl: true,
-      });
-
-    } catch (error) {
-      await loading.dismiss();
-      await this.showToast(
-        'Error al crear el evento',
-        'danger'
-      );
-    }
+  } catch (error) {
+    await loading.dismiss();
+    await this.showToast('Error al crear el evento', 'danger');
   }
+}
 
   // =========================
   // 🔙 NAVEGACIÓN
