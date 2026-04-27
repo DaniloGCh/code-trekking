@@ -169,12 +169,74 @@
         </ion-item>
 
         <ion-item>
-          <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+          <ion-icon
+            [name]="evento.lugar.requiereRegistroAcceso ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start"
+            [color]="evento.lugar.requiereRegistroAcceso ? 'warning' : 'success'">
+          </ion-icon>
+
           <ion-label>
-            <p>Temporada</p>
-            <h3>{{ evento.lugar.temporada }}</h3>
+            <p>Registro de acceso</p>
+            <h3>{{ evento.lugar.requiereRegistroAcceso ? 'Requiere registro de acceso' : 'No requiere registro de acceso al parque' }}</h3>
           </ion-label>
         </ion-item>
+
+        <ion-item>
+          <ion-icon
+            [name]="evento.lugar.requierePagoEntrada ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start"
+            [color]="evento.lugar.requierePagoEntrada ? 'warning' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Pago de entrada</p>
+            <h3>{{ evento.lugar.requierePagoEntrada ? 'Requiere pago de entrada' : 'No requiere pago de entrada' }}</h3>
+          </ion-label>
+        </ion-item>
+
+        <!-- 💰 VALOR ENTRADA -->
+        <ion-item *ngIf="evento.lugar.requierePagoEntrada">
+
+          <ion-icon name="cash-outline" slot="start" color="success"></ion-icon>
+
+          <ion-label>
+            <p>Valor entrada</p>
+
+            <h3>
+              {{ evento.lugar.valorEntrada 
+                ? (evento.lugar.valorEntrada | currency:'CLP':'symbol':'1.0-0') 
+                : 'Acceso gratis - Consultar en acceso' }}
+            </h3>
+
+          </ion-label>
+
+        </ion-item>
+
+        <!-- ⏰ HORARIO VISITA -->
+        <ion-item>
+
+          <ion-icon
+            [name]="evento.lugar.requiereHorarioVisita ? 'time-outline' : 'checkmark-circle-outline'"
+            slot="start"
+            [color]="evento.lugar.requiereHorarioVisita ? 'primary' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Horario de visita</p>
+
+            <h3 *ngIf="evento.lugar.requiereHorarioVisita">
+              {{ evento.lugar.horarioVisita?.apertura }} - {{ evento.lugar.horarioVisita?.cierre }}
+            </h3>
+
+            <h3 *ngIf="!evento.lugar.requiereHorarioVisita">
+              Sin restricción horaria
+            </h3>
+
+          </ion-label>
+
+        </ion-item>
+
+        
 
         <ion-item>
           <ion-icon
@@ -188,6 +250,7 @@
             <h3>{{ evento.lugar.requierePermiso ? 'Requiere permiso' : 'No requiere permiso' }}</h3>
           </ion-label>
         </ion-item>
+
 
         <ion-item>
           <ion-icon name="backpack-outline" slot="start" color="primary"></ion-icon>

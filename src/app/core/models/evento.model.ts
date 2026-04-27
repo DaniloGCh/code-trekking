@@ -4,15 +4,22 @@ export interface Lugar {
   id?: string;
   nombre: string;
   informacion: string;
-  altitud: number;
-  dificultad: 'Baja' | 'Media' | 'Alta';
+  altitud: string;
+  dificultad: 'Baja' | 'Baja - Media' | 'Media' | 'Media - Alta' | 'Alta' | 'Alta - Muy Alta';
   distanciaKm: number;               // ✅ Nuevo
-  tiempoEstimadoHoras: number;       // ✅ Nuevo
-  temporada: string;                 // ✅ Nuevo
+  tiempoEstimadoHoras: string;       // ✅ Nuevo
   equipamiento: string[];            // ✅ Nuevo
   DireccionPuntoInicio: string;               // ✅ Nuevo
+  requiereRegistroAcceso: boolean;          // ✅ Nuevo
+  requierePagoEntrada: boolean;          // ✅ Nuevo
+  valorEntrada?: number; // 👈 AGREGAR ESTO
+  requiereHorarioVisita: boolean;
+
+  horarioVisita?: {
+    apertura: string;
+    cierre: string;
+  };
   requierePermiso: boolean;          // ✅ Nuevo
-  calificacionRiesgo: 'Bajo' | 'Moderado' | 'Alto' | 'Extremo'; // ✅ Nuevo
 }
 
 export interface Participante {

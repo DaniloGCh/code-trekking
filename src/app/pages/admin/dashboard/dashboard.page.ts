@@ -1,5 +1,3 @@
-// src/app/pages/admin/dashboard/dashboard.page.ts
-
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
@@ -83,7 +81,7 @@ export class DashboardPage implements OnInit {
   totalAdmins = 0;
   totalRegulares = 0;
 
-    totalEventos = 0;
+  totalEventos = 0;
 
   // 🔥 IMPORTANTE: índice string
   eventosPorUsuario: { [uid: string]: number } = {};
@@ -148,15 +146,24 @@ export class DashboardPage implements OnInit {
   lugarForm: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     informacion: ['', [Validators.required, Validators.minLength(10)]],
-    altitud: ['', [Validators.required, Validators.min(0)]],
+    altitud: ['', [Validators.required, Validators.minLength(3)]],
     dificultad: ['', [Validators.required]],
     distanciaKm: ['', [Validators.required, Validators.min(0.1)]],
-    tiempoEstimadoHoras: ['', [Validators.required, Validators.min(0.5)]],
-    temporada: ['', [Validators.required]],
+    tiempoEstimadoHoras: ['', [Validators.required, Validators.minLength(3)]],
     equipamiento: [[], [Validators.required]],
     DireccionPuntoInicio: ['', [Validators.required, Validators.minLength(3)]],
+    requiereRegistroAcceso: [false],
+    requierePagoEntrada: [false],
+    valorEntrada: [null],
+
+    requiereHorarioVisita: [false],
+
+    horarioVisita: this.fb.group({
+      apertura: [''],
+      cierre: ['']
+    }),
     requierePermiso: [false],
-    calificacionRiesgo: ['', [Validators.required]],
+
   });
 
   // =========================
@@ -168,11 +175,15 @@ export class DashboardPage implements OnInit {
   get fDificultad() { return this.lugarForm.get('dificultad'); }
   get fDistanciaKm() { return this.lugarForm.get('distanciaKm'); }
   get fTiempoEstimadoHoras() { return this.lugarForm.get('tiempoEstimadoHoras'); }
-  get fTemporada() { return this.lugarForm.get('temporada'); }
   get fEquipamiento() { return this.lugarForm.get('equipamiento'); }
   get fDireccionPuntoInicio() { return this.lugarForm.get('direccionPuntoInicio'); }
+  get fRequierePagoEntrada() { return this.lugarForm.get('requierePagoEntrada'); }
   get fRequierePermiso() { return this.lugarForm.get('requierePermiso'); }
-  get fCalificacionRiesgo() { return this.lugarForm.get('calificacionRiesgo'); }
+  get fRequiereRegistroAcceso() { return this.lugarForm.get('requiereRegistroAcceso'); }
+  get fRequiereHorarioVisita() { return this.lugarForm.get('requiereHorarioVisita'); }
+  get fHorarioVisita() { return this.lugarForm.get('horarioVisita'); }
+
+
   get cTitulo() { return this.consejoForm.get('titulo'); }
   get cDescripcion() { return this.consejoForm.get('descripcion'); }
   get mTitulo() { return this.manualForm.get('titulo'); }
@@ -221,8 +232,21 @@ export class DashboardPage implements OnInit {
       this.totalRegulares = users.filter(u => u.rol === 'user').length;
     });
 
+    this.lugarForm.get('requierePagoEntrada')?.valueChanges.subscribe((requiere: boolean) => {
+      const control = this.lugarForm.get('valorEntrada');
+
+      if (requiere) {
+        control?.setValidators([Validators.required, Validators.min(0)]);
+      } else {
+        control?.clearValidators();
+        control?.setValue(null);
+      }
+
+      control?.updateValueAndValidity();
+    });
+
+
     // 🔥 CALCULAR EVENTOS
-// 🔥 CORRECCIÓN AQUÍ
     this.eventos$.subscribe(eventos => {
 
       this.totalEventos = eventos.length;
@@ -465,11 +489,17 @@ export class DashboardPage implements OnInit {
       dificultad: lugar.dificultad,
       distanciaKm: lugar.distanciaKm,
       tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
-      temporada: lugar.temporada,
       equipamiento: lugar.equipamiento,
-      DireccionPuntoInicio: lugar.DireccionPuntoInicio,
+      DireccionPuntoInicio: lugar.DireccionPuntoInicio || '',
+      requiereRegistroAcceso: lugar.requiereRegistroAcceso,
+      requierePagoEntrada: lugar.requierePagoEntrada,
+      requiereHorarioVisita: lugar.requiereHorarioVisita,
+      horarioVisita: {
+        apertura: lugar.horarioVisita?.apertura || '',
+        cierre: lugar.horarioVisita?.cierre || ''
+      },
       requierePermiso: lugar.requierePermiso,
-      calificacionRiesgo: lugar.calificacionRiesgo,
+
     });
 
     this.mostrarFormLugar = true;
@@ -495,16 +525,39 @@ export class DashboardPage implements OnInit {
       const datos: Omit<Lugar, 'id'> = {
         nombre: this.lugarForm.value.nombre.trim(),
         informacion: this.lugarForm.value.informacion.trim(),
-        altitud: Number(this.lugarForm.value.altitud),
+        altitud: this.lugarForm.value.altitud,
         dificultad: this.lugarForm.value.dificultad,
         distanciaKm: Number(this.lugarForm.value.distanciaKm),
-        tiempoEstimadoHoras: Number(this.lugarForm.value.tiempoEstimadoHoras),
-        temporada: this.lugarForm.value.temporada,
+        tiempoEstimadoHoras: this.lugarForm.value.tiempoEstimadoHoras,
         equipamiento: this.lugarForm.value.equipamiento,
-        DireccionPuntoInicio: this.lugarForm.value.DireccionPuntoInicio.trim(),
+
+        DireccionPuntoInicio: (this.lugarForm.value.DireccionPuntoInicio || '').trim(),
+
+        requierePagoEntrada: this.lugarForm.value.requierePagoEntrada,
         requierePermiso: this.lugarForm.value.requierePermiso,
-        calificacionRiesgo: this.lugarForm.value.calificacionRiesgo,
+        requiereRegistroAcceso: this.lugarForm.value.requiereRegistroAcceso,
+        requiereHorarioVisita: this.lugarForm.value.requiereHorarioVisita,
+
+        horarioVisita: this.lugarForm.value.requiereHorarioVisita
+          ? {
+            apertura: this.lugarForm.value.horarioVisita?.apertura || '',
+            cierre: this.lugarForm.value.horarioVisita?.cierre || '',
+          }
+          : undefined,
+
+        valorEntrada: this.lugarForm.value.requierePagoEntrada
+          ? Number(this.lugarForm.value.valorEntrada || 0)
+          : undefined,
+
       };
+
+      if (!datos.requierePagoEntrada) {
+        delete datos.valorEntrada;
+      }
+
+      if (!datos.requiereHorarioVisita) {
+        delete datos.horarioVisita;
+      }
 
       if (this.lugarEditando) {
         await this.lugarService.editarLugar(this.lugarEditando.id!, datos);
@@ -524,10 +577,10 @@ export class DashboardPage implements OnInit {
   }
 
   onCancelarForm() {
-    this.mostrarFormLugar = false;
-    this.lugarEditando = null;
-    this.lugarForm.reset();
-  }
+  this.mostrarFormLugar = false;
+  this.lugarEditando = null;
+  this.lugarForm.reset
+}
 
   async onEliminarLugar(lugar: Lugar) {
     const alert = await this.alertCtrl.create({

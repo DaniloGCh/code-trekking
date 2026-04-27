@@ -75,7 +75,7 @@ export class CrearEventoPage implements OnInit {
   fechaSeleccionada: string = '';
   horaSeleccionada: string = '';
 
-  async ngOnInit() {}
+  async ngOnInit() { }
 
   // =========================
   // 📅 MANEJO DE FECHA
@@ -156,11 +156,14 @@ export class CrearEventoPage implements OnInit {
           dificultad: lugar.dificultad,
           distanciaKm: lugar.distanciaKm,
           tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
-          temporada: lugar.temporada,
           equipamiento: lugar.equipamiento,
           DireccionPuntoInicio: lugar.DireccionPuntoInicio,
+          requiereRegistroAcceso: lugar.requiereRegistroAcceso,
+          requierePagoEntrada: lugar.requierePagoEntrada,
+          valorEntrada: lugar.valorEntrada,
+          requiereHorarioVisita: lugar.requiereHorarioVisita,
           requierePermiso: lugar.requierePermiso,
-          calificacionRiesgo: lugar.calificacionRiesgo,
+
         },
         creadoPor: {
           uid: userData!.uid,

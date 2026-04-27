@@ -104,125 +104,125 @@
 
     <div class="panel-estadisticas">
       <!-- ========================= -->
-    <!-- 📊 ESTADÍSTICAS -->
-    <!-- ========================= -->
-    <h3 class="section-title">Estadísticas</h3>
+      <!-- 📊 ESTADÍSTICAS -->
+      <!-- ========================= -->
+      <h3 class="section-title">Estadísticas</h3>
 
-    <ion-grid>
-      <ion-row>
+      <ion-grid>
+        <ion-row>
 
-        <ion-col size="4">
-          <ion-card class="stat-card total">
+          <ion-col size="4">
+            <ion-card class="stat-card total">
+              <ion-card-content>
+                <ion-icon name="people-outline"></ion-icon>
+                <h2>{{ totalUsers }}</h2>
+                <p>Total</p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <ion-col size="4">
+            <ion-card class="stat-card admins">
+              <ion-card-content>
+                <ion-icon name="shield-outline"></ion-icon>
+                <h2>{{ totalAdmins }}</h2>
+                <p>Admins</p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <ion-col size="4">
+            <ion-card class="stat-card users">
+              <ion-card-content>
+                <ion-icon name="person-outline"></ion-icon>
+                <h2>{{ totalRegulares }}</h2>
+                <p>Usuarios</p>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+        </ion-row>
+      </ion-grid>
+
+
+
+      <!-- ========================= -->
+      <!-- 📊 EVENTOS POR USUARIO -->
+      <!-- ========================= -->
+
+      <ion-accordion-group class="usuarios-accordion-group">
+
+        <ion-accordion value="usuarios" class="usuarios-accordion">
+
+          <!-- 🔹 HEADER -->
+          <ion-item slot="header" class="usuarios-header">
+            <ion-icon name="people-outline" slot="start" class="usuarios-icon"></ion-icon>
+            <ion-label>Eventos por usuario</ion-label>
+          </ion-item>
+
+          <!-- 🔹 CONTENIDO -->
+          <div slot="content" class="usuarios-content">
+
+            <ion-list class="usuarios-list">
+
+              <ng-container *ngIf="users$ | async as users">
+
+                <!-- 🚫 SIN USUARIOS -->
+                <ion-item *ngIf="users.length === 0" class="usuarios-empty">
+                  <ion-label class="ion-text-center">
+                    <p>No hay usuarios disponibles</p>
+                  </ion-label>
+                </ion-item>
+
+                <!-- 👥 LISTA -->
+                <ion-item *ngFor="let user of users" class="usuarios-item">
+
+                  <ion-icon name="person-outline" slot="start" class="usuarios-user-icon"></ion-icon>
+
+                  <ion-label class="usuarios-label">
+                    <h3>{{ user.nombre }}</h3>
+                    <p>{{ user.email }}</p>
+                  </ion-label>
+
+                  <ion-badge class="usuarios-badge">
+                    {{ getEventosPorUsuario(user.uid) }}
+                  </ion-badge>
+
+                </ion-item>
+
+              </ng-container>
+
+            </ion-list>
+
+          </div>
+
+        </ion-accordion>
+
+      </ion-accordion-group>
+
+      <div class="stats-section">
+
+        <ion-col size="3">
+          <ion-card class="stat-card eventos">
             <ion-card-content>
-              <ion-icon name="people-outline"></ion-icon>
-              <h2>{{ totalUsers }}</h2>
-              <p>Total</p>
+
+              <div class="stat-icon">
+                <ion-icon name="calendar-outline"></ion-icon>
+              </div>
+
+              <h2>{{ totalEventos }}</h2>
+              <p>Total de eventos</p>
+
             </ion-card-content>
           </ion-card>
         </ion-col>
 
-        <ion-col size="4">
-          <ion-card class="stat-card admins">
-            <ion-card-content>
-              <ion-icon name="shield-outline"></ion-icon>
-              <h2>{{ totalAdmins }}</h2>
-              <p>Admins</p>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-
-        <ion-col size="4">
-          <ion-card class="stat-card users">
-            <ion-card-content>
-              <ion-icon name="person-outline"></ion-icon>
-              <h2>{{ totalRegulares }}</h2>
-              <p>Usuarios</p>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-
-      </ion-row>
-    </ion-grid>
+      </div>
 
 
-
-    <!-- ========================= -->
-    <!-- 📊 EVENTOS POR USUARIO -->
-    <!-- ========================= -->
-
-    <ion-accordion-group class="usuarios-accordion-group">
-
-      <ion-accordion value="usuarios" class="usuarios-accordion">
-
-        <!-- 🔹 HEADER -->
-        <ion-item slot="header" class="usuarios-header">
-          <ion-icon name="people-outline" slot="start" class="usuarios-icon"></ion-icon>
-          <ion-label>Eventos por usuario</ion-label>
-        </ion-item>
-
-        <!-- 🔹 CONTENIDO -->
-        <div slot="content" class="usuarios-content">
-
-          <ion-list class="usuarios-list">
-
-            <ng-container *ngIf="users$ | async as users">
-
-              <!-- 🚫 SIN USUARIOS -->
-              <ion-item *ngIf="users.length === 0" class="usuarios-empty">
-                <ion-label class="ion-text-center">
-                  <p>No hay usuarios disponibles</p>
-                </ion-label>
-              </ion-item>
-
-              <!-- 👥 LISTA -->
-              <ion-item *ngFor="let user of users" class="usuarios-item">
-
-                <ion-icon name="person-outline" slot="start" class="usuarios-user-icon"></ion-icon>
-
-                <ion-label class="usuarios-label">
-                  <h3>{{ user.nombre }}</h3>
-                  <p>{{ user.email }}</p>
-                </ion-label>
-
-                <ion-badge class="usuarios-badge">
-                  {{ getEventosPorUsuario(user.uid) }}
-                </ion-badge>
-
-              </ion-item>
-
-            </ng-container>
-
-          </ion-list>
-
-        </div>
-
-      </ion-accordion>
-
-    </ion-accordion-group>
-
-    <div class="stats-section">
-
-      <ion-col size="3">
-        <ion-card class="stat-card eventos">
-          <ion-card-content>
-
-            <div class="stat-icon">
-              <ion-icon name="calendar-outline"></ion-icon>
-            </div>
-
-            <h2>{{ totalEventos }}</h2>
-            <p>Total de eventos</p>
-
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
 
     </div>
 
-
-
-    </div>
-    
 
     <!-- ========================= -->
     <!-- 📍 LUGARES -->
@@ -277,7 +277,7 @@
             <!-- PUNTO DE INICIO -->
             <ion-item [class.ion-invalid]="fDireccionPuntoInicio?.invalid && fDireccionPuntoInicio?.touched">
               <ion-label position="floating">Direccion Punto de inicio</ion-label>
-              <ion-input type="text" formControlName="direccionPuntoInicio"></ion-input>
+              <ion-input type="text" formControlName="DireccionPuntoInicio"></ion-input>
             </ion-item>
 
             <!-- ALTITUD / DISTANCIA -->
@@ -287,7 +287,7 @@
                 <ion-col size="6">
                   <ion-item>
                     <ion-label position="floating">Altitud (msnm)</ion-label>
-                    <ion-input type="number" formControlName="altitud"></ion-input>
+                    <ion-input type="text" formControlName="altitud"></ion-input>
                   </ion-item>
                 </ion-col>
 
@@ -302,52 +302,34 @@
             </ion-grid>
 
             <!-- TIEMPO -->
-            <ion-item>
-              <ion-label position="floating">Tiempo estimado (horas)</ion-label>
-              <ion-input type="number" formControlName="tiempoEstimadoHoras"></ion-input>
-            </ion-item>
-
-            <!-- SELECTS -->
             <ion-grid class="ion-no-padding">
               <ion-row>
+
+                <ion-col size="6">
+                  <ion-item>
+                    <ion-label position="floating">Tiempo estimado (horas)</ion-label>
+                    <ion-input type="text" formControlName="tiempoEstimadoHoras"></ion-input>
+                  </ion-item>
+                </ion-col>
 
                 <ion-col size="6">
                   <ion-item>
                     <ion-label position="floating">Dificultad</ion-label>
                     <ion-select formControlName="dificultad">
                       <ion-select-option value="Baja">Baja 🟢</ion-select-option>
+                      <ion-select-option value="Baja - Media">Baja - Media 🟢🟡</ion-select-option>
                       <ion-select-option value="Media">Media 🟡</ion-select-option>
-                      <ion-select-option value="Alta">Alta 🔴</ion-select-option>
+                      <ion-select-option value="Media - Alta">Media - Alta 🟡🟠</ion-select-option>
+                      <ion-select-option value="Alta">Alta 🟠</ion-select-option>
+                      <ion-select-option value="Alta - Muy Alta">Alta - Muy Alta 🟠🔴</ion-select-option>
                     </ion-select>
                   </ion-item>
                 </ion-col>
 
-                <ion-col size="6">
-                  <ion-item>
-                    <ion-label position="floating">Riesgo</ion-label>
-                    <ion-select formControlName="calificacionRiesgo">
-                      <ion-select-option value="Bajo">Bajo 🟢</ion-select-option>
-                      <ion-select-option value="Moderado">Moderado 🟡</ion-select-option>
-                      <ion-select-option value="Alto">Alto 🟠</ion-select-option>
-                      <ion-select-option value="Extremo">Extremo 🔴</ion-select-option>
-                    </ion-select>
-                  </ion-item>
-                </ion-col>
 
               </ion-row>
             </ion-grid>
 
-            <!-- TEMPORADA -->
-            <ion-item>
-              <ion-label position="floating">Temporada</ion-label>
-              <ion-select formControlName="temporada">
-                <ion-select-option value="Verano">Verano ☀️</ion-select-option>
-                <ion-select-option value="Invierno">Invierno ❄️</ion-select-option>
-                <ion-select-option value="Primavera">Primavera 🌸</ion-select-option>
-                <ion-select-option value="Otoño">Otoño 🍂</ion-select-option>
-                <ion-select-option value="Todo el año">Todo el año 📅</ion-select-option>
-              </ion-select>
-            </ion-item>
 
             <!-- EQUIPAMIENTO -->
             <ion-item>
@@ -359,11 +341,63 @@
               </ion-select>
             </ion-item>
 
+            <!-- REGISTRO DE ACCESO -->
+
+            <ion-item>
+              <ion-label>¿Requiere registro de acceso?</ion-label>
+              <ion-toggle formControlName="requiereRegistroAcceso" slot="end"></ion-toggle>
+            </ion-item>
+
+            <!-- PAGO DE ENTRADA -->
+            <ion-item>
+              <ion-label>¿Requiere pago de entrada?</ion-label>
+              <ion-toggle formControlName="requierePagoEntrada" slot="end"></ion-toggle>
+            </ion-item>
+
+            <!-- 💰 VALOR ENTRADA (CONDICIONAL) -->
+            <ion-item *ngIf="lugarForm.get('requierePagoEntrada')?.value">
+              <ion-label position="floating">Valor entrada ($)</ion-label>
+              <ion-input type="number" formControlName="valorEntrada"></ion-input>
+            </ion-item>
+
+            <!-- HORARIO DE VISITA -->
+            <!-- ⏰ HORARIO DE VISITA -->
+            <ion-item>
+              <ion-label>¿Tiene horario de visita?</ion-label>
+              <ion-toggle formControlName="requiereHorarioVisita" slot="end"></ion-toggle>
+            </ion-item>
+
+            <!-- 🕒 INPUT HORARIO -->
+            <div *ngIf="lugarForm.get('requiereHorarioVisita')?.value" formGroupName="horarioVisita">
+
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="floating">Hora apertura</ion-label>
+                      <ion-input type="time" formControlName="apertura"></ion-input>
+                    </ion-item>
+                  </ion-col>
+
+                  <ion-col size="6">
+                    <ion-item>
+                      <ion-label position="floating">Hora cierre</ion-label>
+                      <ion-input type="time" formControlName="cierre"></ion-input>
+                    </ion-item>
+                  </ion-col>
+
+                </ion-row>
+              </ion-grid>
+
+            </div>
+
             <!-- PERMISO -->
             <ion-item>
               <ion-label>¿Requiere permiso?</ion-label>
               <ion-toggle formControlName="requierePermiso" slot="end"></ion-toggle>
             </ion-item>
+
 
             <!-- BOTONES -->
             <div class="form-buttons">
