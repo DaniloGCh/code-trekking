@@ -46,8 +46,8 @@ const routes: Routes = [
         canActivate: [authGuard]
       },
       {
-        path: 'tab1',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule),
+        path: 'lista-foros',
+        loadChildren: () => import('../pages/users/lista-foros/lista-foros.module').then(m => m.ListaForosPageModule),
         canActivate: [authGuard]
       },
       {

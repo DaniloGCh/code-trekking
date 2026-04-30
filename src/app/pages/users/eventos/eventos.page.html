@@ -72,8 +72,7 @@
           </div>
 
           <!-- 🏷️ DIFICULTAD -->
-          <ion-badge
-            [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+          <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
                      evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
             {{ evento.lugar.dificultad }}
           </ion-badge>
@@ -128,22 +127,31 @@
           </ion-button>
 
           <!-- 🗑️ ELIMINAR -->
-          <ion-button
-            *ngIf="evento.creadoPor.uid === currentUid"
-            class="btn-eliminar-evento"
-            fill="outline"
-            color="danger"
-            size="small"
-            (click)="onEliminarEvento(evento)">
+          <ion-button *ngIf="evento.creadoPor.uid === currentUid" class="btn-eliminar-evento" fill="outline"
+            color="danger" size="small" (click)="onEliminarEvento(evento)">
 
             <ion-icon name="trash-outline" slot="start"></ion-icon>
             Eliminar
           </ion-button>
 
+
+          <!-- <div class="foro-container">
+
+            <ion-button expand="block" class="btn-foro" (click)="irAlForo(evento)">
+              <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+              Foro del evento
+            </ion-button>
+
+            <ion-badge class="foro-badge" *ngIf="getMensajesNuevos(evento.id) > 0">
+              {{ getMensajesNuevos(evento.id) > 99 ? '99+' : getMensajesNuevos(evento.id) }}
+            </ion-badge>
+
+          </div> -->
+
+
           <!-- ⭐ FAVORITOS -->
           <ion-button fill="clear" color="warning" (click)="toggleFavorito(evento)">
-            <ion-icon
-              [name]="isFavorito(evento.id!) ? 'star' : 'star-outline'"
+            <ion-icon [name]="isFavorito(evento.id!) ? 'star' : 'star-outline'"
               [color]="isFavorito(evento.id!) ? 'warning' : ''">
             </ion-icon>
           </ion-button>

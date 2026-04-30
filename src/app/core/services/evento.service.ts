@@ -23,6 +23,7 @@ import {
   arrayRemove
 } from '@angular/fire/firestore';
 
+
 // =========================
 // 🔹 FIREBASE AUTH
 // =========================
@@ -31,7 +32,7 @@ import { Auth, authState } from '@angular/fire/auth';
 // =========================
 // 🔹 RXJS
 // =========================
-import { Observable, of } from 'rxjs';
+import { Observable, of , BehaviorSubject} from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 // =========================
@@ -49,6 +50,10 @@ export class EventoService {
   // =========================
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+
+    // 🔴 NOTIFICADOR GLOBAL (NUEVO)
+  private foroVistoSubject = new BehaviorSubject<void>(undefined);
+  foroVisto$ = this.foroVistoSubject.asObservable();
 
   // =========================
   // 📍 OBTENER LUGARES
@@ -206,10 +211,23 @@ export class EventoService {
     })) as MensajeForo[];
   }
 
-  async enviarMensaje(eventoId: string, mensaje: Omit<MensajeForo, 'id'>): Promise<void> {
-    const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
-    await addDoc(ref, mensaje);
-  }
+ async enviarMensaje(eventoId: string, mensaje: Omit<MensajeForo, 'id'>): Promise<void> {
+  const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
+
+  // 📩 Guardar mensaje en el foro
+  await addDoc(ref, mensaje);
+
+  // 🔥 ACTUALIZAR ÚLTIMO MENSAJE EN EL EVENTO (ESTILO WHATSAPP)
+  const eventoRef = doc(this.firestore, `eventos/${eventoId}`);
+
+  await updateDoc(eventoRef, {
+    ultimoMensaje: {
+      texto: mensaje.texto,
+      autorNombre: mensaje.autorNombre,
+      creadoEn: new Date()
+    }
+  });
+}
 
   async eliminarMensaje(eventoId: string, mensajeId: string): Promise<void> {
     const ref = doc(this.firestore, `eventos/${eventoId}/foro/${mensajeId}`);
@@ -245,5 +263,18 @@ export class EventoService {
   marcarForoVisto(eventoId: string, uid: string): void {
     const key = `foro_ultima_visita_${eventoId}_${uid}`;
     localStorage.setItem(key, new Date().toISOString());
+        // 🔥 AVISA A TODA LA APP
+    this.foroVistoSubject.next();
   }
+
+
+  getMensajesForoRealtime(eventoId: string): Observable<MensajeForo[]> {
+  const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
+  const q = query(ref, orderBy('creadoEn', 'asc'));
+
+  return collectionData(q, { idField: 'id' }) as Observable<MensajeForo[]>;
+}
+
+
+  
 }

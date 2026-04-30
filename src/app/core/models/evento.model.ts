@@ -32,6 +32,9 @@ export interface Lugar {
     URL: string;
     Otro: string;
   };
+
+    // ✅ NUEVO CAMPO LIMPIO Y SEGURO
+  mapaRutaUrl?: string; // 🔥 SOLO LA URL DEL EMBED
 }
 
 export interface Participante {
@@ -56,6 +59,13 @@ export interface Evento {
   participantes: string[];           // ✅ Se mantiene para queries
   participantesInfo: Participante[]; // ✅ Nuevo: array con uid y nombre
   creadoEn: any;
+
+    // 🔥 AGREGAR ESTO (NUEVO)
+  ultimoMensaje?: {
+    texto: string;
+    autorNombre: string;
+    creadoEn: any;
+  };
 }
 
 // ✅ Agrega esta interfaz
@@ -103,3 +113,4 @@ export interface KitSupervivencia {
   creadoPor?: string;
   fechaCreacion?: any;
 }
+

@@ -273,3 +273,69 @@ ion-accordion {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
+
+
+.mapa-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+
+  /* sombra tipo tarjeta outdoor */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+
+  border: 2px solid rgba(76, 140, 43, 0.2);
+  padding-bottom: 40px;
+}
+
+/* ========================= */
+/* 🧭 IFRAME MAPA */
+/* ========================= */
+.mapa-container iframe {
+  display: block;
+  width: 100%;
+  height: 500px;
+  border: none;
+  border-radius: 16px;
+
+  /* efecto suavizado */
+  filter: saturate(1.1) contrast(1.05);
+}
+
+/* ========================= */
+/* 🌐 CREDITOS WIKILOC */
+/* ========================= */
+.wikiloc-credit {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 4px 8px;
+  border-radius: 10px;
+
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  margin-top: 15px;
+}
+
+.wikiloc-credit a {
+  color: #4C8C2B;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Ícono */
+ion-item[slot="header"] ion-icon {
+  color: #c8e6c9 !important;
+  font-size: 20px;
+}
+
+
+/* ========================= */
+/* 🌄 EFECTO HOVER (DESKTOP) */
+/* ========================= */
+.mapa-container:hover {
+  transform: scale(1.01);
+  transition: all 0.25s ease;
+}

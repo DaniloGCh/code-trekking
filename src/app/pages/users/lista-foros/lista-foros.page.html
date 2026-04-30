@@ -1,0 +1,53 @@
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
+    <ion-title>Foros</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+
+  <ion-list *ngIf="misEventos$ | async as eventos">
+
+    <ion-item 
+      *ngFor="let evento of eventos" 
+      (click)="irAlForo(evento)"
+      button
+    >
+
+      <ion-label>
+
+        <!-- 🏷️ NOMBRE EVENTO -->
+        <h2>{{ evento.nombre }}</h2>
+
+        <!-- 💬 ÚLTIMO MENSAJE -->
+        <p *ngIf="evento.ultimoMensaje">
+          <strong>{{ evento.ultimoMensaje.autorNombre }}:</strong>
+          {{ evento.ultimoMensaje.texto }}
+        </p>
+
+        <p *ngIf="!evento.ultimoMensaje">
+          Sin mensajes aún
+        </p>
+
+      </ion-label>
+
+      <!-- ⏰ HORA -->
+      <div style="text-align: right; font-size: 12px; color: gray;">
+        {{ formatearHora(evento.ultimoMensaje?.creadoEn) }}
+      </div>
+
+      <!-- 🔴 CONTADOR -->
+      <ion-badge 
+        color="danger"
+        *ngIf="getMensajesNuevos(evento.id) > 0"
+      >
+        {{ getMensajesNuevos(evento.id) > 99 
+            ? '99+' 
+            : getMensajesNuevos(evento.id) }}
+      </ion-badge>
+
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

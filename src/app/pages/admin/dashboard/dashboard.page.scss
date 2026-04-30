@@ -326,8 +326,8 @@ ion-header ion-toolbar {
    🟢 PANEL GESTIÓN
 ========================= */
 .panel-gestion {
-  margin: 15px;
-  padding: 15px;
+  margin: 0px;
+  padding: 0px;
 
   background: rgba(34, 49, 34, 0.25);
   backdrop-filter: blur(12px);
@@ -456,11 +456,11 @@ ion-item.ion-invalid {
    ========================================================= */
 
 ion-accordion-group {
-  margin: 12px;
+  margin: 5px;
 }
 
 ion-accordion {
-  margin: 12px 0;
+  margin: 5px 0;
   border-radius: 16px;
   overflow: hidden;
 
@@ -480,4 +480,8 @@ ion-accordion {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.ion-padding {
+  padding: 0px;
 }

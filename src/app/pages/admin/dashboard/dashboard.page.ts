@@ -23,6 +23,14 @@ import { KitPrimerosAuxilios, KitSupervivencia } from 'src/app/core/models/event
 import { Evento } from 'src/app/core/models/evento.model';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 
+// ✅ Agrega este import
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ViewChild } from '@angular/core';
+import { IonAccordionGroup } from '@ionic/angular';
+
+import { Auth, EmailAuthProvider, reauthenticateWithCredential } from '@angular/fire/auth';
+
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -30,6 +38,13 @@ import { Firestore, collection, collectionData } from '@angular/fire/firestore';
   standalone: false,
 })
 export class DashboardPage implements OnInit {
+
+  // ✅ Inyecta Auth
+  private auth = inject(Auth);
+
+  // ✅ Referencia al accordion
+  @ViewChild('accordionAdmin') accordionGroup?: IonAccordionGroup;
+  @ViewChild('accordionUsuarios') accordionUsuarios?: IonAccordionGroup;
 
   // =========================
   // 🔹 SERVICIOS
@@ -46,6 +61,8 @@ export class DashboardPage implements OnInit {
   private kitPAService = inject(KitPrimerosAuxiliosService);
   private kitSupService = inject(KitSupervivenciaService);
   private firestore = inject(Firestore);
+  // ✅ Inyecta el sanitizer
+  private sanitizer = inject(DomSanitizer);
 
   constructor(
     public weatherGlobal: WeatherGlobalService,
@@ -174,8 +191,16 @@ export class DashboardPage implements OnInit {
       URL: [''],
       Otro: ['']
     }),
+    mapaRutaUrl: [''] // 🔥 SOLO LA URL DEL EMBED
 
   });
+
+  // ✅ Estado del panel admin
+  panelDesbloqueado = false;
+
+  // ✅ Estado del accordion de usuarios
+usuariosDesbloqueado = false;
+
 
   // =========================
   // 📌 GETTERS FORMULARIO
@@ -195,7 +220,7 @@ export class DashboardPage implements OnInit {
   get fHorarioVisita() { return this.lugarForm.get('horarioVisita'); }
   get fRequiereMasInformacion() { return this.lugarForm.get('requiereMasInformacion'); }
   get fMasInformacion() { return this.lugarForm.get('MasInformacion'); }
-
+  get fMapaRutaUrl() { return this.lugarForm.get('mapaRutaUrl'); }
   get cTitulo() { return this.consejoForm.get('titulo'); }
   get cDescripcion() { return this.consejoForm.get('descripcion'); }
   get mTitulo() { return this.manualForm.get('titulo'); }
@@ -240,6 +265,7 @@ export class DashboardPage implements OnInit {
     'Comida de emergencia',
     'GPS o mapa',
   ];
+
 
   // =========================
   // 🚀 INIT
@@ -529,7 +555,8 @@ export class DashboardPage implements OnInit {
         Texto: lugar.MasInformacion?.Texto || '',
         URL: lugar.MasInformacion?.URL || '',
         Otro: lugar.MasInformacion?.Otro || ''
-      }
+      },
+      mapaRutaUrl: lugar.mapaRutaUrl || '', // 🔥 SOLO LA URL DEL EMBED
 
     });
 
@@ -593,6 +620,7 @@ export class DashboardPage implements OnInit {
             Otro: this.lugarForm.value.MasInformacion?.Otro || '',
           }
           : undefined,
+        mapaRutaUrl: this.lugarForm.value.mapaRutaUrl?.trim() || '',
       };
 
       if (!datos.requierePagoEntrada) {
@@ -829,4 +857,154 @@ export class DashboardPage implements OnInit {
   openWeatherLink() {
     window.open('https://www.google.com/search?q=clima+santiago', '_blank');
   }
+
+  // ✅ Agrega este método
+  getSafeUrl(url: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  // ✅ Verificar contraseña antes de abrir el panel
+  async onAbrirPanel(event: any) {
+    if (this.panelDesbloqueado) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const alert = await this.alertCtrl.create({
+      header: '🔐 Acceso restringido',
+      message: 'Ingresa tu contraseña para acceder al panel de gestión',
+      inputs: [
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Tu contraseña'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Acceder',
+          handler: async (data) => {
+            if (!data.password) {
+              await this.showToast('Ingresa tu contraseña', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
+            await loading.present();
+
+            try {
+              const currentUser = this.auth.currentUser;
+              if (!currentUser || !currentUser.email) throw new Error('No autenticado');
+
+              // ✅ Import estático, no dinámico
+              const credential = EmailAuthProvider.credential(currentUser.email, data.password);
+              await reauthenticateWithCredential(currentUser, credential);
+
+              await loading.dismiss();
+              this.panelDesbloqueado = true;
+
+              // ✅ Abrir accordion manualmente
+              if (this.accordionGroup) {
+                this.accordionGroup.value = 'panel-admin';
+              }
+
+              await this.showToast('Acceso concedido', 'success');
+
+            } catch (error: any) {
+              await loading.dismiss();
+              await this.showToast('Contraseña incorrecta', 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ✅ Solo bloquea si se cierra el accordion principal
+  onCambioAccordion(event: any) {
+    // ✅ Solo reacciona si el evento viene del accordion principal
+    if (event.target.id !== 'accordion-admin-principal') return;
+
+    const valorAbierto = event.detail.value;
+    if (!valorAbierto || valorAbierto === '') {
+      this.panelDesbloqueado = false;
+    }
+  }
+
+  // ✅ Verificar contraseña antes de abrir usuarios
+async onAbrirUsuarios(event: any) {
+  if (this.usuariosDesbloqueado) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  const alert = await this.alertCtrl.create({
+    header: '🔐 Acceso restringido',
+    message: 'Ingresa tu contraseña para ver los usuarios registrados',
+    inputs: [
+      {
+        name: 'password',
+        type: 'password',
+        placeholder: 'Tu contraseña'
+      }
+    ],
+    buttons: [
+      { text: 'Cancelar', role: 'cancel' },
+      {
+        text: 'Acceder',
+        handler: async (data) => {
+          if (!data.password) {
+            await this.showToast('Ingresa tu contraseña', 'warning');
+            return false;
+          }
+
+          const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
+          await loading.present();
+
+          try {
+            const currentUser = this.auth.currentUser;
+            if (!currentUser || !currentUser.email) throw new Error('No autenticado');
+
+            const credential = EmailAuthProvider.credential(currentUser.email, data.password);
+            await reauthenticateWithCredential(currentUser, credential);
+
+            await loading.dismiss();
+            this.usuariosDesbloqueado = true;
+
+            // ✅ Abrir accordion manualmente
+            if (this.accordionUsuarios) {
+              this.accordionUsuarios.value = 'usuarios';
+            }
+
+            await this.showToast('Acceso concedido', 'success');
+
+          } catch (error: any) {
+            await loading.dismiss();
+            await this.showToast('Contraseña incorrecta', 'danger');
+          }
+
+          return true;
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+}
+
+// ✅ Bloquear cuando se cierra el accordion de usuarios
+onCambioAccordionUsuarios(event: any) {
+  if (event.target.id !== 'accordion-usuarios-principal') return;
+
+  const valorAbierto = event.detail.value;
+  if (!valorAbierto || valorAbierto === '') {
+    this.usuariosDesbloqueado = false;
+  }
+}
+
 }

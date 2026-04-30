@@ -180,6 +180,7 @@ async onCrearEvento(lugares: Lugar[]) {
           : undefined,
 
         requierePermiso: lugar.requierePermiso,
+        mapaRutaUrl: lugar.mapaRutaUrl || '', // ✅ Faltaba este campo
       },
 
       creadoPor: {

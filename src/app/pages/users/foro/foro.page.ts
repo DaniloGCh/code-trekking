@@ -8,6 +8,7 @@ import { Auth } from '@angular/fire/auth';
 import { EventoService } from 'src/app/core/services/evento.service';
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { MensajeForo } from 'src/app/core/models/evento.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-foro',
@@ -38,7 +39,7 @@ export class ForoPage implements OnInit {
   eventoId: string = '';
   organizadorUid: string = '';
 
-  mensajes: MensajeForo[] = [];
+  mensajes$: Observable<MensajeForo[]> | null = null;
   userData: UserData | null = null;
 
   currentUid = this.auth.currentUser?.uid;
@@ -60,66 +61,62 @@ export class ForoPage implements OnInit {
   // =========================
   // 🚀 INIT
   // =========================
-  async ngOnInit() {
-    this.eventoId = this.route.snapshot.paramMap.get('eventoId') || '';
-    this.organizadorUid = this.route.snapshot.paramMap.get('organizadorUid') || '';
+async ngOnInit() {
+  this.eventoId = this.route.snapshot.paramMap.get('eventoId') || '';
+  this.organizadorUid = this.route.snapshot.paramMap.get('organizadorUid') || '';
 
-    this.userData = await this.authService.getCurrentUserData();
-    await this.cargarMensajes();
-  }
+  this.userData = await this.authService.getCurrentUserData();
+
+  // 🔥 TIEMPO REAL
+  this.mensajes$ = this.eventoService.getMensajesForoRealtime(this.eventoId);
+
+  setTimeout(() => this.scrollAlFinal(), 300);
+}
 
   // =========================
   // 📥 MENSAJES
   // =========================
-  async cargarMensajes() {
-    this.cargando = true;
+  // async cargarMensajes() {
+  //   this.cargando = true;
 
-    try {
-      this.mensajes = await this.eventoService.getMensajesForo(this.eventoId);
-      setTimeout(() => this.scrollAlFinal(), 100);
-    } catch {
-      await this.showToast('Error al cargar los mensajes', 'danger');
-    } finally {
-      this.cargando = false;
-    }
-  }
+  //   try {
+  //     this.mensajes = await this.eventoService.getMensajesForo(this.eventoId);
+  //     setTimeout(() => this.scrollAlFinal(), 100);
+  //   } catch {
+  //     await this.showToast('Error al cargar los mensajes', 'danger');
+  //   } finally {
+  //     this.cargando = false;
+  //   }
+  // }
 
-  async onRefresh(event: any) {
-    await this.cargarMensajes();
-    event.target.complete();
-  }
+  // async onRefresh(event: any) {
+  //   await this.cargarMensajes();
+  //   event.target.complete();
+  // }
 
   // =========================
   // ✍️ ENVIAR MENSAJE
   // =========================
-  async onEnviarMensaje() {
-    if (!this.nuevoMensaje.trim() || !this.userData) return;
+async onEnviarMensaje() {
+  if (!this.nuevoMensaje.trim() || !this.userData) return;
 
-    const texto = this.nuevoMensaje.trim();
-    this.nuevoMensaje = '';
+  const texto = this.nuevoMensaje.trim();
+  this.nuevoMensaje = '';
 
-    const mensajeLocal: MensajeForo = {
+  try {
+    await this.eventoService.enviarMensaje(this.eventoId, {
       texto,
       autorUid: this.userData.uid,
       autorNombre: this.userData.nombre,
-      creadoEn: { toDate: () => new Date() }
-    };
+      creadoEn: new Date(),
+    });
 
-    this.mensajes.push(mensajeLocal);
-    setTimeout(() => this.scrollAlFinal(), 100);
+    setTimeout(() => this.scrollAlFinal(), 200);
 
-    try {
-      await this.eventoService.enviarMensaje(this.eventoId, {
-        texto,
-        autorUid: this.userData.uid,
-        autorNombre: this.userData.nombre,
-        creadoEn: new Date(),
-      });
-    } catch {
-      await this.showToast('Error al enviar el mensaje', 'danger');
-      this.mensajes.pop();
-    }
+  } catch {
+    await this.showToast('Error al enviar el mensaje', 'danger');
   }
+}
 
   // =========================
   // 😊 EMOJIS
@@ -142,7 +139,6 @@ export class ForoPage implements OnInit {
           handler: async () => {
             try {
               await this.eventoService.eliminarMensaje(this.eventoId, mensaje.id!);
-              this.mensajes = this.mensajes.filter(m => m.id !== mensaje.id);
               await this.showToast('Mensaje eliminado', 'success');
             } catch {
               await this.showToast('Error al eliminar el mensaje', 'danger');
