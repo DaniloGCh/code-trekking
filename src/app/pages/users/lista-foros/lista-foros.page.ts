@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { Evento } from 'src/app/core/models/evento.model';
 
 @Component({
-  selector: 'app-foros',
+  selector: 'app-lista-foros',
   templateUrl: './lista-foros.page.html',
   styleUrls: ['./lista-foros.page.scss'],
   standalone: false,
@@ -47,6 +47,17 @@ export class ListaForosPage implements OnInit {
   getMensajesNuevos(eventoId?: string): number {
     if (!eventoId) return 0;
     return this.mensajesNuevosMap[eventoId] || 0;
+  }
+
+  formatearHora(fecha: any): string {
+    if (!fecha) return '';
+
+    const date = fecha.toDate ? fecha.toDate() : new Date(fecha);
+
+    return date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   irAlForo(evento: Evento) {

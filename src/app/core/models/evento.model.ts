@@ -56,6 +56,13 @@ export interface Evento {
   participantes: string[];           // ✅ Se mantiene para queries
   participantesInfo: Participante[]; // ✅ Nuevo: array con uid y nombre
   creadoEn: any;
+
+    // 🔥 AGREGAR ESTO (NUEVO)
+  ultimoMensaje?: {
+    texto: string;
+    autorNombre: string;
+    creadoEn: any;
+  };
 }
 
 // ✅ Agrega esta interfaz
@@ -103,3 +110,4 @@ export interface KitSupervivencia {
   creadoPor?: string;
   fechaCreacion?: any;
 }
+
