@@ -9,7 +9,8 @@ import { Auth } from '@angular/fire/auth';
 import { EventoService } from 'src/app/core/services/evento.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { Evento } from 'src/app/core/models/evento.model';
-
+// ✅ Agrega este import
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-evento-detalle',
   templateUrl: './evento-detalle.page.html',
@@ -29,6 +30,9 @@ export class EventoDetallePage implements OnInit {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
+  // ✅ Inyecta el sanitizer
+  private sanitizer = inject(DomSanitizer);
+
 
   // =========================
   // 📦 ESTADO DEL COMPONENTE
@@ -224,5 +228,8 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
     await toast.present();
   }
 
-  
+  // ✅ Agrega este método
+  getSafeUrl(url: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
 }

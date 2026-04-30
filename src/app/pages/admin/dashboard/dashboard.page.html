@@ -421,7 +421,7 @@
 
             <!-- MÁS INFORMACIÓN -->
 
-                        <ion-item>
+            <ion-item>
               <ion-label>¿Tiene más información?</ion-label>
               <ion-toggle formControlName="requiereMasInformacion" slot="end"></ion-toggle>
             </ion-item>
@@ -457,7 +457,31 @@
 
             </div>
 
+<!-- MAPA DE LA RUTA -->
+<!-- MAPA DE LA RUTA -->
+<ion-item>
+  <ion-label position="floating">URL del mapa de ruta (Wikiloc)</ion-label>
+  <ion-input
+    type="text"
+    formControlName="mapaRutaUrl"
+    placeholder="https://es.wikiloc.com/wikiloc/embedv2.do?id=...">
+  </ion-input>
+</ion-item>
 
+<!-- PREVIEW del mapa si hay URL -->
+<div *ngIf="lugarForm.get('mapaRutaUrl')?.value" class="mapa-preview">
+  <p class="preview-label">
+    <ion-icon name="map-outline" color="primary"></ion-icon>
+    Vista previa del mapa
+  </p>
+  <iframe
+    [src]="getSafeUrl(lugarForm.get('mapaRutaUrl')?.value)"
+    width="100%"
+    height="300"
+    frameBorder="0"
+    scrolling="no">
+  </iframe>
+</div>
             <!-- BOTONES -->
             <div class="form-buttons">
 

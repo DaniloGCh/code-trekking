@@ -32,6 +32,9 @@ export interface Lugar {
     URL: string;
     Otro: string;
   };
+
+    // ✅ NUEVO CAMPO LIMPIO Y SEGURO
+  mapaRutaUrl?: string; // 🔥 SOLO LA URL DEL EMBED
 }
 
 export interface Participante {

@@ -23,6 +23,9 @@ import { KitPrimerosAuxilios, KitSupervivencia } from 'src/app/core/models/event
 import { Evento } from 'src/app/core/models/evento.model';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 
+// ✅ Agrega este import
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -46,6 +49,8 @@ export class DashboardPage implements OnInit {
   private kitPAService = inject(KitPrimerosAuxiliosService);
   private kitSupService = inject(KitSupervivenciaService);
   private firestore = inject(Firestore);
+  // ✅ Inyecta el sanitizer
+private sanitizer = inject(DomSanitizer);
 
   constructor(
     public weatherGlobal: WeatherGlobalService,
@@ -174,6 +179,7 @@ export class DashboardPage implements OnInit {
       URL: [''],
       Otro: ['']
     }),
+    mapaRutaUrl: [''] // 🔥 SOLO LA URL DEL EMBED
 
   });
 
@@ -195,7 +201,7 @@ export class DashboardPage implements OnInit {
   get fHorarioVisita() { return this.lugarForm.get('horarioVisita'); }
   get fRequiereMasInformacion() { return this.lugarForm.get('requiereMasInformacion'); }
   get fMasInformacion() { return this.lugarForm.get('MasInformacion'); }
-
+  get fMapaRutaUrl() { return this.lugarForm.get('mapaRutaUrl'); }
   get cTitulo() { return this.consejoForm.get('titulo'); }
   get cDescripcion() { return this.consejoForm.get('descripcion'); }
   get mTitulo() { return this.manualForm.get('titulo'); }
@@ -529,7 +535,8 @@ export class DashboardPage implements OnInit {
         Texto: lugar.MasInformacion?.Texto || '',
         URL: lugar.MasInformacion?.URL || '',
         Otro: lugar.MasInformacion?.Otro || ''
-      }
+      },
+      mapaRutaUrl: lugar.mapaRutaUrl || '', // 🔥 SOLO LA URL DEL EMBED
 
     });
 
@@ -593,6 +600,7 @@ export class DashboardPage implements OnInit {
             Otro: this.lugarForm.value.MasInformacion?.Otro || '',
           }
           : undefined,
+          mapaRutaUrl: this.lugarForm.value.mapaRutaUrl?.trim() || '',
       };
 
       if (!datos.requierePagoEntrada) {
@@ -829,4 +837,9 @@ export class DashboardPage implements OnInit {
   openWeatherLink() {
     window.open('https://www.google.com/search?q=clima+santiago', '_blank');
   }
+
+  // ✅ Agrega este método
+getSafeUrl(url: string): SafeResourceUrl {
+  return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+}
 }
