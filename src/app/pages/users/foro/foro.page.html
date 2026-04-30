@@ -14,11 +14,11 @@
     <ion-title>Foro del evento</ion-title>
 
     <!-- 🔄 REFRESCAR -->
-    <ion-buttons slot="end">
+    <!-- <ion-buttons slot="end">
       <ion-button (click)="cargarMensajes()">
         <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
       </ion-button>
-    </ion-buttons>
+    </ion-buttons> -->
 
   </ion-toolbar>
 
@@ -30,9 +30,9 @@
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <!-- 🔄 REFRESH PULL -->
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+  <!-- <ion-refresher slot="fixed" (ionRefresh)="o($event)">
     <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+  </ion-refresher> -->
 
   <!-- ========================= -->
   <!-- ⏳ CARGANDO -->
@@ -45,7 +45,7 @@
   <!-- ========================= -->
   <!-- 🚫 SIN MENSAJES -->
   <!-- ========================= -->
-  <div class="empty-state" *ngIf="!cargando && mensajes.length === 0">
+  <div class="empty-state" *ngIf="!cargando && (mensajes$ | async)?.length === 0">
     <ion-icon name="chatbubbles-outline"></ion-icon>
     <h3>Sin mensajes aún</h3>
     <p>¡Sé el primero en escribir!</p>
@@ -57,7 +57,7 @@
   <div class="mensajes-container" *ngIf="!cargando">
 
     <div
-      *ngFor="let mensaje of mensajes"
+      *ngFor="let mensaje of mensajes$ | async"
       class="mensaje-wrapper"
       [class.propio]="mensaje.autorUid === currentUid">
 
