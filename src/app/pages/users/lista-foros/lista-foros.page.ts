@@ -23,6 +23,9 @@ export class ListaForosPage implements OnInit {
 
   mensajesNuevosMap: { [eventoId: string]: number } = {};
 
+    hideHeader = false;
+  lastScrollTop = 0;
+
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.currentUid = user?.uid || null;
@@ -71,5 +74,16 @@ export class ListaForosPage implements OnInit {
     this.router.navigateByUrl(
       `/tabs/foro/${evento.id}/${evento.creadoPor.uid}`
     );
+  }
+
+    // =========================
+  // 📜 SCROLL
+  // =========================
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+
+    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
+
+    this.lastScrollTop = scrollTop;
   }
 }

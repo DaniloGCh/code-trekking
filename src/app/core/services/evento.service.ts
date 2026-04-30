@@ -23,6 +23,7 @@ import {
   arrayRemove
 } from '@angular/fire/firestore';
 
+
 // =========================
 // 🔹 FIREBASE AUTH
 // =========================
@@ -31,7 +32,7 @@ import { Auth, authState } from '@angular/fire/auth';
 // =========================
 // 🔹 RXJS
 // =========================
-import { Observable, of } from 'rxjs';
+import { Observable, of , BehaviorSubject} from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 // =========================
@@ -49,6 +50,10 @@ export class EventoService {
   // =========================
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+
+    // 🔴 NOTIFICADOR GLOBAL (NUEVO)
+  private foroVistoSubject = new BehaviorSubject<void>(undefined);
+  foroVisto$ = this.foroVistoSubject.asObservable();
 
   // =========================
   // 📍 OBTENER LUGARES
@@ -258,7 +263,10 @@ export class EventoService {
   marcarForoVisto(eventoId: string, uid: string): void {
     const key = `foro_ultima_visita_${eventoId}_${uid}`;
     localStorage.setItem(key, new Date().toISOString());
+        // 🔥 AVISA A TODA LA APP
+    this.foroVistoSubject.next();
   }
+
 
   getMensajesForoRealtime(eventoId: string): Observable<MensajeForo[]> {
   const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
@@ -266,5 +274,7 @@ export class EventoService {
 
   return collectionData(q, { idField: 'id' }) as Observable<MensajeForo[]>;
 }
+
+
   
 }

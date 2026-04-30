@@ -1,0 +1,176 @@
+/* =========================================================
+   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
+   ========================================================= */
+
+/* toolbar transparente total */
+.transparent-toolbar {
+  --background: transparent !important;
+  --border-width: 0 !important;
+  --box-shadow: none !important;
+  --padding-start: 15px;
+  --padding-end: 15px;
+}
+
+/* header base */
+ion-header {
+  background: transparent !important;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* header oculto */
+ion-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* iconos header */
+ion-header ion-toolbar ion-icon {
+  color: #8bd58e !important;
+}
+
+/* toolbar sin sombra */
+ion-toolbar {
+  --box-shadow: none !important;
+  box-shadow: none !important;
+  --border-width: 0 !important;
+}
+
+/* botones header */
+ion-buttons {
+  z-index: 2;
+}
+
+
+/* =========================================================
+   🌄 FONDO
+   ========================================================= */
+
+ion-content {
+  --background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')
+    no-repeat center center / cover;
+}
+
+/* ajuste scroll por header */
+ion-content::part(scroll) {
+  margin: 85px 15px 15px 15px;
+}
+
+/* 🌿 LISTA FOROS - ESTILO TREKKING */
+
+ion-list {
+  background: rgba(53, 150, 77, 0.15); // verde transparente
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 16px;
+  padding: 10px;
+
+  border: 1px solid rgba(53, 150, 77, 0.3);
+}
+
+/* 🧭 ITEM (cada evento) */
+/* 🧭 ITEM (cada evento) - VERDE CRISTAL */
+ion-item {
+  --background: rgba(46, 125, 50, 0.18); // verde translúcido
+  --border-radius: 14px;
+  --padding-start: 14px;
+  --inner-padding-end: 10px;
+
+  margin-bottom: 10px;
+  border-radius: 14px;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(76, 175, 80, 0.25); // borde verde suave
+
+  box-shadow: 
+    0 4px 10px rgba(0, 80, 40, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15); // efecto vidrio
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  display: flex;
+  align-items: center;
+
+  &:active {
+    transform: scale(0.98);
+
+    box-shadow: 
+      0 2px 6px rgba(0, 80, 40, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* 🏷️ NOMBRE EVENTO */
+ion-label h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff; // verde oscuro trekking
+  margin-bottom: 4px;
+}
+
+/* 💬 MENSAJE */
+ion-label p {
+  font-size: 13px;
+  color: #f8f8f8; // verde grisáceo
+  margin: 0;
+  line-height: 1.4;
+
+  strong {
+    color: #08ddba; // verde medio
+  }
+}
+
+/* ⏰ HORA */
+.hora {
+  text-align: right;
+  font-size: 11px;
+  color: #7a9b87;
+  margin-left: 8px;
+  min-width: 55px;
+}
+
+/* 🔴 BADGE */
+ion-badge {
+  margin-left: 8px;
+  font-size: 11px;
+  border-radius: 10px;
+  padding: 4px 6px;
+
+  box-shadow: 0 2px 6px rgba(255, 0, 0, 0.2);
+}
+
+/* 🌄 EFECTO HOVER (desktop) */
+@media (hover: hover) {
+  ion-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 80, 40, 0.15);
+  }
+}
+
+/* 🌱 VARIANTE: EVENTO SIN MENSAJES */
+ion-label p:empty,
+ion-label p:has(+ p) {
+  color: #9e9e9e;
+  font-style: italic;
+}
+
+/* 🌲 OPCIONAL: BORDE IZQUIERDO TIPO ESTADO */
+ion-item::before {
+  content: '';
+  width: 4px;
+  height: 60%;
+  background: linear-gradient(180deg, #2e7d32, #66bb6a);
+  position: absolute;
+  left: 0;
+  border-radius: 4px;
+}

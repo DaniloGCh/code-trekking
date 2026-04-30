@@ -1,10 +1,10 @@
-<ion-header>
-  <ion-toolbar color="primary">
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
     <ion-title>Foros</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <ion-list *ngIf="misEventos$ | async as eventos">
 
