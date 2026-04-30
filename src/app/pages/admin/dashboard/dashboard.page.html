@@ -550,12 +550,12 @@
                           <p>{{ lugar.altitud }} msnm · {{ lugar.informacion }}</p>
                         </ion-label>
 
-                        <ion-badge slot="end" [color]="lugar.dificultad === 'Alta' ? 'danger' :
+                        <!-- <ion-badge slot="end" [color]="lugar.dificultad === 'Alta' ? 'danger' :
                           lugar.dificultad === 'Media' ? 'warning' : 'success'">
 
                           {{ lugar.dificultad }}
 
-                        </ion-badge>
+                        </ion-badge> -->
 
                         <ion-button slot="end" fill="clear" color="primary" (click)="onEditarLugar(lugar)">
                           <ion-icon name="pencil-outline"></ion-icon>
@@ -656,7 +656,7 @@
                       </ion-item>
                       <!-- Lista -->
                       <ion-item *ngFor="let consejo of consejos">
-                        <ion-icon name="bulb-outline" slot="start" color="warning"></ion-icon>
+                        <!-- <ion-icon name="bulb-outline" slot="start" color="warning"></ion-icon> -->
                         <ion-label class="ion-text-wrap">
                           <h3>{{ consejo.titulo }}</h3>
                           <p>{{ consejo.descripcion }}</p>
@@ -767,8 +767,8 @@
 
                       <!-- LISTA -->
                       <ion-item *ngFor="let k of kits">
-
-                        <ion-icon name="medkit-outline" slot="start" color="danger"></ion-icon>
+<!-- 
+                        <ion-icon name="medkit-outline" slot="start" color="danger"></ion-icon> -->
 
                         <ion-label class="ion-text-wrap">
                           <h3>{{ k.nombre }}</h3>
@@ -886,7 +886,7 @@
                       <!-- LISTA -->
                       <ion-item *ngFor="let k of kits">
 
-                        <ion-icon name="compass-outline" slot="start" color="success"></ion-icon>
+                        <!-- <ion-icon name="compass-outline" slot="start" color="success"></ion-icon> -->
 
                         <ion-label class="ion-text-wrap">
                           <h3>{{ k.nombre }} </h3>
@@ -1004,7 +1004,7 @@
                       <!-- LISTA -->
                       <ion-item *ngFor="let paso of pasos">
 
-                        <ion-icon name="document-text-outline" slot="start" color="tertiary"></ion-icon>
+                        <!-- <ion-icon name="document-text-outline" slot="start" color="tertiary"></ion-icon> -->
 
                         <ion-label class="ion-text-wrap">
                           <h3>{{ paso.icono }} {{ paso.titulo }}</h3>
