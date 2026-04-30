@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Foros</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list *ngIf="misEventos$ | async as eventos">
+
+    <ion-item 
+      *ngFor="let evento of eventos" 
+      (click)="irAlForo(evento)"
+      button
+    >
+
+      <ion-label>
+        <h2>{{ evento.nombre }}</h2>
+        <p>Accede al foro del evento</p>
+      </ion-label>
+
+      <!-- 🔴 CONTADOR -->
+      <ion-badge 
+        color="danger"
+        *ngIf="getMensajesNuevos(evento.id) > 0"
+      >
+        {{ getMensajesNuevos(evento.id) > 99 
+            ? '99+' 
+            : getMensajesNuevos(evento.id) }}
+      </ion-badge>
+
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

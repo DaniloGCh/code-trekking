@@ -380,3 +380,58 @@ ion-item ion-icon[color="primary"] {
   --background: #1b5e20;
   transform: scale(0.97);
 }
+
+/* =========================
+   🌿 BOTÓN FORO TREKKING
+========================= */
+
+.foro-container {
+  position: relative;
+  width: 20%;
+  color: white;
+}
+
+/* Botón estilo trekking */
+.btn-foro {
+  
+  --background: linear-gradient(135deg, #2e7d32, #66bb6a);
+  --background-hover: linear-gradient(135deg, #1b5e20, #43a047);
+  --color: #ffffff;
+  color: #fff;
+
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  font-weight: 600;
+  letter-spacing: 0.5px;
+
+  transition: transform 0.2s ease;
+}
+
+/* Efecto al presionar */
+.btn-foro:active {
+  transform: scale(0.97);
+}
+
+/* Icono más visible */
+.btn-foro ion-icon {
+  font-size: 20px;
+}
+
+/* Badge tipo notificación */
+.foro-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  font-size: 12px;
+  font-weight: bold;
+
+  border-radius: 50%;
+  padding: 6px 8px;
+
+  background: #e53935;
+  color: white;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}

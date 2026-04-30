@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   AlertController,
   ToastController,
@@ -36,7 +36,7 @@ export class EventosPage implements OnInit {
   private authService = inject(AuthService);
   private auth = inject(Auth);
   private router = inject(Router);
-
+  private route = inject(ActivatedRoute);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
@@ -46,7 +46,13 @@ export class EventosPage implements OnInit {
   // 📊 DATOS PRINCIPALES
   // =========================
   misEventos$: Observable<Evento[]> = this.eventoService.getMisEventos();
-  currentUid: string | null = null;
+  currentUid: string | null = this.auth.currentUser?.uid || null;
+
+  evento: Evento | null = null;
+  esCreadoPor = false;
+
+  // 🔥 Contador de mensajes por evento
+  mensajesNuevosMap: { [eventoId: string]: number } = {};
 
   // =========================
   // ⭐ FAVORITOS
@@ -54,7 +60,7 @@ export class EventosPage implements OnInit {
   favoritos: string[] = [];
 
   // =========================
-  // 🔽 UI / SCROLL
+  // 🎨 UI / SCROLL
   // =========================
   hideHeader = false;
   lastScrollTop = 0;
@@ -67,7 +73,44 @@ export class EventosPage implements OnInit {
 
     this.authService.currentUser$.subscribe(user => {
       this.currentUid = user?.uid || null;
+
+      // 🔥 Cargar contador de mensajes por evento
+      this.misEventos$.subscribe(async (eventos) => {
+        if (!this.currentUid) return;
+
+        for (const ev of eventos) {
+          if (!ev.id) continue;
+
+          const cantidad = await this.eventoService.contarMensajesNuevos(
+            ev.id,
+            this.currentUid
+          );
+
+          this.mensajesNuevosMap[ev.id] = cantidad;
+        }
+      });
     });
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) return;
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Cargando evento...'
+    });
+
+    await loading.present();
+
+    try {
+      this.evento = await this.eventoService.getEventoById(id);
+      this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
+
+      await loading.dismiss();
+
+    } catch {
+      await loading.dismiss();
+      await this.showToast('Error al cargar el evento', 'danger');
+      this.goBack();
+    }
   }
 
   // =========================
@@ -180,7 +223,6 @@ export class EventosPage implements OnInit {
 
             try {
               await this.eventoService.eliminarEvento(evento.id!);
-
               await loading.dismiss();
               await this.showToast('Evento eliminado', 'success');
 
@@ -230,7 +272,6 @@ export class EventosPage implements OnInit {
 
       await deleteDoc(favRef);
       this.favoritos = this.favoritos.filter(id => id !== evento.id);
-
       this.showToast('Eliminado de favoritos', 'medium');
 
     } else {
@@ -242,9 +283,29 @@ export class EventosPage implements OnInit {
       });
 
       this.favoritos.push(evento.id);
-
       this.showToast('Agregado a favoritos ⭐', 'success');
     }
+  }
+
+  // =========================
+  // 💬 FORO
+  // =========================
+  irAlForo(evento: Evento) {
+    if (!evento.id) return;
+
+    if (this.currentUid) {
+      this.eventoService.marcarForoVisto(evento.id, this.currentUid);
+      this.mensajesNuevosMap[evento.id] = 0;
+    }
+
+    this.router.navigateByUrl(
+      `/tabs/foro/${evento.id}/${evento.creadoPor.uid}`
+    );
+  }
+
+  getMensajesNuevos(eventoId?: string): number {
+    if (!eventoId) return 0;
+    return this.mensajesNuevosMap[eventoId] || 0;
   }
 
   // =========================
@@ -262,7 +323,7 @@ export class EventosPage implements OnInit {
   }
 
   // =========================
-  // 👇 SCROLL HEADER
+  // 📜 SCROLL
   // =========================
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
@@ -271,5 +332,12 @@ export class EventosPage implements OnInit {
       scrollTop > this.lastScrollTop && scrollTop > 50;
 
     this.lastScrollTop = scrollTop;
+  }
+
+  // =========================
+  // 🔙 NAVEGACIÓN
+  // =========================
+  goBack() {
+    this.router.navigateByUrl('/tabs/eventos');
   }
 }

@@ -54,6 +54,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/users/foro/foro.module').then( m => m.ForoPageModule),
     canActivate: [authGuard]
   },
+  {
+    path: 'lista-foros',
+    loadChildren: () => import('./pages/users/lista-foros/lista-foros.module').then( m => m.ListaForosPageModule)
+  },
+
 
 
   
