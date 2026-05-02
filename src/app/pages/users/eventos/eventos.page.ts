@@ -21,6 +21,9 @@ import {
   getDocs
 } from '@angular/fire/firestore';
 
+import { map } from 'rxjs/operators';
+
+
 @Component({
   selector: 'app-eventos',
   templateUrl: './eventos.page.html',
@@ -46,6 +49,30 @@ export class EventosPage implements OnInit {
   // 📊 DATOS PRINCIPALES
   // =========================
   misEventos$: Observable<Evento[]> = this.eventoService.getMisEventos();
+
+  // 👇 🔥 AQUÍ VA
+  misEventosOrdenados$ = this.misEventos$.pipe(
+    map(eventos => {
+      return [...eventos].sort((a, b) => {
+
+        const prioridadA = this.getPrioridadEvento(a);
+        const prioridadB = this.getPrioridadEvento(b);
+
+        // 1️⃣ Orden por estado
+        if (prioridadA !== prioridadB) {
+          return prioridadA - prioridadB;
+        }
+
+        // 2️⃣ Dentro del mismo grupo ordenar por fecha
+        const fechaA = a.fecha.toDate ? a.fecha.toDate() : new Date(a.fecha);
+        const fechaB = b.fecha.toDate ? b.fecha.toDate() : new Date(b.fecha);
+
+        return fechaA.getTime() - fechaB.getTime();
+      });
+    })
+  );
+
+
   currentUid: string | null = this.auth.currentUser?.uid || null;
 
   evento: Evento | null = null;
@@ -342,51 +369,51 @@ export class EventosPage implements OnInit {
   }
 
   // =========================
-// 🔵 EVENTO PRÓXIMO (FUTURO)
-// =========================
-esEventoProximo(evento: Evento): boolean {
-  if (!evento?.fecha) return false;
+  // 🔵 EVENTO PRÓXIMO (FUTURO)
+  // =========================
+  esEventoProximo(evento: Evento): boolean {
+    if (!evento?.fecha) return false;
 
-  const fechaEvento = evento.fecha.toDate
-    ? evento.fecha.toDate()
-    : new Date(evento.fecha);
+    const fechaEvento = evento.fecha.toDate
+      ? evento.fecha.toDate()
+      : new Date(evento.fecha);
 
-  const hoy = new Date();
+    const hoy = new Date();
 
-  // Limpiar horas para comparar solo fechas
-  const eventoSinHora = new Date(
-    fechaEvento.getFullYear(),
-    fechaEvento.getMonth(),
-    fechaEvento.getDate()
-  );
+    // Limpiar horas para comparar solo fechas
+    const eventoSinHora = new Date(
+      fechaEvento.getFullYear(),
+      fechaEvento.getMonth(),
+      fechaEvento.getDate()
+    );
 
-  const hoySinHora = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate()
-  );
+    const hoySinHora = new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      hoy.getDate()
+    );
 
-  return eventoSinHora > hoySinHora;
-}
+    return eventoSinHora > hoySinHora;
+  }
 
   // =========================
-// 🟢 EVENTO EN CURSO (HOY)
-// =========================
-esEventoEnCurso(evento: Evento): boolean {
-  if (!evento?.fecha) return false;
+  // 🟢 EVENTO EN CURSO (HOY)
+  // =========================
+  esEventoEnCurso(evento: Evento): boolean {
+    if (!evento?.fecha) return false;
 
-  const fechaEvento = evento.fecha.toDate
-    ? evento.fecha.toDate()
-    : new Date(evento.fecha);
+    const fechaEvento = evento.fecha.toDate
+      ? evento.fecha.toDate()
+      : new Date(evento.fecha);
 
-  const hoy = new Date();
+    const hoy = new Date();
 
-  return (
-    fechaEvento.getDate() === hoy.getDate() &&
-    fechaEvento.getMonth() === hoy.getMonth() &&
-    fechaEvento.getFullYear() === hoy.getFullYear()
-  );
-}
+    return (
+      fechaEvento.getDate() === hoy.getDate() &&
+      fechaEvento.getMonth() === hoy.getMonth() &&
+      fechaEvento.getFullYear() === hoy.getFullYear()
+    );
+  }
 
   // =========================
   // ⏰ VALIDAR SI EVENTO FINALIZÓ
@@ -403,5 +430,15 @@ esEventoEnCurso(evento: Evento): boolean {
     return fechaEvento < ahora;
   }
 
-  
+  // =========================
+  // 📊 PRIORIDAD DEL EVENTO
+  // =========================
+  getPrioridadEvento(evento: Evento): number {
+    if (this.esEventoEnCurso(evento)) return 1;
+    if (this.esEventoProximo(evento)) return 2;
+    if (this.esEventoFinalizado(evento)) return 3;
+    return 4; // fallback
+  }
+
+
 }
