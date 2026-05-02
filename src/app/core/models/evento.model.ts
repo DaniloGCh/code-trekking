@@ -1,5 +1,3 @@
-// src/app/core/models/evento.model.ts
-
 export interface Lugar {
   id?: string;
   nombre: string;
@@ -60,7 +58,6 @@ export interface Evento {
   participantesInfo: Participante[]; // ✅ Nuevo: array con uid y nombre
   creadoEn: any;
 
-    // 🔥 AGREGAR ESTO (NUEVO)
   ultimoMensaje?: {
     texto: string;
     autorNombre: string;

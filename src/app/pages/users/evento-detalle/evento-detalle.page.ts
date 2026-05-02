@@ -232,4 +232,38 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   getSafeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
+
+  // =========================
+// 🟢 EVENTO EN CURSO (HOY)
+// =========================
+esEventoEnCurso(evento: Evento): boolean {
+  if (!evento?.fecha) return false;
+
+  const fechaEvento = evento.fecha.toDate
+    ? evento.fecha.toDate()
+    : new Date(evento.fecha);
+
+  const hoy = new Date();
+
+  return (
+    fechaEvento.getDate() === hoy.getDate() &&
+    fechaEvento.getMonth() === hoy.getMonth() &&
+    fechaEvento.getFullYear() === hoy.getFullYear()
+  );
+}
+
+  // =========================
+  // ⏰ VALIDAR SI EVENTO FINALIZÓ
+  // =========================
+  esEventoFinalizado(evento: Evento): boolean {
+    if (!evento?.fecha) return false;
+
+    const fechaEvento = evento.fecha.toDate
+      ? evento.fecha.toDate() // 🔥 Firestore Timestamp
+      : new Date(evento.fecha);
+
+    const ahora = new Date();
+
+    return fechaEvento < ahora;
+  }
 }

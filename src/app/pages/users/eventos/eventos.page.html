@@ -90,10 +90,42 @@
         <ion-list lines="none">
 
           <!-- 📅 FECHA -->
-          <ion-item>
+          <!-- <ion-item>
             <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
             <ion-label>
               {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+            </ion-label>
+          </ion-item> -->
+
+          <!-- 📅 FECHA -->
+          <ion-item>
+            <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+
+              <!-- 🔴 FINALIZADO -->
+              <ng-container *ngIf="esEventoFinalizado(evento); else noFinalizado">
+                <span style="color: red; font-weight: bold;">
+                  Evento finalizado
+                </span>
+              </ng-container>
+
+              <!-- ⬇️ SI NO ESTÁ FINALIZADO -->
+              <ng-template #noFinalizado>
+
+                <!-- 🟢 EN CURSO -->
+                <ng-container *ngIf="esEventoEnCurso(evento); else fechaNormal">
+                  <span style="color: green; font-weight: bold;">
+                    Evento en curso
+                  </span>
+                </ng-container>
+
+                <!-- 📅 NORMAL -->
+                <ng-template #fechaNormal>
+                  {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                </ng-template>
+
+              </ng-template>
+
             </ion-label>
           </ion-item>
 
