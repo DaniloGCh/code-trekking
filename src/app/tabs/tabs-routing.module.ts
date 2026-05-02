@@ -17,13 +17,13 @@ const routes: Routes = [
       {
         path: 'profile',
         loadChildren: () => import('../pages/users/profile/profile.module').then(m => m.ProfilePageModule),
-        //canActivate: [authGuard]
-      },
-      {
-        path: 'settings',
-        loadChildren: () => import('../pages/users/settings/settings.module').then(m => m.SettingsPageModule),
         canActivate: [authGuard]
       },
+      // {
+      //   path: 'settings',
+      //   loadChildren: () => import('../pages/users/settings/settings.module').then(m => m.SettingsPageModule),
+      //   canActivate: [authGuard]
+      // },
 
       {
         path: 'eventos',
@@ -48,6 +48,11 @@ const routes: Routes = [
       {
         path: 'lista-foros',
         loadChildren: () => import('../pages/users/lista-foros/lista-foros.module').then(m => m.ListaForosPageModule),
+        canActivate: [authGuard]
+      },
+            {
+        path: 'tab1',
+        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule),
         canActivate: [authGuard]
       },
       {

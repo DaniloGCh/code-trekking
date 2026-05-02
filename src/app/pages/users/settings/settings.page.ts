@@ -249,7 +249,7 @@ export class SettingsPage implements OnInit {
   // 🔙 NAVEGACIÓN
   // =========================
   goBack() {
-    this.router.navigateByUrl('/tabs/profile');
+    this.router.navigateByUrl('/profile');
   }
 
   // =========================

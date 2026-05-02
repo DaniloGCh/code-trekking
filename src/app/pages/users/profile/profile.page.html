@@ -8,8 +8,14 @@
 
     <ion-buttons slot="end">
 
+                  <!-- 🚪 LOGOUT -->
+      <ion-button *ngIf="userData" (click)="goHome()">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
+
+
       <!-- ⚙️ SETTINGS -->
-      <ion-button class="btn-settings" routerLink="/tabs/settings">
+      <ion-button class="btn-settings" routerLink="/settings">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
 

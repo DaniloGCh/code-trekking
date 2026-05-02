@@ -154,6 +154,10 @@ export class HomePage implements OnInit, OnDestroy {
     this.router.navigateByUrl('/register');
   }
 
+    goProfile() {
+    this.router.navigateByUrl('/profile');
+  }
+
   // =========================
   // 🌤️ WEATHER ACTION
   // =========================

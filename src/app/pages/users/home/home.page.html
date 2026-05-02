@@ -17,6 +17,11 @@
     <!-- 🔘 ACCIONES DERECHA -->
     <ion-buttons slot="end">
 
+            <!-- profile -->
+      <ion-button *ngIf="userData" (click)="goProfile()">
+        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+      </ion-button>
+
       <!-- 🏠 Dashboard (solo admin) -->
       <ion-button *ngIf="userData?.rol === 'admin'" (click)="goDashboard()">
         <ion-icon slot="icon-only" name="grid-outline"></ion-icon>

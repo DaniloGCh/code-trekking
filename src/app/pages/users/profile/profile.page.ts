@@ -183,6 +183,10 @@ export class ProfilePage implements OnInit {
     this.router.navigateByUrl('/register');
   }
 
+  goHome() {
+    this.router.navigateByUrl('/tabs/home');
+  }
+
   // =========================
   // 😊 ESTADO DE ÁNIMO
   // =========================
