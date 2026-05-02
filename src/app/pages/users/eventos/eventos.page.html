@@ -105,7 +105,7 @@
               <!-- 🔴 FINALIZADO -->
               <ng-container *ngIf="esEventoFinalizado(evento); else noFinalizado">
                 <span style="color: red; font-weight: bold;">
-                  Evento finalizado
+                  🔴 Evento finalizado
                 </span>
               </ng-container>
 
@@ -113,15 +113,34 @@
               <ng-template #noFinalizado>
 
                 <!-- 🟢 EN CURSO -->
-                <ng-container *ngIf="esEventoEnCurso(evento); else fechaNormal">
+                <ng-container *ngIf="esEventoEnCurso(evento); else noEnCurso">
                   <span style="color: green; font-weight: bold;">
                     Evento en curso
                   </span>
+                  <ion-label>
+                    {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                  </ion-label>
                 </ng-container>
 
-                <!-- 📅 NORMAL -->
-                <ng-template #fechaNormal>
-                  {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                <!-- ⬇️ SI NO ESTÁ EN CURSO -->
+                <ng-template #noEnCurso>
+
+                  <!-- 🔵 PRÓXIMO -->
+
+                  <ng-container *ngIf="esEventoProximo(evento); else fechaNormal">
+                    <span style="color: #007bff; font-weight: bold;">
+                      Próximo evento
+                    </span>
+                    <ion-label>
+                      {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                    </ion-label>
+                  </ng-container>
+
+                  <!-- 📅 NORMAL (fallback) -->
+                  <ng-template #fechaNormal>
+                    {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                  </ng-template>
+
                 </ng-template>
 
               </ng-template>

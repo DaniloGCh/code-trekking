@@ -342,6 +342,34 @@ export class EventosPage implements OnInit {
   }
 
   // =========================
+// 🔵 EVENTO PRÓXIMO (FUTURO)
+// =========================
+esEventoProximo(evento: Evento): boolean {
+  if (!evento?.fecha) return false;
+
+  const fechaEvento = evento.fecha.toDate
+    ? evento.fecha.toDate()
+    : new Date(evento.fecha);
+
+  const hoy = new Date();
+
+  // Limpiar horas para comparar solo fechas
+  const eventoSinHora = new Date(
+    fechaEvento.getFullYear(),
+    fechaEvento.getMonth(),
+    fechaEvento.getDate()
+  );
+
+  const hoySinHora = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth(),
+    hoy.getDate()
+  );
+
+  return eventoSinHora > hoySinHora;
+}
+
+  // =========================
 // 🟢 EVENTO EN CURSO (HOY)
 // =========================
 esEventoEnCurso(evento: Evento): boolean {
@@ -374,4 +402,6 @@ esEventoEnCurso(evento: Evento): boolean {
 
     return fechaEvento < ahora;
   }
+
+  
 }
