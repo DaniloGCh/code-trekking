@@ -205,6 +205,7 @@ export class EventosPage implements OnInit {
               const messages: Record<string, string> = {
                 'codigo-invalido': 'El código no existe o es incorrecto.',
                 'ya-participante': 'Ya eres participante de este evento.',
+                'evento-finalizado': 'No puedes unirte, el evento ya finalizó',
               };
 
               await this.showToast(
@@ -440,5 +441,6 @@ export class EventosPage implements OnInit {
     return 4; // fallback
   }
 
+  
 
 }

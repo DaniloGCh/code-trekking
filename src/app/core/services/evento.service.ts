@@ -135,34 +135,50 @@ export class EventoService {
   // =========================
   // 🔗 UNIRSE CON CÓDIGO
   // =========================
-  async unirseConCodigo(codigo: string): Promise<Evento | null> {
+// =========================
+// 🔗 UNIRSE CON CÓDIGO
+// =========================
+async unirseConCodigo(codigo: string): Promise<Evento | null> {
 
-    const currentUser = this.auth.currentUser;
-    if (!currentUser) throw new Error('No hay usuario autenticado');
+  const currentUser = this.auth.currentUser;
+  if (!currentUser) throw new Error('No hay usuario autenticado');
 
-    const ref = collection(this.firestore, 'eventos');
-    const q = query(ref, where('codigoInvitacion', '==', codigo.toUpperCase().trim()));
+  const ref = collection(this.firestore, 'eventos');
+  const q = query(ref, where('codigoInvitacion', '==', codigo.toUpperCase().trim()));
 
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) throw new Error('codigo-invalido');
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) throw new Error('codigo-invalido');
 
-    const docEvent = snapshot.docs[0];
-    const evento = { id: docEvent.id, ...docEvent.data() } as Evento;
+  const docEvent = snapshot.docs[0];
+  const evento = { id: docEvent.id, ...docEvent.data() } as Evento;
 
-    if (evento.participantes.includes(currentUser.uid)) {
-      throw new Error('ya-participante');
-    }
+  // 🚫 VALIDAR SI YA FINALIZÓ
+  const fechaEvento = evento.fecha.toDate
+    ? evento.fecha.toDate()
+    : new Date(evento.fecha);
 
-    const userSnap = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
-    const nombre = (userSnap.data() as any)?.nombre || 'Usuario';
+  const ahora = new Date();
 
-    await updateDoc(doc(this.firestore, `eventos/${docEvent.id}`), {
-      participantes: arrayUnion(currentUser.uid),
-      participantesInfo: arrayUnion({ uid: currentUser.uid, nombre })
-    });
-
-    return evento;
+  if (fechaEvento < ahora) {
+    throw new Error('evento-finalizado'); // 🔥 nuevo error
   }
+
+  // 🚫 VALIDAR SI YA ES PARTICIPANTE
+  if (evento.participantes.includes(currentUser.uid)) {
+    throw new Error('ya-participante');
+  }
+
+  const userSnap = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
+  const nombre = (userSnap.data() as any)?.nombre || 'Usuario';
+
+  // ✅ RECIÉN AQUÍ SE UNE
+  await updateDoc(doc(this.firestore, `eventos/${docEvent.id}`), {
+    participantes: arrayUnion(currentUser.uid),
+    participantesInfo: arrayUnion({ uid: currentUser.uid, nombre })
+  });
+
+  return evento;
+}
 
   // =========================
   // 🗑️ ELIMINAR EVENTO
