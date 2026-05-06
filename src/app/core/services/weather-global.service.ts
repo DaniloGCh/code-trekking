@@ -29,8 +29,8 @@ export class WeatherGlobalService {
     try {
       const ubicacion = await this.sosService.obtenerUbicacion();
 
-      // console.log('📍 LAT:', ubicacion.latitud);
-      // console.log('📍 LON:', ubicacion.longitud);
+      console.log('📍 LAT:', ubicacion.latitud);
+      console.log('📍 LON:', ubicacion.longitud);
 
       // =========================
       // 🌤️ CLIMA
