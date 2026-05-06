@@ -1,1 +1,91 @@
+ion-tab-bar {
+    position: relative;
+    height: 70px;
+}
+
+/* ESPACIO CENTRAL */
+.empty-tab {
+    pointer-events: none;
+}
+
+/* BOTÓN SOS CENTRADO */
+.sos-tab-btn {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: transparent;
+}
+
+/* CÍRCULO */
+// .sos-circle {
+//   width: 65px;
+//   height: 65px;
+//   background: linear-gradient(135deg, #ff3b30, #ff0000);
+//   border-radius: 50%;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+//   position: relative;
+// }
+
+.sos-circle {
+    position: relative;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: var(--ion-color-danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(235, 68, 90, 0.6);
+    animation: sosPulse 2s infinite;
+}
+
+
+/* TEXTO */
+.sos-circle-text {
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    z-index: 2;
+}
+
+.sos-circle-text {
+    color: white;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    z-index: 2;
+}
+
+.sos-circle-ripple {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--ion-color-danger);
+    opacity: 0.4;
+    animation: ripple 2s infinite;
+}
+
+.sos-tab-btn {
+    position: absolute;
+    top: -1px;
+    /* antes -25px */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+
+ion-tab-bar {
+    position: relative;
+    height: 85px;
+    /* antes 70px → dale más espacio */
+    overflow: visible;
+    /* CLAVE */
+}
 
