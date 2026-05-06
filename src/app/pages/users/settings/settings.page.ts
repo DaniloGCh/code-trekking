@@ -9,7 +9,7 @@ import {
   LoadingController
 } from '@ionic/angular';
 
-import { AuthService, UserData } from 'src/app/core/services/auth.service';
+import { AuthService, UserData, ContactoEmergencia } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -33,6 +33,8 @@ export class SettingsPage implements OnInit {
   // =========================
   userData: UserData | null = null;
 
+  contactos: ContactoEmergencia[] = [];
+
   hideHeader = false;
   lastScrollTop = 0;
 
@@ -41,7 +43,173 @@ export class SettingsPage implements OnInit {
   // =========================
   async ngOnInit() {
     this.userData = await this.authService.getCurrentUserData();
+    this.contactos = this.userData?.contactosEmergencia || [];
   }
+
+  // ➕ AGREGAR CONTACTO
+  async onAgregarContacto() {
+    if (this.contactos.length >= 3) {
+      await this.showToast('Máximo 3 contactos de emergencia', 'warning');
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Agregar contacto de emergencia',
+      inputs: [
+        {
+          name: 'nombre',
+          type: 'text',
+          placeholder: 'Nombre completo',
+        },
+        {
+          name: 'telefono',
+          type: 'tel',
+          placeholder: 'Teléfono (ej: +56912345678)',
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Agregar',
+          handler: async (data) => {
+            if (!data.nombre || !data.telefono) {
+              await this.showToast('Completa todos los campos', 'warning');
+              return false;
+            }
+
+            if (data.nombre.trim().length < 3) {
+              await this.showToast('El nombre debe tener mínimo 3 caracteres', 'warning');
+              return false;
+            }
+
+            if (data.telefono.trim().length < 8) {
+              await this.showToast('Ingresa un teléfono válido', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({ message: 'Guardando...' });
+            await loading.present();
+
+            try {
+              const nuevoContacto: ContactoEmergencia = {
+                nombre: data.nombre.trim(),
+                telefono: data.telefono.trim(),
+              };
+
+              this.contactos = [...this.contactos, nuevoContacto];
+              await this.authService.updateProfile({ contactosEmergencia: this.contactos });
+              await loading.dismiss();
+              await this.showToast('Contacto agregado correctamente', 'success');
+            } catch (error) {
+              await loading.dismiss();
+              await this.showToast('Error al guardar el contacto', 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ✏️ EDITAR CONTACTO
+  async onEditarContacto(index: number) {
+    const contacto = this.contactos[index];
+
+    const alert = await this.alertCtrl.create({
+      header: 'Editar contacto',
+      inputs: [
+        {
+          name: 'nombre',
+          type: 'text',
+          value: contacto.nombre,
+          placeholder: 'Nombre completo',
+        },
+        {
+          name: 'telefono',
+          type: 'tel',
+          value: contacto.telefono,
+          placeholder: 'Teléfono',
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Guardar',
+          handler: async (data) => {
+            if (!data.nombre || !data.telefono) {
+              await this.showToast('Completa todos los campos', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({ message: 'Guardando...' });
+            await loading.present();
+
+            try {
+              this.contactos[index] = {
+                nombre: data.nombre.trim(),
+                telefono: data.telefono.trim(),
+              };
+              this.contactos = [...this.contactos];
+              await this.authService.updateProfile({ contactosEmergencia: this.contactos });
+              await loading.dismiss();
+              await this.showToast('Contacto actualizado', 'success');
+            } catch (error) {
+              await loading.dismiss();
+              await this.showToast('Error al actualizar el contacto', 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // 🗑️ ELIMINAR CONTACTO
+  async onEliminarContacto(index: number) {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar contacto',
+      message: `¿Eliminar a <strong>${this.contactos[index].nombre}</strong> de tus contactos de emergencia?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
+            await loading.present();
+
+            try {
+              this.contactos.splice(index, 1);
+              this.contactos = [...this.contactos];
+              await this.authService.updateProfile({ contactosEmergencia: this.contactos });
+              await loading.dismiss();
+              await this.showToast('Contacto eliminado', 'success');
+            } catch (error) {
+              await loading.dismiss();
+              await this.showToast('Error al eliminar el contacto', 'danger');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // 📞 LLAMAR AL CONTACTO
+  llamarContacto(telefono: string) {
+    window.open(`tel:${telefono}`, '_system');
+  }
+
+  // 💬 ENVIAR SMS AL CONTACTO
+enviarSMS(telefono: string) {
+  window.open(`sms:${telefono}`, '_system');
+}
 
   // =========================
   // 🔐 CAMBIO DE CONTRASEÑA

@@ -38,6 +38,12 @@ import {
 // =========================
 import { Observable } from 'rxjs';
 
+export interface ContactoEmergencia {
+  nombre: string;
+  telefono: string;
+}
+
+
 // =========================
 // 👤 MODELO USUARIO
 // =========================
@@ -50,6 +56,7 @@ export interface UserData {
   estado?: string;
   preguntaSeguridad?: string;
   respuestaSeguridad?: string;
+  contactosEmergencia?: ContactoEmergencia[]; // ✅ Nuevo
 }
 
 @Injectable({
