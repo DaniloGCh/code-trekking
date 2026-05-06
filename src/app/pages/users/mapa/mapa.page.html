@@ -1,0 +1,55 @@
+<ion-content fullscreen>
+
+  <div id="map"></div>
+
+  <div class="map-info">
+
+    <div class="info-card">
+      <strong>📍 Ubicación actual</strong>
+      <p>{{ currentLat }}</p>
+      <p>{{ currentLng }}</p>
+    </div>
+
+  </div>
+
+  <div class="map-info">
+
+    <div class="info-card">
+
+      <strong>📏 Distancia</strong>
+      <p>{{ (totalDistance / 1000).toFixed(2) }} km</p>
+
+      <strong>🚀 Velocidad</strong>
+      <p>{{ speedKmh }} km/h</p>
+
+    </div>
+
+  </div>
+
+  <div class="map-info">
+
+    <div class="info-card">
+
+      <strong>📏 Distancia</strong>
+      <p>{{ (totalDistance / 1000).toFixed(2) }} km</p>
+
+      <strong>🚀 Velocidad</strong>
+      <p>{{ speedKmh }} km/h</p>
+
+      <strong>⛰️ Elevación ganada</strong>
+      <p>{{ elevationGain.toFixed(0) }} m</p>
+
+      <ion-button size="small" (click)="exportGPX()">
+        📦 Exportar GPX
+      </ion-button>
+
+    </div>
+
+  </div>
+
+  <!-- ✅ BOTÓN FUERA DE LOS BLOQUES -->
+  <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
+    <ion-icon name="navigate" class="center-icon"></ion-icon>
+  </ion-button>
+
+</ion-content>
