@@ -1,51 +1,60 @@
 <ion-content fullscreen>
 
-  <div id="map"></div>
+  <div class="map-container">
 
+    <div id="map"></div>
+
+    <!-- 🔵 BOTÓN CENTRAR USUARIO -->
+    <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
+      <ion-icon name="navigate"></ion-icon>
+    </ion-button>
+
+  </div>
+
+  <!-- 📊 PANEL INFERIOR -->
   <div class="map-info">
 
     <div class="info-card">
 
-      <!-- <div class="location-header">
-        <span class="icon">📍</span>
-        <strong>Ubicación actual</strong>
-      </div>
-
-      <div class="coords">
-        <p><span>Lat:</span> {{ currentLat }}</p>
-        <p><span>Lng:</span> {{ currentLng }}</p>
-      </div> -->
-
       <div class="stats-panel">
 
+        <!-- 📏 DISTANCIA -->
         <div class="stat-item">
-          <div class="stat-icon"></div>
           <div>
             <strong>Distancia recorrida</strong>
             <p>{{ distanceKm | number:'1.2-2' }} km</p>
           </div>
         </div>
 
+        <!-- 🔴 ESTADO TRACKING -->
+        <div class="stat-item">
+          <div>
+            <strong>Tracking</strong>
+            <p>
+              {{ trackingActive ? 'Activo' : 'Detenido' }}
+            </p>
+          </div>
+        </div>
+
+            <!-- ▶️⏸ BOTÓN START / STOP TRACKING -->
+    <ion-button
+      class="tracking-btn"
+      [color]="trackingActive ? 'danger' : 'success'"
+      (click)="toggleTracking()"
+    >
+      <ion-icon [name]="trackingActive ? 'pause' : 'play'"></ion-icon>
+      {{ trackingActive ? 'Pausar' : 'Iniciar' }} tracking
+    </ion-button>
+
       </div>
 
+      <!-- 📦 EXPORT GPX -->
       <ion-button expand="block" class="gpx-btn" (click)="exportGPX()">
         📦 Exportar GPX
       </ion-button>
 
     </div>
 
-
   </div>
-
-<div class="map-container">
-
-  <div id="map"></div>
-
-  <!-- 🔵 BOTÓN CENTRAR -->
-  <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
-    <ion-icon name="navigate" class="center-icon"></ion-icon>
-  </ion-button>
-
-</div>
 
 </ion-content>

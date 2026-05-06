@@ -24,6 +24,8 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
   followUser = true;
 
+  trackingActive = false; // 🔥 NUEVO: control de tracking
+
   lastValidPoint: { lat: number; lng: number; time: number } | null = null;
 
   totalDistance = 0;
@@ -31,7 +33,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   async ngAfterViewInit() {
     setTimeout(() => {
       this.initMap();
-      this.startTracking();
+      this.restoreRoute(); // 🔥 recupera ruta si existe
     }, 300);
   }
 
@@ -59,30 +61,23 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     setTimeout(() => this.map.invalidateSize(), 500);
   }
 
-  // 📏 DISTANCIA HAVERSINE
-  private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  // =========================
+  // 🔘 BOTÓN START / STOP
+  // =========================
+  toggleTracking() {
 
-    const R = 6371e3;
-
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a =
-      Math.sin(Δφ / 2) ** 2 +
-      Math.cos(φ1) * Math.cos(φ2) *
-      Math.sin(Δλ / 2) ** 2;
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
+    if (this.trackingActive) {
+      this.stopTracking();
+    } else {
+      this.startTracking();
+    }
   }
 
   startTracking() {
 
     if (!navigator.geolocation) return;
+
+    this.trackingActive = true;
 
     this.watchId = navigator.geolocation.watchPosition(
 
@@ -93,14 +88,13 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         const accuracy = position.coords.accuracy;
         const now = Date.now();
 
-        // 🚨 FILTRO PRECISIÓN
         if (accuracy > 30) return;
 
-        // 🚨 PRIMER PUNTO
         if (!this.lastValidPoint) {
 
           this.lastValidPoint = { lat, lng, time: now };
           this.addPoint(lat, lng, accuracy);
+          this.saveRoute();
           return;
         }
 
@@ -113,21 +107,20 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
         const timeDiff = (now - this.lastValidPoint.time) / 1000;
 
-        // 🚨 FILTRO ANTI-RUIDO (ESTILO STRAVA)
         if (
-          dist < 5 ||      // ruido GPS
-          dist > 80 ||     // salto imposible
-          timeDiff < 1     // frecuencia excesiva
-        ) {
-          return;
-        }
+          dist < 5 ||
+          dist > 80 ||
+          timeDiff < 1
+        ) return;
 
-        // 🚀 SUMA DISTANCIA REAL
         this.totalDistance += dist;
 
         this.lastValidPoint = { lat, lng, time: now };
 
         this.addPoint(lat, lng, accuracy);
+
+        this.saveRoute(); // 🔥 guarda ruta en cada punto
+
       },
 
       (error) => console.error('GPS error:', error),
@@ -140,7 +133,19 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     );
   }
 
-  // 🔵 agrega punto limpio (ruta + marker)
+  stopTracking() {
+
+    this.trackingActive = false;
+
+    if (this.watchId) {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.watchId = null;
+    }
+  }
+
+  // =========================
+  // ➕ AGREGAR PUNTO
+  // =========================
   private addPoint(lat: number, lng: number, accuracy?: number) {
 
     this.currentLat = lat;
@@ -182,12 +187,57 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     }
   }
 
-  // 📏 UI km
+  // =========================
+  // 💾 PERSISTENCIA RUTA
+  // =========================
+  saveRoute() {
+    localStorage.setItem('routePoints', JSON.stringify(this.routePoints));
+  }
+
+  restoreRoute() {
+
+    const saved = localStorage.getItem('routePoints');
+
+    if (!saved) return;
+
+    this.routePoints = JSON.parse(saved);
+
+    this.routeLine.setLatLngs(this.routePoints);
+  }
+
+  // =========================
+  // 📏 DISTANCIA
+  // =========================
+  private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+
+    const R = 6371e3;
+
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+      Math.sin(Δφ / 2) ** 2 +
+      Math.cos(φ1) * Math.cos(φ2) *
+      Math.sin(Δλ / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  }
+
+  // =========================
+  // 📏 KM UI
+  // =========================
   get distanceKm(): number {
     return this.totalDistance / 1000;
   }
 
+  // =========================
   // 📦 EXPORT GPX
+  // =========================
   exportGPX() {
 
     if (this.routePoints.length === 0) return;
