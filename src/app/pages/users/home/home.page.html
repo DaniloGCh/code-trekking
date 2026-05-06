@@ -17,7 +17,7 @@
     <!-- 🔘 ACCIONES DERECHA -->
     <ion-buttons slot="end">
 
-            <!-- profile -->
+      <!-- profile -->
       <ion-button *ngIf="userData" (click)="goProfile()">
         <ion-icon slot="icon-only" name="person-outline"></ion-icon>
       </ion-button>
@@ -157,6 +157,17 @@
         <ion-icon name="book-outline" slot="start"></ion-icon>
         Manual de emergencia
       </ion-button>
+
+      <!-- ========================= -->
+      <!-- 🆘 BOTÓN SOS FLOTANTE -->
+      <!-- ========================= -->
+      <div class="sos-container">
+        <button class="sos-btn" [class.sos-activo]="sosActivo" (click)="onSOS()">
+          <span class="sos-text">SOS</span>
+          <span class="sos-ripple"></span>
+        </button>
+        <p class="sos-label">Emergencia</p>
+      </div>
 
     </div> <!--Fin Welcome -->
 
