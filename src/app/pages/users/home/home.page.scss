@@ -58,12 +58,9 @@ ion-buttons {
 ion-content {
   --background: none;
 
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.65),
-      rgba(0, 0, 0, 0.75)
-    ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470")
-    no-repeat center / cover;
+  background: linear-gradient(rgba(0, 0, 0, 0.65),
+      rgba(0, 0, 0, 0.75)),
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
 
   color: #fff;
 }
@@ -77,7 +74,7 @@ ion-content {
 }
 
 .welcome-header {
-  margin-top: 85px;
+  margin-top: 15px;
   margin-bottom: 20px;
   padding: 20px;
   text-align: center;
@@ -290,6 +287,7 @@ ion-skeleton-text {
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -297,7 +295,8 @@ ion-skeleton-text {
 }
 
 .btn-iniciar {
-  --background: #2e7d32;  /* verde bosque */
+  --background: #2e7d32;
+  /* verde bosque */
   --color: #fff;
 
   border-radius: 12px;
@@ -317,7 +316,7 @@ ion-skeleton-text {
 }
 
 //CONSEJOS SECCION
-.consejos-section h2{
+.consejos-section h2 {
   margin: 15px 15px;
 }
 
@@ -360,7 +359,8 @@ p {
 /* 📦 CONTENEDOR */
 .kits-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* lado a lado */
+  grid-template-columns: 1fr 1fr;
+  /* lado a lado */
   gap: 15px;
   padding: 15px;
 }
@@ -399,18 +399,22 @@ p {
   font-size: 1.1rem;
   color: #ffffff;
   margin: 7px 7px 20px 7px;
-  
-  text-align: justify;      /* 👈 esto justifica */
-  text-justify: inter-word; /* 👈 opcional (mejora el espaciado) */
+
+  text-align: justify;
+  /* 👈 esto justifica */
+  text-justify: inter-word;
+  /* 👈 opcional (mejora el espaciado) */
 }
 
 .kit-card p {
   font-size: 1.1rem;
   color: #c7f9cc;
   margin: 10px;
-  
-  text-align: justify;      /* 👈 esto justifica */
-  text-justify: inter-word; /* 👈 opcional (mejora el espaciado) */
+
+  text-align: justify;
+  /* 👈 esto justifica */
+  text-justify: inter-word;
+  /* 👈 opcional (mejora el espaciado) */
 }
 
 /* 🔴 KIT PRIMEROS AUXILIOS */
@@ -492,12 +496,104 @@ p {
 }
 
 @keyframes sosPulse {
-  0%   { box-shadow: 0 4px 15px rgba(235, 68, 90, 0.5); }
-  50%  { box-shadow: 0 4px 30px rgba(235, 68, 90, 0.9); }
-  100% { box-shadow: 0 4px 15px rgba(235, 68, 90, 0.5); }
+  0% {
+    box-shadow: 0 4px 15px rgba(235, 68, 90, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 4px 30px rgba(235, 68, 90, 0.9);
+  }
+
+  100% {
+    box-shadow: 0 4px 15px rgba(235, 68, 90, 0.5);
+  }
 }
 
 @keyframes ripple {
-  0%   { transform: scale(1); opacity: 0.4; }
-  100% { transform: scale(1.6); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+
+/* =========================
+   🌤️ WEATHER CHIP
+========================= */
+.weather-chip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 12px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  text-transform: none;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* =========================
+   📦 CONTENEDOR INTERNO
+========================= */
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* =========================
+   🌤️ ICONO
+========================= */
+.weather-info ion-icon {
+  font-size: 26px;
+  color: #127f0c;
+  /* amarillo clima */
+  min-width: 26px;
+}
+
+/* =========================
+   📊 TEXTO CONTENEDOR
+========================= */
+.weather-info div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+/* =========================
+   🌡️ TEMPERATURA
+========================= */
+.temp {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* =========================
+   ☁️ DESCRIPCIÓN
+========================= */
+.desc {
+  font-size: 11px;
+  color: #cbd5f5;
+  text-transform: capitalize;
+}
+
+/* =========================
+   📍 UBICACIÓN
+========================= */
+.location {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+/* =========================
+   👆 EFECTO TOUCH
+========================= */
+.weather-chip:active {
+  transform: scale(0.96);
+  transition: transform 0.1s ease;
 }

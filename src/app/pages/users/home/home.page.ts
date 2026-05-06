@@ -22,6 +22,10 @@ import { SosService } from 'src/app/core/services/sos.service';
 import { EventoService } from 'src/app/core/services/evento.service';
 import { Auth } from '@angular/fire/auth';
 
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment.prod';
+import { WeatherService } from 'src/app/core/services/weather.service';
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -71,10 +75,19 @@ export class HomePage implements OnInit, OnDestroy {
     public timeService: TimeService,
     private consejoService: ConsejoService,
     private modalCtrl: ModalController,
+    private http: HttpClient,
+    private weatherService: WeatherService
   ) { }
 
   kitsPA$: Observable<KitPrimerosAuxilios[]> = this.kitPAService.getKits();
   kitsSup$: Observable<KitSupervivencia[]> = this.kitSupService.getKits();
+
+  temperature$ = this.weatherGlobal.temperature;
+  description$ = this.weatherGlobal.description;
+  locationName$ = this.weatherGlobal.locationName;
+  icon$ = this.weatherGlobal.icon;
+  humidity$ = this.weatherGlobal.humidity;
+  windSpeed$ = this.weatherGlobal.windSpeed;
 
   // =========================
   // 🚀 INIT
@@ -343,8 +356,20 @@ export class HomePage implements OnInit, OnDestroy {
   // =========================
   // 🌤️ WEATHER ACTION
   // =========================
-  openWeatherLink() {
-    window.open('https://www.google.com/search?q=clima+santiago', '_blank');
+  async openWeatherLink() {
+    try {
+      const ubicacion = await this.sosService.obtenerUbicacion();
+
+      const url = `https://www.google.com/search?q=clima&near=${ubicacion.latitud},${ubicacion.longitud}`;
+
+      window.open(url, '_blank');
+
+    } catch (error) {
+      console.error('Error obteniendo ubicación', error);
+
+      // fallback si falla el GPS
+      window.open('https://www.google.com/search?q=clima', '_blank');
+    }
   }
 
   // =========================

@@ -8,11 +8,12 @@
     <ion-title>Inicio</ion-title>
 
     <!-- 🌤️ CLIMA + HORA -->
-    <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
+    <!-- <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
       <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
       <span>{{ weatherGlobal.temperature | async }}°</span>
       <span>| {{ timeService.dateTime | async }}</span>
-    </ion-button>
+        <small>{{ locationName$ | async }}</small>
+    </ion-button> -->
 
     <!-- 🔘 ACCIONES DERECHA -->
     <ion-buttons slot="end">
@@ -42,15 +43,35 @@
 <!-- ========================= -->
 <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
+
+
   <!-- ========================= -->
   <!-- 🔐 USUARIO LOGUEADO -->
   <!-- ========================= -->
   <ng-container *ngIf="authReady && userData; else noAuth">
 
-    <div class="welcome-container">
 
+
+    <div class="welcome-container">
+      <ion-button fill="clear" class="weather-chip" (click)="openWeatherLink()">
+
+        <div class="weather-info">
+
+          <ion-icon [name]="icon$ | async"></ion-icon>
+
+          <div>
+            <span class="temp">{{ temperature$ | async }}°C</span>
+            <span class="desc">{{ description$ | async }}</span>
+            <small class="location">📍 {{ locationName$ | async }}</small>
+          </div>
+
+        </div>
+
+      </ion-button>
       <!-- 👋 HEADER BIENVENIDA -->
       <div class="welcome-header">
+
+
 
         <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
 
