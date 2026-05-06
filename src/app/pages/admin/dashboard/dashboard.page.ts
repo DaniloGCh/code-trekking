@@ -30,6 +30,8 @@ import { IonAccordionGroup } from '@ionic/angular';
 
 import { Auth, EmailAuthProvider, reauthenticateWithCredential } from '@angular/fire/auth';
 
+import { SosService } from 'src/app/core/services/sos.service';
+import { EventoService } from 'src/app/core/services/evento.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -64,10 +66,23 @@ export class DashboardPage implements OnInit {
   // ✅ Inyecta el sanitizer
   private sanitizer = inject(DomSanitizer);
 
+  private sosService = inject(SosService);
+  private eventoService = inject(EventoService);
+
+
   constructor(
     public weatherGlobal: WeatherGlobalService,
-    public timeService: TimeService
+    public timeService: TimeService,
+
+
   ) { }
+
+  temperature$ = this.weatherGlobal.temperature;
+  description$ = this.weatherGlobal.description;
+  locationName$ = this.weatherGlobal.locationName;
+  icon$ = this.weatherGlobal.icon;
+  humidity$ = this.weatherGlobal.humidity;
+  windSpeed$ = this.weatherGlobal.windSpeed;
 
   // =========================
   // 📜 UI STATE
@@ -199,7 +214,7 @@ export class DashboardPage implements OnInit {
   panelDesbloqueado = false;
 
   // ✅ Estado del accordion de usuarios
-usuariosDesbloqueado = false;
+  usuariosDesbloqueado = false;
 
 
   // =========================
@@ -854,8 +869,20 @@ usuariosDesbloqueado = false;
   // =========================
   // 🌤️ WEATHER
   // =========================
-  openWeatherLink() {
-    window.open('https://www.google.com/search?q=clima+santiago', '_blank');
+  async openWeatherLink() {
+    try {
+      const ubicacion = await this.sosService.obtenerUbicacion();
+
+      const url = `https://www.google.com/search?q=clima&near=${ubicacion.latitud},${ubicacion.longitud}`;
+
+      window.open(url, '_blank');
+
+    } catch (error) {
+      console.error('Error obteniendo ubicación', error);
+
+      // fallback si falla el GPS
+      window.open('https://www.google.com/search?q=clima', '_blank');
+    }
   }
 
   // ✅ Agrega este método
@@ -937,74 +964,74 @@ usuariosDesbloqueado = false;
   }
 
   // ✅ Verificar contraseña antes de abrir usuarios
-async onAbrirUsuarios(event: any) {
-  if (this.usuariosDesbloqueado) return;
+  async onAbrirUsuarios(event: any) {
+    if (this.usuariosDesbloqueado) return;
 
-  event.preventDefault();
-  event.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-  const alert = await this.alertCtrl.create({
-    header: '🔐 Acceso restringido',
-    message: 'Ingresa tu contraseña para ver los usuarios registrados',
-    inputs: [
-      {
-        name: 'password',
-        type: 'password',
-        placeholder: 'Tu contraseña'
-      }
-    ],
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Acceder',
-        handler: async (data) => {
-          if (!data.password) {
-            await this.showToast('Ingresa tu contraseña', 'warning');
-            return false;
-          }
-
-          const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
-          await loading.present();
-
-          try {
-            const currentUser = this.auth.currentUser;
-            if (!currentUser || !currentUser.email) throw new Error('No autenticado');
-
-            const credential = EmailAuthProvider.credential(currentUser.email, data.password);
-            await reauthenticateWithCredential(currentUser, credential);
-
-            await loading.dismiss();
-            this.usuariosDesbloqueado = true;
-
-            // ✅ Abrir accordion manualmente
-            if (this.accordionUsuarios) {
-              this.accordionUsuarios.value = 'usuarios';
+    const alert = await this.alertCtrl.create({
+      header: '🔐 Acceso restringido',
+      message: 'Ingresa tu contraseña para ver los usuarios registrados',
+      inputs: [
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Tu contraseña'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Acceder',
+          handler: async (data) => {
+            if (!data.password) {
+              await this.showToast('Ingresa tu contraseña', 'warning');
+              return false;
             }
 
-            await this.showToast('Acceso concedido', 'success');
+            const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
+            await loading.present();
 
-          } catch (error: any) {
-            await loading.dismiss();
-            await this.showToast('Contraseña incorrecta', 'danger');
+            try {
+              const currentUser = this.auth.currentUser;
+              if (!currentUser || !currentUser.email) throw new Error('No autenticado');
+
+              const credential = EmailAuthProvider.credential(currentUser.email, data.password);
+              await reauthenticateWithCredential(currentUser, credential);
+
+              await loading.dismiss();
+              this.usuariosDesbloqueado = true;
+
+              // ✅ Abrir accordion manualmente
+              if (this.accordionUsuarios) {
+                this.accordionUsuarios.value = 'usuarios';
+              }
+
+              await this.showToast('Acceso concedido', 'success');
+
+            } catch (error: any) {
+              await loading.dismiss();
+              await this.showToast('Contraseña incorrecta', 'danger');
+            }
+
+            return true;
           }
-
-          return true;
         }
-      }
-    ]
-  });
+      ]
+    });
 
-  await alert.present();
-}
-
-// ✅ Bloquear cuando se cierra el accordion de usuarios
-onCambioAccordionUsuarios(event: any) {
-  if (event.target.id !== 'accordion-usuarios-principal') return;
-
-  const valorAbierto = event.detail.value;
-  if (!valorAbierto || valorAbierto === '') {
-    this.usuariosDesbloqueado = false;
+    await alert.present();
   }
-}
+
+  // ✅ Bloquear cuando se cierra el accordion de usuarios
+  onCambioAccordionUsuarios(event: any) {
+    if (event.target.id !== 'accordion-usuarios-principal') return;
+
+    const valorAbierto = event.detail.value;
+    if (!valorAbierto || valorAbierto === '') {
+      this.usuariosDesbloqueado = false;
+    }
+  }
 
 }

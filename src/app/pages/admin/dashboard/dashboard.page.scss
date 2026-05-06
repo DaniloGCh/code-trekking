@@ -70,7 +70,7 @@ ion-header ion-toolbar {
    ========================================================= */
 
 .welcome-header {
-  margin: 85px 15px 20px;
+  margin: 15px 15px 20px;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -484,4 +484,81 @@ ion-accordion {
 
 .ion-padding {
   padding: 0px;
+}
+
+/* =========================
+   🌤️ WEATHER CHIP
+========================= */
+.weather-chip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 12px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  text-transform: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-top: 75px;
+}
+
+/* =========================
+   📦 CONTENEDOR INTERNO
+========================= */
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* =========================
+   🌤️ ICONO
+========================= */
+.weather-info ion-icon {
+  font-size: 26px;
+  color: #127f0c;
+  /* amarillo clima */
+  min-width: 26px;
+}
+
+/* =========================
+   📊 TEXTO CONTENEDOR
+========================= */
+.weather-info div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+/* =========================
+   🌡️ TEMPERATURA
+========================= */
+.temp {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* =========================
+   ☁️ DESCRIPCIÓN
+========================= */
+.desc {
+  font-size: 11px;
+  color: #cbd5f5;
+  text-transform: capitalize;
+}
+
+/* =========================
+   📍 UBICACIÓN
+========================= */
+.location {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+/* =========================
+   👆 EFECTO TOUCH
+========================= */
+.weather-chip:active {
+  transform: scale(0.96);
+  transition: transform 0.1s ease;
 }

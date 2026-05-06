@@ -10,13 +10,6 @@
 
       <ion-title>Admin</ion-title>
 
-      <!-- 🌤️ CLIMA + HORA -->
-      <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
-        <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
-        <span>{{ weatherGlobal.temperature | async }}° </span>
-        <span>| {{ timeService.dateTime | async }}</span>
-      </ion-button>
-
       <!-- 🔘 ACCIONES -->
       <ion-buttons slot="end">
 
@@ -36,10 +29,29 @@
   <!-- ========================= -->
   <!-- 📄 CONTENIDO -->
   <!-- ========================= -->
+
   <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
+          <!-- 🌤️ CLIMA + HORA -->
+      <ion-button fill="clear" class="weather-chip" (click)="openWeatherLink()">
+
+        <div class="weather-info">
+
+          <ion-icon [name]="icon$ | async"></ion-icon>
+
+          <div>
+            <span class="temp">{{ temperature$ | async }}°C</span>
+            <span class="desc">{{ description$ | async }}</span>
+            <small class="location">📍 {{ locationName$ | async }}</small>
+          </div>
+
+        </div>
+
+      </ion-button>
     <!-- 👋 BIENVENIDA -->
     <div class="welcome-header" *ngIf="adminData">
+
+
 
       <ion-icon name="shield-checkmark-outline"></ion-icon>
 
@@ -56,58 +68,54 @@
     <!-- ========================= -->
     <!-- 👥 USUARIOS -->
     <!-- ========================= -->
-<h3 class="section-title">
-  Usuarios registrados
-</h3>
+    <h3 class="section-title">
+      Usuarios registrados
+    </h3>
 
-<ion-accordion-group
-  #accordionUsuarios
-  id="accordion-usuarios-principal"
-  (ionChange)="onCambioAccordionUsuarios($event)">
+    <ion-accordion-group #accordionUsuarios id="accordion-usuarios-principal"
+      (ionChange)="onCambioAccordionUsuarios($event)">
 
-  <ion-accordion value="usuarios">
+      <ion-accordion value="usuarios">
 
-    <ion-item slot="header" (click)="onAbrirUsuarios($event)">
-      <ion-icon name="people-outline" slot="start" color="success"></ion-icon>
-      <ion-label>Ver usuarios registrados</ion-label>
-      <!-- ✅ Icono candado -->
-      <ion-icon
-        slot="end"
-        [name]="usuariosDesbloqueado ? 'lock-open-outline' : 'lock-closed-outline'"
-        [color]="usuariosDesbloqueado ? 'success' : 'warning'">
-      </ion-icon>
-    </ion-item>
-
-    <div slot="content">
-      <ion-list>
-
-        <ion-item *ngFor="let user of users$ | async">
-
-          <ion-avatar slot="start">
-            <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
-          </ion-avatar>
-
-          <ion-label>
-            <h3>{{ user.nombre }}</h3>
-            <p>{{ user.email }}</p>
-          </ion-label>
-
-          <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
-            {{ user.rol === 'admin' ? 'Admin' : 'User' }}
-          </ion-badge>
-
-          <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
-            <ion-icon name="swap-horizontal-outline"></ion-icon>
-          </ion-button>
-
+        <ion-item slot="header" (click)="onAbrirUsuarios($event)">
+          <ion-icon name="people-outline" slot="start" color="success"></ion-icon>
+          <ion-label>Ver usuarios registrados</ion-label>
+          <!-- ✅ Icono candado -->
+          <ion-icon slot="end" [name]="usuariosDesbloqueado ? 'lock-open-outline' : 'lock-closed-outline'"
+            [color]="usuariosDesbloqueado ? 'success' : 'warning'">
+          </ion-icon>
         </ion-item>
 
-      </ion-list>
-    </div>
+        <div slot="content">
+          <ion-list>
 
-  </ion-accordion>
+            <ion-item *ngFor="let user of users$ | async">
 
-</ion-accordion-group>
+              <ion-avatar slot="start">
+                <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
+              </ion-avatar>
+
+              <ion-label>
+                <h3>{{ user.nombre }}</h3>
+                <p>{{ user.email }}</p>
+              </ion-label>
+
+              <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
+                {{ user.rol === 'admin' ? 'Admin' : 'User' }}
+              </ion-badge>
+
+              <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
+                <ion-icon name="swap-horizontal-outline"></ion-icon>
+              </ion-button>
+
+            </ion-item>
+
+          </ion-list>
+        </div>
+
+      </ion-accordion>
+
+    </ion-accordion-group>
 
     <div class="panel-estadisticas">
       <!-- ========================= -->
@@ -231,24 +239,19 @@
     </div>
 
 
-<ion-accordion-group
-  #accordionAdmin
-  id="accordion-admin-principal"
-  (ionChange)="onCambioAccordion($event)">
+    <ion-accordion-group #accordionAdmin id="accordion-admin-principal" (ionChange)="onCambioAccordion($event)">
 
-  <ion-accordion value="panel-admin">
+      <ion-accordion value="panel-admin">
 
-    <ion-item slot="header" (click)="onAbrirPanel($event)">
-      <ion-icon name="settings-outline" slot="start" color="warning"></ion-icon>
-      <ion-label>Panel de gestión (Admin)</ion-label>
-      <ion-icon
-        slot="end"
-        [name]="panelDesbloqueado ? 'lock-open-outline' : 'lock-closed-outline'"
-        [color]="panelDesbloqueado ? 'success' : 'warning'">
-      </ion-icon>
-    </ion-item>
+        <ion-item slot="header" (click)="onAbrirPanel($event)">
+          <ion-icon name="settings-outline" slot="start" color="warning"></ion-icon>
+          <ion-label>Panel de gestión (Admin)</ion-label>
+          <ion-icon slot="end" [name]="panelDesbloqueado ? 'lock-open-outline' : 'lock-closed-outline'"
+            [color]="panelDesbloqueado ? 'success' : 'warning'">
+          </ion-icon>
+        </ion-item>
 
-    <div slot="content" class="ion-padding">
+        <div slot="content" class="ion-padding">
 
           <div class="panel-gestion">
             <h3 class="section-title">
@@ -767,7 +770,7 @@
 
                       <!-- LISTA -->
                       <ion-item *ngFor="let k of kits">
-<!-- 
+                        <!-- 
                         <ion-icon name="medkit-outline" slot="start" color="danger"></ion-icon> -->
 
                         <ion-label class="ion-text-wrap">
