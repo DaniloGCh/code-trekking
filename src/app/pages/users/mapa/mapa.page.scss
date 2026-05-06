@@ -1,6 +1,6 @@
 #map {
   width: 100%;
-  height: 100vh;
+  height: 100%;
 }
 
 .map-info {
@@ -16,52 +16,134 @@
 }
 
 .info-card {
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-
-  padding: 12px 16px;
-  border-radius: 16px;
-
-  backdrop-filter: blur(8px);
-
-  font-size: 14px;
-
-  width: 90%;
-  max-width: 320px;
-
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  background: linear-gradient(145deg, #0f172a, #111827);
+  border-radius: 18px;
+  padding: 16px;
+  color: #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  margin: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.info-card p {
+/* HEADER UBICACIÓN */
+.location-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.location-header .icon {
+  font-size: 18px;
+}
+
+/* COORDENADAS */
+.coords {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.coords p {
   margin: 4px 0;
+  font-size: 12px;
   color: #cbd5e1;
 }
 
+.coords span {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* STATS */
+.stats-panel {
+  margin-top: 10px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(37, 99, 235, 0.12);
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.stat-icon {
+  font-size: 22px;
+}
+
+.stat-item strong {
+  font-size: 13px;
+  display: block;
+  color: #e0f2fe;
+}
+
+.stat-item p {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #60a5fa;
+}
+
+/* BOTÓN GPX */
+.gpx-btn {
+  margin-top: 14px;
+  --background: #2563eb;
+  --border-radius: 12px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* EFECTO INTERACCIÓN */
+.info-card:active {
+  transform: scale(0.99);
+}
+
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* MAPA */
+#map {
+  width: 100%;
+  height: 100%;
+}
+
 .center-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
 
   width: 48px;
   height: 48px;
 
-  border-radius: 50%;
-
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-
-  z-index: 9999;
+  --background: transparent;
+  --box-shadow: none;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  border-radius: 50%;
+  border: 2px solid #001aff;
 }
 
+/* ICONO */
 .center-icon {
-  font-size: 22px;
-  color: #2563eb;
+  font-size: 26px;
+  color: #0400fffa;
+
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
+/* EFECTO CLICK */
 .center-btn:active {
   transform: scale(0.92);
 }

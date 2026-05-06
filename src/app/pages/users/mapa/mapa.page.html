@@ -5,51 +5,47 @@
   <div class="map-info">
 
     <div class="info-card">
-      <strong>📍 Ubicación actual</strong>
-      <p>{{ currentLat }}</p>
-      <p>{{ currentLng }}</p>
-    </div>
 
-  </div>
+      <!-- <div class="location-header">
+        <span class="icon">📍</span>
+        <strong>Ubicación actual</strong>
+      </div>
 
-  <div class="map-info">
+      <div class="coords">
+        <p><span>Lat:</span> {{ currentLat }}</p>
+        <p><span>Lng:</span> {{ currentLng }}</p>
+      </div> -->
 
-    <div class="info-card">
+      <div class="stats-panel">
 
-      <strong>📏 Distancia</strong>
-      <p>{{ (totalDistance / 1000).toFixed(2) }} km</p>
+        <div class="stat-item">
+          <div class="stat-icon"></div>
+          <div>
+            <strong>Distancia recorrida</strong>
+            <p>{{ distanceKm | number:'1.2-2' }} km</p>
+          </div>
+        </div>
 
-      <strong>🚀 Velocidad</strong>
-      <p>{{ speedKmh }} km/h</p>
+      </div>
 
-    </div>
-
-  </div>
-
-  <div class="map-info">
-
-    <div class="info-card">
-
-      <strong>📏 Distancia</strong>
-      <p>{{ (totalDistance / 1000).toFixed(2) }} km</p>
-
-      <strong>🚀 Velocidad</strong>
-      <p>{{ speedKmh }} km/h</p>
-
-      <strong>⛰️ Elevación ganada</strong>
-      <p>{{ elevationGain.toFixed(0) }} m</p>
-
-      <ion-button size="small" (click)="exportGPX()">
+      <ion-button expand="block" class="gpx-btn" (click)="exportGPX()">
         📦 Exportar GPX
       </ion-button>
 
     </div>
 
+
   </div>
 
-  <!-- ✅ BOTÓN FUERA DE LOS BLOQUES -->
+<div class="map-container">
+
+  <div id="map"></div>
+
+  <!-- 🔵 BOTÓN CENTRAR -->
   <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
     <ion-icon name="navigate" class="center-icon"></ion-icon>
   </ion-button>
+
+</div>
 
 </ion-content>

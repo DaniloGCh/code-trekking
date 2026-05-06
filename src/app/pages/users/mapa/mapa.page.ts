@@ -15,23 +15,18 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   accuracyCircle!: L.Circle;
 
   routeLine!: L.Polyline;
-  routePoints: any[] = [];
+  routePoints: [number, number][] = [];
 
   watchId: number | null = null;
 
   currentLat = 0;
   currentLng = 0;
 
+  followUser = true;
+
+  lastValidPoint: { lat: number; lng: number; time: number } | null = null;
+
   totalDistance = 0;
-  speedKmh = 0;
-
-  lastAltitude: number | null = null;
-  elevationGain = 0;
-
-  lastPosition: { lat: number; lng: number; time: number } | null = null;
-
-  // 🧭 CONTROL DE AUTO-FOLLOW
-  followUser = false;
 
   async ngAfterViewInit() {
     setTimeout(() => {
@@ -57,7 +52,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       weight: 5
     }).addTo(this.map);
 
-    // 🧠 detectar si el usuario mueve el mapa manualmente
     this.map.on('dragstart', () => {
       this.followUser = false;
     });
@@ -65,7 +59,9 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     setTimeout(() => this.map.invalidateSize(), 500);
   }
 
+  // 📏 DISTANCIA HAVERSINE
   private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+
     const R = 6371e3;
 
     const φ1 = lat1 * Math.PI / 180;
@@ -95,125 +91,133 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         const accuracy = position.coords.accuracy;
-        const altitude = position.coords.altitude || 0;
         const now = Date.now();
 
-        if (accuracy > 50) return;
+        // 🚨 FILTRO PRECISIÓN
+        if (accuracy > 30) return;
 
-        this.currentLat = lat;
-        this.currentLng = lng;
+        // 🚨 PRIMER PUNTO
+        if (!this.lastValidPoint) {
 
-        // 🛤️ ruta
-        this.routePoints.push([lat, lng]);
-        this.routeLine.setLatLngs(this.routePoints);
-
-        // 📏 distancia + velocidad
-        if (this.lastPosition) {
-
-          const dist = this.calcularDistancia(
-            this.lastPosition.lat,
-            this.lastPosition.lng,
-            lat,
-            lng
-          );
-
-          const timeDiff = (now - this.lastPosition.time) / 1000;
-
-          if (dist > 5 && timeDiff > 1) {
-            this.totalDistance += dist;
-
-            const speedMs = dist / timeDiff;
-            this.speedKmh = Math.round(speedMs * 3.6);
-          }
+          this.lastValidPoint = { lat, lng, time: now };
+          this.addPoint(lat, lng, accuracy);
+          return;
         }
 
-        this.lastPosition = { lat, lng, time: now };
+        const dist = this.calcularDistancia(
+          this.lastValidPoint.lat,
+          this.lastValidPoint.lng,
+          lat,
+          lng
+        );
 
-        // ⛰️ elevación
-        if (altitude && this.lastAltitude !== null) {
-          const diff = altitude - this.lastAltitude;
+        const timeDiff = (now - this.lastValidPoint.time) / 1000;
 
-          if (diff > 0 && diff < 50) {
-            this.elevationGain += diff;
-          }
+        // 🚨 FILTRO ANTI-RUIDO (ESTILO STRAVA)
+        if (
+          dist < 5 ||      // ruido GPS
+          dist > 80 ||     // salto imposible
+          timeDiff < 1     // frecuencia excesiva
+        ) {
+          return;
         }
 
-        this.lastAltitude = altitude;
+        // 🚀 SUMA DISTANCIA REAL
+        this.totalDistance += dist;
 
-        // 🔵 marcador usuario
-        if (!this.userMarker) {
+        this.lastValidPoint = { lat, lng, time: now };
 
-          this.userMarker = L.circleMarker([lat, lng], {
-            radius: 10,
-            fillColor: '#2563eb',
-            color: '#fff',
-            weight: 3,
-            fillOpacity: 1
-          }).addTo(this.map);
-
-          this.accuracyCircle = L.circle([lat, lng], {
-            radius: accuracy,
-            color: '#3b82f6',
-            fillOpacity: 0.15
-          }).addTo(this.map);
-
-          this.map.setView([lat, lng], 16);
-          this.followUser = true;
-
-        } else {
-
-          this.userMarker.setLatLng([lat, lng]);
-          this.accuracyCircle.setLatLng([lat, lng]);
-          this.accuracyCircle.setRadius(accuracy);
-
-          // 👇 solo sigue al usuario si está en modo follow
-          if (this.followUser) {
-            this.map.setView([lat, lng], this.map.getZoom());
-          }
-        }
-
+        this.addPoint(lat, lng, accuracy);
       },
 
-      (error) => console.error(error),
+      (error) => console.error('GPS error:', error),
 
       {
         enableHighAccuracy: true,
-        maximumAge: 10000,
+        maximumAge: 2000,
         timeout: 30000
       }
-
     );
   }
 
-  // 🧭 BOTÓN: centrar en usuario
-  centrarEnUsuario() {
-    if (!this.currentLat || !this.currentLng) return;
+  // 🔵 agrega punto limpio (ruta + marker)
+  private addPoint(lat: number, lng: number, accuracy?: number) {
 
-    this.followUser = true;
+    this.currentLat = lat;
+    this.currentLng = lng;
 
-    this.map.setView([this.currentLat, this.currentLng], 16);
+    this.routePoints.push([lat, lng]);
+    this.routeLine.setLatLngs(this.routePoints);
+
+    if (!this.userMarker) {
+
+      this.userMarker = L.circleMarker([lat, lng], {
+        radius: 10,
+        fillColor: '#2563eb',
+        color: '#fff',
+        weight: 3,
+        fillOpacity: 1
+      }).addTo(this.map);
+
+      this.accuracyCircle = L.circle([lat, lng], {
+        radius: accuracy || 10,
+        color: '#3b82f6',
+        fillOpacity: 0.15
+      }).addTo(this.map);
+
+      this.map.setView([lat, lng], 16);
+
+    } else {
+
+      this.userMarker.setLatLng([lat, lng]);
+
+      if (accuracy) {
+        this.accuracyCircle.setLatLng([lat, lng]);
+        this.accuracyCircle.setRadius(accuracy);
+      }
+
+      if (this.followUser) {
+        this.map.setView([lat, lng], this.map.getZoom());
+      }
+    }
   }
 
+  // 📏 UI km
+  get distanceKm(): number {
+    return this.totalDistance / 1000;
+  }
+
+  // 📦 EXPORT GPX
   exportGPX() {
 
-    let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    gpx += `<gpx version="1.1" creator="TrekkingApp">\n<trk><name>Ruta Trekking</name><trkseg>\n`;
+    if (this.routePoints.length === 0) return;
 
-    this.routePoints.forEach((p: any) => {
+    let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    gpx += `<gpx version="1.1" creator="TrekkingApp">\n`;
+    gpx += `<trk><name>Ruta Trekking</name><trkseg>\n`;
+
+    this.routePoints.forEach((p) => {
       gpx += `<trkpt lat="${p[0]}" lon="${p[1]}"></trkpt>\n`;
     });
 
-    gpx += `</trkseg></trk></gpx>`;
+    gpx += `</trkseg></trk>\n</gpx>`;
 
     const blob = new Blob([gpx], { type: 'application/gpx+xml' });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'ruta-trekking.gpx';
+    a.download = `ruta-trekking-${Date.now()}.gpx`;
     a.click();
 
     URL.revokeObjectURL(url);
+  }
+
+  centrarEnUsuario() {
+    if (!this.currentLat || !this.currentLng) return;
+
+    this.followUser = true;
+    this.map.setView([this.currentLat, this.currentLng], 16);
   }
 
   ngOnDestroy(): void {
