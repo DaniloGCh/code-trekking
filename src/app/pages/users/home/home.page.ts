@@ -93,6 +93,7 @@ export class HomePage implements OnInit, OnDestroy {
   // 🚀 INIT
   // =========================
   ngOnInit() {
+    this.weatherGlobal.startLocationTracking();
     this.consejoService.getConsejos().subscribe(data => {
       this.consejos = this.shuffleArray(data);
     });
@@ -306,6 +307,7 @@ export class HomePage implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.authSub?.unsubscribe();
     this.eventosSub?.unsubscribe(); // ✅ Limpiar suscripción de eventos
+    this.weatherGlobal.stopLocationTracking();
   }
 
   // =========================

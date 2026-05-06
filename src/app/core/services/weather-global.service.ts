@@ -16,13 +16,16 @@ export class WeatherGlobalService {
   humidity = new BehaviorSubject<number | null>(null);
   windSpeed = new BehaviorSubject<number | null>(null);
 
+  private watchId: any = null;
+  private lastCoords: { lat: number; lon: number } | null = null;
+
   // 🧠 CACHE DE UBICACIÓN (Nominatim)
   private lastLocationName: string | null = null;
 
   constructor(
     private weatherService: WeatherService,
     private sosService: SosService
-  ) {}
+  ) { }
 
   async loadWeather(): Promise<void> {
 
@@ -115,8 +118,22 @@ export class WeatherGlobalService {
         this.locationName.next(lugar);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error cargando clima:', error);
+
+      if (error.message === 'permiso-denegado') {
+        this.locationName.next('Permiso de ubicación denegado');
+      }
+      else if (error.message === 'ubicacion-no-disponible') {
+        this.locationName.next('Ubicación no disponible');
+      }
+      else if (error.message === 'tiempo-excedido') {
+        this.locationName.next('GPS lento, intenta de nuevo');
+      }
+      else {
+        this.locationName.next('Error de ubicación');
+      }
+
       this.setErrorState();
     }
   }
@@ -129,4 +146,75 @@ export class WeatherGlobalService {
     this.windSpeed.next(null);
     this.locationName.next('Ubicación desconocida');
   }
+
+  private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371e3; // metros
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) *
+      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // metros
+  }
+
+  startLocationTracking() {
+
+    this.watchId = this.sosService.watchUbicacion(async (ubicacion) => {
+
+      console.log('📍 Movimiento detectado:', ubicacion);
+
+      if (!this.lastCoords) {
+        this.lastCoords = {
+          lat: ubicacion.latitud,
+          lon: ubicacion.longitud
+        };
+
+        await this.loadWeather(); // primera carga
+        return;
+      }
+
+      const distancia = this.calcularDistancia(
+        this.lastCoords.lat,
+        this.lastCoords.lon,
+        ubicacion.latitud,
+        ubicacion.longitud
+      );
+
+      console.log('📏 Distancia movida:', distancia, 'metros');
+
+      // 🔥 SOLO actualizar si se mueve más de 200m
+      if (distancia > 200) {
+
+        console.log('🔄 Actualizando clima y ubicación');
+
+        this.lastCoords = {
+          lat: ubicacion.latitud,
+          lon: ubicacion.longitud
+        };
+
+        // ⚠️ reset cache de ubicación
+        this.lastLocationName = null;
+
+        await this.loadWeather();
+      }
+
+    });
+
+  }
+
+  stopLocationTracking() {
+    if (this.watchId) {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.watchId = null;
+    }
+  }
+
+
 }

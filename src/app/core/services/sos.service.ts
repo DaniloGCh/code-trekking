@@ -43,8 +43,9 @@ export class SosService {
 
   async obtenerUbicacion(): Promise<UbicacionSOS> {
     return new Promise((resolve, reject) => {
+
       if (!navigator.geolocation) {
-        reject(new Error('GPS no disponible en este dispositivo'));
+        reject(new Error('GPS no disponible'));
         return;
       }
 
@@ -58,18 +59,33 @@ export class SosService {
           });
         },
         (error) => {
-          if (error.code === error.PERMISSION_DENIED) {
-            reject(new Error('permiso-denegado'));
-          } else {
-            reject(new Error('No se pudo obtener ubicación'));
+
+          console.error('❌ Error GPS:', error);
+
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              reject(new Error('permiso-denegado'));
+              break;
+
+            case error.POSITION_UNAVAILABLE:
+              reject(new Error('ubicacion-no-disponible'));
+              break;
+
+            case error.TIMEOUT:
+              reject(new Error('tiempo-excedido'));
+              break;
+
+            default:
+              reject(new Error('error-desconocido'));
           }
         },
         {
           enableHighAccuracy: true,
-          timeout: 30000,
-          maximumAge: 0
+          timeout: 60000, // ⬅️ MÁS TIEMPO
+          maximumAge: 10000 // ⬅️ PERMITE CACHE
         }
       );
+
     });
   }
 
@@ -128,5 +144,34 @@ export class SosService {
     const telefonoLimpio = telefono.replace(/\D/g, '');
     const mensajeCodificado = encodeURIComponent(mensaje);
     window.open(`https://wa.me/${telefonoLimpio}?text=${mensajeCodificado}`, '_system');
+  }
+
+  watchUbicacion(callback: (ubicacion: UbicacionSOS) => void) {
+
+    if (!navigator.geolocation) {
+      console.error('GPS no disponible');
+      return;
+    }
+
+    return navigator.geolocation.watchPosition(
+      (posicion) => {
+        const ubicacion: UbicacionSOS = {
+          latitud: posicion.coords.latitude,
+          longitud: posicion.coords.longitude,
+          precision: posicion.coords.accuracy,
+          timestamp: new Date(),
+        };
+
+        callback(ubicacion);
+      },
+      (error) => {
+        console.error('Error GPS:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 30000
+      }
+    );
   }
 }
