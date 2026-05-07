@@ -28,10 +28,13 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
   totalDistance = 0;
 
+  // 🟢 NUEVO: control de tracking
+  trackingActive = false;
+
   async ngAfterViewInit() {
     setTimeout(() => {
       this.initMap();
-      this.startTracking();
+      this.startTracking(); // inicia automático (puedes quitarlo si quieres manual)
     }, 300);
   }
 
@@ -80,9 +83,14 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     return R * c;
   }
 
+  // =========================
+  // ▶️ START TRACKING
+  // =========================
   startTracking() {
 
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation || this.trackingActive) return;
+
+    this.trackingActive = true;
 
     this.watchId = navigator.geolocation.watchPosition(
 
@@ -113,18 +121,16 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
         const timeDiff = (now - this.lastValidPoint.time) / 1000;
 
-        // 🚨 FILTRO ANTI-RUIDO (ESTILO STRAVA)
+        // 🚨 FILTRO ANTI-RUIDO
         if (
-          dist < 5 ||      // ruido GPS
-          dist > 80 ||     // salto imposible
-          timeDiff < 1     // frecuencia excesiva
+          dist < 5 ||
+          dist > 80 ||
+          timeDiff < 1
         ) {
           return;
         }
 
-        // 🚀 SUMA DISTANCIA REAL
         this.totalDistance += dist;
-
         this.lastValidPoint = { lat, lng, time: now };
 
         this.addPoint(lat, lng, accuracy);
@@ -140,7 +146,32 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     );
   }
 
-  // 🔵 agrega punto limpio (ruta + marker)
+  // =========================
+  // ⏹ STOP TRACKING
+  // =========================
+  stopTracking() {
+
+    if (this.watchId !== null) {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.watchId = null;
+    }
+
+    this.trackingActive = false;
+  }
+
+  // =========================
+  // 🔄 TOGGLE BUTTON
+  // =========================
+  toggleTracking() {
+
+    if (this.trackingActive) {
+      this.stopTracking();
+    } else {
+      this.startTracking();
+    }
+  }
+
+  // 🔵 agrega punto limpio
   private addPoint(lat: number, lng: number, accuracy?: number) {
 
     this.currentLat = lat;

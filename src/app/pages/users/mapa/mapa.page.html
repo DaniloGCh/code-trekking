@@ -26,14 +26,6 @@
           </div>
         </div>
 
-        <!-- 🔴 INFO TRACKING (solo visual) -->
-        <div class="stat-item">
-          <div>
-            <strong>Tracking</strong>
-            <p>Activo</p>
-          </div>
-        </div>
-
       </div>
 
       <!-- 📦 EXPORT GPX -->
@@ -41,6 +33,13 @@
         📦 Exportar GPX
       </ion-button>
 
+      <ion-button [color]="trackingActive ? 'danger' : 'success'" (click)="toggleTracking()">
+
+        <ion-icon [name]="trackingActive ? 'pause' : 'play'"></ion-icon>
+
+        {{ trackingActive ? 'Detener tracking' : 'Iniciar tracking' }}
+
+      </ion-button>
     </div>
 
   </div>
