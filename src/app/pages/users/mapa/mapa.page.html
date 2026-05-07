@@ -8,36 +8,32 @@
       <ion-icon name="locate"></ion-icon>
     </ion-button>
 
-    
-    
+
+
   </div>
 
-<!-- ✅ SELECTOR TIPO MAPA CON ACCORDION -->
-<div class="map-type-selector">
+  <!-- ✅ SELECTOR TIPO MAPA CON ACCORDION -->
+  <div class="map-type-selector">
 
-  <!-- Botón principal -->
-  <button class="map-type-toggle" (click)="mostrarTipos = !mostrarTipos">
-    🗺️ Mapa
-    <ion-icon [name]="mostrarTipos ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
-  </button>
-
-  <!-- Opciones desplegables -->
-  <div class="map-type-options" [class.visible]="mostrarTipos">
-
-    <button
-      class="map-type-btn"
-      [class.active]="tipoMapaActual === 'calle'"
-      (click)="cambiarTipaMapa('calle'); mostrarTipos = false">
-      🗺️ 
+    <!-- Botón principal -->
+    <button class="map-type-toggle" (click)="mostrarTipos = !mostrarTipos">
+      🗺️ Mapa
+      <ion-icon [name]="mostrarTipos ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
     </button>
 
-    <button
-      class="map-type-btn"
-      [class.active]="tipoMapaActual === 'satelital'"
-      (click)="cambiarTipaMapa('satelital'); mostrarTipos = false">
-      🛰️ 
-    </button>
-<!-- 
+    <!-- Opciones desplegables -->
+    <div class="map-type-options" [class.visible]="mostrarTipos">
+
+      <button class="map-type-btn" [class.active]="tipoMapaActual === 'calle'"
+        (click)="cambiarTipaMapa('calle'); mostrarTipos = false">
+        🗺️
+      </button>
+
+      <button class="map-type-btn" [class.active]="tipoMapaActual === 'satelital'"
+        (click)="cambiarTipaMapa('satelital'); mostrarTipos = false">
+        🛰️
+      </button>
+      <!-- 
     <button
       class="map-type-btn"
       [class.active]="tipoMapaActual === 'terreno'"
@@ -45,17 +41,15 @@
       🏔️ 
     </button> -->
 
-    <button
-      class="map-type-btn"
-      [class.active]="tipoMapaActual === 'topo'"
-      (click)="cambiarTipaMapa('topo'); mostrarTipos = false">
-      📐
-    </button>
-    
+      <button class="map-type-btn" [class.active]="tipoMapaActual === 'topo'"
+        (click)="cambiarTipaMapa('topo'); mostrarTipos = false">
+        📐
+      </button>
+
+
+    </div>
 
   </div>
-
-</div>
 
   <!-- 📊 PANEL INFERIOR -->
   <div class="map-info">
@@ -97,42 +91,98 @@
       <div class="action-buttons">
 
         <!-- ▶️ TOGGLE TRACKING -->
-        <ion-button
-          [color]="trackingActive ? 'danger' : 'success'"
-          expand="block"
-          (click)="toggleTracking()">
+        <ion-button [color]="trackingActive ? 'danger' : 'success'" expand="block" (click)="toggleTracking()">
           <ion-icon [name]="trackingActive ? 'pause' : 'play'" slot="start"></ion-icon>
           {{ trackingActive ? 'Detener' : 'Iniciar' }}
         </ion-button>
 
         <!-- 🗑️ LIMPIAR RUTA -->
-        <ion-button
-          color="warning"
-          expand="block"
-          (click)="onLimpiarRuta()">
+        <ion-button color="warning" expand="block" (click)="onLimpiarRuta()">
           <ion-icon name="trash-outline" slot="start"></ion-icon>
           Limpiar
         </ion-button>
 
         <!-- 📦 EXPORT GPX -->
-        <ion-button
-          color="tertiary"
-          expand="block"
-          (click)="exportGPX()"
-          [disabled]="routePoints.length === 0">
+        <ion-button color="tertiary" expand="block" (click)="exportGPX()" [disabled]="routePoints.length === 0">
           <ion-icon name="download-outline" slot="start"></ion-icon>
           GPX
         </ion-button>
 
-            <ion-buttons>
-      <ion-button (click)="goHome()">
-        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+        <ion-buttons>
+          <ion-button (click)="goHome()">
+            <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
 
       </div>
 
     </div>
+  </div>
+
+  <!-- ========================= -->
+  <!-- 🗺️ SECCIÓN RUTAS -->
+  <!-- ========================= -->
+   <!-- ✅ ACORDEÓN DE INSTRUCCIONES -->
+<ion-accordion-group *ngIf="rutaControl">
+
+  <ion-accordion value="ruta">
+
+    <ion-item slot="header" color="light">
+      <ion-icon name="navigate-outline" slot="start"></ion-icon>
+      <ion-label>Indicaciones de la ruta</ion-label>
+    </ion-item>
+
+    <div slot="content" class="contenedor-ruta">
+
+      <!-- Aquí Leaflet insertará las instrucciones -->
+      <div id="panel-ruta"></div>
+
+    </div>
+
+  </ion-accordion>
+
+</ion-accordion-group>
+
+  <div class="ruta-section">
+
+    <h4 class="ruta-title">
+      <ion-icon name="navigate-outline" color="danger"></ion-icon>
+      Trazar ruta
+    </h4>
+
+    <div class="ruta-buttons">
+
+      <!-- Tocar dos puntos en el mapa -->
+      <ion-button [color]="modoRuta ? 'danger' : 'primary'" fill="outline" size="small" expand="block"
+        (click)="toggleModoRuta()">
+        <ion-icon [name]="modoRuta ? 'close-outline' : 'map-outline'" slot="start">
+        </ion-icon>
+        {{ modoRuta ? 'Cancelar' : 'Marcar puntos' }}
+      </ion-button>
+
+      <!-- Ruta desde ubicación actual -->
+      <ion-button color="success" fill="outline" size="small" expand="block" (click)="rutaDesdeUbicacion()">
+        <ion-icon name="locate-outline" slot="start"></ion-icon>
+        Desde mi ubicación
+      </ion-button>
+
+      <!-- Limpiar ruta -->
+      <ion-button color="medium" fill="outline" size="small" expand="block" (click)="limpiarRutaTrazada()"
+        [disabled]="puntosRuta.length === 0 && !rutaControl">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Limpiar ruta
+      </ion-button>
+
+    </div>
+
+    <!-- Instrucciones -->
+    <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 0">
+      🟢 Toca el mapa para marcar el <strong>origen</strong>
+    </p>
+    <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 1">
+      🔴 Ahora toca el <strong>destino</strong>
+    </p>
+
   </div>
 
 </ion-content>

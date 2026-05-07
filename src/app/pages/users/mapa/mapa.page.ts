@@ -4,6 +4,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { TrackingService, EstadoTracking } from 'src/app/core/services/tracking.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import 'leaflet-routing-machine';
 
 @Component({
   selector: 'app-mapa',
@@ -24,6 +25,13 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
+  // ✅ Nuevas propiedades
+  modoRuta = false;
+  puntosRuta: L.LatLng[] = [];
+  rutaControl: any = null;
+  marcadoresRuta: L.Marker[] = [];
+  buscandoDestino = false;
+
   map!: L.Map;
   userMarker!: L.CircleMarker;
   accuracyCircle!: L.Circle;
@@ -40,6 +48,8 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   get distanceKm() { return this.estado.distanciaTotal / 1000; }
   get tiempoSegundos() { return this.estado.tiempoSegundos; }
   get routePoints() { return this.estado.puntos; }
+
+
 
   get tiempoFormateado(): string {
     const horas = Math.floor(this.tiempoSegundos / 3600);
@@ -229,6 +239,198 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     });
     await toast.present();
   }
+
+  // ✅ ACTIVAR/DESACTIVAR MODO RUTA
+toggleModoRuta() {
+  this.modoRuta = !this.modoRuta;
+
+  if (this.modoRuta) {
+    this.map.on('click', this.onMapClick.bind(this));
+    this.showToast('Toca el mapa para marcar origen y destino', 'primary');
+  } else {
+    this.map.off('click');
+    this.limpiarRutaTrazada();
+  }
+}
+
+// ✅ CLICK EN EL MAPA PARA MARCAR PUNTOS
+private onMapClick(e: L.LeafletMouseEvent) {
+  if (this.puntosRuta.length >= 2) {
+    this.showToast('Ya tienes origen y destino. Limpia la ruta para trazar una nueva.', 'warning');
+    return;
+  }
+
+  const punto = e.latlng;
+  this.puntosRuta.push(punto);
+
+  // Crear marcador
+  const icono = this.puntosRuta.length === 1
+    ? this.crearIconoMarcador('🟢', 'Origen')
+    : this.crearIconoMarcador('🔴', 'Destino');
+
+  const marcador = L.marker(punto, { icon: icono }).addTo(this.map);
+  this.marcadoresRuta.push(marcador);
+
+  if (this.puntosRuta.length === 2) {
+    this.trazarRuta(this.puntosRuta[0], this.puntosRuta[1]);
+  } else {
+    this.showToast('Ahora toca el destino en el mapa', 'primary');
+  }
+}
+
+// ✅ RUTA DESDE UBICACIÓN ACTUAL
+async rutaDesdeUbicacion() {
+  const pos = this.trackingService.estadoActual.posicionActual;
+
+  if (!pos) {
+    await this.showToast('No se detectó tu ubicación actual', 'warning');
+    return;
+  }
+
+  // Limpiar puntos anteriores
+  this.limpiarRutaTrazada();
+
+  // Agregar origen como ubicación actual
+  const origen = L.latLng(pos.lat, pos.lng);
+  this.puntosRuta.push(origen);
+
+  const icono = this.crearIconoMarcador('🟢', 'Tu ubicación');
+  const marcador = L.marker(origen, { icon: icono }).addTo(this.map);
+  this.marcadoresRuta.push(marcador);
+
+  // Activar modo ruta para que el usuario toque el destino
+  this.modoRuta = true;
+  this.map.on('click', this.onMapClick.bind(this));
+  await this.showToast('Toca el mapa para marcar tu destino', 'primary');
+}
+
+// ✅ TRAZAR RUTA CON OSRM
+// ✅ TRAZAR RUTA CON OSRM
+private trazarRuta(origen: L.LatLng, destino: L.LatLng) {
+
+  // Limpiar ruta anterior
+  if (this.rutaControl) {
+    this.map.removeControl(this.rutaControl);
+    this.rutaControl = null;
+  }
+
+  this.showToast('Calculando ruta...', 'primary');
+
+  this.rutaControl = (L as any).Routing.control({
+
+    waypoints: [origen, destino],
+
+    router: (L as any).Routing.osrmv1({
+      serviceUrl: 'https://router.project-osrm.org/route/v1',
+      profile: 'foot',
+    }),
+
+    lineOptions: {
+      styles: [{
+        color: '#e74c3c',
+        weight: 5,
+        opacity: 0.8
+      }],
+      extendToWaypoints: true,
+      missingRouteTolerance: 0
+    },
+
+    // ✅ IMPORTANTE
+    show: false,
+
+    addWaypoints: false,
+    routeWhileDragging: false,
+    fitSelectedRoutes: true,
+    showAlternatives: false,
+
+    createMarker: () => null,
+
+  })
+
+  .on('routesfound', async (e: any) => {
+
+    const ruta = e.routes[0];
+
+    const distancia = (
+      ruta.summary.totalDistance / 1000
+    ).toFixed(2);
+
+    const tiempo = Math.round(
+      ruta.summary.totalTime / 60
+    );
+
+    await this.showToast(
+      `Ruta: ${distancia} km · ~${tiempo} min`,
+      'success'
+    );
+
+    // ✅ MOVER PANEL DE LEAFLET AL ACORDEÓN
+    setTimeout(() => {
+
+      const instrucciones = document.querySelector(
+        '.leaflet-routing-container'
+      );
+
+      const panel = document.getElementById('panel-ruta');
+
+      if (instrucciones && panel) {
+
+        panel.innerHTML = '';
+
+        panel.appendChild(instrucciones);
+
+      }
+
+    }, 300);
+
+  })
+
+  .on('routingerror', async () => {
+
+    await this.showToast(
+      'No se encontró ruta entre los puntos seleccionados',
+      'danger'
+    );
+
+    this.limpiarRutaTrazada();
+
+  })
+
+  .addTo(this.map);
+}
+
+// ✅ LIMPIAR RUTA TRAZADA
+limpiarRutaTrazada() {
+  // Eliminar control de ruta
+  if (this.rutaControl) {
+    this.map.removeControl(this.rutaControl);
+    this.rutaControl = null;
+  }
+
+  // Eliminar marcadores
+  this.marcadoresRuta.forEach(m => m.remove());
+  this.marcadoresRuta = [];
+  this.puntosRuta = [];
+
+  // Desactivar modo ruta
+  this.modoRuta = false;
+  this.map.off('click');
+}
+
+// ✅ CREAR ICONO PERSONALIZADO
+private crearIconoMarcador(emoji: string, titulo: string): L.DivIcon {
+  return L.divIcon({
+    html: `<div style="
+      font-size: 24px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      cursor: pointer;">
+      ${emoji}
+    </div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    className: ''
+  });
+}
 
   ngOnDestroy(): void {
     // ✅ Solo desuscribirse, NO detener el tracking

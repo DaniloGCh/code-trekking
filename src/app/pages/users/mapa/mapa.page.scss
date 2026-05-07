@@ -166,4 +166,87 @@ ion-content::part(scroll) {
       }
     }
   }
+
+  .ruta-section {
+    margin-top: 16px;
+    border-top: 1px solid var(--ion-color-light-shade);
+    padding-top: 12px;
+
+    .ruta-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: var(--ion-color-dark);
+    }
+
+    .ruta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ruta-instruccion {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      margin: 8px 0 0;
+      padding: 8px;
+      background: var(--ion-color-light);
+      border-radius: 8px;
+    }
+  }
+
+  // Ocultar el panel de instrucciones de OSRM
+  .leaflet-routing-container {
+    display: none !important;
+  }
+
+  .contenedor-ruta {
+
+  padding: 10px;
+
+  #panel-ruta {
+
+    .leaflet-routing-container {
+
+      width: 100%;
+      background: transparent;
+      box-shadow: none;
+      border-radius: 12px;
+      font-size: 14px;
+      padding: 0;
+
+    }
+
+    table {
+      width: 100%;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    h3 {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #666;
+    }
+
+    tr {
+      border-bottom: 1px solid #eee;
+    }
+
+    td {
+      padding: 8px 4px;
+      vertical-align: middle;
+    }
+
+  }
+
+}
 }
