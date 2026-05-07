@@ -383,5 +383,8 @@ export class HomePage implements OnInit, OnDestroy {
     this.lastScrollTop = scrollTop;
   }
 
+  goMapa() {
+    this.router.navigateByUrl('/mapa');
+  }
 
 }

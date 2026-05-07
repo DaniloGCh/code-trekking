@@ -99,6 +99,11 @@
         Crear evento
       </ion-button>
 
+      <ion-button (click)="goMapa()">
+        <ion-icon name="navigate-outline" slot="start"></ion-icon>
+        Ir al mapa
+      </ion-button>
+
       <div class="consejos-section" *ngIf="consejos.length > 0">
 
         <h2 class="consejos-section2">💡 Consejos</h2>
@@ -178,6 +183,7 @@
         <ion-icon name="book-outline" slot="start"></ion-icon>
         Manual de emergencia
       </ion-button>
+
 
       <!-- ========================= -->
       <!-- 🆘 BOTÓN SOS FLOTANTE -->
