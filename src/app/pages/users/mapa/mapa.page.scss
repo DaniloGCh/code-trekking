@@ -1,6 +1,28 @@
+// ========================= 
+// 📄 ION-CONTENT
+// =========================
+ion-content {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  --background: transparent;
+}
+
+ion-content::part(scroll) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+// =========================
+// 🗺️ MAPA
+// =========================
 .map-container {
   position: relative;
-  height: 55vh;
+  flex: 1;
+  min-height: 0;
 
   #map {
     height: 100%;
@@ -14,21 +36,30 @@
     z-index: 1000;
     background: white;
     border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 }
 
+// =========================
+// 📊 PANEL INFERIOR
+// =========================
 .map-info {
+  flex-shrink: 0;
   padding: 12px;
+  padding-bottom: calc(12px + var(--ion-safe-area-bottom, 0px));
+  background: var(--ion-background-color);
 
   .info-card {
     background: var(--ion-card-background);
     border-radius: 16px;
     padding: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
+// =========================
+// 📈 STATS
+// =========================
 .stats-panel {
   display: flex;
   flex-wrap: wrap;
@@ -77,6 +108,9 @@
   }
 }
 
+// =========================
+// 🎛️ BOTONES
+// =========================
 .action-buttons {
   display: flex;
   gap: 8px;
