@@ -6,7 +6,7 @@
 
     <!-- 🔵 BOTÓN CENTRAR USUARIO -->
     <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
-      <ion-icon name="navigate"></ion-icon>
+      <ion-icon name="locate"></ion-icon>
     </ion-button>
 
   </div>
@@ -26,25 +26,13 @@
           </div>
         </div>
 
-        <!-- 🔴 ESTADO TRACKING -->
+        <!-- 🔴 INFO TRACKING (solo visual) -->
         <div class="stat-item">
           <div>
             <strong>Tracking</strong>
-            <p>
-              {{ trackingActive ? 'Activo' : 'Detenido' }}
-            </p>
+            <p>Activo</p>
           </div>
         </div>
-
-            <!-- ▶️⏸ BOTÓN START / STOP TRACKING -->
-    <ion-button
-      class="tracking-btn"
-      [color]="trackingActive ? 'danger' : 'success'"
-      (click)="toggleTracking()"
-    >
-      <ion-icon [name]="trackingActive ? 'pause' : 'play'"></ion-icon>
-      {{ trackingActive ? 'Pausar' : 'Iniciar' }} tracking
-    </ion-button>
 
       </div>
 
