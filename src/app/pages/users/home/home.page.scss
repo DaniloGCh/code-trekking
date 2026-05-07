@@ -597,3 +597,26 @@ p {
   transform: scale(0.96);
   transition: transform 0.1s ease;
 }
+
+.map-btn {
+  background: rgba(34, 49, 34, 0.45);
+  color: #ffffff;
+
+}
+
+.map-btn ion-icon {
+  font-size: 18px;
+  margin-right: 4px;
+}
+
+/* efecto hover (web) */
+.map-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(70, 235, 37, 0.45);
+}
+
+/* efecto click */
+.map-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 14px rgba(37, 235, 50, 0.25);
+}

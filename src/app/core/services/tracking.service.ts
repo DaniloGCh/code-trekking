@@ -46,27 +46,41 @@ export class TrackingService {
   // =========================
   // 📍 WATCHER POSICIÓN (siempre activo)
   // =========================
-  iniciarWatcherPosicion() {
-    if (this.posicionWatchId !== null) return;
+iniciarWatcherPosicion() {
+  if (this.posicionWatchId !== null) return;
 
-    this.posicionWatchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+  this.posicionWatchId = navigator.geolocation.watchPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
 
-        this.estado.next({
-          ...this.estadoActual,
-          posicionActual: { lat, lng }
-        });
-      },
-      (error) => console.error('Watcher posición error:', error),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 2000,
-        timeout: 30000
+      this.estado.next({
+        ...this.estadoActual,
+        posicionActual: { lat, lng }
+      });
+    },
+    (error) => {
+      // ✅ Manejo específico por tipo de error
+      switch (error.code) {
+        case 1: // PERMISSION_DENIED
+          console.warn('GPS: Permiso denegado');
+          break;
+        case 2: // POSITION_UNAVAILABLE
+          console.warn('GPS: Posición no disponible');
+          break;
+        case 3: // TIMEOUT
+          // ✅ Timeout es normal, simplemente ignorarlo y seguir intentando
+          console.warn('GPS: Timeout, reintentando...');
+          break;
       }
-    );
-  }
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 10000,  // ✅ Acepta posición cacheada de hasta 10 segundos
+      timeout: 60000,     // ✅ Aumentar timeout a 60 segundos
+    }
+  );
+}
 
   detenerWatcherPosicion() {
     if (this.posicionWatchId !== null) {
