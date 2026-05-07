@@ -1,149 +1,87 @@
-#map {
-  width: 100%;
-  height: 100%;
+.map-container {
+  position: relative;
+  height: 55vh;
+
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+
+  .center-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    z-index: 1000;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
 }
 
 .map-info {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-
-  display: flex;
-  justify-content: center;
-
-  z-index: 999;
-}
-
-.info-card {
-  background: linear-gradient(145deg, #0f172a, #111827);
-  border-radius: 18px;
-  padding: 16px;
-  color: #e5e7eb;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-  margin: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* HEADER UBICACIÓN */
-.location-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-.location-header .icon {
-  font-size: 18px;
-}
-
-/* COORDENADAS */
-.coords {
-  background: rgba(255, 255, 255, 0.04);
-  padding: 10px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-}
-
-.coords p {
-  margin: 4px 0;
-  font-size: 12px;
-  color: #cbd5e1;
-}
-
-.coords span {
-  color: #94a3b8;
-  font-weight: 600;
-}
-
-/* STATS */
-.stats-panel {
-  margin-top: 10px;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(37, 99, 235, 0.12);
   padding: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(37, 99, 235, 0.2);
+
+  .info-card {
+    background: var(--ion-card-background);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
 }
 
-.stat-icon {
-  font-size: 22px;
-}
-
-.stat-item strong {
-  font-size: 13px;
-  display: block;
-  color: #e0f2fe;
-}
-
-.stat-item p {
-  margin: 2px 0 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: #60a5fa;
-}
-
-/* BOTÓN GPX */
-.gpx-btn {
-  margin-top: 14px;
-  --background: #2563eb;
-  --border-radius: 12px;
-  font-weight: 600;
-  text-transform: none;
-}
-
-/* EFECTO INTERACCIÓN */
-.info-card:active {
-  transform: scale(0.99);
-}
-
-.map-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-/* MAPA */
-#map {
-  width: 100%;
-  height: 100%;
-}
-
-.center-btn {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 9999;
-
-  width: 48px;
-  height: 48px;
-
-  --background: transparent;
-  --box-shadow: none;
-
+.stats-panel {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
 
-  border-radius: 50%;
-  border: 2px solid #001aff;
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 120px;
+    background: var(--ion-color-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+
+    ion-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+
+      small {
+        font-size: 0.7rem;
+        color: var(--ion-color-medium);
+      }
+
+      strong {
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+    }
+
+    &.coordenadas {
+      width: 100%;
+      flex: unset;
+
+      strong {
+        font-size: 0.8rem;
+        font-family: monospace;
+      }
+    }
+  }
 }
 
-/* ICONO */
-.center-icon {
-  font-size: 26px;
-  color: #0400fffa;
+.action-buttons {
+  display: flex;
+  gap: 8px;
 
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-}
-
-/* EFECTO CLICK */
-.center-btn:active {
-  transform: scale(0.92);
+  ion-button {
+    flex: 1;
+  }
 }

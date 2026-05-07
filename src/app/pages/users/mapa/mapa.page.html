@@ -1,47 +1,84 @@
 <ion-content fullscreen>
 
   <div class="map-container">
-
     <div id="map"></div>
 
-    <!-- 🔵 BOTÓN CENTRAR USUARIO -->
+    <!-- 🔵 BOTÓN CENTRAR -->
     <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
       <ion-icon name="locate"></ion-icon>
     </ion-button>
-
   </div>
 
   <!-- 📊 PANEL INFERIOR -->
   <div class="map-info">
-
     <div class="info-card">
 
+      <!-- STATS -->
       <div class="stats-panel">
 
         <!-- 📏 DISTANCIA -->
         <div class="stat-item">
+          <ion-icon name="map-outline" color="primary"></ion-icon>
           <div>
-            <strong>Distancia recorrida</strong>
-            <p>{{ distanceKm | number:'1.2-2' }} km</p>
+            <small>Distancia</small>
+            <strong>{{ distanceKm | number:'1.2-2' }} km</strong>
+          </div>
+        </div>
+
+        <!-- ⏱️ TIEMPO -->
+        <div class="stat-item">
+          <ion-icon name="time-outline" color="primary"></ion-icon>
+          <div>
+            <small>Tiempo</small>
+            <strong>{{ tiempoFormateado }}</strong>
+          </div>
+        </div>
+
+        <!-- 📍 COORDENADAS -->
+        <div class="stat-item coordenadas">
+          <ion-icon name="location-outline" color="primary"></ion-icon>
+          <div>
+            <small>Coordenadas</small>
+            <strong>{{ coordenadasFormateadas }}</strong>
           </div>
         </div>
 
       </div>
 
-      <!-- 📦 EXPORT GPX -->
-      <ion-button expand="block" class="gpx-btn" (click)="exportGPX()">
-        📦 Exportar GPX
-      </ion-button>
+      <!-- BOTONES -->
+      <div class="action-buttons">
 
-      <ion-button [color]="trackingActive ? 'danger' : 'success'" (click)="toggleTracking()">
+        <!-- ▶️ TOGGLE TRACKING -->
+        <ion-button
+          [color]="trackingActive ? 'danger' : 'success'"
+          expand="block"
+          (click)="toggleTracking()">
+          <ion-icon [name]="trackingActive ? 'pause' : 'play'" slot="start"></ion-icon>
+          {{ trackingActive ? 'Detener' : 'Iniciar' }}
+        </ion-button>
 
-        <ion-icon [name]="trackingActive ? 'pause' : 'play'"></ion-icon>
+        <!-- 🗑️ LIMPIAR RUTA -->
+        <ion-button
+          color="warning"
+          expand="block"
+          (click)="onLimpiarRuta()">
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+          Limpiar
+        </ion-button>
 
-        {{ trackingActive ? 'Detener tracking' : 'Iniciar tracking' }}
+        <!-- 📦 EXPORT GPX -->
+        <ion-button
+          color="tertiary"
+          expand="block"
+          (click)="exportGPX()"
+          [disabled]="routePoints.length === 0">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          GPX
+        </ion-button>
 
-      </ion-button>
+      </div>
+
     </div>
-
   </div>
 
 </ion-content>
