@@ -13,6 +13,12 @@ import { Router } from '@angular/router';
 })
 export class MapaPage implements AfterViewInit, OnDestroy {
 
+  // ✅ Agrega estas propiedades
+  tipoMapaActual: 'calle' | 'satelital' | 'terreno' | 'topo' = 'calle';
+
+  private capas: Record<string, L.TileLayer> = {};
+  private capaActual!: L.TileLayer;
+
   private trackingService = inject(TrackingService);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
@@ -23,6 +29,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   accuracyCircle!: L.Circle;
   routeLine!: L.Polyline;
 
+  mostrarTipos = false;
   followUser = true;
   private trackingSub?: Subscription;
 
@@ -64,6 +71,8 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       attributionControl: true
     }).setView([-33.4489, -70.6693], 13);
 
+
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
@@ -79,6 +88,55 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     });
 
     setTimeout(() => this.map.invalidateSize(), 500);
+
+    // ✅ Definir todas las capas disponibles
+    this.capas = {
+      calle: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }),
+      satelital: L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20, attribution: '© Google'
+      }),
+      // terreno: L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png?api_key=TU-API-KEY', {
+      //   maxZoom: 20,
+      //   attribution: '© Stadia Maps © OpenStreetMap'
+      // }),
+      topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: '© OpenTopoMap'
+      }),
+    };
+
+    // ✅ Agregar capa inicial
+    this.capaActual = this.capas['calle'];
+    this.capaActual.addTo(this.map);
+
+    this.routeLine = L.polyline([], {
+      color: '#2563eb',
+      weight: 5
+    }).addTo(this.map);
+
+    this.map.on('dragstart', () => {
+      this.followUser = false;
+    });
+
+    setTimeout(() => this.map.invalidateSize(), 500);
+  }
+
+  // ✅ Cambiar tipo de mapa
+  cambiarTipaMapa(tipo: 'calle' | 'satelital' | 'terreno' | 'topo') {
+    if (this.tipoMapaActual === tipo) return;
+
+    this.map.removeLayer(this.capaActual);
+    this.capaActual = this.capas[tipo];
+    this.capaActual.addTo(this.map);
+
+    // ✅ Asegurarse que la ruta quede encima
+    this.routeLine.bringToFront();
+
+    this.tipoMapaActual = tipo;
+
   }
 
   // ✅ Suscribirse al estado del servicio
@@ -179,7 +237,9 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   goHome() {
-  this.router.navigateByUrl('/tabs/home');
-}
+    this.router.navigateByUrl('/tabs/home');
+  }
+
+
 
 }

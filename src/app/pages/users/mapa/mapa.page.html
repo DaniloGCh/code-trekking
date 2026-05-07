@@ -7,7 +7,55 @@
     <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
       <ion-icon name="locate"></ion-icon>
     </ion-button>
+
+    
+    
   </div>
+
+<!-- ✅ SELECTOR TIPO MAPA CON ACCORDION -->
+<div class="map-type-selector">
+
+  <!-- Botón principal -->
+  <button class="map-type-toggle" (click)="mostrarTipos = !mostrarTipos">
+    🗺️ Mapa
+    <ion-icon [name]="mostrarTipos ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+  </button>
+
+  <!-- Opciones desplegables -->
+  <div class="map-type-options" [class.visible]="mostrarTipos">
+
+    <button
+      class="map-type-btn"
+      [class.active]="tipoMapaActual === 'calle'"
+      (click)="cambiarTipaMapa('calle'); mostrarTipos = false">
+      🗺️ 
+    </button>
+
+    <button
+      class="map-type-btn"
+      [class.active]="tipoMapaActual === 'satelital'"
+      (click)="cambiarTipaMapa('satelital'); mostrarTipos = false">
+      🛰️ 
+    </button>
+<!-- 
+    <button
+      class="map-type-btn"
+      [class.active]="tipoMapaActual === 'terreno'"
+      (click)="cambiarTipaMapa('terreno'); mostrarTipos = false">
+      🏔️ 
+    </button> -->
+
+    <button
+      class="map-type-btn"
+      [class.active]="tipoMapaActual === 'topo'"
+      (click)="cambiarTipaMapa('topo'); mostrarTipos = false">
+      📐
+    </button>
+    
+
+  </div>
+
+</div>
 
   <!-- 📊 PANEL INFERIOR -->
   <div class="map-info">
