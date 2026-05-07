@@ -599,8 +599,19 @@ p {
 }
 
 .map-btn {
-  background: rgba(34, 49, 34, 0.45);
-  color: #ffffff;
+  width: 100%;
+
+  --background: rgba(7, 255, 15, 0.25);
+  --color: #fff;
+  --border-color: rgba(59, 181, 37, 0.617);
+
+  border-radius: 14px;
+  border: 1px solid rgba(7, 255, 15, 0.25);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  transition: all 0.3s ease;
 
 }
 
@@ -611,8 +622,7 @@ p {
 
 /* efecto hover (web) */
 .map-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 22px rgba(70, 235, 37, 0.45);
+  border-color: rgba(59, 181, 37, 0.617);
 }
 
 /* efecto click */
