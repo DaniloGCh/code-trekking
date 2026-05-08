@@ -170,91 +170,135 @@ ion-content {
 }
 
 /* =========================
-   📈 STATS
+   📈 STATS EN FILA
 ========================= */
 
 .stats-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .stat-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
 
-  background: rgba(79, 125, 92, 0.08);
+  text-align: center;
 
-  padding: 14px;
+  padding: 14px 10px;
+
   border-radius: 16px;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  min-height: 95px;
 }
 
 .stat-item ion-icon {
-  font-size: 1.5rem;
-  color: var(--trek-green);
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+
+  color: var(--forest);
 }
 
 .stat-item small {
   display: block;
-  color: #666;
+
+  font-size: 0.72rem;
+
+  color: var(--text-soft);
+
   margin-bottom: 4px;
 }
 
 .stat-item strong {
-  color: var(--trek-green-dark);
-  font-size: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.2;
+
+  color: var(--text);
+}
+
+/* Coordenadas más compactas */
+
+.coordenadas strong {
+  font-size: 0.72rem;
+  word-break: break-word;
 }
 
 /* =========================
-   🔘 BOTONES
+   🔘 BOTONES EN FILA
 ========================= */
 
 .action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
-ion-button {
-  --border-radius: 16px;
+/* Botones compactos */
+
+.action-buttons ion-button {
   height: 52px;
 
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  --border-radius: 16px;
 
-  text-transform: none;
+  font-size: 0.82rem;
 
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  font-weight: 600;
 }
 
-/* Colores trekking */
+/* Iconos más pequeños */
 
-ion-button[color="success"] {
-  --background: #2f855a;
+.action-buttons ion-icon {
+  font-size: 1rem;
 }
 
-ion-button[color="danger"] {
-  --background: #b83232;
+/* Home cuadrado */
+
+.action-buttons ion-buttons {
+  width: 100%;
 }
 
-ion-button[color="warning"] {
-  --background: #c27803;
+.action-buttons ion-buttons ion-button {
+  width: 100%;
+  margin: 0;
 }
 
-ion-button[color="tertiary"] {
-  --background: #3b82a0;
-}
+/* =========================
+   📱 RESPONSIVE
+========================= */
 
-ion-button[color="primary"] {
-  --background: var(--trek-green);
-}
+@media (max-width: 480px) {
 
-ion-button[color="medium"] {
-  --border-color: #7b5e3b;
-  --color: #7b5e3b;
+  .stats-panel {
+    gap: 8px;
+  }
+
+  .stat-item {
+    padding: 12px 6px;
+    min-height: 90px;
+  }
+
+  .stat-item strong {
+    font-size: 0.74rem;
+  }
+
+  .coordenadas strong {
+    font-size: 0.66rem;
+  }
+
+  .action-buttons {
+    gap: 8px;
+  }
+
+  .action-buttons ion-button {
+    font-size: 0.72rem;
+  }
+
 }
 
 /* =========================
@@ -323,27 +367,54 @@ ion-button[color="medium"] {
 }
 
 /* =========================
-   🛤️ BOTONES RUTA
+   🛤️ BOTONES RUTA EN FILA
 ========================= */
 
 .ruta-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+
+  margin-top: 10px;
 }
 
-.ruta-instruccion {
-  margin-top: 16px;
+/* Botones compactos */
 
-  padding: 14px;
+.ruta-buttons ion-button {
+  height: 52px;
 
-  border-radius: 14px;
+  --border-radius: 16px;
 
-  background: rgba(217, 119, 6, 0.12);
-
-  color: #7a4b00;
+  font-size: 0.78rem;
 
   font-weight: 600;
+
+  text-transform: none;
+
+  margin: 0;
+}
+
+/* Iconos */
+
+.ruta-buttons ion-icon {
+  font-size: 1rem;
+}
+
+/* =========================
+   📱 RESPONSIVE
+========================= */
+
+@media (max-width: 480px) {
+
+  .ruta-buttons {
+    gap: 8px;
+  }
+
+  .ruta-buttons ion-button {
+    font-size: 0.68rem;
+    height: 50px;
+  }
+
 }
 
 /* =========================
