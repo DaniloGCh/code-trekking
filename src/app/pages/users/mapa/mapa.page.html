@@ -96,17 +96,17 @@
 
         </ion-button>
 
-        <!-- 🗑️ LIMPIAR RUTA -->
-        <ion-button color="warning" (click)="onLimpiarRuta()">
-
-          <ion-icon name="trash-outline"></ion-icon>
-
-        </ion-button>
-
         <!-- 📦 EXPORT GPX -->
         <ion-button color="tertiary" (click)="exportGPX()" [disabled]="routePoints.length === 0">
 
           <ion-icon name="download-outline"></ion-icon>
+
+        </ion-button>
+
+          <!-- 🗑️ LIMPIAR RUTA -->
+        <ion-button color="warning" (click)="onLimpiarRuta()">
+
+          <ion-icon name="trash-outline"></ion-icon>
 
         </ion-button>
 
