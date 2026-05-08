@@ -1,328 +1,435 @@
-// ========================= 
-// 📄 ION-CONTENT
-// =========================
+
+/* =========================
+   🌲 PALETA TREKKING
+========================= */
+
+:root {
+  --trek-green-dark: #1f3b2d;
+  --trek-green: #2f5d45;
+  --trek-green-light: #4f7d5c;
+
+  --trek-earth: #7b5e3b;
+  --trek-sand: #d8c3a5;
+
+  --trek-orange: #d97706;
+  --trek-sky: #6fa3a8;
+
+  --trek-bg: #f4f1ea;
+  --trek-card: rgba(255, 255, 255, 0.92);
+
+  --trek-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --trek-radius: 18px;
+}
+
+/* =========================
+   🌍 CONTENEDOR GENERAL
+========================= */
+
 ion-content {
-  --padding-top: 0;
-  --padding-bottom: 0;
-  --padding-start: 0;
-  --padding-end: 0;
-  --background: transparent;
+  --background: var(--trek-bg);
+  font-family: 'Inter', sans-serif;
 }
 
-ion-content::part(scroll) {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-}
+/* =========================
+   🗺️ MAPA
+========================= */
 
-// =========================
-// 🗺️ MAPA
-// =========================
 .map-container {
   position: relative;
-  flex: 1;
-  min-height: 0;
+  width: 100%;
+  height: 69%;
+  overflow: hidden;
+  border-bottom-left-radius: 28px;
+  border-bottom-right-radius: 28px;
+  box-shadow: var(--trek-shadow);
+}
 
-  #map {
-    height: 100%;
-    width: 100%;
-  }
+#map {
+  width: 100%;
+  height: 100%;
+}
 
-  .center-btn {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    z-index: 1000;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+/* =========================
+   📍 BOTÓN CENTRAR
+========================= */
+
+.center-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 18px;
+  z-index: 999;
+
+  --background: rgba(31, 59, 45, 0.95);
+  --color: white;
+
+  width: 56px;
+  height: 56px;
+
+  border-radius: 50%;
+  backdrop-filter: blur(8px);
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+
+  ion-icon {
+    font-size: 1.5rem;
   }
 }
 
-// =========================
-// 📊 PANEL INFERIOR
-// =========================
-.map-info {
-  flex-shrink: 0;
-  padding: 12px;
-  padding-bottom: calc(12px + var(--ion-safe-area-bottom, 0px));
-  background: var(--ion-background-color);
+/* =========================
+   🗺️ SELECTOR MAPA
+========================= */
 
-  .info-card {
-    background: var(--ion-card-background);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  }
-}
-
-// =========================
-// 📈 STATS
-// =========================
-.stats-panel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-
-  .stat-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-    min-width: 120px;
-    background: var(--ion-color-light);
-    border-radius: 10px;
-    padding: 10px 12px;
-
-    ion-icon {
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
-    div {
-      display: flex;
-      flex-direction: column;
-
-      small {
-        font-size: 0.7rem;
-        color: var(--ion-color-medium);
-      }
-
-      strong {
-        font-size: 0.95rem;
-        font-weight: 700;
-      }
-    }
-
-    &.coordenadas {
-      width: 100%;
-      flex: unset;
-
-      strong {
-        font-size: 0.8rem;
-        font-family: monospace;
-      }
-    }
-  }
-}
-
-// ✅ SELECTOR TIPO MAPA
 .map-type-selector {
   position: absolute;
-  top: 12px;
-  right: 12px; // ✅ Cambia left por right
-  z-index: 1000;
+  top: 18px;
+  left: 16px;
+  z-index: 999;
+}
+
+.map-type-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: rgba(31, 59, 45, 0.92);
+  color: white;
+
+  border: none;
+  padding: 12px 16px;
+
+  border-radius: 14px;
+  font-weight: 600;
+
+  backdrop-filter: blur(8px);
+
+  box-shadow: var(--trek-shadow);
+}
+
+.map-type-options {
+  margin-top: 10px;
+
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  align-items: flex-end; // ✅ Alinea opciones a la derecha
+  gap: 10px;
 
-  .map-type-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgb(2, 104, 2);
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    color: var(--ion-color-dark);
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
 
-    ion-icon {
-      font-size: 14px;
-    }
-  }
-
-  .map-type-options {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-
-    &.visible {
-      display: flex; // ✅ Se muestra al hacer clic
-    }
-
-    .map-type-btn {
-      background: rgb(2, 107, 0);
-      border: none;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      color: var(--ion-color-dark);
-      transition: background 0.2s;
-      text-align: left;
-
-      &.active {
-        background: var(--ion-color-primary);
-        color: white;
-      }
-    }
-  }
-
-  .ruta-section {
-    margin-top: 16px;
-    border-top: 1px solid var(--ion-color-light-shade);
-    padding-top: 12px;
-
-    .ruta-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin: 0 0 10px;
-      color: var(--ion-color-dark);
-    }
-
-    .ruta-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .ruta-instruccion {
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--ion-color-medium);
-      margin: 8px 0 0;
-      padding: 8px;
-      background: var(--ion-color-light);
-      border-radius: 8px;
-    }
-  }
-
-  // Ocultar el panel de instrucciones de OSRM
-  .leaflet-routing-container {
-    display: none !important;
-  }
-
-  .contenedor-ruta {
-
-  padding: 10px;
-
-  #panel-ruta {
-
-    .leaflet-routing-container {
-
-      width: 100%;
-      background: transparent;
-      box-shadow: none;
-      border-radius: 12px;
-      font-size: 14px;
-      padding: 0;
-
-    }
-
-    table {
-      width: 100%;
-    }
-
-    h2 {
-      font-size: 16px;
-      margin-bottom: 6px;
-      font-weight: 700;
-    }
-
-    h3 {
-      font-size: 14px;
-      margin-bottom: 10px;
-      color: #666;
-    }
-
-    tr {
-      border-bottom: 1px solid #eee;
-    }
-
-    td {
-      padding: 8px 4px;
-      vertical-align: middle;
-    }
-
-  }
-
+  transition: 0.25s ease;
 }
 
-.instrucciones-panel {
-  margin-top: 12px;
-  border-top: 1px solid var(--ion-color-light-shade);
-  padding-top: 12px;
-  max-height: 200px;
-  overflow-y: auto;
-
-  .instrucciones-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin: 0 0 8px;
-  }
-
-  .instruccion-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--ion-color-light);
-
-    .instruccion-numero {
-      min-width: 24px;
-      height: 24px;
-      background: var(--ion-color-primary);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .instruccion-info {
-      p {
-        margin: 0;
-        font-size: 0.8rem;
-        color: var(--ion-color-dark);
-      }
-
-      small {
-        color: var(--ion-color-medium);
-        font-size: 0.7rem;
-      }
-    }
-  }
+.map-type-options.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
+
+.map-type-btn {
+  width: 54px;
+  height: 54px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  font-size: 1.3rem;
+
+  box-shadow: var(--trek-shadow);
+
+  transition: 0.2s ease;
+}
+
+.map-type-btn.active {
+  background: var(--trek-green);
+  color: white;
+  transform: scale(1.08);
+}
+
+/* =========================
+   📊 PANEL INFERIOR
+========================= */
+
+.map-info {
+  padding: 18px;
+  margin-top: -18px;
+  position: relative;
+  z-index: 10;
+}
+
+.info-card {
+  background: var(--trek-card);
+
+  border-radius: 24px;
+  padding: 18px;
+
+  backdrop-filter: blur(12px);
+
+  box-shadow: var(--trek-shadow);
+}
+
+/* =========================
+   📈 STATS
+========================= */
+
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  background: rgba(79, 125, 92, 0.08);
+
+  padding: 14px;
+  border-radius: 16px;
+}
+
+.stat-item ion-icon {
+  font-size: 1.5rem;
+  color: var(--trek-green);
+}
+
+.stat-item small {
+  display: block;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.stat-item strong {
+  color: var(--trek-green-dark);
+  font-size: 1rem;
+}
+
+/* =========================
+   🔘 BOTONES
+========================= */
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+ion-button {
+  --border-radius: 16px;
+  height: 52px;
+
+  font-weight: 700;
+  letter-spacing: 0.3px;
+
+  text-transform: none;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Colores trekking */
+
+ion-button[color="success"] {
+  --background: #2f855a;
+}
+
+ion-button[color="danger"] {
+  --background: #b83232;
+}
+
+ion-button[color="warning"] {
+  --background: #c27803;
+}
+
+ion-button[color="tertiary"] {
+  --background: #3b82a0;
+}
+
+ion-button[color="primary"] {
+  --background: var(--trek-green);
+}
+
+ion-button[color="medium"] {
+  --border-color: #7b5e3b;
+  --color: #7b5e3b;
+}
+
+/* =========================
+   🧭 SECCIÓN RUTA
+========================= */
+
+.ruta-section {
+  margin: 20px 18px 40px;
+
+  background: var(--trek-card);
+
+  padding: 20px;
+
+  border-radius: 24px;
+
+  box-shadow: var(--trek-shadow);
+}
+
+.ruta-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--trek-green-dark);
+
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  margin-bottom: 18px;
+}
+
+/* =========================
+   🥾 SELECTOR PERFIL
+========================= */
 
 .perfil-selector {
   display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 10px;
 
-  .perfil-btn {
-    flex: 1;
-    background: var(--ion-color-light);
-    border: none;
-    border-radius: 8px;
-    padding: 6px 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--ion-color-dark);
-    transition: all 0.2s;
-
-    &.active {
-      background: var(--ion-color-primary);
-      color: white;
-    }
-  }
+  margin-bottom: 18px;
 }
+
+.perfil-btn {
+  flex: 1;
+
+  border: none;
+
+  padding: 12px;
+
+  border-radius: 14px;
+
+  background: rgba(79, 125, 92, 0.12);
+
+  color: var(--trek-green-dark);
+
+  font-weight: 600;
+
+  transition: 0.2s ease;
+}
+
+.perfil-btn.active {
+  background: var(--trek-green);
+  color: white;
+
+  transform: translateY(-2px);
+}
+
+/* =========================
+   🛤️ BOTONES RUTA
+========================= */
+
+.ruta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ruta-instruccion {
+  margin-top: 16px;
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background: rgba(217, 119, 6, 0.12);
+
+  color: #7a4b00;
+
+  font-weight: 600;
+}
+
+/* =========================
+   📋 INSTRUCCIONES
+========================= */
+
+.instrucciones-panel {
+  margin: 20px 18px;
+
+  background: var(--trek-card);
+
+  border-radius: 24px;
+
+  padding: 20px;
+
+  box-shadow: var(--trek-shadow);
+}
+
+.instrucciones-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 18px;
+
+  color: var(--trek-green-dark);
+}
+
+.instruccion-item {
+  display: flex;
+  gap: 14px;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.instruccion-item:last-child {
+  border-bottom: none;
+}
+
+.instruccion-numero {
+  min-width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--trek-green);
+
+  color: white;
+
+  font-weight: 700;
+}
+
+.instruccion-info p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--trek-green-dark);
+}
+
+.instruccion-info small {
+  color: #777;
+}
+
+/* =========================
+   📱 RESPONSIVE
+========================= */
+
+@media (max-width: 480px) {
+  .map-container {
+    height: 52vh;
+  }
+
+  .info-card,
+  .ruta-section,
+  .instrucciones-panel {
+    border-radius: 20px;
+  }
+
+  ion-button {
+    height: 48px;
+  }
+
+  
 }

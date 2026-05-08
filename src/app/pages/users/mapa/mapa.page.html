@@ -33,13 +33,11 @@
         (click)="cambiarTipaMapa('satelital'); mostrarTipos = false">
         🛰️
       </button>
-      <!-- 
-    <button
-      class="map-type-btn"
-      [class.active]="tipoMapaActual === 'terreno'"
-      (click)="cambiarTipaMapa('terreno'); mostrarTipos = false">
-      🏔️ 
-    </button> -->
+
+      <!-- <button class="map-type-btn" [class.active]="tipoMapaActual === 'terreno'"
+        (click)="cambiarTipaMapa('terreno'); mostrarTipos = false">
+        🏔️
+      </button> -->
 
       <button class="map-type-btn" [class.active]="tipoMapaActual === 'topo'"
         (click)="cambiarTipaMapa('topo'); mostrarTipos = false">
@@ -122,95 +120,57 @@
   <!-- ========================= -->
   <!-- 🗺️ SECCIÓN RUTAS -->
   <!-- ========================= -->
-   <!-- ✅ ACORDEÓN DE INSTRUCCIONES -->
-<!-- <ion-accordion-group *ngIf="rutaControl">
-
-  <ion-accordion value="ruta">
-
-    <ion-item slot="header" color="light">
-      <ion-icon name="navigate-outline" slot="start"></ion-icon>
-      <ion-label>Indicaciones de la ruta</ion-label>
-    </ion-item>
-
-    <div slot="content" class="contenedor-ruta"> -->
-
-      <!-- Aquí Leaflet insertará las instrucciones -->
-      <!-- <div id="panel-ruta"></div>
-
-    </div>
-
-  </ion-accordion>
-
-</ion-accordion-group> -->
-
-<!-- ✅ PANEL DE INSTRUCCIONES -->
-<div class="instrucciones-panel" *ngIf="mostrarInstrucciones && instrucciones.length > 0">
-  <h4 class="instrucciones-title">
-    <ion-icon name="list-outline" color="primary"></ion-icon>
-    Instrucciones
-  </h4>
-  <div class="instruccion-item" *ngFor="let paso of instrucciones; let i = index">
-    <span class="instruccion-numero">{{ i + 1 }}</span>
-    <div class="instruccion-info">
-      <p>{{ paso.instruccion }}</p>
-      <small>{{ paso.distancia }}</small>
+   
+  <!-- ✅ PANEL DE INSTRUCCIONES -->
+  <div class="instrucciones-panel" *ngIf="mostrarInstrucciones && instrucciones.length > 0">
+    <h4 class="instrucciones-title">
+      <ion-icon name="list-outline" color="primary"></ion-icon>
+      Instrucciones
+    </h4>
+    <div class="instruccion-item" *ngFor="let paso of instrucciones; let i = index">
+      <span class="instruccion-numero">{{ i + 1 }}</span>
+      <div class="instruccion-info">
+        <p>{{ paso.instruccion }}</p>
+        <small>{{ paso.distancia }}</small>
+      </div>
     </div>
   </div>
-</div>
 
- <div class="ruta-section">
+  <div class="ruta-section">
 
-  <h4 class="ruta-title">
-    <ion-icon name="navigate-outline" color="danger"></ion-icon>
-    Trazar ruta
-  </h4>
+    <h4 class="ruta-title">
+      <ion-icon name="navigate-outline" color="danger"></ion-icon>
+      Trazar ruta
+    </h4>
 
-  <!-- ✅ SELECTOR DE PERFIL -->
-  <div class="perfil-selector">
-    <button
-      class="perfil-btn"
-      [class.active]="perfilRuta === 'hike'"
-      (click)="perfilRuta = 'hike'">
-      🥾 Sendero
-    </button>
-    <button
-      class="perfil-btn"
-      [class.active]="perfilRuta === 'foot'"
-      (click)="perfilRuta = 'foot'">
-      🚶 Caminata
-    </button>
-    <button
-      class="perfil-btn"
-      [class.active]="perfilRuta === 'car'"
-      (click)="perfilRuta = 'car'">
-      🚗 Auto
-    </button>
-  </div>
+    <!-- ✅ SELECTOR DE PERFIL -->
+    <div class="perfil-selector">
+      <button class="perfil-btn" [class.active]="perfilRuta === 'hike'" (click)="perfilRuta = 'hike'">
+        🥾 Sendero
+      </button>
+      <button class="perfil-btn" [class.active]="perfilRuta === 'foot'" (click)="perfilRuta = 'foot'">
+        🚶 Caminata
+      </button>
+      <button class="perfil-btn" [class.active]="perfilRuta === 'car'" (click)="perfilRuta = 'car'">
+        🚗 Auto
+      </button>
+    </div>
 
-  <div class="ruta-buttons">
+    <div class="ruta-buttons">
 
-    <ion-button
-      [color]="modoRuta ? 'danger' : 'primary'"
-      fill="outline"
-      size="small"
-      expand="block"
-      (click)="toggleModoRuta()">
-      <ion-icon [name]="modoRuta ? 'close-outline' : 'map-outline'" slot="start"></ion-icon>
-      {{ modoRuta ? 'Cancelar' : 'Marcar puntos' }}
-    </ion-button>
+      <ion-button [color]="modoRuta ? 'danger' : 'primary'" fill="outline" size="small" expand="block"
+        (click)="toggleModoRuta()">
+        <ion-icon [name]="modoRuta ? 'close-outline' : 'map-outline'" slot="start"></ion-icon>
+        {{ modoRuta ? 'Cancelar' : 'Marcar puntos' }}
+      </ion-button>
 
-    <ion-button
-      color="success"
-      fill="outline"
-      size="small"
-      expand="block"
-      (click)="rutaDesdeUbicacion()">
-      <ion-icon name="locate-outline" slot="start"></ion-icon>
-      Desde mi ubicación
-    </ion-button>
+      <ion-button color="success" fill="outline" size="small" expand="block" (click)="rutaDesdeUbicacion()">
+        <ion-icon name="locate-outline" slot="start"></ion-icon>
+        Desde mi ubicación
+      </ion-button>
 
-    <!-- ✅ TOGGLE INSTRUCCIONES -->
-    <!-- <ion-button
+      <!-- ✅ TOGGLE INSTRUCCIONES -->
+      <ion-button
       [color]="mostrarInstrucciones ? 'tertiary' : 'medium'"
       fill="outline"
       size="small"
@@ -219,28 +179,67 @@
       [disabled]="instrucciones.length === 0">
       <ion-icon name="list-outline" slot="start"></ion-icon>
       {{ mostrarInstrucciones ? 'Ocultar indicaciones' : 'Ver indicaciones' }}
-    </ion-button> -->
-
-    <ion-button
-      color="medium"
-      fill="outline"
-      size="small"
-      expand="block"
-      (click)="limpiarRutaTrazada()"
-      [disabled]="puntosRuta.length === 0 && !rutaControl">
-      <ion-icon name="trash-outline" slot="start"></ion-icon>
-      Limpiar ruta
     </ion-button>
 
+      <!-- ✅ ACORDEÓN INDICACIONES -->
+      <!-- <ion-accordion-group *ngIf="instrucciones.length > 0" class="acordeon-ruta">
+
+        <ion-accordion value="ruta">
+
+     
+          <ion-item slot="header" color="light">
+
+            <ion-icon name="navigate-outline" slot="start" color="tertiary">
+            </ion-icon>
+
+            <ion-label>
+              Indicaciones de la ruta
+            </ion-label>
+
+          </ion-item>
+
+          
+          <div slot="content" class="contenido-ruta">
+
+            <ion-list lines="full">
+
+              <ion-item *ngFor="let paso of instrucciones; let i = index">
+
+                <ion-label>
+
+                  <h3>Paso {{ i + 1 }}</h3>
+
+                  <p>{{ paso.instruccion }}</p>
+
+                  <small>{{ paso.distancia }}</small>
+
+                </ion-label>
+
+              </ion-item>
+
+            </ion-list>
+
+          </div>
+
+        </ion-accordion>
+
+      </ion-accordion-group> -->
+
+      <ion-button color="medium" fill="outline" size="small" expand="block" (click)="limpiarRutaTrazada()"
+        [disabled]="puntosRuta.length === 0 && !rutaControl">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Limpiar ruta
+      </ion-button>
+
+    </div>
+
+    <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 0">
+      🟢 Toca el mapa para marcar el <strong>origen</strong>
+    </p>
+    <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 1">
+      🔴 Ahora toca el <strong>destino</strong>
+    </p>
+
   </div>
-
-  <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 0">
-    🟢 Toca el mapa para marcar el <strong>origen</strong>
-  </p>
-  <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 1">
-    🔴 Ahora toca el <strong>destino</strong>
-  </p>
-
-</div>
 
 </ion-content>
