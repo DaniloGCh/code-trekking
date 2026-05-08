@@ -79,11 +79,21 @@ ion-content {
    🗺️ SELECTOR MAPA
 ========================= */
 
+/* =========================
+   🗺️ SELECTOR CAPAS
+========================= */
+
 .map-type-selector {
   position: absolute;
-  top: 18px;
-  left: 16px;
-  z-index: 999;
+
+  top: calc(env(safe-area-inset-top) + 16px);
+  right: 16px;
+
+  z-index: 1200;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .map-type-toggle {
@@ -133,7 +143,7 @@ ion-content {
   border: none;
   border-radius: 16px;
 
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(31, 59, 45, 0.92);
 
   font-size: 1.3rem;
 
