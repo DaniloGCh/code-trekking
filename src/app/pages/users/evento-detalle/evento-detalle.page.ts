@@ -294,4 +294,8 @@ esEventoEnCurso(evento: Evento): boolean {
 
     return fechaEvento < ahora;
   }
+
+    goMapa() {
+    this.router.navigateByUrl('/mapa');
+  }
 }

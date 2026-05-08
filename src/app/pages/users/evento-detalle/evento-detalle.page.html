@@ -359,6 +359,7 @@
 
         </ion-accordion-group>
 
+       
         <!-- ========================= -->
         <!-- 🗺️ MAPA DE LA RUTA (ACORDEÓN) -->
         <!-- ========================= -->
@@ -388,11 +389,19 @@
                 </div>
               </div>
 
+               <ion-button expand="block" class="map-btn" (click)="goMapa()">
+          <ion-icon name="navigate-outline" slot="start"></ion-icon>
+          Crea tu propia ruta 
+        </ion-button>
             </div>
+
+            
 
           </ion-accordion>
 
         </ion-accordion-group>
+
+
 
 
       </ion-list>
