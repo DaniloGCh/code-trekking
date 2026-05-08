@@ -473,26 +473,108 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   private traducirInstruccion(instruccion: string): string {
-    return instruccion
-      .replace(/Head/g, 'Dirígete')
-      .replace(/Turn right/g, 'Gira a la derecha')
-      .replace(/Turn left/g, 'Gira a la izquierda')
-      .replace(/Keep right/g, 'Continúa por la derecha')
-      .replace(/Keep left/g, 'Continúa por la izquierda')
-      .replace(/Continue/g, 'Continúa')
-      .replace(/Arrive at/g, 'Has llegado a')
-      .replace(/Arrive/g, 'Has llegado')
-      .replace(/north/g, 'norte')
-      .replace(/south/g, 'sur')
-      .replace(/east/g, 'este')
-      .replace(/west/g, 'oeste')
-      .replace(/onto/gi, 'hacia')
-      .replace(/straight/gi, 'recto')
-      .replace(/toward/gi, 'hacia')
-      .replace(/on the left/gi, '✨')
-      .replace(/on the right/gi, '✨')
-      .replace(/your destination/gi, 'tu destino');
-  }
+
+  let resultado = instruccion;
+
+  const dirMap: Record<string, string> = {
+    north: 'norte',
+    south: 'sur',
+    east: 'este',
+    west: 'oeste'
+  };
+
+  // =========================
+  // 🧼 LIMPIEZA PREVIA (IMPORTANTE)
+  // =========================
+  resultado = resultado
+    .replace(/(⬅️|➡️|↖️|↗️|🔁)\s*(a la izquierda|a la derecha)?/gi, '')
+    .replace(/\s*,\s*$/g, '');
+
+  // =========================
+  // 🏁 LLEGADA (PRIORIDAD ALTA)
+  // =========================
+  resultado = resultado.replace(
+    /(arrive|has llegado)(?: at)?(?: your destination| a)?\s*(.+?)(?:,.*)?$/gi,
+    (_m, _verb, place) => {
+      return `🏁 Has llegado a tu destino: ${place.trim()}`;
+    }
+  );
+
+  // =========================
+  // 🚶 HEAD (ORS CLAVE)
+  // =========================
+  resultado = resultado.replace(
+    /head\s+(north|south|east|west)\s+(on|onto)\s+(.+)/gi,
+    (_m, dir, _pre, street) => {
+      return `➡️ Dirígete hacia el ${dirMap[dir]} por ${street}`;
+    }
+  );
+
+  // =========================
+  // 🚗 GIROS
+  // =========================
+  resultado = resultado
+    .replace(/turn sharp right/gi, '🔁 Gira fuerte a la derecha')
+    .replace(/turn sharp left/gi, '🔁 Gira fuerte a la izquierda')
+    .replace(/turn right/gi, '➡️ Gira a la derecha')
+    .replace(/turn left/gi, '⬅️ Gira a la izquierda')
+    .replace(/slight right/gi, '↗️ Mantente a la derecha')
+    .replace(/slight left/gi, '↖️ Mantente a la izquierda');
+
+  // =========================
+  // 🚶 CONTINUAR
+  // =========================
+  resultado = resultado
+    .replace(/continue straight/gi, '⬆️ Continúa recto')
+    .replace(/continue onto/gi, '➡️ Continúa hacia')
+    .replace(/keep right/gi, '➡️ Mantente a la derecha')
+    .replace(/keep left/gi, '⬅️ Mantente a la izquierda')
+    .replace(/continue/gi, '➡️ Continúa');
+
+  // =========================
+  // 🛣️ CONECTORES
+  // =========================
+  resultado = resultado
+    .replace(/onto/gi, 'hacia')
+    .replace(/toward/gi, 'hacia')
+    .replace(/on the left/gi, '⬅️ a la izquierda')
+    .replace(/on the right/gi, '➡️ a la derecha');
+
+  // =========================
+  // 🔁 ROTONDAS
+  // =========================
+  resultado = resultado
+    .replace(/at the roundabout/gi, '🔄 en la rotonda')
+    .replace(/enter the roundabout/gi, '🔄 entra a la rotonda')
+    .replace(/exit the roundabout/gi, '➡️ sal de la rotonda')
+    .replace(/take exit (\d+)/gi, '➡️ toma la salida $1')
+    .replace(/take the (\d+)(st|nd|rd|th) exit/gi, '➡️ toma la salida $1')
+    .replace(/roundabout/gi, 'rotonda');
+
+  // =========================
+  // 🚗 U-TURN
+  // =========================
+  resultado = resultado
+    .replace(/make a u-turn/gi, '🔁 haz un retorno')
+    .replace(/u-turn/gi, '🔁 retorno');
+
+  // =========================
+  // 🧭 DIRECCIONES
+  // =========================
+  resultado = resultado
+    .replace(/north/gi, 'norte')
+    .replace(/south/gi, 'sur')
+    .replace(/east/gi, 'este')
+    .replace(/west/gi, 'oeste');
+
+  // =========================
+  // 🧼 LIMPIEZA FINAL
+  // =========================
+  return resultado
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 
   // ✅ Un solo método limpiarRutaTrazada
   limpiarRutaTrazada() {

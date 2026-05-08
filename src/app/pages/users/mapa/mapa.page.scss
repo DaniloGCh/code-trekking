@@ -344,7 +344,7 @@ ion-content {
 
   border-radius: 14px;
 
-  background: rgba(79, 125, 92, 0.12);
+  background: rgba(79, 125, 92, 0.468);
 
   color: var(--trek-green-dark);
 
@@ -354,7 +354,7 @@ ion-content {
 }
 
 .perfil-btn.active {
-  background: var(--trek-green);
+  background: rgba(0, 255, 76, 0.468);
   color: white;
 
   transform: translateY(-2px);
