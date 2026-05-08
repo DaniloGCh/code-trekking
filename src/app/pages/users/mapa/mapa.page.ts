@@ -93,14 +93,38 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
       }),
-      satelital: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19,
-        attribution: '© Esri World Imagery'
-      }),
-      // terreno: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-      //   maxZoom: 19,
-      //   attribution: '© Esri World Topo'
-      // }),
+      satelital: L.layerGroup([
+
+        L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 19,
+            attribution: '© Esri'
+          }
+        ),
+
+        L.tileLayer(
+          'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 19
+          }
+        ),
+
+        L.tileLayer(
+          'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+          {
+            maxZoom: 19
+          }
+        )
+
+      ]) as any,
+      terreno: L.tileLayer(
+        'https://tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=' + environment.thunderforestKey,
+        {
+          maxZoom: 22,
+          attribution: '© Thunderforest Landscape'
+        }
+      ),
       topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         maxZoom: 17,
         attribution: '© OpenTopoMap'
@@ -191,10 +215,18 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       (p: any) => L.latLng(p.lat, p.lng)
     );
 
+    const colorRuta =
+      this.perfilRuta === 'car'
+        ? '#2563eb' // azul auto
+        : this.perfilRuta === 'foot'
+          ? '#f59e0b' // naranja caminata
+          : '#16a34a'; // verde trekking
+
     this.rutaControl = L.polyline(latLngs, {
-      color: '#e74c3c',
-      weight: 5,
-      opacity: 0.8
+      color: colorRuta,
+      weight: 6,
+      opacity: 0.9,
+      lineJoin: 'round'
     }).addTo(this.map);
 
     // Restaurar instrucciones
@@ -329,6 +361,13 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       car: 'driving-car'
     };
 
+    if (this.perfilRuta === 'car') {
+      await this.showToast(
+        '🚗 La ruta vehicular depende de caminos habilitados',
+        'primary'
+      );
+    }
+
     try {
       const response = await fetch(
         `https://api.openrouteservice.org/v2/directions/${perfilORS[this.perfilRuta]}?` +
@@ -340,8 +379,29 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       const data = await response.json();
 
       if (!data.features || data.features.length === 0) {
-        await this.showToast('No se encontró ruta entre los puntos', 'danger');
+
+        // 🚗 Si falla en auto → sugerir caminata
+        if (this.perfilRuta === 'car') {
+
+          await this.showToast(
+            '🚫 No hay acceso vehicular. Probando caminata...',
+            'warning'
+          );
+
+          this.perfilRuta = 'foot';
+
+          await this.trazarRuta(origen, destino);
+
+          return;
+        }
+
+        await this.showToast(
+          'No se encontró ruta entre los puntos',
+          'danger'
+        );
+
         this.limpiarRutaTrazada();
+
         return;
       }
 
@@ -353,10 +413,35 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         (c: number[]) => L.latLng(c[1], c[0])
       );
 
+      const colorRuta =
+        this.perfilRuta === 'car'
+          ? '#2563eb' // 🚗 azul
+          : this.perfilRuta === 'foot'
+            ? '#f59e0b' // 🚶 naranja
+            : '#16a34a'; // 🥾 verde trekking
+
       this.rutaControl = L.polyline(latLngs, {
-        color: '#e74c3c',
-        weight: 5,
-        opacity: 0.8
+
+        color: colorRuta,
+
+        weight: this.perfilRuta === 'car'
+          ? 7
+          : 6,
+
+        opacity: 0.92,
+
+        lineJoin: 'round',
+
+        lineCap: 'round',
+
+        // 🥾 Línea punteada trekking
+        dashArray: this.perfilRuta === 'hike'
+          ? '10, 12'
+          : undefined,
+
+        // 🚶 Caminata más suave
+        smoothFactor: 1.5
+
       }).addTo(this.map);
 
       this.map.fitBounds((this.rutaControl as any).getBounds(), { padding: [40, 40] });

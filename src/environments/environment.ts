@@ -10,6 +10,7 @@ export const environment = {
   },
   weatherApiKey: 'c2f5db7cbb71783c61eedd59c8357989',
 
-  orsKey: 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImMyNDU4ZDUxMTYyYTQwZmZiNjUxMDY4ZGJmODcxNjNhIiwiaCI6Im11cm11cjY0In0=' // ✅ Nuevo
+  orsKey: 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImMyNDU4ZDUxMTYyYTQwZmZiNjUxMDY4ZGJmODcxNjNhIiwiaCI6Im11cm11cjY0In0=', // ✅ Nuevo
 
+  thunderforestKey: '68fa0623b6454f27b618229645b930c2'
 };
