@@ -139,44 +139,80 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   // =========================
   // 📡 SUSCRIPCIÓN TRACKING
   // =========================
-  private suscribirseAlEstado() {
-    this.trackingSub = this.trackingService.estado$.subscribe(estado => {
-      this.estado = estado;
+private suscribirseAlEstado() {
+  this.trackingSub = this.trackingService.estado$.subscribe(estado => {
+    this.estado = estado;
 
-      const latLngs = estado.puntos.map(p => [p.lat, p.lng] as [number, number]);
-      this.routeLine?.setLatLngs(latLngs);
+    const latLngs = estado.puntos.map(p => [p.lat, p.lng] as [number, number]);
+    this.routeLine?.setLatLngs(latLngs);
 
-      if (estado.posicionActual) {
-        const { lat, lng } = estado.posicionActual;
+    if (estado.posicionActual) {
+      const { lat, lng } = estado.posicionActual;
 
-        if (!this.userMarker) {
-          this.userMarker = L.circleMarker([lat, lng], {
-            radius: 10,
-            fillColor: '#2563eb',
-            color: '#fff',
-            weight: 3,
-            fillOpacity: 1
-          }).addTo(this.map);
+      if (!this.userMarker) {
+        this.userMarker = L.circleMarker([lat, lng], {
+          radius: 10,
+          fillColor: '#2563eb',
+          color: '#fff',
+          weight: 3,
+          fillOpacity: 1
+        }).addTo(this.map);
 
-          this.accuracyCircle = L.circle([lat, lng], {
-            radius: 10,
-            color: '#3b82f6',
-            fillOpacity: 0.15
-          }).addTo(this.map);
+        this.accuracyCircle = L.circle([lat, lng], {
+          radius: 10,
+          color: '#3b82f6',
+          fillOpacity: 0.15
+        }).addTo(this.map);
 
-          this.map.setView([lat, lng], 16);
+        this.map.setView([lat, lng], 16);
 
-        } else {
-          this.userMarker.setLatLng([lat, lng]);
-          this.accuracyCircle.setLatLng([lat, lng]);
+      } else {
+        this.userMarker.setLatLng([lat, lng]);
+        this.accuracyCircle.setLatLng([lat, lng]);
 
-          if (this.followUser) {
-            this.map.setView([lat, lng], this.map.getZoom());
-          }
+        if (this.followUser) {
+          this.map.setView([lat, lng], this.map.getZoom());
         }
       }
-    });
+    }
+  });
+
+  // ✅ Restaurar ruta trazada si existe
+  const rutaGuardada = this.trackingService.estadoRutaActual;
+  if (rutaGuardada.activa && rutaGuardada.puntos.length > 0) {
+    this.restaurarRutaTrazada(rutaGuardada);
   }
+}
+
+// ✅ Restaurar ruta en el mapa
+private restaurarRutaTrazada(rutaGuardada: any) {
+  // Restaurar polyline
+  const latLngs = rutaGuardada.puntos.map(
+    (p: any) => L.latLng(p.lat, p.lng)
+  );
+
+  this.rutaControl = L.polyline(latLngs, {
+    color: '#e74c3c',
+    weight: 5,
+    opacity: 0.8
+  }).addTo(this.map);
+
+  // Restaurar instrucciones
+  this.instrucciones = rutaGuardada.instrucciones;
+  this.perfilRuta = rutaGuardada.perfilRuta;
+
+  // Restaurar marcadores de origen y destino
+  const emojis = ['🟢', '🔴'];
+  rutaGuardada.puntosMarcados.forEach((p: any, i: number) => {
+    const icono = this.crearIconoMarcador(emojis[i], '');
+    const marcador = L.marker([p.lat, p.lng], { icon: icono }).addTo(this.map);
+    this.marcadoresRuta.push(marcador);
+    this.puntosRuta.push(L.latLng(p.lat, p.lng));
+  });
+
+  // Centrar mapa en la ruta
+  this.map.fitBounds((this.rutaControl as any).getBounds(), { padding: [40, 40] });
+}
 
   // =========================
   // ▶️ TRACKING ACTIONS
@@ -337,6 +373,14 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       const tiempo = Math.round(resumen.duration / 60);
       await this.showToast(`🥾 ${distancia} km · ~${tiempo} min`, 'success');
 
+      // ✅ Guardar ruta en el servicio
+this.trackingService.guardarRutaTrazada(
+  latLngs.map(ll => ({ lat: ll.lat, lng: ll.lng })),
+  this.instrucciones,
+  this.perfilRuta,
+  this.puntosRuta.map(p => ({ lat: p.lat, lng: p.lng }))
+);
+
     } catch (error) {
       await this.showToast('Error al calcular la ruta', 'danger');
       this.limpiarRutaTrazada();
@@ -360,20 +404,23 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   // ✅ Un solo método limpiarRutaTrazada
-  limpiarRutaTrazada() {
-    if (this.rutaControl) {
-      this.map.removeLayer(this.rutaControl);
-      this.rutaControl = null;
-    }
-
-    this.marcadoresRuta.forEach(m => m.remove());
-    this.marcadoresRuta = [];
-    this.puntosRuta = [];
-    this.instrucciones = [];
-    this.mostrarInstrucciones = false;
-    this.modoRuta = false;
-    this.map.off('click');
+limpiarRutaTrazada() {
+  if (this.rutaControl) {
+    this.map.removeLayer(this.rutaControl);
+    this.rutaControl = null;
   }
+
+  this.marcadoresRuta.forEach(m => m.remove());
+  this.marcadoresRuta = [];
+  this.puntosRuta = [];
+  this.instrucciones = [];
+  this.mostrarInstrucciones = false;
+  this.modoRuta = false;
+  this.map.off('click');
+
+  // ✅ Limpiar también en el servicio
+  this.trackingService.limpiarRutaTrazada();
+}
 
   toggleInstrucciones() {
     this.mostrarInstrucciones = !this.mostrarInstrucciones;

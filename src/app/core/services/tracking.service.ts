@@ -17,6 +17,20 @@ export interface EstadoTracking {
   posicionActual: { lat: number; lng: number } | null;
 }
 
+// ✅ Agrega estas interfaces
+export interface PuntoRutaTrazada {
+  lat: number;
+  lng: number;
+}
+
+export interface EstadoRutaTrazada {
+  activa: boolean;
+  puntos: PuntoRutaTrazada[];
+  instrucciones: { instruccion: string; distancia: string }[];
+  perfilRuta: 'hike' | 'foot' | 'car';
+  puntosMarcados: { lat: number; lng: number }[];
+}
+
 @Injectable({
   providedIn: 'root' // ✅ Singleton, vive toda la app
 })
@@ -235,4 +249,46 @@ iniciarWatcherPosicion() {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
+
+  // ✅ Estado de ruta trazada persistente
+private estadoRuta = new BehaviorSubject<EstadoRutaTrazada>({
+  activa: false,
+  puntos: [],
+  instrucciones: [],
+  perfilRuta: 'hike',
+  puntosMarcados: [],
+});
+
+estadoRuta$ = this.estadoRuta.asObservable();
+
+get estadoRutaActual(): EstadoRutaTrazada {
+  return this.estadoRuta.getValue();
+}
+
+// ✅ Guardar ruta trazada
+guardarRutaTrazada(
+  puntos: { lat: number; lng: number }[],
+  instrucciones: { instruccion: string; distancia: string }[],
+  perfilRuta: 'hike' | 'foot' | 'car',
+  puntosMarcados: { lat: number; lng: number }[]
+) {
+  this.estadoRuta.next({
+    activa: true,
+    puntos,
+    instrucciones,
+    perfilRuta,
+    puntosMarcados,
+  });
+}
+
+// ✅ Limpiar ruta trazada
+limpiarRutaTrazada() {
+  this.estadoRuta.next({
+    activa: false,
+    puntos: [],
+    instrucciones: [],
+    perfilRuta: 'hike',
+    puntosMarcados: [],
+  });
+}
 }
