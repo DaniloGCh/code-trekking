@@ -32,22 +32,22 @@
 
   <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-          <!-- 🌤️ CLIMA + HORA -->
-      <ion-button fill="clear" class="weather-chip" (click)="openWeatherLink()">
+    <!-- 🌤️ CLIMA + HORA -->
+    <ion-button fill="clear" class="weather-chip" (click)="openWeatherLink()">
 
-        <div class="weather-info">
+      <div class="weather-info">
 
-          <ion-icon [name]="icon$ | async"></ion-icon>
+        <ion-icon [name]="icon$ | async"></ion-icon>
 
-          <div>
-            <span class="temp">{{ temperature$ | async }}°C</span>
-            <span class="desc">{{ description$ | async }}</span>
-            <small class="location">📍 {{ locationName$ | async }}</small>
-          </div>
-
+        <div>
+          <span class="temp">{{ temperature$ | async }}°C</span>
+          <span class="desc">{{ description$ | async }}</span>
+          <small class="location">📍 {{ locationName$ | async }}</small>
         </div>
 
-      </ion-button>
+      </div>
+
+    </ion-button>
     <!-- 👋 BIENVENIDA -->
     <div class="welcome-header" *ngIf="adminData">
 
@@ -392,6 +392,12 @@
                   <ion-item>
                     <ion-label>¿Requiere registro de acceso?</ion-label>
                     <ion-toggle formControlName="requiereRegistroAcceso" slot="end"></ion-toggle>
+                  </ion-item>
+
+                  <!-- Guia de montaña o turistico -->
+                  <ion-item>
+                    <ion-label>¿Requiere guía de montaña o turistico?</ion-label>
+                    <ion-toggle formControlName="requiereGuiaMontana" slot="end"></ion-toggle>
                   </ion-item>
 
                   <!-- PAGO DE ENTRADA -->

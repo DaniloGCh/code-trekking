@@ -8,7 +8,7 @@
 
     <ion-buttons slot="end">
 
-                 
+
       <ion-button *ngIf="userData" (click)="goHome()">
         <ion-icon slot="icon-only" name="home-outline"></ion-icon>
       </ion-button>
@@ -54,10 +54,23 @@
         <div class="avatar-overlay">
           <ion-icon name="camera-outline"></ion-icon>
         </div>
-
       </div>
 
-      <h2>{{ userData.nombre }}</h2>
+      <!-- Nombre + botón editar -->
+      <div class="nombre-container">
+        <h2>{{ userData.nombre }}</h2>
+
+        <ion-button fill="clear" size="small" (click)="onEditNombre()">
+          <ion-icon name="pencil-outline" color="success"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Info cambio nombre -->
+      <p *ngIf="userData.ultimoCambioNombre" class="cambio-info">
+        {{ getDiasRestantesCambioNombre() > 0 
+        ? '🔒 Puedes cambiar el nombre en ' + getDiasRestantesCambioNombre() + ' día(s)'
+        : '✅ Puedes cambiar tu nombre' }}
+      </p>
 
       <ion-badge *ngIf="userData.rol === 'admin'" color="danger">
         {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}

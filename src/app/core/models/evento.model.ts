@@ -13,10 +13,12 @@ export interface Lugar {
   longitud?: number;
 
   requiereRegistroAcceso: boolean;          // ✅ Nuevo
+  requiereGuiaMontana: boolean;
+
   requierePagoEntrada: boolean;          // ✅ Nuevo
   valorEntrada?: number; // 👈 AGREGAR ESTO
-  requiereHorarioVisita: boolean;
 
+  requiereHorarioVisita: boolean;
   horarioVisita?: {
     apertura: string;
     cierre: string;
@@ -24,7 +26,6 @@ export interface Lugar {
   requierePermiso: boolean;          // ✅ Nuevo
 
   requiereMasInformacion: boolean;
-
   MasInformacion?: {
     Texto: string;
     URL: string;

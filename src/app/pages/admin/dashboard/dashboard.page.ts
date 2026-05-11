@@ -189,6 +189,7 @@ export class DashboardPage implements OnInit {
     longitud: [''],
 
     requiereRegistroAcceso: [false],
+    requiereGuiaMontana:[false],
     requierePagoEntrada: [false],
     valorEntrada: [null],
 
@@ -231,6 +232,7 @@ export class DashboardPage implements OnInit {
   get fRequierePagoEntrada() { return this.lugarForm.get('requierePagoEntrada'); }
   get fRequierePermiso() { return this.lugarForm.get('requierePermiso'); }
   get fRequiereRegistroAcceso() { return this.lugarForm.get('requiereRegistroAcceso'); }
+  get fRequiereGuiaMontana () {return this.lugarForm.get('requiereGuiaMontana')}
   get fRequiereHorarioVisita() { return this.lugarForm.get('requiereHorarioVisita'); }
   get fHorarioVisita() { return this.lugarForm.get('horarioVisita'); }
   get fRequiereMasInformacion() { return this.lugarForm.get('requiereMasInformacion'); }
@@ -557,6 +559,7 @@ export class DashboardPage implements OnInit {
       latitud: lugar.latitud || '',
       longitud: lugar.longitud || '',
       requiereRegistroAcceso: lugar.requiereRegistroAcceso,
+      requiereGuiaMontana: lugar.requiereGuiaMontana,
       requierePagoEntrada: lugar.requierePagoEntrada,
       requiereHorarioVisita: lugar.requiereHorarioVisita,
       horarioVisita: {
@@ -618,6 +621,7 @@ export class DashboardPage implements OnInit {
 
         requierePermiso: this.lugarForm.value.requierePermiso,
         requiereRegistroAcceso: this.lugarForm.value.requiereRegistroAcceso,
+        requiereGuiaMontana: this.lugarForm.value.requiereGuiaMontana,
         requiereHorarioVisita: this.lugarForm.value.requiereHorarioVisita,
 
         horarioVisita: this.lugarForm.value.requiereHorarioVisita

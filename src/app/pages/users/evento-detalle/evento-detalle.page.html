@@ -273,6 +273,17 @@
           </ion-label>
         </ion-item>
 
+                <ion-item>
+          <ion-icon [name]="evento.lugar.requiereGuiaMontana ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start" [color]="evento.lugar.requiereGuiaMontana ? 'warning' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Guia de montaña o turistico</p>
+            <h3> {{ evento.lugar.requiereGuiaMontana ? 'Se recomienda guía de montaña o turistico para una mejor experiencia y cuidado' : 'No se requiere guía de montaña o turistico, pero para una mejor experiencia y cuidado siempre es bueno ir con un guía' }} </h3>
+          </ion-label>
+        </ion-item>
+
         <ion-item>
           <ion-icon [name]="evento.lugar.requierePagoEntrada ? 'alert-circle-outline' : 'checkmark-circle-outline'"
             slot="start" [color]="evento.lugar.requierePagoEntrada ? 'warning' : 'success'">

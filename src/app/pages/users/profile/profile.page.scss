@@ -69,6 +69,24 @@ ion-header ion-toolbar {
   color: #fff;
 }
 
+.nombre-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.nombre-container h2 {
+  margin: 0;
+}
+
+.nombre-container ion-button {
+  margin: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  height: auto;
+}
+
 .avatar-wrapper {
   position: relative;
   width: 150px;
@@ -307,3 +325,4 @@ ion-skeleton-text {
 .icon-green {
   color: #28a745; // verde personalizado
 }
+

@@ -290,6 +290,130 @@ export class ProfilePage implements OnInit {
     await toast.present();
   }
 
+  // ✏️ CAMBIAR NOMBRE DE USUARIO
+  async onEditNombre() {
+    if (!this.userData) return;
+
+    // ✅ Verificar si han pasado 90 días desde el último cambio
+    if (this.userData.ultimoCambioNombre) {
+      const ultimoCambio = new Date(this.userData.ultimoCambioNombre);
+      const hoy = new Date();
+      const diasTranscurridos = Math.floor(
+        (hoy.getTime() - ultimoCambio.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      const diasRestantes = 90 - diasTranscurridos;
+
+      if (diasRestantes > 0) {
+        const alert = await this.alertCtrl.create({
+          header: '⏳ Cambio no disponible',
+          message: `Solo puedes cambiar tu nombre cada 90 días. Podrás cambiarlo en ${diasRestantes} día(s).`,
+          buttons: ['Entendido']
+        });
+        await alert.present();
+        return;
+      }
+    }
+
+    // ✅ Advertencia de 90 días
+    const advertencia = await this.alertCtrl.create({
+      header: '⚠️ Antes de continuar',
+      message: 'Solo puedes cambiar tu nombre de usuario una vez cada 90 días. ¿Deseas continuar?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Continuar',
+          handler: () => this.mostrarFormCambioNombre()
+        }
+      ]
+    });
+
+    await advertencia.present();
+  }
+
+  // ✅ Formulario de cambio de nombre
+  private async mostrarFormCambioNombre() {
+    const alert = await this.alertCtrl.create({
+      header: 'Cambiar nombre de usuario',
+      inputs: [
+        {
+          name: 'nombre',
+          type: 'text',
+          value: this.userData?.nombre || '',
+          placeholder: 'Nuevo nombre de usuario',
+          attributes: { maxlength: 30 }
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Guardar',
+          handler: async (data) => {
+            const nuevoNombre = data.nombre?.trim();
+
+            if (!nuevoNombre || nuevoNombre.length < 3) {
+              await this.showToast('El nombre debe tener mínimo 3 caracteres', 'warning');
+              return false;
+            }
+
+            if (nuevoNombre === this.userData?.nombre) {
+              await this.showToast('El nombre es igual al actual', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
+            await loading.present();
+
+            try {
+              // ✅ Verificar si el nombre está disponible
+              const disponible = await this.authService.isNombreDisponible(nuevoNombre);
+
+              if (!disponible) {
+                await loading.dismiss();
+                await this.showToast('Este nombre ya está en uso', 'danger');
+                return false;
+              }
+
+              // ✅ Guardar nuevo nombre con fecha de cambio
+              await this.authService.updateProfile({
+                nombre: nuevoNombre,
+                ultimoCambioNombre: new Date().toISOString()
+              });
+
+              if (this.userData) {
+                this.userData.nombre = nuevoNombre;
+                this.userData.ultimoCambioNombre = new Date().toISOString();
+              }
+
+              await loading.dismiss();
+              await this.showToast('Nombre actualizado correctamente', 'success');
+
+            } catch (error) {
+              await loading.dismiss();
+              await this.showToast('Error al actualizar el nombre', 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ✅ Calcular días restantes para cambio de nombre
+  getDiasRestantesCambioNombre(): number {
+    if (!this.userData?.ultimoCambioNombre) return 0;
+
+    const ultimoCambio = new Date(this.userData.ultimoCambioNombre);
+    const hoy = new Date();
+    const diasTranscurridos = Math.floor(
+      (hoy.getTime() - ultimoCambio.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    return Math.max(0, 90 - diasTranscurridos);
+  }
+
   // =========================
   // 📜 SCROLL
   // =========================

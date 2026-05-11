@@ -164,6 +164,7 @@ async onCrearEvento(lugares: Lugar[]) {
         longitud: lugar.longitud,
         
         requiereRegistroAcceso: lugar.requiereRegistroAcceso,
+        requiereGuiaMontana: lugar.requiereGuiaMontana,
         requierePagoEntrada: lugar.requierePagoEntrada,
         valorEntrada: lugar.valorEntrada,
 

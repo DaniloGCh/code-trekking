@@ -27,6 +27,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
   collection,
   collectionData,
   updateDoc,
@@ -57,6 +58,7 @@ export interface UserData {
   preguntaSeguridad?: string;
   respuestaSeguridad?: string;
   contactosEmergencia?: ContactoEmergencia[]; // ✅ Nuevo
+  ultimoCambioNombre?: string; // ✅ Fecha en ISO string
 }
 
 @Injectable({
@@ -248,4 +250,12 @@ export class AuthService {
     await deleteDoc(userRef);
     await deleteUser(currentUser);
   }
+
+  // ✅ VERIFICAR SI NOMBRE ESTÁ EN USO
+async isNombreDisponible(nombre: string): Promise<boolean> {
+  const usuariosRef = collection(this.firestore, 'usuarios');
+  const snapshot = await getDocs(usuariosRef);
+  const nombres = snapshot.docs.map(d => (d.data() as UserData).nombre?.toLowerCase().trim());
+  return !nombres.includes(nombre.toLowerCase().trim());
+}
 }
