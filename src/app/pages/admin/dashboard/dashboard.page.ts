@@ -84,6 +84,8 @@ export class DashboardPage implements OnInit {
   humidity$ = this.weatherGlobal.humidity;
   windSpeed$ = this.weatherGlobal.windSpeed;
 
+  safeMapaRutaUrl?: SafeResourceUrl;
+
   // =========================
   // 📜 UI STATE
   // =========================
@@ -189,7 +191,7 @@ export class DashboardPage implements OnInit {
     longitud: [''],
 
     requiereRegistroAcceso: [false],
-    requiereGuiaMontana:[false],
+    requiereGuiaMontana: [false],
     requierePagoEntrada: [false],
     valorEntrada: [null],
 
@@ -228,11 +230,11 @@ export class DashboardPage implements OnInit {
   get fDistanciaKm() { return this.lugarForm.get('distanciaKm'); }
   get fTiempoEstimadoHoras() { return this.lugarForm.get('tiempoEstimadoHoras'); }
   get fEquipamiento() { return this.lugarForm.get('equipamiento'); }
-  get fDireccionPuntoInicio() { return this.lugarForm.get('direccionPuntoInicio'); }
+  get fDireccionPuntoInicio() {return this.lugarForm.get('DireccionPuntoInicio');}
   get fRequierePagoEntrada() { return this.lugarForm.get('requierePagoEntrada'); }
   get fRequierePermiso() { return this.lugarForm.get('requierePermiso'); }
   get fRequiereRegistroAcceso() { return this.lugarForm.get('requiereRegistroAcceso'); }
-  get fRequiereGuiaMontana () {return this.lugarForm.get('requiereGuiaMontana')}
+  get fRequiereGuiaMontana() { return this.lugarForm.get('requiereGuiaMontana') }
   get fRequiereHorarioVisita() { return this.lugarForm.get('requiereHorarioVisita'); }
   get fHorarioVisita() { return this.lugarForm.get('horarioVisita'); }
   get fRequiereMasInformacion() { return this.lugarForm.get('requiereMasInformacion'); }
@@ -295,6 +297,17 @@ export class DashboardPage implements OnInit {
       this.totalUsers = users.length;
       this.totalAdmins = users.filter(u => u.rol === 'admin').length;
       this.totalRegulares = users.filter(u => u.rol === 'user').length;
+    });
+
+    this.lugarForm.get('mapaRutaUrl')?.valueChanges.subscribe((url: string) => {
+
+      if (url) {
+        this.safeMapaRutaUrl =
+          this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      } else {
+        this.safeMapaRutaUrl = undefined;
+      }
+
     });
 
     this.lugarForm.get('requierePagoEntrada')?.valueChanges.subscribe((requiere: boolean) => {
@@ -674,7 +687,7 @@ export class DashboardPage implements OnInit {
   onCancelarForm() {
     this.mostrarFormLugar = false;
     this.lugarEditando = null;
-    this.lugarForm.reset
+    this.lugarForm.reset();
   }
 
   async onEliminarLugar(lugar: Lugar) {
@@ -890,9 +903,9 @@ export class DashboardPage implements OnInit {
   }
 
   // ✅ Agrega este método
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  }
+  // getSafeUrl(url: string): SafeResourceUrl {
+  //   return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  // }
 
   // ✅ Verificar contraseña antes de abrir el panel
   async onAbrirPanel(event: any) {
