@@ -203,7 +203,7 @@ export class CrearEventoPage implements OnInit {
     } catch (error) {
       await loading.dismiss();
       await this.showToast('Error al crear el evento', 'danger');
-      console.log(error);
+      // console.log(error);
 
     }
   }

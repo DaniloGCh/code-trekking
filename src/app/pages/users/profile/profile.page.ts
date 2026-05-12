@@ -291,15 +291,15 @@ export class ProfilePage implements OnInit {
   }
 
   // ✏️ CAMBIAR NOMBRE DE USUARIO
+  // ✏️ CAMBIAR NOMBRE DE USUARIO
   async onEditNombre() {
     if (!this.userData) return;
 
-    // ✅ Verificar si han pasado 90 días desde el último cambio
+    // ✅ Verificar si han pasado 90 días
     if (this.userData.ultimoCambioNombre) {
       const ultimoCambio = new Date(this.userData.ultimoCambioNombre);
-      const hoy = new Date();
       const diasTranscurridos = Math.floor(
-        (hoy.getTime() - ultimoCambio.getTime()) / (1000 * 60 * 60 * 24)
+        (new Date().getTime() - ultimoCambio.getTime()) / (1000 * 60 * 60 * 24)
       );
       const diasRestantes = 90 - diasTranscurridos;
 
@@ -314,15 +314,15 @@ export class ProfilePage implements OnInit {
       }
     }
 
-    // ✅ Advertencia de 90 días
+    // ✅ Paso 1: Advertencia de 90 días
     const advertencia = await this.alertCtrl.create({
       header: '⚠️ Antes de continuar',
-      message: 'Solo puedes cambiar tu nombre de usuario una vez cada 90 días. ¿Deseas continuar?',
+      message: 'Solo puedes cambiar tu nombre una vez cada 90 días. ¿Deseas continuar?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Continuar',
-          handler: () => this.mostrarFormCambioNombre()
+          handler: () => this.verificarPreguntaSeguridad()
         }
       ]
     });
@@ -330,10 +330,103 @@ export class ProfilePage implements OnInit {
     await advertencia.present();
   }
 
-  // ✅ Formulario de cambio de nombre
+  // ✅ Paso 2: Pregunta de seguridad
+  private async verificarPreguntaSeguridad() {
+    const alert = await this.alertCtrl.create({
+      header: '🔐 Verificación de seguridad',
+      message: `${this.userData?.preguntaSeguridad}`,
+      inputs: [
+        {
+          name: 'respuesta',
+          type: 'text',
+          placeholder: 'Tu respuesta de seguridad'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Siguiente',
+          handler: async (data) => {
+            if (!data.respuesta || data.respuesta.trim().length === 0) {
+              await this.showToast('Ingresa tu respuesta de seguridad', 'warning');
+              return false;
+            }
+
+            const respuestaGuardada = this.userData?.respuestaSeguridad?.toLowerCase().trim();
+            const respuestaIngresada = data.respuesta.toLowerCase().trim();
+
+            if (respuestaGuardada !== respuestaIngresada) {
+              await this.showToast('La respuesta de seguridad es incorrecta', 'danger');
+              return false;
+            }
+
+            // ✅ Respuesta correcta, ir al paso 3
+            await this.verificarContrasena();
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ✅ Paso 3: Contraseña
+  private async verificarContrasena() {
+    const alert = await this.alertCtrl.create({
+      header: '🔑 Confirma tu contraseña',
+      inputs: [
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Tu contraseña actual'
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Siguiente',
+          handler: async (data) => {
+            if (!data.password) {
+              await this.showToast('Ingresa tu contraseña', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
+            await loading.present();
+
+            try {
+              // Reautenticar
+              const { EmailAuthProvider, reauthenticateWithCredential } = await import('@angular/fire/auth');
+              const currentUser = this.authService['auth'].currentUser;
+              if (!currentUser || !currentUser.email) throw new Error('No autenticado');
+
+              const credential = EmailAuthProvider.credential(currentUser.email, data.password);
+              await reauthenticateWithCredential(currentUser, credential);
+
+              await loading.dismiss();
+
+              // ✅ Todo verificado, mostrar formulario de cambio
+              await this.mostrarFormCambioNombre();
+
+            } catch (error: any) {
+              await loading.dismiss();
+              await this.showToast('Contraseña incorrecta', 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // ✅ Paso 4: Nuevo nombre
   private async mostrarFormCambioNombre() {
     const alert = await this.alertCtrl.create({
-      header: 'Cambiar nombre de usuario',
+      header: '✏️ Cambiar nombre de usuario',
       inputs: [
         {
           name: 'nombre',
@@ -360,11 +453,11 @@ export class ProfilePage implements OnInit {
               return false;
             }
 
-            const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
+            const loading = await this.loadingCtrl.create({ message: 'Verificando disponibilidad...' });
             await loading.present();
 
             try {
-              // ✅ Verificar si el nombre está disponible
+              // ✅ Verificar disponibilidad
               const disponible = await this.authService.isNombreDisponible(nuevoNombre);
 
               if (!disponible) {
@@ -373,7 +466,7 @@ export class ProfilePage implements OnInit {
                 return false;
               }
 
-              // ✅ Guardar nuevo nombre con fecha de cambio
+              // ✅ Guardar con fecha
               await this.authService.updateProfile({
                 nombre: nuevoNombre,
                 ultimoCambioNombre: new Date().toISOString()
@@ -401,16 +494,12 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-  // ✅ Calcular días restantes para cambio de nombre
+  // ✅ Días restantes para cambio de nombre
   getDiasRestantesCambioNombre(): number {
     if (!this.userData?.ultimoCambioNombre) return 0;
-
-    const ultimoCambio = new Date(this.userData.ultimoCambioNombre);
-    const hoy = new Date();
     const diasTranscurridos = Math.floor(
-      (hoy.getTime() - ultimoCambio.getTime()) / (1000 * 60 * 60 * 24)
+      (new Date().getTime() - new Date(this.userData.ultimoCambioNombre).getTime()) / (1000 * 60 * 60 * 24)
     );
-
     return Math.max(0, 90 - diasTranscurridos);
   }
 
