@@ -151,7 +151,7 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   async onEliminarEvento() {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar evento',
-      message: `¿Eliminar <strong>${this.evento?.nombre}</strong>? Esta acción es irreversible.`,
+      message: `¿Eliminar ${this.evento?.nombre}? Esta acción es irreversible.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {

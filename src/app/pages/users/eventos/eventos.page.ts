@@ -237,7 +237,7 @@ export class EventosPage implements OnInit {
 
     const alert = await this.alertCtrl.create({
       header: 'Eliminar evento',
-      message: `¿Eliminar <strong>${evento.nombre}</strong>?`,
+      message: `¿Eliminar ${evento.nombre}?`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {

@@ -174,7 +174,7 @@ export class SettingsPage implements OnInit {
   async onEliminarContacto(index: number) {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar contacto',
-      message: `¿Eliminar a <strong>${this.contactos[index].nombre}</strong> de tus contactos de emergencia?`,
+      message: `¿Eliminar a ${this.contactos[index].nombre} de tus contactos de emergencia?`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
