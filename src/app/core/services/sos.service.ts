@@ -43,9 +43,8 @@ export class SosService {
 
   async obtenerUbicacion(): Promise<UbicacionSOS> {
     return new Promise((resolve, reject) => {
-
       if (!navigator.geolocation) {
-        reject(new Error('GPS no disponible'));
+        reject(new Error('GPS no disponible en este dispositivo'));
         return;
       }
 
@@ -59,33 +58,40 @@ export class SosService {
           });
         },
         (error) => {
-
-          console.error('❌ Error GPS:', error);
-
           switch (error.code) {
-            case error.PERMISSION_DENIED:
+            case 1:
               reject(new Error('permiso-denegado'));
               break;
-
-            case error.POSITION_UNAVAILABLE:
-              reject(new Error('ubicacion-no-disponible'));
+            case 2:
+              reject(new Error('Posición no disponible'));
               break;
-
-            case error.TIMEOUT:
-              reject(new Error('tiempo-excedido'));
+            case 3:
+              // ✅ Timeout: reintentar con menor precisión
+              navigator.geolocation.getCurrentPosition(
+                (posicion) => {
+                  resolve({
+                    latitud: posicion.coords.latitude,
+                    longitud: posicion.coords.longitude,
+                    precision: posicion.coords.accuracy,
+                    timestamp: new Date(),
+                  });
+                },
+                (err) => reject(new Error('No se pudo obtener ubicación')),
+                {
+                  enableHighAccuracy: false, // ✅ Menor precisión pero más rápido
+                  timeout: 60000,
+                  maximumAge: 60000         // ✅ Acepta posición cacheada de hasta 1 min
+                }
+              );
               break;
-
-            default:
-              reject(new Error('error-desconocido'));
           }
         },
         {
           enableHighAccuracy: true,
-          timeout: 60000, // ⬅️ MÁS TIEMPO
-          maximumAge: 10000 // ⬅️ PERMITE CACHE
+          timeout: 30000,
+          maximumAge: 10000
         }
       );
-
     });
   }
 
