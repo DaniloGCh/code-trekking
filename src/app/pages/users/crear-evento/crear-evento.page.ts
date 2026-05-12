@@ -123,88 +123,90 @@ export class CrearEventoPage implements OnInit {
   // =========================
   // 🚀 CREAR EVENTO
   // =========================
-async onCrearEvento(lugares: Lugar[]) {
-  if (this.eventoForm.invalid) {
-    this.eventoForm.markAllAsTouched();
-    return;
-  }
+  async onCrearEvento(lugares: Lugar[]) {
+    if (this.eventoForm.invalid) {
+      this.eventoForm.markAllAsTouched();
+      return;
+    }
 
-  const loading = await this.loadingCtrl.create({
-    message: 'Creando evento...',
-  });
-
-  await loading.present();
-
-  try {
-    const userData = await this.authService.getCurrentUserData();
-    const { nombre, descripcion, fecha, hora, lugarId } =
-      this.eventoForm.value;
-
-    const lugar = lugares.find((l) => l.id === lugarId)!;
-
-    await this.eventoService.crearEvento({
-      nombre,
-      descripcion,
-      fecha: new Date(fecha),
-      hora,
-      lugarId,
-
-      // 🔥 AQUÍ ESTÁ LA CLAVE
-      lugar: {
-        id: lugar.id,
-        nombre: lugar.nombre,
-        informacion: lugar.informacion,
-        altitud: lugar.altitud,
-        dificultad: lugar.dificultad,
-        distanciaKm: lugar.distanciaKm,
-        tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
-        equipamiento: lugar.equipamiento,
-        DireccionPuntoInicio: lugar.DireccionPuntoInicio,
-        latitud: lugar.latitud,
-        longitud: lugar.longitud,
-        
-        requiereRegistroAcceso: lugar.requiereRegistroAcceso,
-        requiereGuiaMontana: lugar.requiereGuiaMontana,
-        requierePagoEntrada: lugar.requierePagoEntrada,
-        valorEntrada: lugar.valorEntrada,
-
-        requiereMasInformacion: lugar.requiereMasInformacion,
-        MasInformacion: lugar.requiereMasInformacion
-          ? lugar.MasInformacion
-          : undefined,
-
-        requiereHorarioVisita: lugar.requiereHorarioVisita,
-
-        // ✅ ESTO TE FALTABA
-        horarioVisita: lugar.requiereHorarioVisita
-          ? lugar.horarioVisita
-          : undefined,
-
-        requierePermiso: lugar.requierePermiso,
-        mapaRutaUrl: lugar.mapaRutaUrl || '', // ✅ Faltaba este campo
-      },
-
-      creadoPor: {
-        uid: userData!.uid,
-        nombre: userData!.nombre,
-      },
-
-      privado: true,
+    const loading = await this.loadingCtrl.create({
+      message: 'Creando evento...',
     });
 
-    await loading.dismiss();
+    await loading.present();
 
-    await this.showToast('¡Evento creado exitosamente!', 'success');
+    try {
+      const userData = await this.authService.getCurrentUserData();
+      const { nombre, descripcion, fecha, hora, lugarId } =
+        this.eventoForm.value;
 
-    this.router.navigateByUrl('/tabs/eventos', {
-      replaceUrl: true,
-    });
+      const lugar = lugares.find((l) => l.id === lugarId)!;
 
-  } catch (error) {
-    await loading.dismiss();
-    await this.showToast('Error al crear el evento', 'danger');
+      await this.eventoService.crearEvento({
+        nombre,
+        descripcion,
+        fecha: new Date(fecha),
+        hora,
+        lugarId,
+
+        // 🔥 AQUÍ ESTÁ LA CLAVE
+        lugar: {
+          id: lugar.id,
+          nombre: lugar.nombre,
+          informacion: lugar.informacion,
+          altitud: lugar.altitud,
+          dificultad: lugar.dificultad,
+          distanciaKm: lugar.distanciaKm,
+          tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
+          equipamiento: lugar.equipamiento,
+          DireccionPuntoInicio: lugar.DireccionPuntoInicio,
+          latitud: lugar.latitud ?? null,           // ✅ null en vez de undefined
+          longitud: lugar.longitud ?? null,          // ✅ null en vez de undefined
+
+          requiereRegistroAcceso: lugar.requiereRegistroAcceso,
+          requiereGuiaMontana: lugar.requiereGuiaMontana,
+          requierePagoEntrada: lugar.requierePagoEntrada,
+          valorEntrada: lugar.requierePagoEntrada    // ✅ null si no requiere pago
+            ? lugar.valorEntrada
+            : null,
+
+          requiereMasInformacion: lugar.requiereMasInformacion,
+          MasInformacion: lugar.requiereMasInformacion
+            ? lugar.MasInformacion
+            : null,                                  // ✅ null en vez de undefined
+
+          requiereHorarioVisita: lugar.requiereHorarioVisita,
+          horarioVisita: lugar.requiereHorarioVisita
+            ? lugar.horarioVisita
+            : null,                                  // ✅ null en vez de undefined
+
+          requierePermiso: lugar.requierePermiso,
+          mapaRutaUrl: lugar.mapaRutaUrl || '',
+        },
+
+        creadoPor: {
+          uid: userData!.uid,
+          nombre: userData!.nombre,
+        },
+
+        privado: true,
+      });
+
+      await loading.dismiss();
+
+      await this.showToast('¡Evento creado exitosamente!', 'success');
+
+      this.router.navigateByUrl('/tabs/eventos', {
+        replaceUrl: true,
+      });
+
+    } catch (error) {
+      await loading.dismiss();
+      await this.showToast('Error al crear el evento', 'danger');
+      console.log(error);
+
+    }
   }
-}
 
   // =========================
   // 🔙 NAVEGACIÓN

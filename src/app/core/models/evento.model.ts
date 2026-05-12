@@ -4,36 +4,34 @@ export interface Lugar {
   informacion: string;
   altitud: string;
   dificultad: 'Baja' | 'Baja - Media' | 'Media' | 'Media - Alta' | 'Alta' | 'Alta - Muy Alta';
-  distanciaKm: number;               // ✅ Nuevo
-  tiempoEstimadoHoras: string;       // ✅ Nuevo
-  equipamiento: string[];            // ✅ Nuevo
-  DireccionPuntoInicio: string;               // ✅ Nuevo
-    // 🆕 COORDENADAS (PRO)
-  latitud?: number;
-  longitud?: number;
+  distanciaKm: number;
+  tiempoEstimadoHoras: string;
+  equipamiento: string[];
+  DireccionPuntoInicio: string;
 
-  requiereRegistroAcceso: boolean;          // ✅ Nuevo
+  latitud?: number | null;        // ✅ Acepta null
+  longitud?: number | null;       // ✅ Acepta null
+
+  requiereRegistroAcceso: boolean;
   requiereGuiaMontana: boolean;
-
-  requierePagoEntrada: boolean;          // ✅ Nuevo
-  valorEntrada?: number; // 👈 AGREGAR ESTO
+  requierePagoEntrada: boolean;
+  valorEntrada?: number | null;   // ✅ Acepta null
 
   requiereHorarioVisita: boolean;
   horarioVisita?: {
     apertura: string;
     cierre: string;
-  };
-  requierePermiso: boolean;          // ✅ Nuevo
+  } | null;                       // ✅ Acepta null
 
+  requierePermiso: boolean;
   requiereMasInformacion: boolean;
   MasInformacion?: {
     Texto: string;
     URL: string;
     Otro: string;
-  };
+  } | null;                       // ✅ Acepta null
 
-    // ✅ NUEVO CAMPO LIMPIO Y SEGURO
-  mapaRutaUrl?: string; // 🔥 SOLO LA URL DEL EMBED
+  mapaRutaUrl?: string;
 }
 
 export interface Participante {

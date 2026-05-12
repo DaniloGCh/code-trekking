@@ -1,21 +1,20 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
-
 import { Auth } from '@angular/fire/auth';
-
 import { EventoService } from 'src/app/core/services/evento.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { Evento } from 'src/app/core/models/evento.model';
-// ✅ Agrega este import
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-evento-detalle',
   templateUrl: './evento-detalle.page.html',
   styleUrls: ['./evento-detalle.page.scss'],
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush // ✅ Evita re-renders innecesarios
 })
 export class EventoDetallePage implements OnInit {
 
@@ -30,9 +29,8 @@ export class EventoDetallePage implements OnInit {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
-  // ✅ Inyecta el sanitizer
   private sanitizer = inject(DomSanitizer);
-
+  private cdr = inject(ChangeDetectorRef); // ✅ Para notificar cambios manualmente
 
   // =========================
   // 📦 ESTADO DEL COMPONENTE
@@ -41,9 +39,11 @@ export class EventoDetallePage implements OnInit {
   currentUid = this.auth.currentUser?.uid;
   esCreadoPor = false;
   mensajesNuevos = 0;
-
   hideHeader = false;
   lastScrollTop = 0;
+
+  // ✅ URL cacheada, se calcula una sola vez
+  mapaUrlSafe: SafeResourceUrl | null = null;
 
   // =========================
   // 🚀 INICIALIZACIÓN
@@ -55,12 +55,18 @@ export class EventoDetallePage implements OnInit {
     const loading = await this.loadingCtrl.create({
       message: 'Cargando evento...'
     });
-
     await loading.present();
 
     try {
       this.evento = await this.eventoService.getEventoById(id);
       this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
+
+      // ✅ Cachear URL del mapa una sola vez
+      if (this.evento?.lugar?.mapaRutaUrl) {
+        this.mapaUrlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.evento.lugar.mapaRutaUrl
+        );
+      }
 
       if (this.evento && this.currentUid) {
         this.mensajesNuevos = await this.eventoService.contarMensajesNuevos(
@@ -70,6 +76,7 @@ export class EventoDetallePage implements OnInit {
       }
 
       await loading.dismiss();
+      this.cdr.markForCheck(); // ✅ Notificar cambios manualmente
 
     } catch (error) {
       await loading.dismiss();
@@ -83,7 +90,6 @@ export class EventoDetallePage implements OnInit {
   // =========================
   async onCopiarCodigo() {
     if (!this.evento) return;
-
     await Clipboard.write({ string: this.evento.codigoInvitacion });
     await this.showToast('Código copiado al portapapeles', 'success');
   }
@@ -119,22 +125,14 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
         {
           text: 'Salir',
           handler: async () => {
-            const loading = await this.loadingCtrl.create({
-              message: 'Saliendo...'
-            });
-
+            const loading = await this.loadingCtrl.create({ message: 'Saliendo...' });
             await loading.present();
 
             try {
-              await this.eventoService.salirEvento(
-                this.evento!.id!,
-                this.currentUid!
-              );
-
+              await this.eventoService.salirEvento(this.evento!.id!, this.currentUid!);
               await loading.dismiss();
               await this.showToast('Saliste del evento', 'success');
               this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
-
             } catch {
               await loading.dismiss();
               await this.showToast('Error al salir del evento', 'danger');
@@ -159,19 +157,14 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
         {
           text: 'Eliminar',
           handler: async () => {
-            const loading = await this.loadingCtrl.create({
-              message: 'Eliminando...'
-            });
-
+            const loading = await this.loadingCtrl.create({ message: 'Eliminando...' });
             await loading.present();
 
             try {
               await this.eventoService.eliminarEvento(this.evento!.id!);
-
               await loading.dismiss();
               await this.showToast('Evento eliminado', 'success');
               this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
-
             } catch {
               await loading.dismiss();
               await this.showToast('Error al eliminar el evento', 'danger');
@@ -196,10 +189,11 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
       this.eventoService.marcarForoVisto(this.evento!.id!, this.currentUid);
       this.mensajesNuevos = 0;
     }
+    this.router.navigateByUrl(`/tabs/foro/${this.evento!.id}/${this.evento!.creadoPor.uid}`);
+  }
 
-    this.router.navigateByUrl(
-      `/tabs/foro/${this.evento!.id}/${this.evento!.creadoPor.uid}`
-    );
+  goMapa() {
+    this.router.navigateByUrl('/mapa');
   }
 
   // =========================
@@ -207,10 +201,7 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   // =========================
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
-
-    this.hideHeader =
-      scrollTop > this.lastScrollTop && scrollTop > 50;
-
+    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
     this.lastScrollTop = scrollTop;
   }
 
@@ -224,78 +215,41 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
       color,
       position: 'bottom'
     });
-
     await toast.present();
   }
 
-  // ✅ Agrega este método
-  getSafeUrl(url: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  // =========================
+  // 🔵 EVENTO PRÓXIMO
+  // =========================
+  esEventoProximo(evento: Evento): boolean {
+    if (!evento?.fecha) return false;
+    const fechaEvento = evento.fecha.toDate ? evento.fecha.toDate() : new Date(evento.fecha);
+    const hoy = new Date();
+    const eventoSinHora = new Date(fechaEvento.getFullYear(), fechaEvento.getMonth(), fechaEvento.getDate());
+    const hoySinHora = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    return eventoSinHora > hoySinHora;
   }
 
-    // =========================
-// 🔵 EVENTO PRÓXIMO (FUTURO)
-// =========================
-esEventoProximo(evento: Evento): boolean {
-  if (!evento?.fecha) return false;
-
-  const fechaEvento = evento.fecha.toDate
-    ? evento.fecha.toDate()
-    : new Date(evento.fecha);
-
-  const hoy = new Date();
-
-  // Limpiar horas para comparar solo fechas
-  const eventoSinHora = new Date(
-    fechaEvento.getFullYear(),
-    fechaEvento.getMonth(),
-    fechaEvento.getDate()
-  );
-
-  const hoySinHora = new Date(
-    hoy.getFullYear(),
-    hoy.getMonth(),
-    hoy.getDate()
-  );
-
-  return eventoSinHora > hoySinHora;
-}
+  // =========================
+  // 🟢 EVENTO EN CURSO
+  // =========================
+  esEventoEnCurso(evento: Evento): boolean {
+    if (!evento?.fecha) return false;
+    const fechaEvento = evento.fecha.toDate ? evento.fecha.toDate() : new Date(evento.fecha);
+    const hoy = new Date();
+    return (
+      fechaEvento.getDate() === hoy.getDate() &&
+      fechaEvento.getMonth() === hoy.getMonth() &&
+      fechaEvento.getFullYear() === hoy.getFullYear()
+    );
+  }
 
   // =========================
-// 🟢 EVENTO EN CURSO (HOY)
-// =========================
-esEventoEnCurso(evento: Evento): boolean {
-  if (!evento?.fecha) return false;
-
-  const fechaEvento = evento.fecha.toDate
-    ? evento.fecha.toDate()
-    : new Date(evento.fecha);
-
-  const hoy = new Date();
-
-  return (
-    fechaEvento.getDate() === hoy.getDate() &&
-    fechaEvento.getMonth() === hoy.getMonth() &&
-    fechaEvento.getFullYear() === hoy.getFullYear()
-  );
-}
-
-  // =========================
-  // ⏰ VALIDAR SI EVENTO FINALIZÓ
+  // ⏰ EVENTO FINALIZADO
   // =========================
   esEventoFinalizado(evento: Evento): boolean {
     if (!evento?.fecha) return false;
-
-    const fechaEvento = evento.fecha.toDate
-      ? evento.fecha.toDate() // 🔥 Firestore Timestamp
-      : new Date(evento.fecha);
-
-    const ahora = new Date();
-
-    return fechaEvento < ahora;
-  }
-
-    goMapa() {
-    this.router.navigateByUrl('/mapa');
+    const fechaEvento = evento.fecha.toDate ? evento.fecha.toDate() : new Date(evento.fecha);
+    return fechaEvento < new Date();
   }
 }
