@@ -19,32 +19,39 @@
   <meta name="msapplication-tap-highlight" content="no" />
 
   <!-- 🔒 CONTENT SECURITY POLICY -->
-  <meta
-    http-equiv="Content-Security-Policy"
-    content="
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval'
-        https://www.gstatic.com
-        https://apis.google.com;
-      style-src 'self' 'unsafe-inline'
-        https://fonts.googleapis.com;
-      font-src 'self'
-        https://fonts.gstatic.com;
-      img-src 'self' data: https:;
-      frame-src 'self'
-        https://es.wikiloc.com
-        https://wikiloc.com;
-      connect-src 'self'
-        https://*.firebaseio.com
-        https://*.googleapis.com
-        https://firestore.googleapis.com
-        wss://*.firebaseio.com
-        https://router.project-osrm.org
-        https://nominatim.openstreetmap.org
-        https://api.openweathermap.org
-        https://*.tile.openstreetmap.org;
-    "
-  />
+<meta
+  http-equiv="Content-Security-Policy"
+  content="
+    default-src 'self';
+
+    script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      https://www.gstatic.com
+      https://apis.google.com;
+
+    style-src 'self' 'unsafe-inline'
+      https://fonts.googleapis.com;
+
+    font-src 'self'
+      https://fonts.gstatic.com;
+
+    img-src 'self' data: https: blob:;
+
+    frame-src 'self'
+      https://es.wikiloc.com
+      https://wikiloc.com;
+
+    connect-src 'self'
+      https://*.firebaseio.com
+      https://*.googleapis.com
+      https://firestore.googleapis.com
+      wss://*.firebaseio.com
+      https://router.project-osrm.org
+      https://nominatim.openstreetmap.org
+      https://api.openweathermap.org
+      https://*.tile.openstreetmap.org
+      https://api.openrouteservice.org;
+  "
+/>
 
   <!-- 🛡️ Anti Clickjacking -->
   <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
