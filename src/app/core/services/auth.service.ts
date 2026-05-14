@@ -39,6 +39,8 @@ import {
 // =========================
 import { Observable } from 'rxjs';
 
+import { SecurityService } from './security.service';
+
 export interface ContactoEmergencia {
   nombre: string;
   telefono: string;
@@ -71,6 +73,9 @@ export class AuthService {
   // =========================
   private auth = inject(Auth);
   private firestore = inject(Firestore);
+  private security = inject(SecurityService);
+  private loginAttempts = 0;
+  private lastLoginAttempt = 0;
 
   // =========================
   // 👤 USUARIO EN TIEMPO REAL
@@ -80,36 +85,50 @@ export class AuthService {
   // =========================
   // ✅ REGISTRO
   // =========================
-  async register(
-    email: string,
-    password: string,
-    nombre: string,
-    rol: 'admin' | 'user' = 'user'
-  ): Promise<void> {
+  // ✅ REGISTRO con validaciones
+  async register(email: string, password: string, nombre: string, rol: 'admin' | 'user' = 'user'): Promise<void> {
+    // Validaciones de seguridad
+    if (!this.security.isValidEmail(email)) throw new Error('invalid-email');
+    if (!this.security.isSafeText(nombre, 50)) throw new Error('invalid-nombre');
 
-    const credential = await createUserWithEmailAndPassword(
-      this.auth,
-      email,
-      password
-    );
+    const passwordCheck = this.security.isStrongPassword(password);
+    if (!passwordCheck.valid) throw new Error(passwordCheck.message);
 
+    // Sanitizar nombre
+    const nombreSeguro = this.security.sanitizeInput(nombre);
+
+    const credential = await createUserWithEmailAndPassword(this.auth, email, password);
     const uid = credential.user.uid;
-
     const userRef = doc(this.firestore, `usuarios/${uid}`);
 
     await setDoc(userRef, {
       uid,
       email,
-      nombre,
-      rol
+      nombre: nombreSeguro,
+      rol,
+      fotoBase64: '',
+      estado: '',
+      creadoEn: new Date().toISOString()
     } as UserData);
   }
 
   // =========================
   // 🔑 LOGIN
   // =========================
+  // ✅ LOGIN con rate limiting
   async login(email: string, password: string): Promise<void> {
+    // Rate limiting: max 5 intentos por minuto
+    if (!this.security.checkRateLimit('login', 5, 60000)) {
+      throw new Error('too-many-attempts');
+    }
+
+    // Validar email
+    if (!this.security.isValidEmail(email)) {
+      throw new Error('invalid-email');
+    }
+
     await signInWithEmailAndPassword(this.auth, email, password);
+    this.security.resetRateLimit('login');
   }
 
   // =========================
@@ -252,10 +271,10 @@ export class AuthService {
   }
 
   // ✅ VERIFICAR SI NOMBRE ESTÁ EN USO
-async isNombreDisponible(nombre: string): Promise<boolean> {
-  const usuariosRef = collection(this.firestore, 'usuarios');
-  const snapshot = await getDocs(usuariosRef);
-  const nombres = snapshot.docs.map(d => (d.data() as UserData).nombre?.toLowerCase().trim());
-  return !nombres.includes(nombre.toLowerCase().trim());
-}
+  async isNombreDisponible(nombre: string): Promise<boolean> {
+    const usuariosRef = collection(this.firestore, 'usuarios');
+    const snapshot = await getDocs(usuariosRef);
+    const nombres = snapshot.docs.map(d => (d.data() as UserData).nombre?.toLowerCase().trim());
+    return !nombres.includes(nombre.toLowerCase().trim());
+  }
 }

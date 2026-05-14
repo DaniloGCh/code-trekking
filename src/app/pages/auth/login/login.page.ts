@@ -11,6 +11,8 @@ import { LoadingController, AlertController, ToastController } from '@ionic/angu
 // 🔹 Servicios
 import { AuthService } from 'src/app/core/services/auth.service';
 
+import { SecurityService } from 'src/app/core/services/security.service';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -28,6 +30,7 @@ export class LoginPage {
   private loadingCtrl = inject(LoadingController);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
+  private security = inject(SecurityService);
 
   // =========================
   // 👁️ PASSWORD VISIBILITY
@@ -56,36 +59,41 @@ export class LoginPage {
   // 🚀 LOGIN
   // =========================
   async onLogin() {
-
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Iniciando sesión...',
-    });
+    // ✅ Rate limiting en el frontend
+    if (!this.security.checkRateLimit('login-page', 5, 60000)) {
+      await this.showError('too-many-attempts');
+      return;
+    }
 
+    const loading = await this.loadingCtrl.create({ message: 'Iniciando sesión...' });
     await loading.present();
 
     try {
       const { email, password } = this.loginForm.value;
 
+      // ✅ Validar email antes de enviar
+      if (!this.security.isValidEmail(email)) {
+        throw { code: 'auth/invalid-email' };
+      }
+
       await this.authService.login(email, password);
-
       const rol = await this.authService.getUserRole();
-
       await loading.dismiss();
 
       if (rol === 'admin') {
-        this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+        this.router.navigateByUrl('/admin/dashboard', { replaceUrl: true });
       } else {
-        this.router.navigateByUrl('tabs/home', { replaceUrl: true });
+        this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
       }
 
     } catch (error: any) {
       await loading.dismiss();
-      await this.showError(error.code);
+      await this.showError(error.code || error.message);
     }
   }
 
@@ -146,23 +154,21 @@ export class LoginPage {
   // ❌ ERRORES LOGIN
   // =========================
   private async showError(errorCode: string) {
-
     const messages: Record<string, string> = {
-      'auth/user-not-found': 'No existe una cuenta con este correo.',
-      'auth/wrong-password': 'Contraseña incorrecta.',
-      'auth/invalid-email': 'Correo inválido.',
+      'auth/user-not-found': 'Credenciales inválidas.',        // ✅ Mensaje genérico (no revela si existe)
+      'auth/wrong-password': 'Credenciales inválidas.',        // ✅ Mismo mensaje por seguridad
+      'auth/invalid-email': 'El correo no es válido.',
       'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.',
       'auth/invalid-credential': 'Credenciales inválidas.',
+      'too-many-attempts': 'Demasiados intentos. Espera 1 minuto.',
     };
 
-    const message = messages[errorCode] || 'Error al iniciar sesión.';
-
+    const message = messages[errorCode] || 'Error al iniciar sesión. Intenta nuevamente.';
     const alert = await this.alertCtrl.create({
       header: 'Error',
       message,
       buttons: ['Aceptar'],
     });
-
     await alert.present();
   }
 

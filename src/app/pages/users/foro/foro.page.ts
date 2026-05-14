@@ -10,6 +10,8 @@ import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { MensajeForo } from 'src/app/core/models/evento.model';
 import { Observable } from 'rxjs';
 
+import { SecurityService } from 'src/app/core/services/security.service';
+
 @Component({
   selector: 'app-foro',
   templateUrl: './foro.page.html',
@@ -32,6 +34,7 @@ export class ForoPage implements OnInit {
   private route = inject(ActivatedRoute);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
+  private security = inject(SecurityService);
 
   // =========================
   // 📊 ESTADO GENERAL
@@ -98,23 +101,51 @@ async ngOnInit() {
   // ✍️ ENVIAR MENSAJE
   // =========================
 async onEnviarMensaje() {
-  if (!this.nuevoMensaje.trim() || !this.userData) return;
 
-  const texto = this.nuevoMensaje.trim();
+  if (!this.nuevoMensaje.trim()) return;
+  if (!this.userData) return;
+
+  // ✅ Validar contenido del mensaje
+  if (!this.security.isSafeText(this.nuevoMensaje, 500)) {
+    await this.showToast('El mensaje contiene contenido no permitido', 'danger');
+    return;
+  }
+
+  // ✅ Rate limiting mensajes
+  if (!this.security.checkRateLimit('foro-mensaje', 10, 60000)) {
+    await this.showToast(
+      'Estás enviando mensajes muy rápido. Espera un momento.',
+      'warning'
+    );
+    return;
+  }
+
+  // ✅ Sanitizar mensaje
+  const textoSeguro = this.security.sanitizeInput(
+    this.nuevoMensaje.trim()
+  );
+
+  // limpiar input
   this.nuevoMensaje = '';
 
+  // scroll inmediato
+  setTimeout(() => this.scrollAlFinal(), 100);
+
   try {
+
     await this.eventoService.enviarMensaje(this.eventoId, {
-      texto,
+      texto: textoSeguro,
       autorUid: this.userData.uid,
       autorNombre: this.userData.nombre,
       creadoEn: new Date(),
     });
 
-    setTimeout(() => this.scrollAlFinal(), 200);
+  } catch (error) {
 
-  } catch {
-    await this.showToast('Error al enviar el mensaje', 'danger');
+    await this.showToast(
+      'Error al enviar el mensaje',
+      'danger'
+    );
   }
 }
 

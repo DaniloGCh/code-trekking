@@ -17,26 +17,63 @@ export const adminGuard: CanActivateFn = () => {
   // =========================
   return new Promise((resolve) => {
 
-    onAuthStateChanged(auth, async (user) => {
+    // ✅ Timeout de seguridad
+    const timeout = setTimeout(() => {
+
+      router.navigateByUrl('/login', {
+        replaceUrl: true
+      });
+
+      resolve(false);
+
+    }, 10000);
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+
+      clearTimeout(timeout);
+      unsubscribe();
 
       // =========================
       // ❌ SIN USUARIO
       // =========================
       if (!user) {
-        router.navigateByUrl('/login', { replaceUrl: true });
+
+        router.navigateByUrl('/login', {
+          replaceUrl: true
+        });
+
         resolve(false);
         return;
       }
 
-      // =========================
-      // 👤 VALIDAR ROL
-      // =========================
-      const rol = await authService.getUserRole();
+      try {
 
-      if (rol === 'admin') {
-        resolve(true);
-      } else {
-        router.navigateByUrl('tabs/home', { replaceUrl: true });
+        // =========================
+        // 👤 VALIDAR ROL
+        // =========================
+        const rol = await authService.getUserRole();
+
+        if (rol === 'admin') {
+
+          resolve(true);
+
+        } else {
+
+          router.navigateByUrl('/tabs/home', {
+            replaceUrl: true
+          });
+
+          resolve(false);
+        }
+
+      } catch (error) {
+
+        console.error('Error validando rol:', error);
+
+        router.navigateByUrl('/login', {
+          replaceUrl: true
+        });
+
         resolve(false);
       }
     });
