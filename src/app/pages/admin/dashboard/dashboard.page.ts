@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ToastController, LoadingController, IonAccordionGroup } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -6,6 +6,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Auth, EmailAuthProvider, reauthenticateWithCredential } from '@angular/fire/auth';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+
+
 
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { LugarService } from 'src/app/core/services/lugar.service';
@@ -23,13 +25,15 @@ import {
   KitPrimerosAuxilios, KitSupervivencia, Evento
 } from 'src/app/core/models/evento.model';
 
+import { SessionService } from 'src/app/core/services/session.service';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: false,
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, OnDestroy {
 
   // =========================
   // 🔹 DEPENDENCIAS
@@ -50,6 +54,7 @@ export class DashboardPage implements OnInit {
   private loadingCtrl = inject(LoadingController);
   private fb = inject(FormBuilder);
   private sanitizer = inject(DomSanitizer);
+  private sessionService = inject(SessionService);
 
   @ViewChild('accordionAdmin') accordionGroup?: IonAccordionGroup;
   @ViewChild('accordionUsuarios') accordionUsuarios?: IonAccordionGroup;
@@ -57,7 +62,7 @@ export class DashboardPage implements OnInit {
   constructor(
     public weatherGlobal: WeatherGlobalService,
     public timeService: TimeService,
-  ) {}
+  ) { }
 
   // =========================
   // 📊 OBSERVABLES
@@ -107,31 +112,31 @@ export class DashboardPage implements OnInit {
   lugarEditando: Lugar | null = null;
 
   lugarForm: FormGroup = this.fb.group({
-    nombre:               ['', [Validators.required, Validators.minLength(3)]],
-    informacion:          ['', [Validators.required, Validators.minLength(10)]],
-    altitud:              ['', [Validators.required, Validators.minLength(3)]],
-    dificultad:           ['', [Validators.required]],
-    distanciaKm:          ['', [Validators.required, Validators.min(0.1)]],
-    tiempoEstimadoHoras:  ['', [Validators.required, Validators.minLength(3)]],
-    equipamiento:         [[], [Validators.required]],
+    nombre: ['', [Validators.required, Validators.minLength(3)]],
+    informacion: ['', [Validators.required, Validators.minLength(10)]],
+    altitud: ['', [Validators.required, Validators.minLength(3)]],
+    dificultad: ['', [Validators.required]],
+    distanciaKm: ['', [Validators.required, Validators.min(0.1)]],
+    tiempoEstimadoHoras: ['', [Validators.required, Validators.minLength(3)]],
+    equipamiento: [[], [Validators.required]],
     DireccionPuntoInicio: ['', [Validators.required, Validators.minLength(3)]],
-    latitud:              [''],
-    longitud:             [''],
+    latitud: [''],
+    longitud: [''],
     requiereRegistroAcceso: [false],
-    requiereGuiaMontana:    [false],
-    requierePagoEntrada:    [false],
-    valorEntrada:           [null],
-    requiereHorarioVisita:  [false],
+    requiereGuiaMontana: [false],
+    requierePagoEntrada: [false],
+    valorEntrada: [null],
+    requiereHorarioVisita: [false],
     horarioVisita: this.fb.group({
       apertura: [''],
-      cierre:   ['']
+      cierre: ['']
     }),
-    requierePermiso:          [false],
-    requiereMasInformacion:   [false],
+    requierePermiso: [false],
+    requiereMasInformacion: [false],
     MasInformacion: this.fb.group({
       Texto: [''],
-      URL:   [''],
-      Otro:  ['']
+      URL: [''],
+      Otro: ['']
     }),
     mapaRutaUrl: ['']
   });
@@ -143,7 +148,7 @@ export class DashboardPage implements OnInit {
   consejoEditando: Consejo | null = null;
 
   consejoForm: FormGroup = this.fb.group({
-    titulo:      ['', [Validators.required, Validators.minLength(3)]],
+    titulo: ['', [Validators.required, Validators.minLength(3)]],
     descripcion: ['', [Validators.required, Validators.minLength(10)]],
   });
 
@@ -154,9 +159,9 @@ export class DashboardPage implements OnInit {
   paEditando: KitPrimerosAuxilios | null = null;
 
   paForm: FormGroup = this.fb.group({
-    nombre:      ['', Validators.required],
+    nombre: ['', Validators.required],
     descripcion: ['', Validators.required],
-    items:       ['', Validators.required],
+    items: ['', Validators.required],
   });
 
   // =========================
@@ -166,10 +171,10 @@ export class DashboardPage implements OnInit {
   supEditando: KitSupervivencia | null = null;
 
   supForm: FormGroup = this.fb.group({
-    nombre:      ['', Validators.required],
+    nombre: ['', Validators.required],
     descripcion: ['', Validators.required],
-    items:       ['', Validators.required],
-    nivel:       ['básico', Validators.required],
+    items: ['', Validators.required],
+    nivel: ['básico', Validators.required],
   });
 
   // =========================
@@ -179,10 +184,10 @@ export class DashboardPage implements OnInit {
   manualEditando: ManualPaso | null = null;
 
   manualForm: FormGroup = this.fb.group({
-    titulo:      ['', [Validators.required, Validators.minLength(3)]],
+    titulo: ['', [Validators.required, Validators.minLength(3)]],
     descripcion: ['', [Validators.required, Validators.minLength(10)]],
-    icono:       ['🧠', Validators.required],
-    orden:       [1, [Validators.required, Validators.min(1)]],
+    icono: ['🧠', Validators.required],
+    orden: [1, [Validators.required, Validators.min(1)]],
   });
 
   // =========================
@@ -201,51 +206,51 @@ export class DashboardPage implements OnInit {
   // =========================
   // 📌 GETTERS - LUGAR
   // =========================
-  get fNombre()               { return this.lugarForm.get('nombre'); }
-  get fInformacion()          { return this.lugarForm.get('informacion'); }
-  get fAltitud()              { return this.lugarForm.get('altitud'); }
-  get fDificultad()           { return this.lugarForm.get('dificultad'); }
-  get fDistanciaKm()          { return this.lugarForm.get('distanciaKm'); }
-  get fTiempoEstimadoHoras()  { return this.lugarForm.get('tiempoEstimadoHoras'); }
-  get fEquipamiento()         { return this.lugarForm.get('equipamiento'); }
+  get fNombre() { return this.lugarForm.get('nombre'); }
+  get fInformacion() { return this.lugarForm.get('informacion'); }
+  get fAltitud() { return this.lugarForm.get('altitud'); }
+  get fDificultad() { return this.lugarForm.get('dificultad'); }
+  get fDistanciaKm() { return this.lugarForm.get('distanciaKm'); }
+  get fTiempoEstimadoHoras() { return this.lugarForm.get('tiempoEstimadoHoras'); }
+  get fEquipamiento() { return this.lugarForm.get('equipamiento'); }
   get fDireccionPuntoInicio() { return this.lugarForm.get('DireccionPuntoInicio'); }
-  get fRequierePagoEntrada()  { return this.lugarForm.get('requierePagoEntrada'); }
-  get fRequierePermiso()      { return this.lugarForm.get('requierePermiso'); }
+  get fRequierePagoEntrada() { return this.lugarForm.get('requierePagoEntrada'); }
+  get fRequierePermiso() { return this.lugarForm.get('requierePermiso'); }
   get fRequiereRegistroAcceso() { return this.lugarForm.get('requiereRegistroAcceso'); }
-  get fRequiereGuiaMontana()  { return this.lugarForm.get('requiereGuiaMontana'); }
+  get fRequiereGuiaMontana() { return this.lugarForm.get('requiereGuiaMontana'); }
   get fRequiereHorarioVisita() { return this.lugarForm.get('requiereHorarioVisita'); }
-  get fHorarioVisita()        { return this.lugarForm.get('horarioVisita'); }
+  get fHorarioVisita() { return this.lugarForm.get('horarioVisita'); }
   get fRequiereMasInformacion() { return this.lugarForm.get('requiereMasInformacion'); }
-  get fMasInformacion()       { return this.lugarForm.get('MasInformacion'); }
-  get fMapaRutaUrl()          { return this.lugarForm.get('mapaRutaUrl'); }
+  get fMasInformacion() { return this.lugarForm.get('MasInformacion'); }
+  get fMapaRutaUrl() { return this.lugarForm.get('mapaRutaUrl'); }
 
   // =========================
   // 📌 GETTERS - CONSEJO
   // =========================
-  get cTitulo()      { return this.consejoForm.get('titulo'); }
+  get cTitulo() { return this.consejoForm.get('titulo'); }
   get cDescripcion() { return this.consejoForm.get('descripcion'); }
 
   // =========================
   // 📌 GETTERS - MANUAL
   // =========================
-  get mTitulo()      { return this.manualForm.get('titulo'); }
+  get mTitulo() { return this.manualForm.get('titulo'); }
   get mDescripcion() { return this.manualForm.get('descripcion'); }
-  get mIcono()       { return this.manualForm.get('icono'); }
-  get mOrden()       { return this.manualForm.get('orden'); }
+  get mIcono() { return this.manualForm.get('icono'); }
+  get mOrden() { return this.manualForm.get('orden'); }
 
   // =========================
   // 📌 GETTERS - KIT PA
   // =========================
-  get paNombre()      { return this.paForm.get('nombre'); }
+  get paNombre() { return this.paForm.get('nombre'); }
   get paDescripcion() { return this.paForm.get('descripcion'); }
-  get paItems()       { return this.paForm.get('items'); }
+  get paItems() { return this.paForm.get('items'); }
 
   // =========================
   // 📌 GETTERS - KIT SUP
   // =========================
-  get supNombre()      { return this.supForm.get('nombre'); }
+  get supNombre() { return this.supForm.get('nombre'); }
   get supDescripcion() { return this.supForm.get('descripcion'); }
-  get supItems()       { return this.supForm.get('items'); }
+  get supItems() { return this.supForm.get('items'); }
 
   // =========================
   // 🚀 INIT
@@ -253,9 +258,14 @@ export class DashboardPage implements OnInit {
   async ngOnInit() {
     this.adminData = await this.authService.getCurrentUserData();
 
+    // ✅ Verificar que es admin antes de iniciar timer
+    if (this.adminData?.rol === 'admin') {
+      this.sessionService.iniciarTimerAdmin();
+    }
+
     this.users$.subscribe(users => {
-      this.totalUsers    = users.length;
-      this.totalAdmins   = users.filter(u => u.rol === 'admin').length;
+      this.totalUsers = users.length;
+      this.totalAdmins = users.filter(u => u.rol === 'admin').length;
       this.totalRegulares = users.filter(u => u.rol === 'user').length;
     });
 
@@ -452,30 +462,30 @@ export class DashboardPage implements OnInit {
     try {
       const v = this.lugarForm.value;
       const datos: Omit<Lugar, 'id'> = {
-        nombre:               v.nombre.trim(),
-        informacion:          v.informacion.trim(),
-        altitud:              v.altitud,
-        dificultad:           v.dificultad,
-        distanciaKm:          Number(v.distanciaKm),
-        tiempoEstimadoHoras:  v.tiempoEstimadoHoras,
-        equipamiento:         v.equipamiento,
+        nombre: v.nombre.trim(),
+        informacion: v.informacion.trim(),
+        altitud: v.altitud,
+        dificultad: v.dificultad,
+        distanciaKm: Number(v.distanciaKm),
+        tiempoEstimadoHoras: v.tiempoEstimadoHoras,
+        equipamiento: v.equipamiento,
         DireccionPuntoInicio: (v.DireccionPuntoInicio || '').trim(),
-        latitud:              v.latitud ? Number(v.latitud) : undefined,
-        longitud:             v.longitud ? Number(v.longitud) : undefined,
-        requierePagoEntrada:  v.requierePagoEntrada,
-        valorEntrada:         v.requierePagoEntrada ? Number(v.valorEntrada || 0) : undefined,
-        requierePermiso:      v.requierePermiso,
+        latitud: v.latitud ? Number(v.latitud) : undefined,
+        longitud: v.longitud ? Number(v.longitud) : undefined,
+        requierePagoEntrada: v.requierePagoEntrada,
+        valorEntrada: v.requierePagoEntrada ? Number(v.valorEntrada || 0) : undefined,
+        requierePermiso: v.requierePermiso,
         requiereRegistroAcceso: v.requiereRegistroAcceso,
-        requiereGuiaMontana:  v.requiereGuiaMontana,
+        requiereGuiaMontana: v.requiereGuiaMontana,
         requiereHorarioVisita: v.requiereHorarioVisita,
-        horarioVisita:        v.requiereHorarioVisita ? v.horarioVisita : undefined,
+        horarioVisita: v.requiereHorarioVisita ? v.horarioVisita : undefined,
         requiereMasInformacion: v.requiereMasInformacion,
-        MasInformacion:       v.requiereMasInformacion ? v.MasInformacion : undefined,
-        mapaRutaUrl:          v.mapaRutaUrl?.trim() || '',
+        MasInformacion: v.requiereMasInformacion ? v.MasInformacion : undefined,
+        mapaRutaUrl: v.mapaRutaUrl?.trim() || '',
       };
 
-      if (!datos.requierePagoEntrada)    delete datos.valorEntrada;
-      if (!datos.requiereHorarioVisita)  delete datos.horarioVisita;
+      if (!datos.requierePagoEntrada) delete datos.valorEntrada;
+      if (!datos.requiereHorarioVisita) delete datos.horarioVisita;
       if (!datos.requiereMasInformacion) delete datos.MasInformacion;
 
       if (this.lugarEditando) {
@@ -534,7 +544,7 @@ export class DashboardPage implements OnInit {
 
     try {
       const datos = {
-        titulo:      this.consejoForm.value.titulo.trim(),
+        titulo: this.consejoForm.value.titulo.trim(),
         descripcion: this.consejoForm.value.descripcion.trim(),
       };
 
@@ -664,10 +674,10 @@ export class DashboardPage implements OnInit {
 
     try {
       const datos = {
-        titulo:      this.manualForm.value.titulo.trim(),
+        titulo: this.manualForm.value.titulo.trim(),
         descripcion: this.manualForm.value.descripcion.trim(),
-        icono:       this.manualForm.value.icono,
-        orden:       Number(this.manualForm.value.orden),
+        icono: this.manualForm.value.icono,
+        orden: Number(this.manualForm.value.orden),
       };
 
       if (this.manualEditando) {
@@ -774,5 +784,10 @@ export class DashboardPage implements OnInit {
   private async showToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({ message, duration: 2500, color, position: 'bottom' });
     await toast.present();
+  }
+
+  // ✅ Detener timer al salir del dashboard
+  ngOnDestroy() {
+    this.sessionService.detenerTimer();
   }
 }

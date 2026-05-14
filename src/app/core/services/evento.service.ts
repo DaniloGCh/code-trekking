@@ -100,8 +100,6 @@ export class EventoService {
       creadoEn: new Date(),
     };
 
-    console.log(this.crearEvento)
-
     const docRef = await addDoc(ref, nuevoEvento);
     return docRef.id;
 

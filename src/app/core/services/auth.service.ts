@@ -41,6 +41,8 @@ import { Observable } from 'rxjs';
 
 import { SecurityService } from './security.service';
 
+import { environment } from 'src/environments/environment';
+
 export interface ContactoEmergencia {
   nombre: string;
   telefono: string;
@@ -276,5 +278,12 @@ export class AuthService {
     const snapshot = await getDocs(usuariosRef);
     const nombres = snapshot.docs.map(d => (d.data() as UserData).nombre?.toLowerCase().trim());
     return !nombres.includes(nombre.toLowerCase().trim());
+  }
+
+  // ✅ Agrega este método privado
+  private log(mensaje: string, data?: any) {
+    if (!environment.production) {
+      console.log(`[AuthService] ${mensaje}`, data ?? '');
+    }
   }
 }
