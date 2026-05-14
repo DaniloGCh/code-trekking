@@ -94,15 +94,17 @@ export class HomePage implements OnInit, OnDestroy {
   // =========================
   ngOnInit() {
     this.weatherGlobal.startLocationTracking();
-    this.consejoService.getConsejos().subscribe(data => {
-      this.consejos = this.shuffleArray(data);
-    });
 
     this.authSub = this.authService.currentUser$.subscribe(async user => {
       this.authReady = true;
 
       if (user) {
         this.userData = await this.authService.getCurrentUserData();
+
+        // ✅ Cargar consejos DESPUÉS de confirmar sesión
+        this.consejoService.getConsejos().subscribe(data => {
+          this.consejos = this.shuffleArray(data);
+        });
 
         // ✅ Cargar eventos del usuario
         this.eventosSub = this.eventoService.getMisEventos().subscribe(eventos => {
@@ -112,6 +114,7 @@ export class HomePage implements OnInit, OnDestroy {
       } else {
         this.userData = null;
         this.misEventos = [];
+        this.consejos = []; // ✅ Limpiar consejos al cerrar sesión
       }
     });
   }
