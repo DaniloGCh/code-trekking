@@ -124,4 +124,41 @@ ion-button[slot="end"] {
   span:hover {
     text-decoration: underline;
   }
+
+  
+}
+
+.password-strength {
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .strength-bars {
+    display: flex;
+    gap: 4px;
+
+    .bar {
+      height: 4px;
+      flex: 1;
+      border-radius: 2px;
+      background: var(--ion-color-light-shade);
+      transition: background 0.3s;
+
+      &.active {
+        &.weak   { background: var(--ion-color-danger); }
+        &.medium { background: var(--ion-color-warning); }
+        &.strong { background: var(--ion-color-success); }
+        // Barras anteriores heredan color
+        background: var(--ion-color-success);
+      }
+    }
+  }
+
+  .strength-msg {
+    font-size: 0.75rem;
+    &.weak   { color: var(--ion-color-danger); }
+    &.medium { color: var(--ion-color-warning); }
+    &.strong { color: var(--ion-color-success); }
+  }
 }

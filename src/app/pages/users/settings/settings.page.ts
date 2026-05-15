@@ -3,13 +3,9 @@
 // =========================
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  AlertController,
-  ToastController,
-  LoadingController
-} from '@ionic/angular';
-
+import { AlertController, ToastController, LoadingController } from '@ionic/angular';
 import { AuthService, UserData, ContactoEmergencia } from 'src/app/core/services/auth.service';
+import { SecurityService } from 'src/app/core/services/security.service';
 
 @Component({
   selector: 'app-settings',
@@ -27,14 +23,13 @@ export class SettingsPage implements OnInit {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
+  private security = inject(SecurityService); // ✅ Nuevo
 
   // =========================
   // 📊 ESTADO
   // =========================
   userData: UserData | null = null;
-
   contactos: ContactoEmergencia[] = [];
-
   hideHeader = false;
   lastScrollTop = 0;
 
@@ -46,6 +41,29 @@ export class SettingsPage implements OnInit {
     this.contactos = this.userData?.contactosEmergencia || [];
   }
 
+  // =========================
+  // 🔧 VALIDACIONES CONTACTO
+  // =========================
+  private validarContacto(nombre: string, telefono: string): string | null {
+    if (!nombre || !telefono) return 'Completa todos los campos';
+
+    const nombreLimpio = nombre.trim();
+    const telefonoLimpio = telefono.trim();
+
+    // ✅ Validar nombre
+    if (nombreLimpio.length < 3) return 'El nombre debe tener mínimo 3 caracteres';
+    if (nombreLimpio.length > 50) return 'El nombre no puede superar 50 caracteres';
+    if (!this.security.isSafeText(nombreLimpio, 50)) return 'El nombre contiene caracteres no permitidos';
+
+    // ✅ Validar teléfono con formato internacional
+    const telefonoRegex = /^\+?[0-9]{8,15}$/;
+    if (!telefonoRegex.test(telefonoLimpio.replace(/\s/g, ''))) {
+      return 'Ingresa un teléfono válido (ej: +56912345678)';
+    }
+
+    return null; // Sin errores
+  }
+
   // ➕ AGREGAR CONTACTO
   async onAgregarContacto() {
     if (this.contactos.length >= 3) {
@@ -53,37 +71,27 @@ export class SettingsPage implements OnInit {
       return;
     }
 
+    // ✅ Rate limiting: evitar spam
+    if (!this.security.checkRateLimit('agregar-contacto', 5, 60000)) {
+      await this.showToast('Demasiados intentos. Espera un momento.', 'warning');
+      return;
+    }
+
     const alert = await this.alertCtrl.create({
       header: 'Agregar contacto de emergencia',
       inputs: [
-        {
-          name: 'nombre',
-          type: 'text',
-          placeholder: 'Nombre completo',
-        },
-        {
-          name: 'telefono',
-          type: 'tel',
-          placeholder: 'Teléfono (ej: +56912345678)',
-        }
+        { name: 'nombre', type: 'text', placeholder: 'Nombre completo' },
+        { name: 'telefono', type: 'tel', placeholder: 'Teléfono (ej: +56912345678)' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Agregar',
           handler: async (data) => {
-            if (!data.nombre || !data.telefono) {
-              await this.showToast('Completa todos los campos', 'warning');
-              return false;
-            }
-
-            if (data.nombre.trim().length < 3) {
-              await this.showToast('El nombre debe tener mínimo 3 caracteres', 'warning');
-              return false;
-            }
-
-            if (data.telefono.trim().length < 8) {
-              await this.showToast('Ingresa un teléfono válido', 'warning');
+            // ✅ Validar con método centralizado
+            const error = this.validarContacto(data.nombre, data.telefono);
+            if (error) {
+              await this.showToast(error, 'warning');
               return false;
             }
 
@@ -92,15 +100,16 @@ export class SettingsPage implements OnInit {
 
             try {
               const nuevoContacto: ContactoEmergencia = {
-                nombre: data.nombre.trim(),
-                telefono: data.telefono.trim(),
+                // ✅ Sanitizar nombre y formatear teléfono
+                nombre:   this.security.sanitizeInput(data.nombre.trim()),
+                telefono: data.telefono.trim().replace(/\s/g, ''),
               };
 
               this.contactos = [...this.contactos, nuevoContacto];
               await this.authService.updateProfile({ contactosEmergencia: this.contactos });
               await loading.dismiss();
               await this.showToast('Contacto agregado correctamente', 'success');
-            } catch (error) {
+            } catch {
               await loading.dismiss();
               await this.showToast('Error al guardar el contacto', 'danger');
             }
@@ -121,26 +130,18 @@ export class SettingsPage implements OnInit {
     const alert = await this.alertCtrl.create({
       header: 'Editar contacto',
       inputs: [
-        {
-          name: 'nombre',
-          type: 'text',
-          value: contacto.nombre,
-          placeholder: 'Nombre completo',
-        },
-        {
-          name: 'telefono',
-          type: 'tel',
-          value: contacto.telefono,
-          placeholder: 'Teléfono',
-        }
+        { name: 'nombre', type: 'text', value: contacto.nombre, placeholder: 'Nombre completo' },
+        { name: 'telefono', type: 'tel', value: contacto.telefono, placeholder: 'Teléfono' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Guardar',
           handler: async (data) => {
-            if (!data.nombre || !data.telefono) {
-              await this.showToast('Completa todos los campos', 'warning');
+            // ✅ Validar con método centralizado
+            const error = this.validarContacto(data.nombre, data.telefono);
+            if (error) {
+              await this.showToast(error, 'warning');
               return false;
             }
 
@@ -149,14 +150,14 @@ export class SettingsPage implements OnInit {
 
             try {
               this.contactos[index] = {
-                nombre: data.nombre.trim(),
-                telefono: data.telefono.trim(),
+                nombre:   this.security.sanitizeInput(data.nombre.trim()),
+                telefono: data.telefono.trim().replace(/\s/g, ''),
               };
               this.contactos = [...this.contactos];
               await this.authService.updateProfile({ contactosEmergencia: this.contactos });
               await loading.dismiss();
               await this.showToast('Contacto actualizado', 'success');
-            } catch (error) {
+            } catch {
               await loading.dismiss();
               await this.showToast('Error al actualizar el contacto', 'danger');
             }
@@ -174,7 +175,7 @@ export class SettingsPage implements OnInit {
   async onEliminarContacto(index: number) {
     const alert = await this.alertCtrl.create({
       header: 'Eliminar contacto',
-      message: `¿Eliminar a ${this.contactos[index].nombre} de tus contactos de emergencia?`,
+      message: `¿Eliminar a <strong>${this.contactos[index].nombre}</strong> de tus contactos de emergencia?`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -189,7 +190,7 @@ export class SettingsPage implements OnInit {
               await this.authService.updateProfile({ contactosEmergencia: this.contactos });
               await loading.dismiss();
               await this.showToast('Contacto eliminado', 'success');
-            } catch (error) {
+            } catch {
               await loading.dismiss();
               await this.showToast('Error al eliminar el contacto', 'danger');
             }
@@ -203,43 +204,53 @@ export class SettingsPage implements OnInit {
 
   // 📞 LLAMAR AL CONTACTO
   llamarContacto(telefono: string) {
+    // ✅ Validar que sea un teléfono antes de abrir
+    const telefonoRegex = /^\+?[0-9]{8,15}$/;
+    if (!telefonoRegex.test(telefono.replace(/\s/g, ''))) return;
     window.open(`tel:${telefono}`, '_system');
   }
 
-  // 💬 ENVIAR SMS AL CONTACTO
-enviarSMS(telefono: string) {
-  window.open(`sms:${telefono}`, '_system');
-}
+  // 💬 ENVIAR SMS
+  enviarSMS(telefono: string) {
+    // ✅ Validar que sea un teléfono antes de abrir
+    const telefonoRegex = /^\+?[0-9]{8,15}$/;
+    if (!telefonoRegex.test(telefono.replace(/\s/g, ''))) return;
+    window.open(`sms:${telefono}`, '_system');
+  }
 
   // =========================
   // 🔐 CAMBIO DE CONTRASEÑA
   // =========================
-
   async onChangePassword() {
+    // ✅ Rate limiting
+    if (!this.security.checkRateLimit('change-password', 3, 60000)) {
+      await this.showToast('Demasiados intentos. Espera 1 minuto.', 'warning');
+      return;
+    }
+
     const alert = await this.alertCtrl.create({
       header: 'Verificación de seguridad',
-      message: this.userData?.preguntaSeguridad,
+      message: `<strong>${this.userData?.preguntaSeguridad}</strong>`,
       inputs: [
-        {
-          name: 'respuesta',
-          type: 'text',
-          placeholder: 'Tu respuesta de seguridad',
-        }
+        { name: 'respuesta', type: 'text', placeholder: 'Tu respuesta de seguridad' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Continuar',
           handler: async (data) => {
-
             if (!data.respuesta?.trim()) {
               await this.showToast('Ingresa tu respuesta de seguridad', 'warning');
               return false;
             }
 
-            const ok = this.validateSecurityAnswer(data.respuesta);
+            // ✅ Sanitizar antes de comparar
+            const respuestaIngresada = this.security
+              .sanitizeInput(data.respuesta)
+              .toLowerCase()
+              .trim();
 
-            if (!ok) {
+            if (!this.validateSecurityAnswer(respuestaIngresada)) {
               await this.showToast('La respuesta de seguridad es incorrecta', 'danger');
               return false;
             }
@@ -255,8 +266,7 @@ enviarSMS(telefono: string) {
   }
 
   private validateSecurityAnswer(answer: string): boolean {
-    return this.userData?.respuestaSeguridad?.toLowerCase().trim() ===
-      answer.toLowerCase().trim();
+    return this.userData?.respuestaSeguridad?.toLowerCase().trim() === answer;
   }
 
   private async showChangePasswordStep2() {
@@ -264,7 +274,7 @@ enviarSMS(telefono: string) {
       header: 'Cambiar contraseña',
       inputs: [
         { name: 'currentPassword', type: 'password', placeholder: 'Contraseña actual' },
-        { name: 'newPassword', type: 'password', placeholder: 'Nueva contraseña' },
+        { name: 'newPassword', type: 'password', placeholder: 'Nueva contraseña (mín. 8 caracteres)' },
         { name: 'confirmPassword', type: 'password', placeholder: 'Confirmar contraseña' }
       ],
       buttons: [
@@ -280,14 +290,15 @@ enviarSMS(telefono: string) {
   }
 
   private async handlePasswordChange(data: any): Promise<boolean> {
-
     if (!data.currentPassword || !data.newPassword || !data.confirmPassword) {
       await this.showToast('Completa todos los campos', 'warning');
       return false;
     }
 
-    if (data.newPassword.length < 6) {
-      await this.showToast('Mínimo 6 caracteres', 'warning');
+    // ✅ Validar fortaleza de nueva contraseña
+    const passwordCheck = this.security.isStrongPassword(data.newPassword);
+    if (!passwordCheck.valid) {
+      await this.showToast(passwordCheck.message, 'warning');
       return false;
     }
 
@@ -296,31 +307,25 @@ enviarSMS(telefono: string) {
       return false;
     }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Actualizando contraseña...'
-    });
+    // ✅ No permitir misma contraseña
+    if (data.currentPassword === data.newPassword) {
+      await this.showToast('La nueva contraseña debe ser diferente a la actual', 'warning');
+      return false;
+    }
 
+    const loading = await this.loadingCtrl.create({ message: 'Actualizando contraseña...' });
     await loading.present();
 
     try {
-      await this.authService.changePassword(
-        data.currentPassword,
-        data.newPassword
-      );
-
+      await this.authService.changePassword(data.currentPassword, data.newPassword);
       await loading.dismiss();
-      await this.showToast('Contraseña actualizada', 'success');
-
+      await this.showToast('Contraseña actualizada correctamente', 'success');
+      this.security.resetRateLimit('change-password');
     } catch (error: any) {
-
       await loading.dismiss();
-
-      const msg =
-        error.code === 'auth/wrong-password' ||
-        error.code === 'auth/invalid-credential'
-          ? 'La contraseña actual es incorrecta'
-          : 'Error al cambiar la contraseña';
-
+      const msg = error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential'
+        ? 'La contraseña actual es incorrecta'
+        : 'Error al cambiar la contraseña';
       await this.showToast(msg, 'danger');
     }
 
@@ -330,17 +335,19 @@ enviarSMS(telefono: string) {
   // =========================
   // 🗑️ ELIMINAR CUENTA
   // =========================
-
   async onDeleteAccount() {
+    // ✅ Rate limiting para eliminación
+    if (!this.security.checkRateLimit('delete-account', 2, 300000)) {
+      await this.showToast('Demasiados intentos. Espera 5 minutos.', 'warning');
+      return;
+    }
+
     const alert = await this.alertCtrl.create({
       header: '⚠️ Eliminar cuenta',
-      message: 'Esta acción es irreversible. ¿Continuar?',
+      message: 'Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos permanentemente. ¿Continuar?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Continuar',
-          handler: () => this.showDeleteVerification()
-        }
+        { text: 'Continuar', handler: () => this.showDeleteVerification() }
       ]
     });
 
@@ -350,15 +357,15 @@ enviarSMS(telefono: string) {
   private async showDeleteVerification() {
     const alert = await this.alertCtrl.create({
       header: 'Verificación de seguridad',
-      message: this.userData?.preguntaSeguridad,
+      message: `<strong>${this.userData?.preguntaSeguridad}</strong>`,
       inputs: [
-        { name: 'respuesta', type: 'text', placeholder: 'Respuesta' },
-        { name: 'password', type: 'password', placeholder: 'Contraseña' }
+        { name: 'respuesta', type: 'text', placeholder: 'Tu respuesta de seguridad' },
+        { name: 'password', type: 'password', placeholder: 'Tu contraseña actual' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Eliminar',
+          text: 'Eliminar cuenta',
           handler: async (data) => this.handleDeleteAccount(data)
         }
       ]
@@ -368,45 +375,41 @@ enviarSMS(telefono: string) {
   }
 
   private async handleDeleteAccount(data: any): Promise<boolean> {
-
     if (!data.respuesta || !data.password) {
       await this.showToast('Completa todos los campos', 'warning');
       return false;
     }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Eliminando cuenta...'
-    });
+    // ✅ Sanitizar respuesta antes de comparar
+    const respuestaSanitizada = this.security
+      .sanitizeInput(data.respuesta)
+      .toLowerCase()
+      .trim();
 
+    const loading = await this.loadingCtrl.create({ message: 'Eliminando cuenta...' });
     await loading.present();
 
     try {
-      await this.authService.deleteAccount(
-        data.password,
-        data.respuesta
-      );
-
+      await this.authService.deleteAccount(data.password, respuestaSanitizada);
       await loading.dismiss();
-      await this.showToast('Cuenta eliminada', 'success');
 
+      // ✅ Limpiar localStorage al eliminar cuenta
+      localStorage.clear();
+
+      await this.showToast('Cuenta eliminada correctamente', 'success');
       this.router.navigateByUrl('/login', { replaceUrl: true });
 
     } catch (error: any) {
-
       await loading.dismiss();
 
       const messages: Record<string, string> = {
-        'respuesta-incorrecta': 'Respuesta incorrecta',
-        'auth/wrong-password': 'Contraseña incorrecta',
-        'auth/invalid-credential': 'Credenciales inválidas',
-        'auth/too-many-requests': 'Demasiados intentos',
+        'respuesta-incorrecta':    'La respuesta de seguridad es incorrecta.',
+        'auth/wrong-password':     'La contraseña es incorrecta.',
+        'auth/invalid-credential': 'Las credenciales son inválidas.',
+        'auth/too-many-requests':  'Demasiados intentos. Intenta más tarde.',
       };
 
-      const msg =
-        messages[error.message] ||
-        messages[error.code] ||
-        'Error al eliminar cuenta';
-
+      const msg = messages[error.message] || messages[error.code] || 'Error al eliminar la cuenta.';
       await this.showToast(msg, 'danger');
     }
 
@@ -421,14 +424,11 @@ enviarSMS(telefono: string) {
   }
 
   // =========================
-  // 📜 SCROLL HEADER
+  // 📜 SCROLL
   // =========================
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
-
-    this.hideHeader =
-      scrollTop > this.lastScrollTop && scrollTop > 50;
-
+    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
     this.lastScrollTop = scrollTop;
   }
 
@@ -442,7 +442,6 @@ enviarSMS(telefono: string) {
       color,
       position: 'bottom'
     });
-
     await toast.present();
   }
 }

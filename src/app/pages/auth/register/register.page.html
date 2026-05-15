@@ -40,32 +40,43 @@
         </ion-note>
       </ion-item>
 
-      <!-- 🔒 PASSWORD -->
+      <!-- PASSWORD -->
       <ion-item [class.ion-invalid]="password?.invalid && password?.touched">
         <ion-label position="floating">Contraseña</ion-label>
-
-        <ion-input
-          [type]="showPassword ? 'text' : 'password'"
-          formControlName="password">
+        <ion-input [type]="showPassword ? 'text' : 'password'" formControlName="password"
+          (ionInput)="checkPasswordStrength($event)">
         </ion-input>
-
         <ion-button slot="end" fill="clear" (click)="togglePassword()">
           <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </ion-button>
-
         <ion-note slot="error">
           <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
-          <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+          <span *ngIf="password?.errors?.['weakPassword']">{{ passwordErrors }}</span>
         </ion-note>
       </ion-item>
+
+      <!-- ✅ INDICADOR DE FORTALEZA -->
+      <div class="password-strength" *ngIf="passwordStrength">
+        <div class="strength-bars">
+          <div class="bar"
+            [class.active]="passwordStrength === 'weak' || passwordStrength === 'medium' || passwordStrength === 'strong'"
+            [class.weak]="passwordStrength === 'weak'"></div>
+          <div class="bar" [class.active]="passwordStrength === 'medium' || passwordStrength === 'strong'"
+            [class.medium]="passwordStrength === 'medium'"></div>
+          <div class="bar" [class.active]="passwordStrength === 'strong'"
+            [class.strong]="passwordStrength === 'strong'"></div>
+        </div>
+        <span class="strength-msg" [class.weak]="passwordStrength === 'weak'"
+          [class.medium]="passwordStrength === 'medium'" [class.strong]="passwordStrength === 'strong'">
+          {{ passwordStrengthMsg }}
+        </span>
+      </div>
 
       <!-- 🔐 CONFIRM PASSWORD -->
       <ion-item [class.ion-invalid]="confirmPassword?.touched && registerForm.errors?.['passwordMismatch']">
         <ion-label position="floating">Confirmar contraseña</ion-label>
 
-        <ion-input
-          [type]="showConfirmPassword ? 'text' : 'password'"
-          formControlName="confirmPassword">
+        <ion-input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword">
         </ion-input>
 
         <ion-button slot="end" fill="clear" (click)="toggleConfirmPassword()">
@@ -112,11 +123,7 @@
       </ion-item>
 
       <!-- 🔘 BOTÓN REGISTRO -->
-      <ion-button
-        expand="block"
-        type="submit"
-        class="ion-margin-top"
-        [disabled]="registerForm.invalid">
+      <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="registerForm.invalid">
 
         Crear Cuenta
       </ion-button>
