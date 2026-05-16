@@ -84,7 +84,7 @@ export class TabsPage implements OnInit {
           { text: 'Cancelar', role: 'cancel' },
           {
             text: 'Ir a configuración',
-            handler: () => this.router.navigateByUrl('/tabs/settings')
+            handler: () => this.router.navigateByUrl('/settings')
           }
         ]
       });
