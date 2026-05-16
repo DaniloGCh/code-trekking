@@ -137,4 +137,23 @@ export class SecurityService {
     });
     return cleaned;
   }
+
+  // =========================
+  // 🛡️ VALIDAR TELÉFONO
+  // =========================
+  isValidPhone(phone: string): boolean {
+    // Acepta formatos: +56912345678, 912345678, +1234567890
+    const regex = /^\+?[\d\s\-]{8,15}$/;
+    return regex.test(phone.trim());
+  }
+
+  // =========================
+  // 🛡️ VALIDAR NOMBRE SEGURO
+  // =========================
+  isValidNombre(nombre: string, min: number = 3, max: number = 50): boolean {
+    if (!nombre || nombre.trim().length < min || nombre.trim().length > max) return false;
+    // Solo letras, espacios, tildes y guiones
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-']+$/;
+    return regex.test(nombre.trim());
+  }
 }

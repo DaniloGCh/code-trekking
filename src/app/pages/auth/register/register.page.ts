@@ -2,7 +2,7 @@
 
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
@@ -19,11 +19,11 @@ export class RegisterPage {
   // 🔹 DEPENDENCIAS
   // =========================
   private authService = inject(AuthService);
+  private security = inject(SecurityService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private loadingCtrl = inject(LoadingController);
   private alertCtrl = inject(AlertController);
-  private security = inject(SecurityService);
 
   // =========================
   // 👁️ CONTROL VISUAL PASSWORD
@@ -33,105 +33,6 @@ export class RegisterPage {
 
   togglePassword() { this.showPassword = !this.showPassword; }
   toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; }
-
-  // =========================
-  // 💪 INDICADOR FORTALEZA PASSWORD
-  // =========================
-  passwordStrength: 'weak' | 'medium' | 'strong' | '' = '';
-  passwordStrengthMsg = '';
-
-  checkPasswordStrength(event: any) {
-    const password = event.target.value || '';
-
-    if (password.length === 0) {
-      this.passwordStrength = '';
-      this.passwordStrengthMsg = '';
-      return;
-    }
-
-    let score = 0;
-    if (password.length >= 8)                        score++;
-    if (/[A-Z]/.test(password))                      score++;
-    if (/[a-z]/.test(password))                      score++;
-    if (/[0-9]/.test(password))                      score++;
-    if (/[!@#$%^&*(),.?":{}|<>_\-]/.test(password)) score++;
-
-    if (score <= 2) {
-      this.passwordStrength = 'weak';
-      this.passwordStrengthMsg = 'Débil: agrega mayúsculas, números y símbolos';
-    } else if (score <= 3) {
-      this.passwordStrength = 'medium';
-      this.passwordStrengthMsg = 'Media: agrega símbolos para hacerla más segura';
-    } else {
-      this.passwordStrength = 'strong';
-      this.passwordStrengthMsg = 'Fuerte ✅';
-    }
-  }
-
-  // =========================
-  // 📋 FORMULARIO REACTIVO
-  // =========================
-  registerForm: FormGroup = this.fb.group(
-    {
-      nombre:             ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50), this.noSpecialCharsValidator]],
-      email:              ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
-      password:           ['', [Validators.required, this.strongPasswordValidator]],
-      confirmPassword:    ['', [Validators.required]],
-      preguntaSeguridad:  ['', [Validators.required]],
-      respuestaSeguridad: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
-    },
-    { validators: this.passwordMatchValidator }
-  );
-
-  // =========================
-  // 🔐 VALIDADORES PERSONALIZADOS
-  // =========================
-
-  // ✅ Contraseña fuerte
-  private strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.value || '';
-    if (!password) return null;
-
-    const errors: string[] = [];
-    if (password.length < 8)                          errors.push('mínimo 8 caracteres');
-    if (!/[A-Z]/.test(password))                      errors.push('una mayúscula');
-    if (!/[a-z]/.test(password))                      errors.push('una minúscula');
-    if (!/[0-9]/.test(password))                      errors.push('un número');
-    if (!/[!@#$%^&*(),.?":{}|<>_\-]/.test(password)) errors.push('un símbolo (!@#$...)');
-
-    return errors.length > 0 ? { weakPassword: errors } : null;
-  }
-
-  // ✅ Sin caracteres especiales peligrosos en nombre
-  private noSpecialCharsValidator(control: AbstractControl): ValidationErrors | null {
-    const value = control.value || '';
-    const dangerous = /<|>|&|"|'|\/|\\|;|=|\(|\)|\{|\}|\[|\]/;
-    return dangerous.test(value) ? { specialChars: true } : null;
-  }
-
-  // ✅ Contraseñas coinciden
-  private passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordMismatch: true };
-  }
-
-  // =========================
-  // ✅ GETTERS
-  // =========================
-  get nombre()             { return this.registerForm.get('nombre'); }
-  get email()              { return this.registerForm.get('email'); }
-  get password()           { return this.registerForm.get('password'); }
-  get confirmPassword()    { return this.registerForm.get('confirmPassword'); }
-  get preguntaSeguridad()  { return this.registerForm.get('preguntaSeguridad'); }
-  get respuestaSeguridad() { return this.registerForm.get('respuestaSeguridad'); }
-
-  // ✅ Getter para mostrar errores de contraseña débil
-  get passwordErrors(): string {
-    const errors = this.password?.errors?.['weakPassword'] as string[];
-    if (!errors) return '';
-    return 'Falta: ' + errors.join(', ');
-  }
 
   // =========================
   // ❓ PREGUNTAS DE SEGURIDAD
@@ -146,6 +47,64 @@ export class RegisterPage {
   ];
 
   // =========================
+  // 📋 FORMULARIO
+  // =========================
+  registerForm: FormGroup = this.fb.group({
+    nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]], // ✅ Mínimo 8
+    confirmPassword: ['', [Validators.required]],
+    preguntaSeguridad: ['', [Validators.required]],
+    respuestaSeguridad: ['', [Validators.required, Validators.minLength(2)]],
+  }, { validators: this.passwordMatchValidator });
+
+  // =========================
+  // ✅ GETTERS
+  // =========================
+  get nombre() { return this.registerForm.get('nombre'); }
+  get email() { return this.registerForm.get('email'); }
+  get password() { return this.registerForm.get('password'); }
+  get confirmPassword() { return this.registerForm.get('confirmPassword'); }
+  get preguntaSeguridad() { return this.registerForm.get('preguntaSeguridad'); }
+  get respuestaSeguridad() { return this.registerForm.get('respuestaSeguridad'); }
+
+  // =========================
+  // 🔐 VALIDADOR CONTRASEÑAS
+  // =========================
+  private passwordMatchValidator(form: FormGroup) {
+    const password = form.get('password')?.value;
+    const confirm = form.get('confirmPassword')?.value;
+    return password === confirm ? null : { passwordMismatch: true };
+  }
+
+  // =========================
+  // 💪 FORTALEZA DE CONTRASEÑA
+  // =========================
+  getPasswordStrength(): number {
+    const pwd = this.password?.value || '';
+    let score = 0;
+    if (pwd.length >= 8) score += 25;
+    if (/[A-Z]/.test(pwd)) score += 25;
+    if (/[0-9]/.test(pwd)) score += 25;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score += 25;
+    return score;
+  }
+
+  getPasswordStrengthLabel(): string {
+    const s = this.getPasswordStrength();
+    if (s <= 25) return 'Muy débil 🔴';
+    if (s <= 50) return 'Débil 🟠';
+    if (s <= 75) return 'Media 🟡';
+    return 'Fuerte 🟢';
+  }
+
+  // ✅ Métodos para reemplazar las regex en el HTML
+  hasUpperCase(): boolean { return /[A-Z]/.test(this.password?.value || ''); }
+  hasNumber(): boolean { return /[0-9]/.test(this.password?.value || ''); }
+  hasSpecial(): boolean { return /[!@#$%^&*(),.?":{}|<>]/.test(this.password?.value || ''); }
+  hasMinLength(): boolean { return (this.password?.value || '').length >= 8; }
+
+  // =========================
   // 🚀 REGISTRO
   // =========================
   async onRegister() {
@@ -154,9 +113,36 @@ export class RegisterPage {
       return;
     }
 
-    // ✅ Rate limiting: evitar spam de registros
+    const { email, password, nombre, preguntaSeguridad, respuestaSeguridad } = this.registerForm.value;
+
+    // ✅ Validar email
+    if (!this.security.isValidEmail(email)) {
+      await this.showError('El correo no tiene un formato válido');
+      return;
+    }
+
+    // ✅ Validar nombre seguro
+    if (!this.security.isValidNombre(nombre)) {
+      await this.showError('El nombre solo puede contener letras y espacios');
+      return;
+    }
+
+    // ✅ Validar contraseña fuerte
+    const passwordCheck = this.security.isStrongPassword(password);
+    if (!passwordCheck.valid) {
+      await this.showError(passwordCheck.message);
+      return;
+    }
+
+    // ✅ Validar respuesta de seguridad
+    if (!this.security.isSafeText(respuestaSeguridad, 100)) {
+      await this.showError('La respuesta contiene caracteres no permitidos');
+      return;
+    }
+
+    // ✅ Rate limiting: máx 3 registros por minuto
     if (!this.security.checkRateLimit('register', 3, 60000)) {
-      await this.showError('too-many-attempts');
+      await this.showError('Demasiados intentos. Espera 1 minuto.');
       return;
     }
 
@@ -164,38 +150,24 @@ export class RegisterPage {
     await loading.present();
 
     try {
-      const { email, password, nombre, preguntaSeguridad, respuestaSeguridad } = this.registerForm.value;
-
       // ✅ Sanitizar nombre antes de guardar
       const nombreSeguro = this.security.sanitizeInput(nombre.trim());
-
-      // ✅ Validar email con SecurityService
-      if (!this.security.isValidEmail(email)) {
-        throw { code: 'auth/invalid-email' };
-      }
-
-      // ✅ Validar texto seguro en nombre
-      if (!this.security.isSafeText(nombreSeguro, 50)) {
-        throw { code: 'invalid-nombre' };
-      }
 
       await this.authService.register(email, password, nombreSeguro, 'user');
 
       await this.authService.updateProfile({
         preguntaSeguridad,
-        // ✅ Sanitizar y normalizar respuesta
-        respuestaSeguridad: this.security.sanitizeInput(
-          respuestaSeguridad.toLowerCase().trim()
-        ),
+        respuestaSeguridad: respuestaSeguridad.toLowerCase().trim(),
       });
 
+      this.security.resetRateLimit('register');
       await loading.dismiss();
       await this.showSuccess();
       this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
 
     } catch (error: any) {
       await loading.dismiss();
-      await this.showError(error.code || error.message);
+      await this.showError(error.code);
     }
   }
 
@@ -218,13 +190,11 @@ export class RegisterPage {
   private async showError(errorCode: string) {
     const messages: Record<string, string> = {
       'auth/email-already-in-use': 'Este correo ya está registrado.',
-      'auth/invalid-email':        'El correo no es válido.',
-      'auth/weak-password':        'La contraseña es muy débil.',
-      'invalid-nombre':            'El nombre contiene caracteres no permitidos.',
-      'too-many-attempts':         'Demasiados intentos. Espera 1 minuto.',
+      'auth/invalid-email': 'El correo no es válido.',
+      'auth/weak-password': 'La contraseña es muy débil.',
     };
 
-    const message = messages[errorCode] || 'Ocurrió un error. Intenta nuevamente.';
+    const message = messages[errorCode] || errorCode;
 
     const alert = await this.alertCtrl.create({
       header: 'Error al registrarse',

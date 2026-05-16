@@ -43,34 +43,58 @@
       <!-- PASSWORD -->
       <ion-item [class.ion-invalid]="password?.invalid && password?.touched">
         <ion-label position="floating">Contraseña</ion-label>
-        <ion-input [type]="showPassword ? 'text' : 'password'" formControlName="password"
-          (ionInput)="checkPasswordStrength($event)">
+        <ion-input [type]="showPassword ? 'text' : 'password'" formControlName="password">
         </ion-input>
         <ion-button slot="end" fill="clear" (click)="togglePassword()">
           <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </ion-button>
         <ion-note slot="error">
           <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
-          <span *ngIf="password?.errors?.['weakPassword']">{{ passwordErrors }}</span>
+          <span *ngIf="password?.errors?.['minlength']">Mínimo 8 caracteres</span>
         </ion-note>
       </ion-item>
 
-      <!-- ✅ INDICADOR DE FORTALEZA -->
-      <div class="password-strength" *ngIf="passwordStrength">
-        <div class="strength-bars">
-          <div class="bar"
-            [class.active]="passwordStrength === 'weak' || passwordStrength === 'medium' || passwordStrength === 'strong'"
-            [class.weak]="passwordStrength === 'weak'"></div>
-          <div class="bar" [class.active]="passwordStrength === 'medium' || passwordStrength === 'strong'"
-            [class.medium]="passwordStrength === 'medium'"></div>
-          <div class="bar" [class.active]="passwordStrength === 'strong'"
-            [class.strong]="passwordStrength === 'strong'"></div>
+      <!-- ✅ Indicador de fortaleza -->
+      <div class="password-strength" *ngIf="password?.value?.length > 0">
+
+        <div class="strength-bar">
+          <div class="strength-fill" [style.width]="getPasswordStrength() + '%'"
+            [class.weak]="getPasswordStrength() <= 40"
+            [class.medium]="getPasswordStrength() > 40 && getPasswordStrength() <= 80"
+            [class.strong]="getPasswordStrength() > 80">
+          </div>
         </div>
-        <span class="strength-msg" [class.weak]="passwordStrength === 'weak'"
-          [class.medium]="passwordStrength === 'medium'" [class.strong]="passwordStrength === 'strong'">
-          {{ passwordStrengthMsg }}
-        </span>
+
+        <small [class.text-weak]="getPasswordStrength() <= 40"
+          [class.text-medium]="getPasswordStrength() > 40 && getPasswordStrength() <= 80"
+          [class.text-strong]="getPasswordStrength() > 80">
+
+          {{ getPasswordStrengthLabel() }}
+
+        </small>
       </div>
+
+      <!-- ✅ Requisitos -->
+      <div class="password-requirements" *ngIf="password?.value?.length > 0">
+
+        <small [class.met]="hasMinLength()">
+          {{ hasMinLength() ? '✅' : '❌' }} Mínimo 8 caracteres
+        </small>
+
+        <small [class.met]="hasUpperCase()">
+          {{ hasUpperCase() ? '✅' : '❌' }} Una mayúscula
+        </small>
+
+        <small [class.met]="hasNumber()">
+          {{ hasNumber() ? '✅' : '❌' }} Un número
+        </small>
+
+        <small [class.met]="hasSpecial()">
+          {{ hasSpecial() ? '✅' : '❌' }} Un carácter especial
+        </small>
+
+      </div>
+
 
       <!-- 🔐 CONFIRM PASSWORD -->
       <ion-item [class.ion-invalid]="confirmPassword?.touched && registerForm.errors?.['passwordMismatch']">
