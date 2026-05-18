@@ -6,12 +6,11 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastController, LoadingController } from '@ionic/angular';
 import { Observable } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
 
-// Servicios
 import { EventoService } from 'src/app/core/services/evento.service';
 import { AuthService } from 'src/app/core/services/auth.service';
-
-// Modelos
+import { SecurityService } from 'src/app/core/services/security.service';
 import { Lugar } from 'src/app/core/models/evento.model';
 
 @Component({
@@ -23,71 +22,80 @@ import { Lugar } from 'src/app/core/models/evento.model';
 export class CrearEventoPage implements OnInit {
 
   // =========================
-  // 🔹 INYECCIÓN DE DEPENDENCIAS
+  // 🔹 DEPENDENCIAS
   // =========================
   private eventoService = inject(EventoService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
-  private toastCtrl = inject(ToastController);
-  private loadingCtrl = inject(LoadingController);
+  private authService   = inject(AuthService);
+  private security      = inject(SecurityService);
+  private auth          = inject(Auth);
+  private router        = inject(Router);
+  private fb            = inject(FormBuilder);
+  private toastCtrl     = inject(ToastController);
+  private loadingCtrl   = inject(LoadingController);
 
   // =========================
-  // 📜 CONTROL DE HEADER (SCROLL)
+  // 📊 ESTADO
   // =========================
   hideHeader = false;
   lastScrollTop = 0;
 
-  // =========================
-  // 📍 LUGARES
-  // =========================
   lugares$: Observable<Lugar[]> = this.eventoService.getLugares();
   lugarSeleccionado: Lugar | null = null;
 
-  // =========================
-  // 📅 FECHA MÍNIMA
-  // =========================
+  // ✅ Fecha mínima = hoy (no permite fechas pasadas)
   fechaMinima = new Date().toISOString();
+  fechaSeleccionada = '';
+  horaSeleccionada  = '';
 
   // =========================
   // 📋 FORMULARIO
   // =========================
   eventoForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3)]],
-    descripcion: ['', [Validators.required, Validators.minLength(10)]],
-    fecha: ['', [Validators.required]],
-    hora: ['', [Validators.required]],
-    lugarId: ['', [Validators.required]],
+    nombre:      ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+    descripcion: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+    fecha:       ['', [Validators.required]],
+    hora:        ['', [Validators.required]],
+    lugarId:     ['', [Validators.required]],
   });
 
-  // =========================
-  // ✅ GETTERS
-  // =========================
-  get nombre() { return this.eventoForm.get('nombre'); }
+  get nombre()      { return this.eventoForm.get('nombre'); }
   get descripcion() { return this.eventoForm.get('descripcion'); }
-  get fecha() { return this.eventoForm.get('fecha'); }
-  get hora() { return this.eventoForm.get('hora'); }
-  get lugarId() { return this.eventoForm.get('lugarId'); }
+  get fecha()       { return this.eventoForm.get('fecha'); }
+  get hora()        { return this.eventoForm.get('hora'); }
+  get lugarId()     { return this.eventoForm.get('lugarId'); }
 
   // =========================
-  // 🕒 VALORES MOSTRADOS
+  // 🚀 INIT
   // =========================
-  fechaSeleccionada: string = '';
-  horaSeleccionada: string = '';
-
-  async ngOnInit() { }
+  async ngOnInit() {
+    // ✅ Verificar autenticación al cargar
+    if (!this.auth.currentUser) {
+      this.router.navigateByUrl('/login', { replaceUrl: true });
+      return;
+    }
+  }
 
   // =========================
   // 📅 MANEJO DE FECHA
   // =========================
   onFechaChange(event: any) {
     const valor = event.detail.value;
+    if (!valor) return;
 
-    if (valor) {
-      const fecha = new Date(valor);
-      this.fechaSeleccionada = fecha.toLocaleDateString('es-CL');
-      this.eventoForm.patchValue({ fecha: valor });
+    // ✅ Validar que la fecha no sea en el pasado
+    const fechaSeleccionada = new Date(valor);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    if (fechaSeleccionada < hoy) {
+      this.showToast('La fecha no puede ser en el pasado', 'warning');
+      this.eventoForm.patchValue({ fecha: '' });
+      this.fechaSeleccionada = '';
+      return;
     }
+
+    this.fechaSeleccionada = fechaSeleccionada.toLocaleDateString('es-CL');
+    this.eventoForm.patchValue({ fecha: valor });
   }
 
   // =========================
@@ -95,17 +103,15 @@ export class CrearEventoPage implements OnInit {
   // =========================
   onHoraChange(event: any) {
     const valor = event.detail.value;
+    if (!valor) return;
 
-    if (valor) {
-      const hora = new Date(valor);
+    const hora = new Date(valor);
+    this.horaSeleccionada = hora.toLocaleTimeString('es-CL', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
-      this.horaSeleccionada = hora.toLocaleTimeString('es-CL', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-
-      this.eventoForm.patchValue({ hora: this.horaSeleccionada });
-    }
+    this.eventoForm.patchValue({ hora: this.horaSeleccionada });
   }
 
   // =========================
@@ -114,9 +120,17 @@ export class CrearEventoPage implements OnInit {
   onLugarChange(event: any, lugares: Lugar[]) {
     const id = event.detail.value;
 
-    this.lugarSeleccionado =
-      lugares.find((l) => l.id === id) || null;
+    // ✅ Validar que el lugar existe en la lista
+    const lugar = lugares.find(l => l.id === id) || null;
 
+    if (!lugar) {
+      this.showToast('Lugar no válido', 'warning');
+      this.eventoForm.patchValue({ lugarId: '' });
+      this.lugarSeleccionado = null;
+      return;
+    }
+
+    this.lugarSeleccionado = lugar;
     this.eventoForm.patchValue({ lugarId: id });
   }
 
@@ -129,82 +143,104 @@ export class CrearEventoPage implements OnInit {
       return;
     }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Creando evento...',
-    });
+    // ✅ Verificar sesión activa
+    if (!this.auth.currentUser) {
+      await this.showToast('Tu sesión ha expirado. Inicia sesión nuevamente.', 'danger');
+      this.router.navigateByUrl('/login', { replaceUrl: true });
+      return;
+    }
 
+    const { nombre, descripcion, fecha, hora, lugarId } = this.eventoForm.value;
+
+    // ✅ Validar XSS en nombre
+    if (!this.security.isSafeText(nombre, 100)) {
+      await this.showToast('El nombre contiene caracteres no permitidos', 'warning');
+      return;
+    }
+
+    // ✅ Validar XSS en descripción
+    if (!this.security.isSafeText(descripcion, 500)) {
+      await this.showToast('La descripción contiene caracteres no permitidos', 'warning');
+      return;
+    }
+
+    // ✅ Validar fecha no en el pasado
+    const fechaEvento = new Date(fecha);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    if (fechaEvento < hoy) {
+      await this.showToast('La fecha no puede ser en el pasado', 'warning');
+      return;
+    }
+
+    // ✅ Validar que el lugar existe
+    const lugar = lugares.find(l => l.id === lugarId);
+    if (!lugar) {
+      await this.showToast('Selecciona un lugar válido', 'warning');
+      return;
+    }
+
+    // ✅ Rate limiting: máx 5 eventos por hora
+    if (!this.security.checkRateLimit('crear-evento', 5, 3600000)) {
+      await this.showToast('Has creado demasiados eventos. Espera un momento.', 'warning');
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({ message: 'Creando evento...' });
     await loading.present();
 
     try {
       const userData = await this.authService.getCurrentUserData();
-      const { nombre, descripcion, fecha, hora, lugarId } =
-        this.eventoForm.value;
 
-      const lugar = lugares.find((l) => l.id === lugarId)!;
+      // ✅ Sanitizar nombre y descripción antes de guardar
+      const nombreSeguro      = this.security.sanitizeInput(nombre.trim());
+      const descripcionSegura = this.security.sanitizeInput(descripcion.trim());
 
       await this.eventoService.crearEvento({
-        nombre,
-        descripcion,
-        fecha: new Date(fecha),
+        nombre:      nombreSeguro,
+        descripcion: descripcionSegura,
+        fecha:       new Date(fecha),
         hora,
         lugarId,
-
-        // 🔥 AQUÍ ESTÁ LA CLAVE
         lugar: {
-          id: lugar.id,
-          nombre: lugar.nombre,
-          informacion: lugar.informacion,
-          altitud: lugar.altitud,
-          dificultad: lugar.dificultad,
-          distanciaKm: lugar.distanciaKm,
-          tiempoEstimadoHoras: lugar.tiempoEstimadoHoras,
-          equipamiento: lugar.equipamiento,
-          DireccionPuntoInicio: lugar.DireccionPuntoInicio,
-          latitud: lugar.latitud ?? null,           // ✅ null en vez de undefined
-          longitud: lugar.longitud ?? null,          // ✅ null en vez de undefined
-
+          id:                    lugar.id,
+          nombre:                lugar.nombre,
+          informacion:           lugar.informacion,
+          altitud:               lugar.altitud,
+          dificultad:            lugar.dificultad,
+          distanciaKm:           lugar.distanciaKm,
+          tiempoEstimadoHoras:   lugar.tiempoEstimadoHoras,
+          equipamiento:          lugar.equipamiento,
+          DireccionPuntoInicio:  lugar.DireccionPuntoInicio,
+          latitud:               lugar.latitud  ?? null,
+          longitud:              lugar.longitud ?? null,
           requiereRegistroAcceso: lugar.requiereRegistroAcceso,
-          requiereGuiaMontana: lugar.requiereGuiaMontana,
-          requierePagoEntrada: lugar.requierePagoEntrada,
-          valorEntrada: lugar.requierePagoEntrada    // ✅ null si no requiere pago
-            ? lugar.valorEntrada
-            : null,
-
+          requiereGuiaMontana:   lugar.requiereGuiaMontana,
+          requierePagoEntrada:   lugar.requierePagoEntrada,
+          valorEntrada:          lugar.requierePagoEntrada ? lugar.valorEntrada : null,
           requiereMasInformacion: lugar.requiereMasInformacion,
-          MasInformacion: lugar.requiereMasInformacion
-            ? lugar.MasInformacion
-            : null,                                  // ✅ null en vez de undefined
-
+          MasInformacion:        lugar.requiereMasInformacion ? lugar.MasInformacion : null,
           requiereHorarioVisita: lugar.requiereHorarioVisita,
-          horarioVisita: lugar.requiereHorarioVisita
-            ? lugar.horarioVisita
-            : null,                                  // ✅ null en vez de undefined
-
-          requierePermiso: lugar.requierePermiso,
-          mapaRutaUrl: lugar.mapaRutaUrl || '',
+          horarioVisita:         lugar.requiereHorarioVisita ? lugar.horarioVisita : null,
+          requierePermiso:       lugar.requierePermiso,
+          mapaRutaUrl:           lugar.mapaRutaUrl || '',
         },
-
         creadoPor: {
-          uid: userData!.uid,
+          uid:    userData!.uid,
           nombre: userData!.nombre,
         },
-
         privado: true,
       });
 
+      this.security.resetRateLimit('crear-evento');
       await loading.dismiss();
-
       await this.showToast('¡Evento creado exitosamente!', 'success');
-
-      this.router.navigateByUrl('/tabs/eventos', {
-        replaceUrl: true,
-      });
+      this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
 
     } catch (error) {
       await loading.dismiss();
       await this.showToast('Error al crear el evento', 'danger');
-      // console.log(error);
-
     }
   }
 
@@ -218,32 +254,22 @@ export class CrearEventoPage implements OnInit {
   // =========================
   // 🍞 TOAST
   // =========================
-  private async showToast(
-    message: string,
-    color: string = 'success'
-  ) {
+  private async showToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,
       duration: 2500,
       color,
       position: 'bottom',
     });
-
     await toast.present();
   }
 
   // =========================
-  // 📜 SCROLL HEADER
+  // 📜 SCROLL
   // =========================
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
-
-    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
-      this.hideHeader = true;
-    } else {
-      this.hideHeader = false;
-    }
-
+    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
     this.lastScrollTop = scrollTop;
   }
 }
