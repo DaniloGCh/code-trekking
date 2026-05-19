@@ -15,6 +15,10 @@ import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
 import { FotoService } from 'src/app/core/services/foto.service';
 
+// ✅ Agrega el import
+import { ModalController } from '@ionic/angular';
+
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -26,36 +30,39 @@ export class ProfilePage implements OnInit {
   // =========================
   // 🔌 DEPENDENCIAS
   // =========================
-  private authService      = inject(AuthService);
-  private security         = inject(SecurityService);
-  private fotoService      = inject(FotoService);
-  private auth             = inject(Auth);
-  private router           = inject(Router);
-  private alertCtrl        = inject(AlertController);
-  private toastCtrl        = inject(ToastController);
-  private loadingCtrl      = inject(LoadingController);
-  private actionSheetCtrl  = inject(ActionSheetController);
-  private firestore        = inject(Firestore);
+  private authService = inject(AuthService);
+  private security = inject(SecurityService);
+  private fotoService = inject(FotoService);
+  private auth = inject(Auth);
+  private router = inject(Router);
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
+  private loadingCtrl = inject(LoadingController);
+  private actionSheetCtrl = inject(ActionSheetController);
+  private firestore = inject(Firestore);
+  
+  // ✅ Inyecta ModalController
+  private modalCtrl = inject(ModalController);
 
   // =========================
   // 📊 ESTADO
   // =========================
   userData: UserData | null = null;
-  favoritos: any[]          = [];
-  authReady                 = false;
-  hideHeader                = false;
-  lastScrollTop             = 0;
+  favoritos: any[] = [];
+  authReady = false;
+  hideHeader = false;
+  lastScrollTop = 0;
 
   // =========================
   // 😊 ESTADOS DE ÁNIMO
   // =========================
   estados = [
     { label: 'Excelente 😄', value: 'Excelente 😄' },
-    { label: 'Bien 🙂',      value: 'Bien 🙂'      },
-    { label: 'Normal 😐',    value: 'Normal 😐'    },
-    { label: 'Cansado 😴',   value: 'Cansado 😴'   },
+    { label: 'Bien 🙂', value: 'Bien 🙂' },
+    { label: 'Normal 😐', value: 'Normal 😐' },
+    { label: 'Cansado 😴', value: 'Cansado 😴' },
     { label: 'Estresado 😤', value: 'Estresado 😤' },
-    { label: 'Triste 😢',    value: 'Triste 😢'    },
+    { label: 'Triste 😢', value: 'Triste 😢' },
   ];
 
   // =========================
@@ -76,7 +83,7 @@ export class ProfilePage implements OnInit {
 
         await this.loadFavoritos();
       } else {
-        this.userData  = null;
+        this.userData = null;
         this.favoritos = [];
       }
     });
@@ -110,9 +117,13 @@ export class ProfilePage implements OnInit {
     try {
       const image = await Camera.getPhoto({
         quality: 90,           // ✅ Alta calidad inicial, comprimimos después
-        allowEditing: true,
+        allowEditing: true,    // ✅ Permite ajustar el ángulo antes de confirmar
         resultType: CameraResultType.Base64,
-        source
+        source,
+
+        // ✅ Opciones adicionales para mejor experiencia de edición
+        correctOrientation: true, // ✅ Corrige orientación automáticamente
+        presentationStyle: 'fullscreen', // ✅ Editor en pantalla completa
       });
 
       if (!image.base64String) return;
@@ -166,7 +177,7 @@ export class ProfilePage implements OnInit {
     if (!user) return;
 
     try {
-      const ref  = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
+      const ref = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
       const snap = await getDocs(ref);
       this.favoritos = snap.docs.map(d => ({ eventoId: d.id, ...d.data() }));
     } catch {
@@ -208,9 +219,9 @@ export class ProfilePage implements OnInit {
     this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 
-  goLogin()    { this.router.navigateByUrl('/login'); }
+  goLogin() { this.router.navigateByUrl('/login'); }
   goRegister() { this.router.navigateByUrl('/register'); }
-  goHome()     { this.router.navigateByUrl('/tabs/home'); }
+  goHome() { this.router.navigateByUrl('/tabs/home'); }
 
   // =========================
   // 😊 ESTADO DE ÁNIMO
@@ -369,7 +380,7 @@ export class ProfilePage implements OnInit {
             }
 
             const respuestaIngresada = data.respuesta.toLowerCase().trim();
-            const respuestaGuardada  = this.userData?.respuestaSeguridad?.toLowerCase().trim();
+            const respuestaGuardada = this.userData?.respuestaSeguridad?.toLowerCase().trim();
 
             if (respuestaGuardada !== respuestaIngresada) {
               await this.showToast('La respuesta de seguridad es incorrecta', 'danger');
@@ -486,7 +497,7 @@ export class ProfilePage implements OnInit {
               });
 
               if (this.userData) {
-                this.userData.nombre             = nombreSeguro;
+                this.userData.nombre = nombreSeguro;
                 this.userData.ultimoCambioNombre = new Date().toISOString();
               }
 

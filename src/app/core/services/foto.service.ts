@@ -16,12 +16,12 @@ export class FotoService {
   // =========================
   // ⚙️ CONFIGURACIÓN
   // =========================
-  private readonly MAX_SIZE_MB  = 1;
-  private readonly MAX_WIDTH    = 400;
-  private readonly MAX_HEIGHT   = 400;
-  private readonly QUALITY      = 0.7;
+  private readonly MAX_SIZE_MB = 2;
+  private readonly MAX_WIDTH = 400;
+  private readonly MAX_HEIGHT = 400;
+  private readonly QUALITY = 0.7;
   private readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  private readonly STORAGE_KEY  = 'user_profile_photo';
+  private readonly STORAGE_KEY = 'user_profile_photo';
 
   // =========================
   // ✅ VALIDAR FOTO
@@ -45,7 +45,7 @@ export class FotoService {
 
     // ✅ Validar tamaño
     const sizeBytes = (base64.length * 3) / 4;
-    const sizeMB    = sizeBytes / (1024 * 1024);
+    const sizeMB = sizeBytes / (1024 * 1024);
 
     if (sizeMB > this.MAX_SIZE_MB) {
       return { valid: false, message: `La imagen no puede superar ${this.MAX_SIZE_MB}MB` };
@@ -69,14 +69,14 @@ export class FotoService {
 
         if (width > this.MAX_WIDTH || height > this.MAX_HEIGHT) {
           const ratio = Math.min(
-            this.MAX_WIDTH  / width,
+            this.MAX_WIDTH / width,
             this.MAX_HEIGHT / height
           );
-          width  = Math.round(width  * ratio);
+          width = Math.round(width * ratio);
           height = Math.round(height * ratio);
         }
 
-        canvas.width  = width;
+        canvas.width = width;
         canvas.height = height;
 
         const ctx = canvas.getContext('2d');
@@ -102,6 +102,7 @@ export class FotoService {
   // ⚡ PUNTO DE MIGRACIÓN A FIREBASE STORAGE
   // =========================
   async guardarFoto(uid: string, base64: string): Promise<string> {
+    const key = `${this.STORAGE_KEY}_${uid}`;
     // 🔥 CUANDO MIGRES A FIREBASE STORAGE:
     // 1. Elimina el código de localStorage
     // 2. Descomenta el código de Storage
@@ -115,7 +116,6 @@ export class FotoService {
     // ─────────────────────────────────────────────────────────
 
     // ─── LOCALSTORAGE (actual) ────────────────────────────────
-    const key = `${this.STORAGE_KEY}_${uid}`;
     localStorage.setItem(key, base64);
     return base64;
     // ─────────────────────────────────────────────────────────
