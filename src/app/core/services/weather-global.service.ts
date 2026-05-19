@@ -32,8 +32,8 @@ export class WeatherGlobalService {
     try {
       const ubicacion = await this.sosService.obtenerUbicacion();
 
-      console.log('📍 LAT:', ubicacion.latitud);
-      console.log('📍 LON:', ubicacion.longitud);
+      // console.log('📍 LAT:', ubicacion.latitud);
+      // console.log('📍 LON:', ubicacion.longitud);
 
       // =========================
       // 🌤️ CLIMA
@@ -119,7 +119,7 @@ export class WeatherGlobalService {
       }
 
     } catch (error: any) {
-      console.error('Error cargando clima:', error);
+      // console.error('Error cargando clima:', error);
 
       if (error.message === 'permiso-denegado') {
         this.locationName.next('Permiso de ubicación denegado');
@@ -168,7 +168,7 @@ export class WeatherGlobalService {
 
     this.watchId = this.sosService.watchUbicacion(async (ubicacion) => {
 
-      console.log('📍 Movimiento detectado:', ubicacion);
+      // console.log('📍 Movimiento detectado:', ubicacion);
 
       if (!this.lastCoords) {
         this.lastCoords = {
@@ -187,12 +187,12 @@ export class WeatherGlobalService {
         ubicacion.longitud
       );
 
-      console.log('📏 Distancia movida:', distancia, 'metros');
+      // console.log('📏 Distancia movida:', distancia, 'metros');
 
       // 🔥 SOLO actualizar si se mueve más de 200m
       if (distancia > 200) {
 
-        console.log('🔄 Actualizando clima y ubicación');
+        // console.log('🔄 Actualizando clima y ubicación');
 
         this.lastCoords = {
           lat: ubicacion.latitud,

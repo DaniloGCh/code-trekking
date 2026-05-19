@@ -71,9 +71,16 @@
       <!-- 👋 HEADER BIENVENIDA -->
       <div class="welcome-header">
 
+      <!-- 🖼️ AVATAR -->
+      <div class="avatar-wrapper">
 
+        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img"
+          alt="Foto de perfil del usuario" />
 
-        <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
+        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon">
+        </ion-icon>
+        
+      </div>
 
         <h1>¡Hola, {{ userData.nombre }}!</h1>
 

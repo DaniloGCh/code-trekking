@@ -4,23 +4,16 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  AlertController,
-  ToastController,
-  LoadingController,
-  ActionSheetController
+  AlertController, ToastController,
+  LoadingController, ActionSheetController
 } from '@ionic/angular';
-
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-
-import {
-  Firestore,
-  collection,
-  getDocs,
-  deleteDoc,
-  doc
-} from '@angular/fire/firestore';
+import { Firestore, collection, getDocs, deleteDoc, doc } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
 
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
+import { SecurityService } from 'src/app/core/services/security.service';
+import { FotoService } from 'src/app/core/services/foto.service';
 
 @Component({
   selector: 'app-profile',
@@ -33,86 +26,60 @@ export class ProfilePage implements OnInit {
   // =========================
   // 🔌 DEPENDENCIAS
   // =========================
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private alertCtrl = inject(AlertController);
-  private toastCtrl = inject(ToastController);
-  private loadingCtrl = inject(LoadingController);
-  private actionSheetCtrl = inject(ActionSheetController);
-  private firestore = inject(Firestore);
+  private authService      = inject(AuthService);
+  private security         = inject(SecurityService);
+  private fotoService      = inject(FotoService);
+  private auth             = inject(Auth);
+  private router           = inject(Router);
+  private alertCtrl        = inject(AlertController);
+  private toastCtrl        = inject(ToastController);
+  private loadingCtrl      = inject(LoadingController);
+  private actionSheetCtrl  = inject(ActionSheetController);
+  private firestore        = inject(Firestore);
 
   // =========================
   // 📊 ESTADO
   // =========================
   userData: UserData | null = null;
-  favoritos: any[] = [];
-
-  authReady = false;
-
-  hideHeader = false;
-  lastScrollTop = 0;
+  favoritos: any[]          = [];
+  authReady                 = false;
+  hideHeader                = false;
+  lastScrollTop             = 0;
 
   // =========================
   // 😊 ESTADOS DE ÁNIMO
   // =========================
   estados = [
     { label: 'Excelente 😄', value: 'Excelente 😄' },
-    { label: 'Bien 🙂', value: 'Bien 🙂' },
-    { label: 'Normal 😐', value: 'Normal 😐' },
-    { label: 'Cansado 😴', value: 'Cansado 😴' },
+    { label: 'Bien 🙂',      value: 'Bien 🙂'      },
+    { label: 'Normal 😐',    value: 'Normal 😐'    },
+    { label: 'Cansado 😴',   value: 'Cansado 😴'   },
     { label: 'Estresado 😤', value: 'Estresado 😤' },
-    { label: 'Triste 😢', value: 'Triste 😢' },
+    { label: 'Triste 😢',    value: 'Triste 😢'    },
   ];
 
   // =========================
-  // 🚀 CICLO DE VIDA
+  // 🚀 INIT
   // =========================
   async ngOnInit() {
     this.authService.currentUser$.subscribe(async user => {
-
       this.authReady = true;
 
       if (user) {
         this.userData = await this.authService.getCurrentUserData();
+
+        // ✅ Cargar foto desde localStorage
+        const fotoGuardada = this.fotoService.cargarFoto(user.uid);
+        if (fotoGuardada && this.userData) {
+          this.userData.fotoBase64 = fotoGuardada;
+        }
+
         await this.loadFavoritos();
       } else {
-        this.userData = null;
+        this.userData  = null;
         this.favoritos = [];
       }
-
     });
-  }
-
-  // =========================
-  // ⭐ FAVORITOS
-  // =========================
-  async loadFavoritos() {
-    const user = this.authService['auth'].currentUser;
-    if (!user) return;
-
-    const ref = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
-    const snap = await getDocs(ref);
-
-    this.favoritos = snap.docs.map(d => ({
-      eventoId: d.id,
-      ...d.data()
-    }));
-  }
-
-  async removeFavorito(eventoId: string) {
-    const user = this.authService['auth'].currentUser;
-    if (!user) return;
-
-    const ref = doc(this.firestore, `usuarios/${user.uid}/favoritos/${eventoId}`);
-    await deleteDoc(ref);
-
-    this.favoritos = this.favoritos.filter(f => f.eventoId !== eventoId);
-
-    this.showToast('Eliminado de favoritos', 'medium');
-  }
-
-  verEvento(id: string) {
-    this.router.navigateByUrl(`/tabs/evento-detalle/${id}`);
   }
 
   // =========================
@@ -142,7 +109,7 @@ export class ProfilePage implements OnInit {
   private async takePicture(source: CameraSource) {
     try {
       const image = await Camera.getPhoto({
-        quality: 70,
+        quality: 90,           // ✅ Alta calidad inicial, comprimimos después
         allowEditing: true,
         resultType: CameraResultType.Base64,
         source
@@ -150,21 +117,87 @@ export class ProfilePage implements OnInit {
 
       if (!image.base64String) return;
 
-      const base64 = `data:image/jpeg;base64,${image.base64String}`;
+      const base64Original = `data:image/jpeg;base64,${image.base64String}`;
 
-      const loading = await this.loadingCtrl.create({ message: 'Guardando...' });
+      // ✅ Validar foto
+      const validacion = this.fotoService.validarFoto(base64Original);
+      if (!validacion.valid) {
+        await this.showToast(validacion.message, 'warning');
+        return;
+      }
+
+      const loading = await this.loadingCtrl.create({ message: 'Procesando foto...' });
       await loading.present();
 
-      await this.authService.updateProfile({ fotoBase64: base64 });
+      try {
+        // ✅ Comprimir foto automáticamente
+        const base64Comprimida = await this.fotoService.comprimirFoto(base64Original);
 
-      if (this.userData) this.userData.fotoBase64 = base64;
+        const uid = this.auth.currentUser?.uid;
+        if (!uid) throw new Error('No autenticado');
 
-      await loading.dismiss();
-      await this.showToast('Foto actualizada', 'success');
+        // ✅ Guardar en localStorage (preparado para Firebase Storage)
+        const fotoGuardada = await this.fotoService.guardarFoto(uid, base64Comprimida);
+
+        // ✅ Actualizar referencia en Firestore (solo uid, no el base64)
+        // 🔥 Cuando migres a Storage, guarda aquí la URL de descarga
+        await this.authService.updateProfile({ fotoBase64: fotoGuardada });
+
+        if (this.userData) this.userData.fotoBase64 = fotoGuardada;
+
+        await loading.dismiss();
+        await this.showToast('Foto actualizada', 'success');
+
+      } catch {
+        await loading.dismiss();
+        await this.showToast('Error al procesar la foto', 'danger');
+      }
 
     } catch {
-      await this.showToast('Error al subir foto', 'danger');
+      await this.showToast('Error al obtener la foto', 'danger');
     }
+  }
+
+  // =========================
+  // ⭐ FAVORITOS
+  // =========================
+  async loadFavoritos() {
+    const user = this.auth.currentUser; // ✅ Usar auth inyectado, no acceso privado
+    if (!user) return;
+
+    try {
+      const ref  = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
+      const snap = await getDocs(ref);
+      this.favoritos = snap.docs.map(d => ({ eventoId: d.id, ...d.data() }));
+    } catch {
+      await this.showToast('Error al cargar favoritos', 'danger');
+    }
+  }
+
+  async removeFavorito(eventoId: string) {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    // ✅ Validar eventoId
+    if (!eventoId || !this.security.isSafeText(eventoId, 50)) {
+      await this.showToast('ID de favorito inválido', 'danger');
+      return;
+    }
+
+    try {
+      const ref = doc(this.firestore, `usuarios/${user.uid}/favoritos/${eventoId}`);
+      await deleteDoc(ref);
+      this.favoritos = this.favoritos.filter(f => f.eventoId !== eventoId);
+      await this.showToast('Eliminado de favoritos', 'medium');
+    } catch {
+      await this.showToast('Error al eliminar favorito', 'danger');
+    }
+  }
+
+  verEvento(id: string) {
+    // ✅ Validar ID antes de navegar
+    if (!id || !this.security.isSafeText(id, 50)) return;
+    this.router.navigateByUrl(`/tabs/evento-detalle/${id}`);
   }
 
   // =========================
@@ -175,17 +208,9 @@ export class ProfilePage implements OnInit {
     this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 
-  goLogin() {
-    this.router.navigateByUrl('/login');
-  }
-
-  goRegister() {
-    this.router.navigateByUrl('/register');
-  }
-
-  goHome() {
-    this.router.navigateByUrl('/tabs/home');
-  }
+  goLogin()    { this.router.navigateByUrl('/login'); }
+  goRegister() { this.router.navigateByUrl('/register'); }
+  goHome()     { this.router.navigateByUrl('/tabs/home'); }
 
   // =========================
   // 😊 ESTADO DE ÁNIMO
@@ -214,11 +239,9 @@ export class ProfilePage implements OnInit {
           text: 'Siguiente',
           handler: async (selected) => {
             if (!selected) return false;
-
             selected === 'custom'
               ? await this.showCustomEstadoInput()
               : await this.saveEstado(selected);
-
             return true;
           }
         }
@@ -249,7 +272,13 @@ export class ProfilePage implements OnInit {
               return false;
             }
 
-            await this.saveEstado(data.estadoCustom.trim());
+            // ✅ Validar XSS en estado personalizado
+            if (!this.security.isSafeText(data.estadoCustom, 50)) {
+              await this.showToast('El estado contiene caracteres no permitidos', 'warning');
+              return false;
+            }
+
+            await this.saveEstado(this.security.sanitizeInput(data.estadoCustom.trim()));
             return true;
           }
         }
@@ -260,53 +289,37 @@ export class ProfilePage implements OnInit {
   }
 
   private async saveEstado(estado: string) {
-    const loading = await this.loadingCtrl.create({
-      message: 'Guardando estado...'
-    });
-
+    const loading = await this.loadingCtrl.create({ message: 'Guardando estado...' });
     await loading.present();
 
-    await this.authService.updateProfile({ estado });
-
-    if (this.userData) {
-      this.userData.estado = estado;
+    try {
+      await this.authService.updateProfile({ estado });
+      if (this.userData) this.userData.estado = estado;
+      await loading.dismiss();
+      await this.showToast('Estado actualizado', 'success');
+    } catch {
+      await loading.dismiss();
+      await this.showToast('Error al guardar estado', 'danger');
     }
-
-    await loading.dismiss();
-    await this.showToast('Estado actualizado', 'success');
   }
 
   // =========================
-  // 🍞 TOAST
+  // ✏️ CAMBIAR NOMBRE
   // =========================
-  private async showToast(message: string, color: string = 'success') {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000,
-      color,
-      position: 'bottom'
-    });
-
-    await toast.present();
-  }
-
-  // ✏️ CAMBIAR NOMBRE DE USUARIO
-  // ✏️ CAMBIAR NOMBRE DE USUARIO
   async onEditNombre() {
     if (!this.userData) return;
 
-    // ✅ Verificar si han pasado 90 días
     if (this.userData.ultimoCambioNombre) {
-      const ultimoCambio = new Date(this.userData.ultimoCambioNombre);
       const diasTranscurridos = Math.floor(
-        (new Date().getTime() - ultimoCambio.getTime()) / (1000 * 60 * 60 * 24)
+        (new Date().getTime() - new Date(this.userData.ultimoCambioNombre).getTime())
+        / (1000 * 60 * 60 * 24)
       );
       const diasRestantes = 90 - diasTranscurridos;
 
       if (diasRestantes > 0) {
         const alert = await this.alertCtrl.create({
           header: '⏳ Cambio no disponible',
-          message: `Solo puedes cambiar tu nombre cada 90 días. Podrás cambiarlo en ${diasRestantes} día(s).`,
+          message: `Podrás cambiar tu nombre en <strong>${diasRestantes} día(s)</strong>.`,
           buttons: ['Entendido']
         });
         await alert.present();
@@ -314,53 +327,55 @@ export class ProfilePage implements OnInit {
       }
     }
 
-    // ✅ Paso 1: Advertencia de 90 días
+    // ✅ Rate limiting
+    if (!this.security.checkRateLimit('cambio-nombre', 3, 3600000)) {
+      await this.showToast('Demasiados intentos. Espera 1 hora.', 'warning');
+      return;
+    }
+
     const advertencia = await this.alertCtrl.create({
       header: '⚠️ Antes de continuar',
-      message: 'Solo puedes cambiar tu nombre una vez cada 90 días. ¿Deseas continuar?',
+      message: 'Solo puedes cambiar tu nombre <strong>una vez cada 90 días</strong>. ¿Deseas continuar?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Continuar',
-          handler: () => this.verificarPreguntaSeguridad()
-        }
+        { text: 'Continuar', handler: () => this.verificarPreguntaSeguridad() }
       ]
     });
 
     await advertencia.present();
   }
 
-  // ✅ Paso 2: Pregunta de seguridad
   private async verificarPreguntaSeguridad() {
     const alert = await this.alertCtrl.create({
       header: '🔐 Verificación de seguridad',
-      message: `${this.userData?.preguntaSeguridad}`,
+      message: `<strong>${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}</strong>`,
       inputs: [
-        {
-          name: 'respuesta',
-          type: 'text',
-          placeholder: 'Tu respuesta de seguridad'
-        }
+        { name: 'respuesta', type: 'text', placeholder: 'Tu respuesta de seguridad' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Siguiente',
           handler: async (data) => {
-            if (!data.respuesta || data.respuesta.trim().length === 0) {
+            if (!data.respuesta?.trim()) {
               await this.showToast('Ingresa tu respuesta de seguridad', 'warning');
               return false;
             }
 
-            const respuestaGuardada = this.userData?.respuestaSeguridad?.toLowerCase().trim();
+            // ✅ Validar XSS en respuesta
+            if (!this.security.isSafeText(data.respuesta, 100)) {
+              await this.showToast('La respuesta contiene caracteres no permitidos', 'warning');
+              return false;
+            }
+
             const respuestaIngresada = data.respuesta.toLowerCase().trim();
+            const respuestaGuardada  = this.userData?.respuestaSeguridad?.toLowerCase().trim();
 
             if (respuestaGuardada !== respuestaIngresada) {
               await this.showToast('La respuesta de seguridad es incorrecta', 'danger');
               return false;
             }
 
-            // ✅ Respuesta correcta, ir al paso 3
             await this.verificarContrasena();
             return true;
           }
@@ -371,16 +386,11 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-  // ✅ Paso 3: Contraseña
   private async verificarContrasena() {
     const alert = await this.alertCtrl.create({
       header: '🔑 Confirma tu contraseña',
       inputs: [
-        {
-          name: 'password',
-          type: 'password',
-          placeholder: 'Tu contraseña actual'
-        }
+        { name: 'password', type: 'password', placeholder: 'Tu contraseña actual' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
@@ -396,20 +406,17 @@ export class ProfilePage implements OnInit {
             await loading.present();
 
             try {
-              // Reautenticar
               const { EmailAuthProvider, reauthenticateWithCredential } = await import('@angular/fire/auth');
-              const currentUser = this.authService['auth'].currentUser;
-              if (!currentUser || !currentUser.email) throw new Error('No autenticado');
+              const currentUser = this.auth.currentUser;
+              if (!currentUser?.email) throw new Error('No autenticado');
 
               const credential = EmailAuthProvider.credential(currentUser.email, data.password);
               await reauthenticateWithCredential(currentUser, credential);
 
               await loading.dismiss();
-
-              // ✅ Todo verificado, mostrar formulario de cambio
               await this.mostrarFormCambioNombre();
 
-            } catch (error: any) {
+            } catch {
               await loading.dismiss();
               await this.showToast('Contraseña incorrecta', 'danger');
             }
@@ -423,7 +430,6 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-  // ✅ Paso 4: Nuevo nombre
   private async mostrarFormCambioNombre() {
     const alert = await this.alertCtrl.create({
       header: '✏️ Cambiar nombre de usuario',
@@ -448,6 +454,12 @@ export class ProfilePage implements OnInit {
               return false;
             }
 
+            // ✅ Validar nombre seguro
+            if (!this.security.isValidNombre(nuevoNombre)) {
+              await this.showToast('El nombre solo puede contener letras y espacios', 'warning');
+              return false;
+            }
+
             if (nuevoNombre === this.userData?.nombre) {
               await this.showToast('El nombre es igual al actual', 'warning');
               return false;
@@ -457,7 +469,6 @@ export class ProfilePage implements OnInit {
             await loading.present();
 
             try {
-              // ✅ Verificar disponibilidad
               const disponible = await this.authService.isNombreDisponible(nuevoNombre);
 
               if (!disponible) {
@@ -466,21 +477,23 @@ export class ProfilePage implements OnInit {
                 return false;
               }
 
-              // ✅ Guardar con fecha
+              // ✅ Sanitizar antes de guardar
+              const nombreSeguro = this.security.sanitizeInput(nuevoNombre);
+
               await this.authService.updateProfile({
-                nombre: nuevoNombre,
+                nombre: nombreSeguro,
                 ultimoCambioNombre: new Date().toISOString()
               });
 
               if (this.userData) {
-                this.userData.nombre = nuevoNombre;
+                this.userData.nombre             = nombreSeguro;
                 this.userData.ultimoCambioNombre = new Date().toISOString();
               }
 
               await loading.dismiss();
               await this.showToast('Nombre actualizado correctamente', 'success');
 
-            } catch (error) {
+            } catch {
               await loading.dismiss();
               await this.showToast('Error al actualizar el nombre', 'danger');
             }
@@ -494,11 +507,11 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-  // ✅ Días restantes para cambio de nombre
   getDiasRestantesCambioNombre(): number {
     if (!this.userData?.ultimoCambioNombre) return 0;
     const diasTranscurridos = Math.floor(
-      (new Date().getTime() - new Date(this.userData.ultimoCambioNombre).getTime()) / (1000 * 60 * 60 * 24)
+      (new Date().getTime() - new Date(this.userData.ultimoCambioNombre).getTime())
+      / (1000 * 60 * 60 * 24)
     );
     return Math.max(0, 90 - diasTranscurridos);
   }
@@ -510,5 +523,18 @@ export class ProfilePage implements OnInit {
     const scrollTop = event.detail.scrollTop;
     this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
     this.lastScrollTop = scrollTop;
+  }
+
+  // =========================
+  // 🍞 TOAST
+  // =========================
+  private async showToast(message: string, color: string = 'success') {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    await toast.present();
   }
 }
