@@ -50,12 +50,9 @@ ion-buttons {
    ========================================================= */
 
 ion-content {
-  --background: linear-gradient(
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 0, 0, 0.55)
-    ),
-    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e')
-    no-repeat center center / cover;
+  --background: linear-gradient(rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)),
+    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e') no-repeat center center / cover;
 }
 
 
@@ -315,7 +312,7 @@ ion-accordion {
   border-radius: 10px;
 
 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   margin-top: 15px;
 }
 
@@ -338,4 +335,71 @@ ion-item[slot="header"] ion-icon {
 .mapa-container:hover {
   transform: scale(1.01);
   transition: all 0.25s ease;
+}
+
+.codigo-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  // 🌲 Verde trekking oscuro
+  background: linear-gradient(135deg,
+      #16241c 0%,
+      #1d3327 45%,
+      #274235 100%);
+
+  border: 1px solid rgba(160, 140, 95, 0.28);
+  border-radius: 16px;
+
+  padding: 0px 20px;
+  margin-bottom: 10px;
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  .codigo-text {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 5px;
+
+    // 🏕️ Arena clara
+    color: #f1e4c6;
+
+    font-family: 'Courier New', monospace;
+
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+  }
+
+  .codigo-actions {
+    display: flex;
+    gap: 8px;
+
+    ion-button {
+      // 🔥 Fondo completamente transparente
+      --background: transparent;
+      --background-hover: transparent;
+      --background-activated: transparent;
+      --background-focused: transparent;
+
+      // 🌿 Color trekking
+      --color: #f1e4c6;
+
+      // ❌ Sin bordes ni sombras
+      --box-shadow: none;
+      border: none;
+
+      ion-icon {
+        font-size: 20px;
+        opacity: 0.9;
+
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      &:hover ion-icon {
+        transform: scale(1.08);
+        opacity: 1;
+      }
+    }
+  }
 }

@@ -61,12 +61,29 @@
 
     <ion-card-content>
       <div class="codigo-container">
-        <span class="codigo-text">{{ evento.codigoInvitacion }}</span>
 
-        <ion-button fill="clear" (click)="onCopiarCodigo()">
-          <ion-icon name="copy-outline"></ion-icon>
-        </ion-button>
+        <!-- ✅ Código oculto o visible -->
+        <span class="codigo-text">{{ codigoMostrado }}</span>
+
+        <div class="codigo-actions">
+          <!-- ✅ Toggle mostrar/ocultar -->
+          <ion-button fill="clear" (click)="toggleCodigoVisible()">
+            <ion-icon [name]="codigoVisible ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+
+          <!-- ✅ Copiar solo si está visible -->
+          <ion-button fill="clear" (click)="onCopiarCodigo()">
+            <ion-icon name="copy-outline"></ion-icon>
+          </ion-button>
+        </div>
+
       </div>
+
+      <!-- ✅ Aviso de seguridad -->
+      <p class="codigo-aviso" *ngIf="!codigoVisible">
+        <ion-icon name="shield-checkmark-outline" color="success"></ion-icon>
+        Toca el ojo para revelar el código
+      </p>
 
       <ion-button class="btn-compartir" expand="block" (click)="onCompartir()">
         <ion-icon name="share-social-outline" slot="start"></ion-icon>
@@ -269,7 +286,8 @@
 
           <ion-label>
             <p>Registro de acceso</p>
-            <h3> {{ evento.lugar.requiereRegistroAcceso ? 'Requiere registro de acceso' : 'No requiere registro de acceso al parque' }} </h3>
+            <h3> {{ evento.lugar.requiereRegistroAcceso ? 'Requiere registro de acceso' : 'No requiere registro de
+              acceso al parque' }} </h3>
           </ion-label>
         </ion-item>
 
@@ -280,7 +298,9 @@
 
           <ion-label>
             <p>Guia de montaña o turistico</p>
-            <h3> {{ evento.lugar.requiereGuiaMontana ? 'Se recomienda guía de montaña o turistico para una mejor experiencia y cuidado' : 'No se requiere guía de montaña o turistico, pero para una mejor experiencia y cuidado siempre es bueno ir con un guía' }} </h3>
+            <h3> {{ evento.lugar.requiereGuiaMontana ? 'Se recomienda guía de montaña o turistico para una mejor
+              experiencia y cuidado' : 'No se requiere guía de montaña o turistico, pero para una mejor experiencia y
+              cuidado siempre es bueno ir con un guía' }} </h3>
           </ion-label>
         </ion-item>
 

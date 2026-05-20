@@ -6,6 +6,7 @@ import { Clipboard } from '@capacitor/clipboard';
 import { Auth } from '@angular/fire/auth';
 import { EventoService } from 'src/app/core/services/evento.service';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { SecurityService } from 'src/app/core/services/security.service';
 import { Evento } from 'src/app/core/models/evento.model';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -14,51 +15,80 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   templateUrl: './evento-detalle.page.html',
   styleUrls: ['./evento-detalle.page.scss'],
   standalone: false,
-  changeDetection: ChangeDetectionStrategy.OnPush // ✅ Evita re-renders innecesarios
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EventoDetallePage implements OnInit {
 
   // =========================
-  // 🔹 INYECCIÓN DE DEPENDENCIAS
+  // 🔹 DEPENDENCIAS
   // =========================
   private eventoService = inject(EventoService);
-  private authService = inject(AuthService);
-  private auth = inject(Auth);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private alertCtrl = inject(AlertController);
-  private toastCtrl = inject(ToastController);
-  private loadingCtrl = inject(LoadingController);
-  private sanitizer = inject(DomSanitizer);
-  private cdr = inject(ChangeDetectorRef); // ✅ Para notificar cambios manualmente
+  private authService   = inject(AuthService);
+  private security      = inject(SecurityService);
+  private auth          = inject(Auth);
+  private route         = inject(ActivatedRoute);
+  private router        = inject(Router);
+  private alertCtrl     = inject(AlertController);
+  private toastCtrl     = inject(ToastController);
+  private loadingCtrl   = inject(LoadingController);
+  private sanitizer     = inject(DomSanitizer);
+  private cdr           = inject(ChangeDetectorRef);
 
   // =========================
-  // 📦 ESTADO DEL COMPONENTE
+  // 📦 ESTADO
   // =========================
-  evento: Evento | null = null;
-  currentUid = this.auth.currentUser?.uid;
-  esCreadoPor = false;
-  mensajesNuevos = 0;
-  hideHeader = false;
-  lastScrollTop = 0;
-
-  // ✅ URL cacheada, se calcula una sola vez
+  evento: Evento | null     = null;
+  currentUid                = this.auth.currentUser?.uid;
+  esCreadoPor               = false;
+  mensajesNuevos            = 0;
+  hideHeader                = false;
+  lastScrollTop             = 0;
   mapaUrlSafe: SafeResourceUrl | null = null;
 
+  // ✅ Control de visibilidad del código
+  codigoVisible = false;
+
+  // ✅ Getter para mostrar código enmascarado o real
+  get codigoMostrado(): string {
+    if (!this.evento?.codigoInvitacion) return '';
+    return this.codigoVisible
+      ? this.evento.codigoInvitacion
+      : '••••••••••';
+  }
+
+  toggleCodigoVisible() {
+    this.codigoVisible = !this.codigoVisible;
+    this.cdr.markForCheck();
+  }
+
   // =========================
-  // 🚀 INICIALIZACIÓN
+  // 🚀 INIT
   // =========================
   async ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) return;
+    // ✅ Verificar autenticación
+    if (!this.auth.currentUser) {
+      this.router.navigateByUrl('/login', { replaceUrl: true });
+      return;
+    }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Cargando evento...'
-    });
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
+      return;
+    }
+
+    // ✅ Validar que el ID sea seguro
+    if (!this.security.isSafeText(id, 50)) {
+      await this.showToast('ID de evento inválido', 'danger');
+      this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({ message: 'Cargando evento...' });
     await loading.present();
 
     try {
-      this.evento = await this.eventoService.getEventoById(id);
+      this.evento     = await this.eventoService.getEventoById(id);
       this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
 
       // ✅ Cachear URL del mapa una sola vez
@@ -76,9 +106,9 @@ export class EventoDetallePage implements OnInit {
       }
 
       await loading.dismiss();
-      this.cdr.markForCheck(); // ✅ Notificar cambios manualmente
+      this.cdr.markForCheck();
 
-    } catch (error) {
+    } catch {
       await loading.dismiss();
       await this.showToast('Error al cargar el evento', 'danger');
       this.goBack();
@@ -90,6 +120,13 @@ export class EventoDetallePage implements OnInit {
   // =========================
   async onCopiarCodigo() {
     if (!this.evento) return;
+
+    // ✅ Solo copiar si el código es visible
+    if (!this.codigoVisible) {
+      await this.showToast('Muestra el código primero para copiarlo', 'warning');
+      return;
+    }
+
     await Clipboard.write({ string: this.evento.codigoInvitacion });
     await this.showToast('Código copiado al portapapeles', 'success');
   }
@@ -100,12 +137,14 @@ export class EventoDetallePage implements OnInit {
   async onCompartir() {
     if (!this.evento) return;
 
+    // ✅ Sanitizar datos antes de compartir
+    const nombreSeguro = this.security.sanitizeInput(this.evento.nombre);
+    const lugarSeguro  = this.security.sanitizeInput(this.evento.lugar.nombre);
+
     try {
       await Share.share({
-        title: `¡Te invito al evento: ${this.evento.nombre}!`,
-        text: `Únete a "${this.evento.nombre}" en ${this.evento.lugar.nombre}.
-Código: ${this.evento.codigoInvitacion}
-Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las ${this.evento.hora}`,
+        title: `¡Te invito al evento: ${nombreSeguro}!`,
+        text:  `Únete a "${nombreSeguro}" en ${lugarSeguro}.\nCódigo: ${this.evento.codigoInvitacion}\nFecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las ${this.evento.hora}`,
         dialogTitle: 'Compartir evento',
       });
     } catch {
@@ -117,6 +156,12 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   // 🚪 SALIR DEL EVENTO
   // =========================
   async onSalirEvento() {
+    // ✅ No puede salir si es el creador
+    if (this.esCreadoPor) {
+      await this.showToast('El organizador no puede salir del evento', 'warning');
+      return;
+    }
+
     const alert = await this.alertCtrl.create({
       header: 'Salir del evento',
       message: '¿Estás seguro que deseas salir de este evento?',
@@ -149,9 +194,17 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   // 🗑️ ELIMINAR EVENTO
   // =========================
   async onEliminarEvento() {
+    // ✅ Solo el creador puede eliminar
+    if (!this.esCreadoPor) {
+      await this.showToast('No tienes permisos para eliminar este evento', 'danger');
+      return;
+    }
+
+    const nombreSeguro = this.security.sanitizeInput(this.evento?.nombre || '');
+
     const alert = await this.alertCtrl.create({
       header: 'Eliminar evento',
-      message: `¿Eliminar ${this.evento?.nombre}? Esta acción es irreversible.`,
+      message: `¿Eliminar <strong>${nombreSeguro}</strong>? Esta acción es irreversible.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -185,11 +238,14 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   }
 
   irAlForo() {
+    if (!this.evento?.id || !this.evento?.creadoPor?.uid) return;
+
     if (this.currentUid) {
-      this.eventoService.marcarForoVisto(this.evento!.id!, this.currentUid);
+      this.eventoService.marcarForoVisto(this.evento.id, this.currentUid);
       this.mensajesNuevos = 0;
     }
-    this.router.navigateByUrl(`/tabs/foro/${this.evento!.id}/${this.evento!.creadoPor.uid}`);
+
+    this.router.navigateByUrl(`/tabs/foro/${this.evento.id}/${this.evento.creadoPor.uid}`);
   }
 
   goMapa() {
@@ -197,7 +253,7 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   }
 
   // =========================
-  // 📜 SCROLL HEADER
+  // 📜 SCROLL
   // =========================
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
@@ -206,7 +262,7 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   }
 
   // =========================
-  // 🍞 TOAST HELPER
+  // 🍞 TOAST
   // =========================
   private async showToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
@@ -223,10 +279,10 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
   // =========================
   esEventoProximo(evento: Evento): boolean {
     if (!evento?.fecha) return false;
-    const fechaEvento = evento.fecha.toDate ? evento.fecha.toDate() : new Date(evento.fecha);
-    const hoy = new Date();
+    const fechaEvento   = evento.fecha.toDate ? evento.fecha.toDate() : new Date(evento.fecha);
+    const hoy           = new Date();
     const eventoSinHora = new Date(fechaEvento.getFullYear(), fechaEvento.getMonth(), fechaEvento.getDate());
-    const hoySinHora = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const hoySinHora    = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
     return eventoSinHora > hoySinHora;
   }
 
@@ -238,8 +294,8 @@ Fecha: ${new Date(this.evento.fecha.toDate()).toLocaleDateString('es-CL')} a las
     const fechaEvento = evento.fecha.toDate ? evento.fecha.toDate() : new Date(evento.fecha);
     const hoy = new Date();
     return (
-      fechaEvento.getDate() === hoy.getDate() &&
-      fechaEvento.getMonth() === hoy.getMonth() &&
+      fechaEvento.getDate()     === hoy.getDate()     &&
+      fechaEvento.getMonth()    === hoy.getMonth()    &&
       fechaEvento.getFullYear() === hoy.getFullYear()
     );
   }
