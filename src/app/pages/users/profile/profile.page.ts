@@ -330,7 +330,7 @@ export class ProfilePage implements OnInit {
       if (diasRestantes > 0) {
         const alert = await this.alertCtrl.create({
           header: '⏳ Cambio no disponible',
-          message: `Podrás cambiar tu nombre en <strong>${diasRestantes} día(s)</strong>.`,
+          message: `Podrás cambiar tu nombre en ${diasRestantes} día(s).`,
           buttons: ['Entendido']
         });
         await alert.present();
@@ -346,7 +346,7 @@ export class ProfilePage implements OnInit {
 
     const advertencia = await this.alertCtrl.create({
       header: '⚠️ Antes de continuar',
-      message: 'Solo puedes cambiar tu nombre <strong>una vez cada 90 días</strong>. ¿Deseas continuar?',
+      message: 'Solo puedes cambiar tu nombre una vez cada 90 días. ¿Deseas continuar?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         { text: 'Continuar', handler: () => this.verificarPreguntaSeguridad() }
@@ -359,7 +359,7 @@ export class ProfilePage implements OnInit {
   private async verificarPreguntaSeguridad() {
     const alert = await this.alertCtrl.create({
       header: '🔐 Verificación de seguridad',
-      message: `<strong>${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}</strong>`,
+      message: `${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}`,
       inputs: [
         { name: 'respuesta', type: 'text', placeholder: 'Tu respuesta de seguridad' }
       ],

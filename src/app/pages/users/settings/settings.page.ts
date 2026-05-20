@@ -185,7 +185,7 @@ export class SettingsPage implements OnInit {
 
     const alert = await this.alertCtrl.create({
       header: 'Eliminar contacto',
-      message: `¿Eliminar a <strong>${this.security.sanitizeInput(this.contactos[index].nombre)}</strong>?`,
+      message: `¿Eliminar a ${this.security.sanitizeInput(this.contactos[index].nombre)}?`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -235,7 +235,7 @@ export class SettingsPage implements OnInit {
 
     const alert = await this.alertCtrl.create({
       header: 'Verificación de seguridad',
-      message: `<strong>${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}</strong>`,
+      message: `${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}`,
       inputs: [
         { name: 'respuesta', type: 'text', placeholder: 'Tu respuesta de seguridad' }
       ],
@@ -351,7 +351,7 @@ export class SettingsPage implements OnInit {
 
     const alert = await this.alertCtrl.create({
       header: '⚠️ Eliminar cuenta',
-      message: 'Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos permanentemente. ¿Continuar?',
+      message: 'Esta acción es irreversible. Se eliminarán todos tus datos permanentemente. ¿Continuar?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         { text: 'Continuar', handler: () => this.showDeleteVerification() }
@@ -364,7 +364,7 @@ export class SettingsPage implements OnInit {
   private async showDeleteVerification() {
     const alert = await this.alertCtrl.create({
       header: 'Verificación de seguridad',
-      message: `<strong>${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}</strong>`,
+      message: `${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}`,
       inputs: [
         { name: 'respuesta', type: 'text',     placeholder: 'Tu respuesta de seguridad' },
         { name: 'password',  type: 'password', placeholder: 'Tu contraseña actual' }

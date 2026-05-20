@@ -204,7 +204,7 @@ export class EventoDetallePage implements OnInit {
 
     const alert = await this.alertCtrl.create({
       header: 'Eliminar evento',
-      message: `¿Eliminar <strong>${nombreSeguro}</strong>? Esta acción es irreversible.`,
+      message: `¿Eliminar ${nombreSeguro}? Esta acción es irreversible.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
