@@ -5,6 +5,7 @@ import { TrackingService, EstadoTracking } from 'src/app/core/services/tracking.
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-mapa',
@@ -15,9 +16,10 @@ import { environment } from 'src/environments/environment';
 export class MapaPage implements AfterViewInit, OnDestroy {
 
   private trackingService = inject(TrackingService);
-  private alertCtrl = inject(AlertController);
-  private toastCtrl = inject(ToastController);
-  private router = inject(Router);
+  private alertCtrl       = inject(AlertController);
+  private toastCtrl       = inject(ToastController);
+  private router          = inject(Router);
+  private auth            = inject(Auth); // ✅ Para verificar sesión
 
   // =========================
   // 🗺️ MAPA
@@ -26,8 +28,8 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   userMarker!: L.CircleMarker;
   accuracyCircle!: L.Circle;
   routeLine!: L.Polyline;
-  followUser = true;
-  mostrarTipos = false;
+  followUser      = true;
+  mostrarTipos    = false;
   tipoMapaActual: 'calle' | 'satelital' | 'terreno' | 'topo' = 'topo';
   private capas: Record<string, L.TileLayer> = {};
   private capaActual!: L.TileLayer;
@@ -39,12 +41,12 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   estado: EstadoTracking = this.trackingService.estadoActual;
 
   get trackingActive() { return this.estado.activo; }
-  get distanceKm() { return this.estado.distanciaTotal / 1000; }
+  get distanceKm()     { return this.estado.distanciaTotal / 1000; }
   get tiempoSegundos() { return this.estado.tiempoSegundos; }
-  get routePoints() { return this.estado.puntos; }
+  get routePoints()    { return this.estado.puntos; }
 
   get tiempoFormateado(): string {
-    const horas = Math.floor(this.tiempoSegundos / 3600);
+    const horas   = Math.floor(this.tiempoSegundos / 3600);
     const minutos = Math.floor((this.tiempoSegundos % 3600) / 60);
     const segundos = this.tiempoSegundos % 60;
     const hh = horas.toString().padStart(2, '0');
@@ -56,24 +58,40 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   get coordenadasFormateadas(): string {
     const pos = this.estado.posicionActual;
     if (!pos) return 'Sin señal GPS';
-    return `${pos.lat.toFixed(6)}, ${pos.lng.toFixed(6)}`;
+    // ✅ Mostrar solo 4 decimales por privacidad (~11m de precisión)
+    return `${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)}`;
   }
 
   // =========================
   // 🛣️ RUTAS
   // =========================
-  modoRuta = false;
+  modoRuta            = false;
   puntosRuta: L.LatLng[] = [];
-  rutaControl: any = null;
+  rutaControl: any    = null;
   marcadoresRuta: L.Marker[] = [];
-  mostrarInstrucciones = false;       // ✅ Propiedad faltante
-  perfilRuta: 'hike' | 'foot' | 'car' = 'hike'; // ✅ Propiedad faltante
+  mostrarInstrucciones = false;
+  perfilRuta: 'hike' | 'foot' | 'car' = 'hike';
   instrucciones: { instruccion: string; distancia: string }[] = [];
+
+  // ✅ Límites de coordenadas válidas
+  private readonly COORD_LIMITS = {
+    latMin: -90, latMax: 90,
+    lngMin: -180, lngMax: 180
+  };
+
+  // ✅ Límite de puntos en ruta para evitar abuso de API
+  private readonly MAX_PUNTOS_RUTA = 2;
 
   // =========================
   // 🚀 INIT
   // =========================
   async ngAfterViewInit() {
+    // ✅ Verificar autenticación
+    if (!this.auth.currentUser) {
+      this.router.navigateByUrl('/login', { replaceUrl: true });
+      return;
+    }
+
     setTimeout(() => {
       this.initMap();
       this.trackingService.iniciarWatcherPosicion();
@@ -87,43 +105,28 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       attributionControl: true
     }).setView([-33.4489, -70.6693], 13);
 
-    // ✅ Definir capas
     this.capas = {
       calle: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
       }),
       satelital: L.layerGroup([
-
         L.tileLayer(
           'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-          {
-            maxZoom: 19,
-            attribution: '© Esri'
-          }
+          { maxZoom: 19, attribution: '© Esri' }
         ),
-
         L.tileLayer(
           'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',
-          {
-            maxZoom: 19
-          }
+          { maxZoom: 19 }
         ),
-
         L.tileLayer(
           'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-          {
-            maxZoom: 19
-          }
+          { maxZoom: 19 }
         )
-
       ]) as any,
       terreno: L.tileLayer(
-        'https://tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=' + environment.thunderforestKey,
-        {
-          maxZoom: 22,
-          attribution: '© Thunderforest Landscape'
-        }
+        `https://tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=${environment.thunderforestKey}`,
+        { maxZoom: 22, attribution: '© Thunderforest Landscape' }
       ),
       topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         maxZoom: 17,
@@ -131,18 +134,12 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       }),
     };
 
-    // ✅ Topo como capa inicial
     this.capaActual = this.capas['calle'];
     this.capaActual.addTo(this.map);
 
-    this.routeLine = L.polyline([], {
-      color: '#2563eb',
-      weight: 5
-    }).addTo(this.map);
+    this.routeLine = L.polyline([], { color: '#2563eb', weight: 5 }).addTo(this.map);
 
-    this.map.on('dragstart', () => {
-      this.followUser = false;
-    });
+    this.map.on('dragstart', () => { this.followUser = false; });
 
     setTimeout(() => this.map.invalidateSize(), 500);
   }
@@ -173,6 +170,9 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       if (estado.posicionActual) {
         const { lat, lng } = estado.posicionActual;
 
+        // ✅ Validar coordenadas antes de usar
+        if (!this.validarCoordenadas(lat, lng)) return;
+
         if (!this.userMarker) {
           this.userMarker = L.circleMarker([lat, lng], {
             radius: 10,
@@ -201,48 +201,43 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       }
     });
 
-    // ✅ Restaurar ruta trazada si existe
     const rutaGuardada = this.trackingService.estadoRutaActual;
     if (rutaGuardada.activa && rutaGuardada.puntos.length > 0) {
       this.restaurarRutaTrazada(rutaGuardada);
     }
   }
 
-  // ✅ Restaurar ruta en el mapa
-  private restaurarRutaTrazada(rutaGuardada: any) {
-    // Restaurar polyline
-    const latLngs = rutaGuardada.puntos.map(
-      (p: any) => L.latLng(p.lat, p.lng)
+  // ✅ Validar coordenadas GPS
+  private validarCoordenadas(lat: number, lng: number): boolean {
+    return (
+      typeof lat === 'number' && typeof lng === 'number' &&
+      !isNaN(lat) && !isNaN(lng) &&
+      lat >= this.COORD_LIMITS.latMin && lat <= this.COORD_LIMITS.latMax &&
+      lng >= this.COORD_LIMITS.lngMin && lng <= this.COORD_LIMITS.lngMax
     );
+  }
 
-    const colorRuta =
-      this.perfilRuta === 'car'
-        ? '#2563eb' // azul auto
-        : this.perfilRuta === 'foot'
-          ? '#f59e0b' // naranja caminata
-          : '#16a34a'; // verde trekking
+  private restaurarRutaTrazada(rutaGuardada: any) {
+    const latLngs = rutaGuardada.puntos.map((p: any) => L.latLng(p.lat, p.lng));
+
+    const colorRuta = this.perfilRuta === 'car' ? '#2563eb'
+      : this.perfilRuta === 'foot' ? '#f59e0b' : '#16a34a';
 
     this.rutaControl = L.polyline(latLngs, {
-      color: colorRuta,
-      weight: 6,
-      opacity: 0.9,
-      lineJoin: 'round'
+      color: colorRuta, weight: 6, opacity: 0.9, lineJoin: 'round'
     }).addTo(this.map);
 
-    // Restaurar instrucciones
     this.instrucciones = rutaGuardada.instrucciones;
-    this.perfilRuta = rutaGuardada.perfilRuta;
+    this.perfilRuta    = rutaGuardada.perfilRuta;
 
-    // Restaurar marcadores de origen y destino
     const emojis = ['🟢', '🔴'];
     rutaGuardada.puntosMarcados.forEach((p: any, i: number) => {
-      const icono = this.crearIconoMarcador(emojis[i], '');
+      const icono   = this.crearIconoMarcador(emojis[i], '');
       const marcador = L.marker([p.lat, p.lng], { icon: icono }).addTo(this.map);
       this.marcadoresRuta.push(marcador);
       this.puntosRuta.push(L.latLng(p.lat, p.lng));
     });
 
-    // Centrar mapa en la ruta
     this.map.fitBounds((this.rutaControl as any).getBounds(), { padding: [40, 40] });
   }
 
@@ -275,9 +270,26 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     await alert.present();
   }
 
-  exportGPX() {
-    if (this.routePoints.length === 0) return;
-    this.trackingService.exportarGPX();
+  // ✅ Exportar GPX con advertencia de privacidad
+  async exportGPX() {
+    if (this.routePoints.length === 0) {
+      await this.showToast('No hay puntos de ruta para exportar', 'warning');
+      return;
+    }
+
+    // ✅ Advertencia de privacidad antes de exportar
+    const alert = await this.alertCtrl.create({
+      header: '⚠️ Privacidad',
+      message: 'El archivo GPX contendrá tus coordenadas GPS exactas. ¿Deseas continuar?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Exportar',
+          handler: () => this.trackingService.exportarGPX()
+        }
+      ]
+    });
+    await alert.present();
   }
 
   centrarEnUsuario() {
@@ -303,12 +315,19 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   private onMapClick(e: L.LeafletMouseEvent) {
-    if (this.puntosRuta.length >= 2) {
+    if (this.puntosRuta.length >= this.MAX_PUNTOS_RUTA) {
       this.showToast('Ya tienes origen y destino. Limpia la ruta para trazar una nueva.', 'warning');
       return;
     }
 
     const punto = e.latlng;
+
+    // ✅ Validar coordenadas del click
+    if (!this.validarCoordenadas(punto.lat, punto.lng)) {
+      this.showToast('Coordenadas inválidas', 'danger');
+      return;
+    }
+
     this.puntosRuta.push(punto);
 
     const icono = this.puntosRuta.length === 1
@@ -333,12 +352,18 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       return;
     }
 
+    // ✅ Validar coordenadas antes de usar
+    if (!this.validarCoordenadas(pos.lat, pos.lng)) {
+      await this.showToast('Coordenadas GPS inválidas', 'danger');
+      return;
+    }
+
     this.limpiarRutaTrazada();
 
     const origen = L.latLng(pos.lat, pos.lng);
     this.puntosRuta.push(origen);
 
-    const icono = this.crearIconoMarcador('🟢', 'Tu ubicación');
+    const icono   = this.crearIconoMarcador('🟢', 'Tu ubicación');
     const marcador = L.marker(origen, { icon: icono }).addTo(this.map);
     this.marcadoresRuta.push(marcador);
 
@@ -348,6 +373,22 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   private async trazarRuta(origen: L.LatLng, destino: L.LatLng) {
+
+    // ✅ Validar ambos puntos antes de llamar a la API
+    if (!this.validarCoordenadas(origen.lat, origen.lng) ||
+        !this.validarCoordenadas(destino.lat, destino.lng)) {
+      await this.showToast('Coordenadas inválidas para trazar ruta', 'danger');
+      this.limpiarRutaTrazada();
+      return;
+    }
+
+    // ✅ Verificar que los puntos no sean el mismo
+    if (origen.lat === destino.lat && origen.lng === destino.lng) {
+      await this.showToast('El origen y destino no pueden ser el mismo punto', 'warning');
+      this.limpiarRutaTrazada();
+      return;
+    }
+
     if (this.rutaControl) {
       this.map.removeLayer(this.rutaControl);
       this.rutaControl = null;
@@ -358,17 +399,20 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     const perfilORS: Record<string, string> = {
       hike: 'foot-hiking',
       foot: 'foot-walking',
-      car: 'driving-car'
+      car:  'driving-car'
     };
 
     if (this.perfilRuta === 'car') {
-      await this.showToast(
-        '🚗 La ruta vehicular depende de caminos habilitados',
-        'primary'
-      );
+      await this.showToast('🚗 La ruta vehicular depende de caminos habilitados', 'primary');
     }
 
     try {
+      // ✅ Verificar que la API key existe
+      if (!environment.orsKey) {
+        await this.showToast('Servicio de rutas no disponible', 'danger');
+        return;
+      }
+
       const response = await fetch(
         `https://api.openrouteservice.org/v2/directions/${perfilORS[this.perfilRuta]}?` +
         `api_key=${environment.orsKey}` +
@@ -376,72 +420,51 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         `&end=${destino.lng},${destino.lat}`
       );
 
+      // ✅ Verificar respuesta HTTP
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (!data.features || data.features.length === 0) {
-
-        // 🚗 Si falla en auto → sugerir caminata
         if (this.perfilRuta === 'car') {
-
-          await this.showToast(
-            '🚫 No hay acceso vehicular. Probando caminata...',
-            'warning'
-          );
-
+          await this.showToast('🚫 No hay acceso vehicular. Probando caminata...', 'warning');
           this.perfilRuta = 'foot';
-
           await this.trazarRuta(origen, destino);
-
           return;
         }
-
-        await this.showToast(
-          'No se encontró ruta entre los puntos',
-          'danger'
-        );
-
+        await this.showToast('No se encontró ruta entre los puntos', 'danger');
         this.limpiarRutaTrazada();
-
         return;
       }
 
-      const feature = data.features[0];
+      const feature   = data.features[0];
       const coordenadas = feature.geometry.coordinates;
-      const resumen = feature.properties.summary;
+      const resumen   = feature.properties.summary;
 
-      const latLngs: L.LatLng[] = coordenadas.map(
-        (c: number[]) => L.latLng(c[1], c[0])
-      );
+      // ✅ Validar coordenadas de la respuesta
+      const latLngs: L.LatLng[] = coordenadas
+        .filter((c: number[]) => this.validarCoordenadas(c[1], c[0]))
+        .map((c: number[]) => L.latLng(c[1], c[0]));
 
-      const colorRuta =
-        this.perfilRuta === 'car'
-          ? '#2563eb' // 🚗 azul
-          : this.perfilRuta === 'foot'
-            ? '#f59e0b' // 🚶 naranja
-            : '#16a34a'; // 🥾 verde trekking
+      if (latLngs.length === 0) {
+        await this.showToast('La ruta recibida contiene datos inválidos', 'danger');
+        return;
+      }
+
+      const colorRuta = this.perfilRuta === 'car'   ? '#2563eb'
+                      : this.perfilRuta === 'foot'  ? '#f59e0b'
+                      : '#16a34a';
 
       this.rutaControl = L.polyline(latLngs, {
-
-        color: colorRuta,
-
-        weight: this.perfilRuta === 'car'
-          ? 7
-          : 6,
-
-        opacity: 0.92,
-
-        lineJoin: 'round',
-
-        lineCap: 'round',
-
-        // 🥾 Línea punteada trekking
-        dashArray: this.perfilRuta === 'hike'
-          ? '10, 12'
-          : undefined,
-
-        // 🚶 Caminata más suave
+        color:       colorRuta,
+        weight:      this.perfilRuta === 'car' ? 7 : 6,
+        opacity:     0.92,
+        lineJoin:    'round',
+        lineCap:     'round',
+        dashArray:   this.perfilRuta === 'hike' ? '10, 12' : undefined,
         smoothFactor: 1.5
-
       }).addTo(this.map);
 
       this.map.fitBounds((this.rutaControl as any).getBounds(), { padding: [40, 40] });
@@ -449,16 +472,15 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       const pasos = feature.properties.segments[0].steps;
       this.instrucciones = pasos.map((paso: any) => ({
         instruccion: this.traducirInstruccion(paso.instruction),
-        distancia: paso.distance < 1000
+        distancia:   paso.distance < 1000
           ? `${Math.round(paso.distance)} m`
           : `${(paso.distance / 1000).toFixed(1)} km`
       }));
 
       const distancia = (resumen.distance / 1000).toFixed(2);
-      const tiempo = Math.round(resumen.duration / 60);
+      const tiempo    = Math.round(resumen.duration / 60);
       await this.showToast(`🥾 ${distancia} km · ~${tiempo} min`, 'success');
 
-      // ✅ Guardar ruta en el servicio
       this.trackingService.guardarRutaTrazada(
         latLngs.map(ll => ({ lat: ll.lat, lng: ll.lng })),
         this.instrucciones,
@@ -466,117 +488,65 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         this.puntosRuta.map(p => ({ lat: p.lat, lng: p.lng }))
       );
 
-    } catch (error) {
+    } catch {
       await this.showToast('Error al calcular la ruta', 'danger');
       this.limpiarRutaTrazada();
     }
   }
 
   private traducirInstruccion(instruccion: string): string {
+    let resultado = instruccion;
 
-  let resultado = instruccion;
+    const dirMap: Record<string, string> = {
+      north: 'norte', south: 'sur', east: 'este', west: 'oeste'
+    };
 
-  const dirMap: Record<string, string> = {
-    north: 'norte',
-    south: 'sur',
-    east: 'este',
-    west: 'oeste'
-  };
+    resultado = resultado
+      .replace(/(⬅️|➡️|↖️|↗️|🔁)\s*(a la izquierda|a la derecha)?/gi, '')
+      .replace(/\s*,\s*$/g, '');
 
-  // =========================
-  // 🧼 LIMPIEZA PREVIA (IMPORTANTE)
-  // =========================
-  resultado = resultado
-    .replace(/(⬅️|➡️|↖️|↗️|🔁)\s*(a la izquierda|a la derecha)?/gi, '')
-    .replace(/\s*,\s*$/g, '');
+    resultado = resultado.replace(
+      /(arrive|has llegado)(?: at)?(?: your destination| a)?\s*(.+?)(?:,.*)?$/gi,
+      (_m, _verb, place) => `🏁 Has llegado a tu destino: ${place.trim()}`
+    );
 
-  // =========================
-  // 🏁 LLEGADA (PRIORIDAD ALTA)
-  // =========================
-  resultado = resultado.replace(
-    /(arrive|has llegado)(?: at)?(?: your destination| a)?\s*(.+?)(?:,.*)?$/gi,
-    (_m, _verb, place) => {
-      return `🏁 Has llegado a tu destino: ${place.trim()}`;
-    }
-  );
+    resultado = resultado.replace(
+      /head\s+(north|south|east|west)\s+(on|onto)\s+(.+)/gi,
+      (_m, dir, _pre, street) => `➡️ Dirígete hacia el ${dirMap[dir]} por ${street}`
+    );
 
-  // =========================
-  // 🚶 HEAD (ORS CLAVE)
-  // =========================
-  resultado = resultado.replace(
-    /head\s+(north|south|east|west)\s+(on|onto)\s+(.+)/gi,
-    (_m, dir, _pre, street) => {
-      return `➡️ Dirígete hacia el ${dirMap[dir]} por ${street}`;
-    }
-  );
+    resultado = resultado
+      .replace(/turn sharp right/gi, '🔁 Gira fuerte a la derecha')
+      .replace(/turn sharp left/gi,  '🔁 Gira fuerte a la izquierda')
+      .replace(/turn right/gi,       '➡️ Gira a la derecha')
+      .replace(/turn left/gi,        '⬅️ Gira a la izquierda')
+      .replace(/slight right/gi,     '↗️ Mantente a la derecha')
+      .replace(/slight left/gi,      '↖️ Mantente a la izquierda')
+      .replace(/continue straight/gi, '⬆️ Continúa recto')
+      .replace(/continue onto/gi,    '➡️ Continúa hacia')
+      .replace(/keep right/gi,       '➡️ Mantente a la derecha')
+      .replace(/keep left/gi,        '⬅️ Mantente a la izquierda')
+      .replace(/continue/gi,         '➡️ Continúa')
+      .replace(/onto/gi,             'hacia')
+      .replace(/toward/gi,           'hacia')
+      .replace(/on the left/gi,      '⬅️ a la izquierda')
+      .replace(/on the right/gi,     '➡️ a la derecha')
+      .replace(/at the roundabout/gi, '🔄 en la rotonda')
+      .replace(/enter the roundabout/gi, '🔄 entra a la rotonda')
+      .replace(/exit the roundabout/gi,  '➡️ sal de la rotonda')
+      .replace(/take exit (\d+)/gi,      '➡️ toma la salida $1')
+      .replace(/take the (\d+)(st|nd|rd|th) exit/gi, '➡️ toma la salida $1')
+      .replace(/roundabout/gi,           'rotonda')
+      .replace(/make a u-turn/gi,        '🔁 haz un retorno')
+      .replace(/u-turn/gi,               '🔁 retorno')
+      .replace(/north/gi, 'norte')
+      .replace(/south/gi, 'sur')
+      .replace(/east/gi,  'este')
+      .replace(/west/gi,  'oeste');
 
-  // =========================
-  // 🚗 GIROS
-  // =========================
-  resultado = resultado
-    .replace(/turn sharp right/gi, '🔁 Gira fuerte a la derecha')
-    .replace(/turn sharp left/gi, '🔁 Gira fuerte a la izquierda')
-    .replace(/turn right/gi, '➡️ Gira a la derecha')
-    .replace(/turn left/gi, '⬅️ Gira a la izquierda')
-    .replace(/slight right/gi, '↗️ Mantente a la derecha')
-    .replace(/slight left/gi, '↖️ Mantente a la izquierda');
+    return resultado.replace(/\s+/g, ' ').trim();
+  }
 
-  // =========================
-  // 🚶 CONTINUAR
-  // =========================
-  resultado = resultado
-    .replace(/continue straight/gi, '⬆️ Continúa recto')
-    .replace(/continue onto/gi, '➡️ Continúa hacia')
-    .replace(/keep right/gi, '➡️ Mantente a la derecha')
-    .replace(/keep left/gi, '⬅️ Mantente a la izquierda')
-    .replace(/continue/gi, '➡️ Continúa');
-
-  // =========================
-  // 🛣️ CONECTORES
-  // =========================
-  resultado = resultado
-    .replace(/onto/gi, 'hacia')
-    .replace(/toward/gi, 'hacia')
-    .replace(/on the left/gi, '⬅️ a la izquierda')
-    .replace(/on the right/gi, '➡️ a la derecha');
-
-  // =========================
-  // 🔁 ROTONDAS
-  // =========================
-  resultado = resultado
-    .replace(/at the roundabout/gi, '🔄 en la rotonda')
-    .replace(/enter the roundabout/gi, '🔄 entra a la rotonda')
-    .replace(/exit the roundabout/gi, '➡️ sal de la rotonda')
-    .replace(/take exit (\d+)/gi, '➡️ toma la salida $1')
-    .replace(/take the (\d+)(st|nd|rd|th) exit/gi, '➡️ toma la salida $1')
-    .replace(/roundabout/gi, 'rotonda');
-
-  // =========================
-  // 🚗 U-TURN
-  // =========================
-  resultado = resultado
-    .replace(/make a u-turn/gi, '🔁 haz un retorno')
-    .replace(/u-turn/gi, '🔁 retorno');
-
-  // =========================
-  // 🧭 DIRECCIONES
-  // =========================
-  resultado = resultado
-    .replace(/north/gi, 'norte')
-    .replace(/south/gi, 'sur')
-    .replace(/east/gi, 'este')
-    .replace(/west/gi, 'oeste');
-
-  // =========================
-  // 🧼 LIMPIEZA FINAL
-  // =========================
-  return resultado
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-
-  // ✅ Un solo método limpiarRutaTrazada
   limpiarRutaTrazada() {
     if (this.rutaControl) {
       this.map.removeLayer(this.rutaControl);
@@ -584,14 +554,13 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     }
 
     this.marcadoresRuta.forEach(m => m.remove());
-    this.marcadoresRuta = [];
-    this.puntosRuta = [];
-    this.instrucciones = [];
+    this.marcadoresRuta      = [];
+    this.puntosRuta          = [];
+    this.instrucciones       = [];
     this.mostrarInstrucciones = false;
-    this.modoRuta = false;
+    this.modoRuta            = false;
     this.map.off('click');
 
-    // ✅ Limpiar también en el servicio
     this.trackingService.limpiarRutaTrazada();
   }
 
@@ -601,12 +570,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
   private crearIconoMarcador(emoji: string, titulo: string): L.DivIcon {
     return L.divIcon({
-      html: `<div style="
-        font-size: 24px;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        cursor: pointer;">
-        ${emoji}
-      </div>`,
+      html: `<div style="font-size:24px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));cursor:pointer;">${emoji}</div>`,
       iconSize: [30, 30],
       iconAnchor: [15, 15],
       className: ''
