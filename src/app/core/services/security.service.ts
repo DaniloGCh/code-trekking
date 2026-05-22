@@ -156,4 +156,27 @@ export class SecurityService {
     const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-']+$/;
     return regex.test(nombre.trim());
   }
+
+  // =========================
+  // 🛡️ VALIDAR COORDENADAS GPS
+  // =========================
+  isValidCoordinates(lat: number, lng: number): boolean {
+    return (
+      typeof lat === 'number' && typeof lng === 'number' &&
+      !isNaN(lat) && !isNaN(lng) &&
+      isFinite(lat) && isFinite(lng) &&
+      lat >= -90 && lat <= 90 &&
+      lng >= -180 && lng <= 180
+    );
+  }
+
+  // =========================
+  // 🛡️ VALIDAR ID DE FIRESTORE
+  // =========================
+  isValidFirestoreId(id: string): boolean {
+    if (!id || id.trim().length === 0) return false;
+    // IDs de Firestore son alfanuméricos, máx 128 chars
+    const regex = /^[a-zA-Z0-9_\-]{1,128}$/;
+    return regex.test(id);
+  }
 }

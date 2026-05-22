@@ -7,6 +7,11 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { Auth } from '@angular/fire/auth';
 
+// ✅ Importa e inyecta SecurityService
+import { SecurityService } from 'src/app/core/services/security.service';
+
+
+
 @Component({
   selector: 'app-mapa',
   templateUrl: './mapa.page.html',
@@ -20,6 +25,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   private toastCtrl       = inject(ToastController);
   private router          = inject(Router);
   private auth            = inject(Auth); // ✅ Para verificar sesión
+  private security = inject(SecurityService);
 
   // =========================
   // 🗺️ MAPA
@@ -73,11 +79,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   perfilRuta: 'hike' | 'foot' | 'car' = 'hike';
   instrucciones: { instruccion: string; distancia: string }[] = [];
 
-  // ✅ Límites de coordenadas válidas
-  private readonly COORD_LIMITS = {
-    latMin: -90, latMax: 90,
-    lngMin: -180, lngMax: 180
-  };
 
   // ✅ Límite de puntos en ruta para evitar abuso de API
   private readonly MAX_PUNTOS_RUTA = 2;
@@ -171,7 +172,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         const { lat, lng } = estado.posicionActual;
 
         // ✅ Validar coordenadas antes de usar
-        if (!this.validarCoordenadas(lat, lng)) return;
+        if (!this.security.isValidCoordinates(lat, lng)) return;
 
         if (!this.userMarker) {
           this.userMarker = L.circleMarker([lat, lng], {
@@ -205,16 +206,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     if (rutaGuardada.activa && rutaGuardada.puntos.length > 0) {
       this.restaurarRutaTrazada(rutaGuardada);
     }
-  }
-
-  // ✅ Validar coordenadas GPS
-  private validarCoordenadas(lat: number, lng: number): boolean {
-    return (
-      typeof lat === 'number' && typeof lng === 'number' &&
-      !isNaN(lat) && !isNaN(lng) &&
-      lat >= this.COORD_LIMITS.latMin && lat <= this.COORD_LIMITS.latMax &&
-      lng >= this.COORD_LIMITS.lngMin && lng <= this.COORD_LIMITS.lngMax
-    );
   }
 
   private restaurarRutaTrazada(rutaGuardada: any) {
@@ -323,7 +314,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     const punto = e.latlng;
 
     // ✅ Validar coordenadas del click
-    if (!this.validarCoordenadas(punto.lat, punto.lng)) {
+    if (!this.security.isValidCoordinates(punto.lat, punto.lng)) {
       this.showToast('Coordenadas inválidas', 'danger');
       return;
     }
@@ -353,7 +344,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     }
 
     // ✅ Validar coordenadas antes de usar
-    if (!this.validarCoordenadas(pos.lat, pos.lng)) {
+    if (!this.security.isValidCoordinates(pos.lat, pos.lng)) {
       await this.showToast('Coordenadas GPS inválidas', 'danger');
       return;
     }
@@ -375,8 +366,8 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   private async trazarRuta(origen: L.LatLng, destino: L.LatLng) {
 
     // ✅ Validar ambos puntos antes de llamar a la API
-    if (!this.validarCoordenadas(origen.lat, origen.lng) ||
-        !this.validarCoordenadas(destino.lat, destino.lng)) {
+    if (!this.security.isValidCoordinates(origen.lat, origen.lng) ||
+        !this.security.isValidCoordinates(destino.lat, destino.lng)) {
       await this.showToast('Coordenadas inválidas para trazar ruta', 'danger');
       this.limpiarRutaTrazada();
       return;
@@ -445,7 +436,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
       // ✅ Validar coordenadas de la respuesta
       const latLngs: L.LatLng[] = coordenadas
-        .filter((c: number[]) => this.validarCoordenadas(c[1], c[0]))
+        .filter((c: number[]) => this.security.isValidCoordinates(c[1], c[0]))
         .map((c: number[]) => L.latLng(c[1], c[0]));
 
       if (latLngs.length === 0) {
