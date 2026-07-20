@@ -39,6 +39,42 @@ ion-toolbar {
   text-transform: uppercase;
 }
 
+
+/* =========================
+   📊 TEXTO CONTENEDOR CLIMA 
+========================= */
+.weather-info div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+/* =========================
+   🌡️ TEMPERATURA
+========================= */
+.temp {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* =========================
+   ☁️ DESCRIPCIÓN
+========================= */
+.desc {
+  font-size: 11px;
+  color: #cbd5f5;
+  text-transform: capitalize;
+}
+
+/* =========================
+   📍 UBICACIÓN
+========================= */
+.location {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
 /* =========================================================
    👋 BIENVENIDA
    ========================================================= */
