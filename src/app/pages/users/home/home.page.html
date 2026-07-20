@@ -142,7 +142,7 @@
 
         <!-- 🩺 KIT PRIMEROS AUXILIOS -->
         <ng-container *ngIf="kitsPA$ | async as kitsPA">
-          <ion-card *ngIf="kitsPA.length > 0" class="kit-card kit-pa">
+          <ion-card *ngIf="kitsPA.length > 0" class="kit-card1 kit-pa">
 
             <ion-card-content>
               <div *ngFor="let kit of kitsPA">
@@ -162,7 +162,7 @@
 
         <!-- 🏕️ KIT SUPERVIVENCIA -->
         <ng-container *ngIf="kitsSup$ | async as kitsSup">
-          <ion-card *ngIf="kitsSup.length > 0" class="kit-card kit-sup">
+          <ion-card *ngIf="kitsSup.length > 0" class="kit-card2 kit-sup">
 
             <ion-card-content>
               <div *ngFor="let kit of kitsSup">
