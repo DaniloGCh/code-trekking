@@ -43,7 +43,7 @@
       <p>Crea un evento o únete con un código de invitación</p>
 
       <ion-button expand="block" class="btn-crear-evento" (click)="goCrearEvento()">
-        <ion-icon name="add-outline" slot="start"></ion-icon>
+        <ion-icon name="add-outline"></ion-icon>
         Crear evento
       </ion-button>
 
@@ -99,7 +99,7 @@
 
           <!-- 📅 FECHA -->
           <ion-item>
-            <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon class="calendar" name="calendar-outline" slot="start"></ion-icon>
             <ion-label>
 
               <!-- 🔴 FINALIZADO -->
@@ -128,7 +128,7 @@
                   <!-- 🔵 PRÓXIMO -->
 
                   <ng-container *ngIf="esEventoProximo(evento); else fechaNormal">
-                    <span style="color: #007bff; font-weight: bold;">
+                    <span class="proximo-evento">
                       Próximo evento
                     </span>
                     <ion-label>
@@ -150,7 +150,7 @@
 
           <!-- 👥 PARTICIPANTES -->
           <ion-item>
-            <ion-icon name="people-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon name="people-outline" slot="start"></ion-icon>
             <ion-label>
               {{ evento.participantes.length }} participante(s)
             </ion-label>
@@ -158,7 +158,7 @@
 
           <!-- ⛰️ ALTITUD -->
           <ion-item>
-            <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon name="trending-up-outline" slot="start"></ion-icon>
             <ion-label>
               {{ evento.lugar.altitud }} msnm
             </ion-label>
@@ -172,15 +172,13 @@
         <div class="evento-actions">
 
           <!-- 👁️ VER DETALLE -->
-          <ion-button fill="outline" size="small" (click)="verEvento(evento.id!)">
+          <ion-button class="btn-ver-detalle-evento" fill="outline" size="small" (click)="verEvento(evento.id!)">
             <ion-icon name="eye-outline" slot="start"></ion-icon>
             Ver detalle
           </ion-button>
 
           <!-- 🗑️ ELIMINAR -->
-          <ion-button *ngIf="evento.creadoPor.uid === currentUid" class="btn-eliminar-evento" fill="outline"
-            color="danger" size="small" (click)="onEliminarEvento(evento)">
-
+          <ion-button *ngIf="evento.creadoPor.uid === currentUid" class="btn-eliminar-evento" fill="outline"size="small" (click)="onEliminarEvento(evento)">
             <ion-icon name="trash-outline" slot="start"></ion-icon>
             Eliminar
           </ion-button>

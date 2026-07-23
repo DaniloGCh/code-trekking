@@ -1,7 +1,3 @@
-/* ==========================================================================
-   🎛️ VARIABLES TÁCTICAS EXACTAS (SÓLIDAS)
-   ========================================================================== */
-
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&display=swap');
 
 /* Fondo general con la imagen visible pero oscura */
@@ -11,14 +7,42 @@ ion-content {
   font-family: 'Lexend', sans-serif;
 }
 
-/* Header (inicio - usuario y salir)*/
-ion-toolbar {
+
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
+   ========================================================================== */
+/* para esconder la barra */
+   ion-header {
+  transition: transform 0.3s ease-in-out;
+}
+
+ion-header.hidden {
+  transform: translateY(-100%);
+}
+/* inicio */
+ion-toolbar.transparent-toolbar {
   --background: #0a0c10; /* Totalmente sólido */
   --color: rgb(0, 248, 103);  /* color letras*/
   border-bottom: 1px solid var(--glass-border);
 }
+/* Grosor del titulo */
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
+}
 
-/* Contenedor principal (afecta todo) */
+/* color y tamaño (inicio - usuario y salir) */
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103);  /* color iconos*/
+  font-size: 1rem;
+}
+
+
+/* ==========================================================================
+   Contenedor principal (afecta todo)
+   ========================================================================== */
 .welcome-container {
   margin: 40px 16px 20px 16px;
   display: flex;

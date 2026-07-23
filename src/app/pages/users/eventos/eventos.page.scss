@@ -1,437 +1,223 @@
-/* =========================================================
-   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
-   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&display=swap');
 
-/* toolbar transparente total */
-.transparent-toolbar {
-  --background: transparent !important;
-  --border-width: 0 !important;
-  --box-shadow: none !important;
-  --padding-start: 15px;
-  --padding-end: 15px;
+
+/* ==========================================================================
+   🌄 CONTENEDOR PRINCIPAL & FONDO GENERAL
+   ========================================================================== */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)),
+                url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
+  font-family: 'Lexend', sans-serif;
+
 }
 
-/* header base */
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
+   ========================================================================== */
+/* para esconder la barra */
 ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: transform 0.3s ease-in-out;
 }
 
-/* header oculto */
 ion-header.hidden {
   transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
 }
-
-/* iconos header */
-ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important;
+/* Eventos Trekking */
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Totalmente sólido */
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border-bottom: 1px solid var(--glass-border);
 }
-
-/* toolbar sin sombra */
-ion-toolbar {
-  --box-shadow: none !important;
-  box-shadow: none !important;
-  --border-width: 0 !important;
+/* Grosor del titulo */
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
 }
-
-/* botones header */
-ion-buttons {
-  z-index: 2;
-}
-
-
-/* =========================================================
-   🌄 FONDO PRINCIPAL
-   ========================================================= */
-
-ion-content {
-  --background: linear-gradient(
-      rgba(0, 0, 0, 0.45),
-      rgba(0, 0, 0, 0.45)
-    ),
-    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e')
-    no-repeat center center / cover;
+/* color y tamaño (inicio - usuario y salir) */
+ion-buttons ion-button {
+  --color: var(--accent-lime);
+  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 
-/* =========================================================
-   📌 EMPTY STATE
-   ========================================================= */
-
+/* ==========================================================================
+   🚫 ESTADO VACÍO (NO HAY EVENTOS)
+   ========================================================================== */
 .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  margin-top: 80px;
-  color: #c7f9cc;
-
-  ion-icon {
-    font-size: 70px;
-    margin-bottom: 10px;
-    color: #81c784;
-  }
-
-  h3 {
-    margin: 10px 0;
-    font-weight: 600;
-  }
-
-  p {
-    font-size: 0.9rem;
-    color: #a5d6a7;
-    margin-bottom: 16px;
-  }
-
-  ion-button {
-    --background: #2e7d32;
-    --color: #fff;
-
-    transition: all 0.3s ease;
-
-    &:hover {
-      --background: #388e3c;
-    }
-
-    &:active {
-      --background: #1b5e20;
-      transform: scale(0.97);
-    }
-  }
+  padding: 40px 20px;
+  margin: 30px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.9);
+}
+/* Texto: No tienes eventos aún*/
+.empty-state ion-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
 }
 
-
-/* =========================================================
-   🪵 CARDS DE EVENTO
-   ========================================================= */
-
-.evento-card {
-  background: rgba(34, 49, 34, 0.55);
-  border-radius: 16px;
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  margin-bottom: 16px;
-  color: #fff;
-
-  transition: 0.25s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  }
+/* Texto: No tienes eventos aún*/
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+/* Texto: Crea un evento o únete con un código de invitación...*/
+.empty-state p {
+  font-size: 13px;
+  margin: 0 0 20px 0;
 }
 
+/* ==========================================================================
+   📋 TARJETAS DE EVENTOS
+   ========================================================================== */
+  /* tarjeta completa*/
+  .evento-card {
+  background: var(--surface-command);
+  margin: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--accent-lime);
+  box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.9);
+  background: #14191f; /* Ahora es un bloque sólido, no transparente */
+}
+/*espacio entre las tarjetas*/
+.evento-card.first-space {
+  margin-top: 20px;
+}
+
+/* padding de la tarjeta */
+ion-card-header {
+  padding: 16px 16px 8px 16px;
+}
+/* dificultad del evento baja/ baja-media / alta */
 .evento-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
 }
-
-
-/* =========================================================
-   🧭 TEXTOS
-   ========================================================= */
-
+/* Titulo de la tarjeta */
 ion-card-title {
-  font-weight: 600;
-  color: #fff;
+  --color: rgb(255, 255, 255);  /* color letras*/
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 
+/* subtitulo, ubicacion en la tarjeta */
 ion-card-subtitle {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #a5d6a7;
-  font-size: 0.85rem;
+  --color: rgb(255, 255, 255);  /* color letras*/
+  font-size: 13px;
+  margin-top: 4px;
 }
 
+/* Icono, ubicacion en la tarjeta */
+ion-card-subtitle ion-icon {
+  font-size: 20px;
+  color: var(--accent-lime);
+}
 
-/* =========================================================
-   🎯 BADGES
-   ========================================================= */
-
+/* Badge de Dificultad */
 ion-badge {
-  font-weight: 600;
+  font-weight: 700;
   padding: 6px 10px;
-  border-radius: 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-size: 10px;
 }
 
-
-/* =========================================================
-   📄 LISTAS / ITEMS
-   ========================================================= */
-
+/* ==========================================================================
+   📦 CONTENIDO Y DETALLES DE TARJETA
+   ========================================================================== */
+/* padding de contenido del evento */
+   ion-card-content {
+  padding: 0px 16px 16px 16px;
+}
+/* color de proximo evento */
+.proximo-evento{
+  color: #007bff; 
+  font-weight: bold;
+}
+/* para fondo de proximo evento */
 ion-list {
-  background: transparent;
+  background: #14191f; /* Ahora es un bloque sólido, no transparente */
 }
-
+/* Letras fecha - participante - msnm */
 ion-item {
   --background: transparent;
-  margin-bottom: 4px;
-  transition: 0.2s ease;
-
-  &:hover {
-    --background: rgba(255, 255, 255, 0.05);
-  }
+  --color: rgb(221, 220, 220);
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --min-height: 36px;
+  font-size: 13px;
 }
-
-ion-item ion-icon[color="primary"] {
-  color: #2e7d32 !important;
+/* iconos color y tamaño fecha - participante - msnm */
+ion-item ion-icon {
+  color: #007bff; 
+  font-size: 20px;
+  margin-right: 12px;
 }
-
-
-/* =========================================================
-   ⚙️ ACCIONES
-   ========================================================= */
-
+/* ==========================================================================
+   🎮 BOTONES Y ACCIONES DEL EVENTO
+   ========================================================================== */
+/* botones juntos: ver detale, eliminar y estrella */
 .evento-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: -5px;
+  padding-top: -5px;
+  border-top: 1px solid var(--glass-border);
 }
 
-
-/* =========================================================
-   🌿 BOTÓN PRINCIPAL (VER / NORMAL)
-   ========================================================= */
-
-.evento-actions ion-button:not([color="danger"]) {
-  --color: #2e7d32;
-  --border-color: #2e7d32;
-
-  transition: 0.25s ease;
-
-  &:hover {
-    --background: #2e7d32;
-    --color: #fff;
-  }
-
-  &:active {
-    --background: #1b5e20;
-    transform: scale(0.96);
-  }
+/* Botón Ver Detalle */
+.btn-ver-detalle-evento {
+  --background: var(--surface-command);
+  background: var(--surface-command);
+  --color: rgb(0, 248, 103);  /* color letras*/
+  --border-color: rgba(0, 255, 94, 0.4);
+  --border-width: 2px;
+  border-radius: 5px;
+  text-transform: uppercase;
 }
 
-
-/* =========================================================
-   🔥 BOTÓN ELIMINAR
-   ========================================================= */
-
+/* Botón Eliminar Evento */
 .btn-eliminar-evento {
-  --color: #ef5350;
-  --border-color: #ef5350;
-
-  transition: 0.25s ease;
-
-  &:hover {
-    --background: #ef5350;
-    --color: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  }
-
-  &:active {
-    --background: #b71c1c;
-    transform: scale(0.96);
-  }
-
-  ion-icon {
-    transition: 0.25s ease;
-  }
-
-  &:hover ion-icon {
-    transform: scale(1.2) rotate(-5deg);
-  }
+  --background: var(--surface-command);
+  background: var(--surface-command);
+  --color: rgb(255, 70, 70);
+  --border-color: rgb(121, 29, 29);
+  --border-width: 2px;
+  border-radius: 5px;
+  text-transform: uppercase;
 }
 
-
-/* =========================================================
-   📌 UTILIDADES
-   ========================================================= */
-
-.first-space {
-  margin-top: 70px;
+/* Botón Favoritos (Estrella) */
+ion-button[fill="clear"] {
+  --padding-start: -15px;
+  --padding-end: 8px;
+  font-size: 18px;
 }
 
+/* Botón General Crear Evento (Estado Vacío) */
 .btn-crear-evento {
-  margin: 0 15px;
-}
-
-/* =========================================================
-   🚫 USUARIO NO LOGUEADO - WELCOME SCREEN
-   ========================================================= */
-
-.welcome-container {
-  margin: 80px 15px;
-}
-
-/* =========================================================
-   👋 HEADER DE BIENVENIDA
-   ========================================================= */
-
-.welcome-header {
-  margin: 85px 15px;
-  text-align: center;
-  margin-bottom: 25px;
-  padding: 25px;
-
-  background: rgba(34, 49, 34, 0.55);
-  border-radius: 20px;
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-
-  color: #fff;
-
-  animation: fadeInUp 0.5s ease;
-}
-
-/* icono login */
-.avatar-icon {
-  font-size: 80px;
-  color: #a3d977;
-  margin-bottom: 10px;
-}
-
-/* título */
-.welcome-header h1 {
-  margin: 10px 0 5px;
-  font-size: 1.6rem;
-  font-weight: 600;
-}
-
-/* descripción */
-.welcome-header p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #c7f9cc;
-  line-height: 1.4;
-}
-
-/* =========================================================
-   🔘 BOTONES
-   ========================================================= */
-
-.welcome-container ion-button {
-  margin-top: 12px;
-  --border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-/* botón principal */
-.welcome-container ion-button[color="primary"] {
-  --background: #2e7d32;
-  --color: #fff;
-}
-
-.welcome-container ion-button[color="primary"]:hover {
-  --background: #388e3c;
-  transform: translateY(-1px);
-}
-
-/* botón outline */
-.welcome-container ion-button[fill="outline"] {
-  --border-color: #a3d977;
-  --color: #c7f9cc;
-}
-
-.welcome-container ion-button[fill="outline"]:hover {
-  --background: rgba(163, 217, 119, 0.15);
-}
-
-/* =========================================================
-   ✨ ANIMACIÓN SUAVE
-   ========================================================= */
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.btn-iniciar {
-  --background: #2e7d32;  /* verde bosque */
-  --color: #fff;
-
-  border-radius: 12px;
-
-  transition: all 0.3s ease;
-}
-
-/* hover */
-.btn-iniciar:hover {
-  --background: #388e3c;
-}
-
-/* click */
-.btn-iniciar:active {
-  --background: #1b5e20;
-  transform: scale(0.97);
-}
-
-/* =========================
-   🌿 BOTÓN FORO TREKKING
-========================= */
-
-.foro-container {
-  position: relative;
-  width: 20%;
-  color: white;
-}
-
-/* Botón estilo trekking */
-.btn-foro {
-  
-  --background: linear-gradient(135deg, #2e7d32, #66bb6a);
-  --background-hover: linear-gradient(135deg, #1b5e20, #43a047);
-  --color: #ffffff;
-  color: #fff;
-
-  --border-radius: 12px;
-  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-
-  font-weight: 600;
-  letter-spacing: 0.5px;
-
-  transition: transform 0.2s ease;
-}
-
-/* Efecto al presionar */
-.btn-foro:active {
-  transform: scale(0.97);
-}
-
-/* Icono más visible */
-.btn-foro ion-icon {
-  font-size: 20px;
-}
-
-/* Badge tipo notificación */
-.foro-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-
-  font-size: 12px;
-  font-weight: bold;
-
-  border-radius: 50%;
-  padding: 6px 8px;
-
-  background: #e53935;
-  color: white;
-
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  --background: #14191f;
+  --color: rgb(0, 248, 103);  /* color letras*/
+  box-shadow: 0 10px 6px -6px rgba(0, 0, 0, 0.9);
+  border: 2px solid rgb(0, 248, 103);
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: 900;
 }
