@@ -11,11 +11,11 @@ ion-content {
 /* ==========================================================================
    🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
    ========================================================================== */
-/* para esconder la barra */
+/* para latransicion (movimiento) de la barra */
 ion-header {
   transition: transform 0.3s ease-in-out;
 }
-
+/* para esconder la barra */
 ion-header.hidden {
   transform: translateY(-100%);
 }

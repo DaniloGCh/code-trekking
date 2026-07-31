@@ -39,21 +39,19 @@
 @import "leaflet/dist/leaflet.css";
 
 
-/* 🌤️ clima centrado PERFECTO */
+/* ==========================================================================
+   🌤️ WIDGET CLIMA CENTRADO (ion-toolbar / ion-header)
+   ========================================================================== */
 .weather-header {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-
   display: flex;
   align-items: center;
   gap: 6px;
-
   color: #c7f9cc;
-
   font-weight: 600;
-
   --background: transparent;
   --box-shadow: none;
 }
@@ -66,15 +64,14 @@
   color: #a3d977;
 }
 
-/* 🧭 TAB BAR GLASS TREKKING */
+/* ==========================================================================
+ 🧭 TAB BAR GLASS TREKKING
+========================================================================== */
 ion-tab-bar {
   --background: rgba(20, 35, 20, 0.85);
-
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-
   height: 65px;
 }
 
@@ -82,38 +79,38 @@ ion-tab-bar {
 ion-tab-button {
   --color: #a5d6a7;
   --color-selected: #ffffff;
-
   transition: all 0.3s ease;
 }
 
-/* 🌿 ICONOS */
+/* ICONOS */
 ion-tab-button ion-icon {
   font-size: 22px;
   transition: all 0.3s ease;
 }
 
-/* ✨ TAB ACTIVO */
+/* ==========================================================================
+   ✨ ESTADO SELECCIONADO / TAB ACTIVO (.tab-selected) BARRA DE ABAJO
+   ========================================================================== */
 ion-tab-button.tab-selected {
   --color: #ffffff;
-
-  background: rgba(46, 125, 50, 0.35);
-  border-radius: 14px;
+  background: rgba(50, 100, 126, 0.15);
+  border-radius: 12px;
   margin: 6px 4px;
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
+  border: 1px solid rgba(50, 255, 126, 0.3);
   transform: translateY(-2px);
 }
 
-/* 🔥 ICONO ACTIVO MÁS GRANDE */
+/* Ícono color y agrandado cuando está activo */
 ion-tab-button.tab-selected ion-icon {
-  transform: scale(1.2);
+  color: rgb(2, 218, 92);
+  transform: scale(1.15);
 }
+/* ======================================================================== */
+
 
 /* 🌿 EFECTO HOVER (desktop) */
 ion-tab-button:hover {
-  --color: #c7f9cc;
+  --color: #03c516;
 }
 
 ion-tab-button.tab-selected {

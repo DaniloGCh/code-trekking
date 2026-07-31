@@ -2,17 +2,9 @@
 <!-- ========================= -->
 <!-- 🧭 HEADER -->
 <!-- ========================= -->
-<ion-header [class.hidden]="hideHeader">
+<ion-header [class.hidden]="hideHeader">  <!-- para que se desplace la barra -->
   <ion-toolbar class="transparent-toolbar">
-
-    <ion-buttons slot="start">
-      <ion-button (click)="goBack()">
-        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-
     <ion-title>Crear Evento</ion-title>
-
   </ion-toolbar>
 </ion-header>
 
@@ -210,7 +202,6 @@
               <ion-icon
                 name="trending-up-outline"
                 slot="start"
-                color="primary"
               ></ion-icon>
 
               <ion-label>
@@ -223,7 +214,6 @@
               <ion-icon
                 name="information-circle-outline"
                 slot="start"
-                color="primary"
               ></ion-icon>
 
               <ion-label class="ion-text-wrap">
