@@ -1,6 +1,7 @@
 <!-- src/app/pages/admin/dashboard/dashboard.page.html -->
 
-<ng-container *ngIf="adminData?.rol === 'admin'; else noAcceso">
+
+
 
   <!-- ========================= -->
   <!-- 🔝 HEADER -->
@@ -29,214 +30,212 @@
   <!-- ========================= -->
   <!-- 📄 CONTENIDO -->
   <!-- ========================= -->
+<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-  <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+  <ng-container class="ng-container" *ngIf="adminData?.rol === 'admin'; else noAcceso">
+    <div class="welcome-container">      
 
-    <!-- 🌤️ CLIMA + HORA -->
-    <ion-button fill="clear" class="weather-chip" (click)="openWeatherLink()">
+          <!-- 🌤️ CLIMA + HORA -->
+          <ion-button fill="clear" class="weather-chip" (click)="openWeatherLink()">
 
-      <div class="weather-info">
+            <div class="weather-info">
 
-        <ion-icon [name]="icon$ | async"></ion-icon>
+              <ion-icon [name]="icon$ | async"></ion-icon>
 
-        <div>
-          <span class="temp">{{ temperature$ | async }}°C</span>
-          <span class="desc">{{ description$ | async }}</span>
-          <small class="location">📍 {{ locationName$ | async }}</small>
-        </div>
-
-      </div>
-
-    </ion-button>
-    <!-- 👋 BIENVENIDA -->
-    <div class="welcome-header" *ngIf="adminData">
-
-
-
-      <ion-icon name="shield-checkmark-outline"></ion-icon>
-
-      <div>
-        <h2>¡Hola, {{ adminData.nombre }}!</h2>
-        <p>
-          Bienvenido a tu dashboard administrativo.
-          Gestiona la plataforma de forma eficiente y segura.
-        </p>
-      </div>
-
-    </div>
-
-    <!-- ========================= -->
-    <!-- 👥 USUARIOS -->
-    <!-- ========================= -->
-    <h3 class="section-title">
-      Usuarios registrados
-    </h3>
-
-    <ion-accordion-group #accordionUsuarios id="accordion-usuarios-principal"
-      (ionChange)="onCambioAccordionUsuarios($event)">
-
-      <ion-accordion value="usuarios">
-
-        <ion-item slot="header" (click)="onAbrirUsuarios($event)">
-          <ion-icon name="people-outline" slot="start" color="success"></ion-icon>
-          <ion-label>Ver usuarios registrados</ion-label>
-          <!-- ✅ Icono candado -->
-          <ion-icon slot="end" [name]="usuariosDesbloqueado ? 'lock-open-outline' : 'lock-closed-outline'"
-            [color]="usuariosDesbloqueado ? 'success' : 'warning'">
-          </ion-icon>
-        </ion-item>
-
-        <div slot="content">
-          <ion-list>
-
-            <ion-item *ngFor="let user of users$ | async">
-
-              <ion-avatar slot="start">
-                <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
-              </ion-avatar>
-
-              <ion-label>
-                <h3>{{ user.nombre }}</h3>
-                <p>{{ user.email }}</p>
-              </ion-label>
-
-              <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
-                {{ user.rol === 'admin' ? 'Admin' : 'User' }}
-              </ion-badge>
-
-              <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
-                <ion-icon name="swap-horizontal-outline"></ion-icon>
-              </ion-button>
-
-            </ion-item>
-
-          </ion-list>
-        </div>
-
-      </ion-accordion>
-
-    </ion-accordion-group>
-
-    <div class="panel-estadisticas">
-      <!-- ========================= -->
-      <!-- 📊 ESTADÍSTICAS -->
-      <!-- ========================= -->
-      <h3 class="section-title">Estadísticas</h3>
-
-      <ion-grid>
-        <ion-row>
-
-          <ion-col size="4">
-            <ion-card class="stat-card total">
-              <ion-card-content>
-                <ion-icon name="people-outline"></ion-icon>
-                <h2>{{ totalUsers }}</h2>
-                <p>Total</p>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <ion-col size="4">
-            <ion-card class="stat-card admins">
-              <ion-card-content>
-                <ion-icon name="shield-outline"></ion-icon>
-                <h2>{{ totalAdmins }}</h2>
-                <p>Admins</p>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <ion-col size="4">
-            <ion-card class="stat-card users">
-              <ion-card-content>
-                <ion-icon name="person-outline"></ion-icon>
-                <h2>{{ totalRegulares }}</h2>
-                <p>Usuarios</p>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-        </ion-row>
-      </ion-grid>
-
-
-
-      <!-- ========================= -->
-      <!-- 📊 EVENTOS POR USUARIO -->
-      <!-- ========================= -->
-
-      <!-- <ion-accordion-group class="usuarios-accordion-group">
-
-        <ion-accordion value="usuarios" class="usuarios-accordion"> -->
-
-      <!-- 🔹 HEADER -->
-      <!-- <ion-item slot="header" class="usuarios-header">
-            <ion-icon name="people-outline" slot="start" class="usuarios-icon"></ion-icon>
-            <ion-label>Eventos por usuario</ion-label>
-          </ion-item> -->
-
-      <!-- 🔹 CONTENIDO -->
-      <!-- <div slot="content" class="usuarios-content">
-
-            <ion-list class="usuarios-list">
-
-              <ng-container *ngIf="users$ | async as users"> -->
-
-      <!-- 🚫 SIN USUARIOS -->
-      <!-- <ion-item *ngIf="users.length === 0" class="usuarios-empty">
-                  <ion-label class="ion-text-center">
-                    <p>No hay usuarios disponibles</p>
-                  </ion-label>
-                </ion-item> -->
-
-      <!-- 👥 LISTA -->
-      <!-- <ion-item *ngFor="let user of users" class="usuarios-item">
-
-                  <ion-icon name="person-outline" slot="start" class="usuarios-user-icon"></ion-icon>
-
-                  <ion-label class="usuarios-label">
-                    <h3>{{ user.nombre }}</h3>
-                    <p>{{ user.email }}</p>
-                  </ion-label>
-
-                  <ion-badge class="usuarios-badge">
-                    {{ getEventosPorUsuario(user.uid) }}
-                  </ion-badge>
-
-                </ion-item>
-
-              </ng-container>
-
-            </ion-list>
-
-          </div>
-
-        </ion-accordion>
-
-      </ion-accordion-group> -->
-
-      <div class="stats-section">
-
-        <ion-col size="3">
-          <ion-card class="stat-card eventos">
-            <ion-card-content>
-
-              <div class="stat-icon">
-                <ion-icon name="calendar-outline"></ion-icon>
+              <div>
+                <span class="temp">{{ temperature$ | async }}°C</span>
+                <span class="desc">{{ description$ | async }}</span>
+                <small class="location">📍 {{ locationName$ | async }}</small>
               </div>
 
-              <h2>{{ totalEventos }}</h2>
-              <p>Total de eventos</p>
+            </div>
 
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
+          </ion-button>
 
-      </div>
+          <!-- 👋 BIENVENIDA -->
+          <div class="welcome-header" *ngIf="adminData">
+
+            <ion-icon class="avatar-icon" name="shield-checkmark-outline"></ion-icon>
+
+            <div>
+              <h2>¡Hola, {{ adminData.nombre }}!</h2>
+              <p>
+                Bienvenido a tu dashboard administrativo.
+                Gestiona la plataforma de forma eficiente y segura.
+              </p>
+            </div>
+
+          </div>
+          
+
+          <!-- ========================= -->
+          <!-- 👥 USUARIOS -->
+          <!-- ========================= -->
+          <h3 class="section-title">
+            Usuarios registrados
+          </h3>
+
+          <ion-accordion-group #accordionUsuarios id="accordion-usuarios-principal"
+            (ionChange)="onCambioAccordionUsuarios($event)">
+
+            <ion-accordion value="usuarios">
+
+              <ion-item slot="header" (click)="onAbrirUsuarios($event)">
+                <ion-icon name="people-outline" slot="start" color="success"></ion-icon>
+                <ion-label>Ver usuarios registrados</ion-label>
+                <!-- ✅ Icono candado -->
+                <ion-icon slot="end" [name]="usuariosDesbloqueado ? 'lock-open-outline' : 'lock-closed-outline'"
+                  [color]="usuariosDesbloqueado ? 'success' : 'warning'">
+                </ion-icon>
+              </ion-item>
+
+              <div slot="content">
+                <ion-list>
+
+                  <ion-item *ngFor="let user of users$ | async">
+
+                    <ion-avatar slot="start">
+                      <ion-icon name="person-circle-outline" style="font-size: 40px;"></ion-icon>
+                    </ion-avatar>
+
+                    <ion-label>
+                      <h3>{{ user.nombre }}</h3>
+                      <p>{{ user.email }}</p>
+                    </ion-label>
+
+                    <ion-badge slot="end" [color]="user.rol === 'admin' ? 'danger' : 'primary'">
+                      {{ user.rol === 'admin' ? 'Admin' : 'User' }}
+                    </ion-badge>
+
+                    <ion-button slot="end" fill="clear" (click)="onChangeRole(user)">
+                      <ion-icon name="swap-horizontal-outline"></ion-icon>
+                    </ion-button>
+
+                  </ion-item>
+
+                </ion-list>
+              </div>
+            </ion-accordion>
+          </ion-accordion-group>
+          <div class="panel-estadisticas">
+
+            
+            <!-- ========================= -->
+            <!-- 📊 ESTADÍSTICAS -->
+            <!-- ========================= -->
+            <h3 class="section-title">Estadísticas</h3>
+
+            <ion-grid>
+              <ion-row>
+
+                <ion-col size="4">
+                  <ion-card class="stat-card total">
+                    <ion-card-content>
+                      <ion-icon name="people-outline"></ion-icon>
+                      <h2>{{ totalUsers }}</h2>
+                      <p>Total</p>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="4">
+                  <ion-card class="stat-card admins">
+                    <ion-card-content>
+                      <ion-icon name="shield-outline"></ion-icon>
+                      <h2>{{ totalAdmins }}</h2>
+                      <p>Admins</p>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+                <ion-col size="4">
+                  <ion-card class="stat-card users">
+                    <ion-card-content>
+                      <ion-icon name="person-outline"></ion-icon>
+                      <h2>{{ totalRegulares }}</h2>
+                      <p>Usuarios</p>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+
+              </ion-row>
+            </ion-grid>
 
 
+            <!-- ========================= -->
+            <!-- 📊 EVENTOS POR USUARIO -->
+            <!-- ========================= -->
 
-    </div>
+            <!-- <ion-accordion-group class="usuarios-accordion-group">
+
+              <ion-accordion value="usuarios" class="usuarios-accordion"> -->
+
+            <!-- 🔹 HEADER -->
+            <!-- <ion-item slot="header" class="usuarios-header">
+                  <ion-icon name="people-outline" slot="start" class="usuarios-icon"></ion-icon>
+                  <ion-label>Eventos por usuario</ion-label>
+                </ion-item> -->
+
+            <!-- 🔹 CONTENIDO -->
+            <!-- <div slot="content" class="usuarios-content">
+
+                  <ion-list class="usuarios-list">
+
+                    <ng-container *ngIf="users$ | async as users"> -->
+
+            <!-- 🚫 SIN USUARIOS -->
+            <!-- <ion-item *ngIf="users.length === 0" class="usuarios-empty">
+                        <ion-label class="ion-text-center">
+                          <p>No hay usuarios disponibles</p>
+                        </ion-label>
+                      </ion-item> -->
+
+            <!-- 👥 LISTA -->
+            <!-- <ion-item *ngFor="let user of users" class="usuarios-item">
+
+                        <ion-icon name="person-outline" slot="start" class="usuarios-user-icon"></ion-icon>
+
+                        <ion-label class="usuarios-label">
+                          <h3>{{ user.nombre }}</h3>
+                          <p>{{ user.email }}</p>
+                        </ion-label>
+
+                        <ion-badge class="usuarios-badge">
+                          {{ getEventosPorUsuario(user.uid) }}
+                        </ion-badge>
+
+                      </ion-item>
+
+                    </ng-container>
+
+                  </ion-list>
+
+                </div>
+
+              </ion-accordion>
+
+            </ion-accordion-group> -->
+
+            <div class="stats-section">
+
+              <ion-col size="3">
+                <ion-card class="stat-card eventos">
+                  <ion-card-content>
+
+                    <div class="stat-icon">
+                      <ion-icon name="calendar-outline"></ion-icon>
+                    </div>
+
+                    <h2>{{ totalEventos }}</h2>
+                    <p>Total de eventos</p>
+
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+
+            </div>
+          </div>
+    
 
 
     <ion-accordion-group #accordionAdmin id="accordion-admin-principal" (ionChange)="onCambioAccordion($event)">
@@ -1050,9 +1049,16 @@
 
     </ion-accordion-group>
 
-  </ion-content>
 
-</ng-container>
+    </div>
+  </ng-container>
+</ion-content>
+
+
+
+
+
+
 
 <!-- 🚫 NO ACCESO -->
 <ng-template #noAcceso>

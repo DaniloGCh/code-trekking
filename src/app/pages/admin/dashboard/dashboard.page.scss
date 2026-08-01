@@ -1,528 +1,45 @@
-/* =========================================================
-   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
-   ========================================================= */
-
-.transparent-toolbar {
-  --background: transparent !important;
-  --border-width: 0 !important;
-  --box-shadow: none !important;
-  --padding-start: 15px;
-  --padding-end: 15px;
+/* Fondo general con la imagen visible pero oscura */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)),
+                url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
+  font-family: 'Lexend', sans-serif;
+  --color: #e2e8f0;
 }
 
-ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
+   ========================================================================== */
+/* para esconder la barra */
+   ion-header {
+  transition: transform 0.3s ease-in-out;
 }
 
 ion-header.hidden {
   transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
+}
+/* ADMIN */
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Totalmente sólido */
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border-bottom: 1px solid var(--glass-border);
+}
+/* Grosor del titulo */
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
 }
 
-/* QUITAR SOMBRA TOOLBAR */
-ion-toolbar {
-  --box-shadow: none !important;
-  box-shadow: none !important;
-  --border-width: 0 !important;
-}
-
-ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important;
-}
-
-/* =========================================================
-   🌄 FONDO PRINCIPAL
-   ========================================================= */
-
-ion-content {
-  --background: none;
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 0, 0, 0.7)
-    ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470")
-    no-repeat center/cover;
-
-  color: #fff;
+/* color y tamaño (inicio - usuario y salir) */
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103);  /* color iconos*/
+  font-size: 1rem;
 }
 
 /* =========================================================
-   🧭 HEADER VISUAL
+   📊 TEXTO CONTENEDOR CLIMA 
    ========================================================= */
-
-ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85);
-  --color: #fff;
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* =========================================================
-   👋 WELCOME HEADER
-   ========================================================= */
-
-.welcome-header {
-  margin: 15px 15px 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-
-  padding: 15px;
-  border-radius: 15px;
-
-  background: rgba(34, 49, 34, 0.6);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  ion-icon {
-    font-size: 40px;
-    color: #a3d977;
-  }
-
-  h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #dcdcdc;
-  }
-}
-
-/* =========================================================
-   📌 TÍTULOS DE SECCIÓN (UNIFICADO)
-   ========================================================= */
-
-.section-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  margin: 20px 0 10px 15px;
-  font-weight: 600;
-  color: #ffffff;
-
-  padding-left: 5px;
-}
-
-/* botón agregar */
-.section-title ion-button {
-  --color: #81c784;
-  transition: all 0.25s ease;
-}
-
-.section-title ion-button:hover {
-  transform: scale(1.05);
-}
-
-/* =========================================================
-   📊 CARDS ESTADÍSTICAS
-   ========================================================= */
-
-.stat-card {
-  border-radius: 15px;
-  text-align: center;
-  color: #fff;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  ion-card-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-
-  ion-icon {
-    font-size: 28px;
-  }
-
-  h2 {
-    margin: 5px 0;
-    font-size: 1.5rem;
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.8rem;
-    opacity: 0.8;
-  }
-}
-
-.stat-card.total { background: rgba(85, 107, 47, 0.7); }
-.stat-card.admins { background: rgba(139, 69, 19, 0.7); }
-.stat-card.users { background: rgba(34, 139, 34, 0.7); }
-
-/* 📊 SECCIÓN */
-.stats-section {
-  margin: 20px 15px;
-}
-
-/* 🧭 TITULO */
-.stats-title {
-  color: #c7f9cc;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-/* 🪵 CARD */
-.stat-card {
-  text-align: center;
-
-  background: rgba(34, 49, 34, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border-radius: 16px;
-  padding: 10px;
-
-  color: #fff;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-
-  transition: all 0.25s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-3px);
-}
-
-/* 📅 ICONO */
-.stat-icon {
-  font-size: 28px;
-  color: #81c784;
-  margin-bottom: 5px;
-}
-
-/* 🔢 NUMERO */
-.stat-card h2 {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin: 5px 0;
-}
-
-/* 📝 TEXTO */
-.stat-card p {
-  font-size: 0.85rem;
-  color: #c7f9cc;
-}
-
-/* 📦 CONTENEDOR */
-.usuarios-accordion-group {
-  margin: 10px 15px;
-}
-
-/* 🪵 ACORDEÓN */
-.usuarios-accordion {
-  background: rgba(34, 49, 34, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border-radius: 14px;
-  overflow: hidden;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* 📌 HEADER */
-.usuarios-header {
-  --background: transparent;
-  --color: #fff;
-  font-weight: 500;
-}
-
-.usuarios-icon {
-  color: #81c784;
-}
-
-/* 📄 CONTENIDO */
-.usuarios-content {
-  background: rgba(0, 0, 0, 0.15);
-}
-
-/* 📋 LISTA */
-.usuarios-list {
-  background: transparent;
-}
-
-/* 📦 ITEM */
-.usuarios-item {
-  --background: transparent;
-  --color: #fff;
-
-  border-radius: 10px;
-  margin-bottom: 5px;
-
-  transition: all 0.2s ease;
-}
-
-.usuarios-item:hover {
-  --background: rgba(255, 255, 255, 0.05);
-}
-
-/* 👤 ICONO */
-.usuarios-user-icon {
-  color: #4caf50;
-}
-
-/* 🧾 TEXTO */
-.usuarios-label h3 {
-  font-weight: 600;
-  color: #fff;
-}
-
-.usuarios-label p {
-  color: #c7f9cc;
-  font-size: 0.8rem;
-}
-
-/* 🟢 BADGE */
-.usuarios-badge {
-  background: rgba(46, 125, 50, 0.3);
-  color: #c7f9cc;
-
-  border: 1px solid rgba(76, 175, 80, 0.5);
-
-  border-radius: 10px;
-  padding: 5px 10px;
-
-  font-weight: 600;
-}
-
-/* 🚫 EMPTY */
-.usuarios-empty p {
-  color: #a5d6a7;
-}
-
-
-/* =========================
-   🔵 PANEL ESTADÍSTICAS
-========================= */
-.panel-estadisticas {
-  margin: 15px;
-  padding: 15px;
-
-  background: rgba(0, 60, 100, 0.20);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(33, 150, 243, 0.25);
-  border-radius: 16px;
-}
-/* =========================
-   🟢 PANEL GESTIÓN
-========================= */
-.panel-gestion {
-  margin: 0px;
-  padding: 0px;
-
-  background: rgba(34, 49, 34, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(76, 175, 80, 0.2);
-  border-radius: 16px;
-}
-
-/* =========================================================
-   👥 LISTAS (UNIFICADO)
-   ========================================================= */
-
-ion-list {
-  background: transparent;
-  margin: 15px;
-}
-
-/* item base */
-ion-item {
-  --background: rgba(255, 255, 255, 0.05);
-  margin-bottom: 8px;
-  border-radius: 12px;
-
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  transition: all 0.2s ease;
-}
-
-ion-item:hover {
-  --background: rgba(255, 255, 255, 0.08);
-}
-
-/* textos */
-ion-label h3 {
-  font-weight: 600;
-  color: #fff;
-}
-
-ion-label p {
-  color: #a5d6a7;
-  font-size: 0.85rem;
-}
-
-/* avatar */
-ion-avatar ion-icon {
-  color: #c7f9cc;
-}
-
-/* botones globales */
-ion-button {
-  --color: #c7f9cc;
-}
-
-/* =========================================================
-   🚫 NO ACCESO
-   ========================================================= */
-
-.no-acceso {
-  text-align: center;
-  margin-top: 100px;
-  color: #fff;
-
-  background: rgba(60, 0, 0, 0.45);
-  padding: 30px 20px;
-  border-radius: 18px;
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-}
-
-.no-acceso ion-icon {
-  font-size: 70px;
-  color: #ef5350;
-}
-
-.no-acceso h2 {
-  margin: 10px 0;
-}
-
-.no-acceso p {
-  font-size: 0.95rem;
-  color: #ffcdd2;
-}
-
-/* =========================================================
-   📋 FORMULARIOS
-   ========================================================= */
-
-.form-card {
-  background: rgba(34, 49, 34, 0.55);
-  border-radius: 16px;
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  margin-bottom: 20px;
-  color: #fff;
-}
-
-ion-item.ion-invalid {
-  --border-color: #ef5350;
-}
-
-/* botones form */
-.form-buttons {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.form-buttons ion-button:first-child {
-  --background: #2e7d32;
-}
-
-.form-buttons ion-button:last-child {
-  --color: #ccc;
-}
-
-/* =========================================================
-   🧊 ACORDEÓN
-   ========================================================= */
-
-ion-accordion-group {
-  margin: 5px;
-}
-
-ion-accordion {
-  margin: 5px 0;
-  border-radius: 16px;
-  overflow: hidden;
-
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-/* =========================
-   🏷️ TÍTULOS DE SECCIÓN
-========================= */
-.section-title {
-  color: #c7f9cc;
-  font-size: 1.1rem;
-  font-weight: 600;
-
-  margin: 20px 10px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ion-padding {
-  padding: 0px;
-}
-
-/* =========================
-   🌤️ WEATHER CHIP
-========================= */
-.weather-chip {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 8px 12px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  text-transform: none;
-  border: 1px solid rgba(255,255,255,0.08);
-  margin-top: 75px;
-}
-
-/* =========================
-   📦 CONTENEDOR INTERNO
-========================= */
-.weather-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* =========================
-   🌤️ ICONO
-========================= */
-.weather-info ion-icon {
-  font-size: 26px;
-  color: #127f0c;
-  /* amarillo clima */
-  min-width: 26px;
-}
-
-/* =========================
-   📊 TEXTO CONTENEDOR
-========================= */
 .weather-info div {
   display: flex;
   flex-direction: column;
@@ -555,10 +72,283 @@ ion-accordion {
   color: #94a3b8;
 }
 
-/* =========================
-   👆 EFECTO TOUCH
-========================= */
-.weather-chip:active {
-  transform: scale(0.96);
-  transition: transform 0.1s ease;
+
+
+/* ==========================================================================
+   🌤️ WIDGET CLIMA
+   ========================================================================== */
+.weather-chip {
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+
+
+/* =========================================================
+   👋 BIENVENIDA
+   ========================================================= */
+/* Contenedor principal (afecta todo)*/
+.welcome-container {
+  margin: 15px 16px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* Texto bienvenido...*/
+.welcome-header {
+  padding: 20px;
+  text-align: center;
+  background: #14191f;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Icono de avatar admin */
+.avatar-icon {
+  font-size: 80px;
+  color: #a3d977;
+}
+
+/* letra ¡Hola, (admin)!*/
+.welcome-header h1 {
+  margin: 0;
+  font-size: 28px; /* tamaño letra HOLA*/
+  font-weight: 900; /* grosor letra HOLA*/
+  text-transform: uppercase;
+}
+
+
+
+/* ==========================================================================
+   📝 TARJETAS DE FORMULARIO (Crear/Editar Kit y Manual)
+   ========================================================================== */
+.form-card {
+  background: #14191f;
+  border-radius: 12px;
+  margin: 16px;
+  border: 1px solid rgba(50, 255, 126, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  color: #e2e8f0;
+}
+
+.form-card ion-card-title {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Inputs y Textareas en Formularios */
+.form-card ion-item {
+  --background: #1a232d;
+  --color: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --highlight-color-focused: rgb(0, 248, 103);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.form-card ion-label {
+  color: #94a3b8 !important;
+}
+
+.form-card ion-input, 
+.form-card ion-textarea {
+  --color: #ffffff;
+  font-size: 0.95rem;
+  margin-top: 12px;
+}
+
+/* Validaciones y Errores */
+ion-item.ion-invalid {
+  --border-color: #ff4d4d;
+}
+
+ion-note[slot="error"] {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+}
+
+/* Contenedor de Botones de Formulario */
+.form-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* Botón Guardar / Agregar */
+.form-buttons ion-button[type="submit"] {
+  --background: #14191f;
+  background: #14191f;
+  --color: rgb(0, 248, 103);
+  border: 1px solid rgba(50, 255, 126, 0.5);
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+/* Botón Cancelar */
+.form-buttons ion-button[fill="outline"] {
+  --background: #14191f;
+  background: #14191f;
+  --color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+
+
+
+/* ==========================================================================
+   🗂️ ACORDEONES Y LISTAS DE DATOS (Kits y Manuales)
+   ========================================================================== */
+
+ion-accordion {
+  background: #14191f;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+/* Cabecera del Acordeón */
+ion-accordion ion-item[slot="header"] {
+  --background: #14191f;
+  --color: rgb(0, 248, 103);
+  font-weight: 700;
+}
+
+/* Contenido dentro del Acordeón */
+ion-accordion div[slot="content"] {
+  background: #0d1117;
+}
+
+ion-accordion ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+/* Ítems de la lista desplegada */
+ion-accordion ion-item {
+  --background: #14191f;
+  --color: #e2e8f0;
+  --border-color: rgba(255, 255, 255, 0.05);
+
+}
+
+/* Textos dentro de los ítems de lista */
+ion-accordion ion-label h3 {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+ion-accordion ion-label p {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+ion-accordion ion-label small {
+  color: rgb(0, 248, 103);
+  font-size: 0.8rem;
+}
+
+
+
+/* ==========================================================================
+   📊 TARJETAS DE ESTADÍSTICAS (STAT CARDS)
+   ========================================================================== */
+
+ion-grid ion-col {
+  padding: 4px; /* Espaciado entre columnas */
+}
+
+/* Estilo Base de las Tarjetas (Siguiendo el diseño de kit-card) */
+.stat-card {
+  background: #14191f;
+  margin: 0;
+  border-radius: 5px; /* Redondeo del borde alineado con kit-card */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra y profundidad */
+  --color: rgb(221, 220, 220); /* Color de letras general */
+  height: 100%; /* Para que todas mantengan la misma altura */
+}
+
+/* Contenido dentro de la tarjeta */
+.stat-card ion-card-content {
+  padding: 12px 8px; /* Relleno interno centrado */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Iconos de las métricas */
+.stat-card ion-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+/* Número destacado (Métrica) */
+.stat-card h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+/* Etiqueta del texto bajo el número */
+.stat-card p {
+  margin: 4px 0 0 0;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* TOTAL EVENTOS */
+
+
+/* --------------------------------------------------------------------------
+   🎨 VARIACIONES POR TIPO DE ESTADÍSTICA (Bordes laterales y colores)
+   -------------------------------------------------------------------------- */
+
+/* 1. TOTAL USUARIOS (Azul / Cian) */
+.stat-card.total {
+  border-left: 5px solid #38bdf8;
+}
+.stat-card.total ion-icon {
+  color: #38bdf8;
+}
+
+/* 2. ADMINS (Verde Neón) */
+.stat-card.admins {
+  border-left: 5px solid rgb(50, 255, 126);
+}
+.stat-card.admins ion-icon {
+  color: rgb(0, 248, 103);
+}
+
+/* 3. USUARIOS REGULARES (Naranja / Coral) */
+.stat-card.users {
+  border-left: 5px solid #ff6b4a;
+}
+.stat-card.users ion-icon {
+  color: #ff6b4a;
+}
+
+/* 4. TOTAL EVENTOS (violeta) */
+.stat-card.eventos {
+  border-left: 5px solid #a855f7; /* Borde violeta brillante */
+}
+.stat-card.eventos{
+  color: #a855f7; /* Color a juego con el borde */
 }

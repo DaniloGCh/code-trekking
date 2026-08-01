@@ -3,8 +3,8 @@ ion-content {
   --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)),
                 url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
   font-family: 'Lexend', sans-serif;
+  --color: #e2e8f0;
 }
-
 
 /* ==========================================================================
    🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
@@ -61,9 +61,10 @@ ion-buttons ion-button {
   text-transform: uppercase;
 }
 
-/* =========================
+
+/* =========================================================
    📊 TEXTO CONTENEDOR CLIMA 
-========================= */
+   ========================================================= */
 .weather-info div {
   display: flex;
   flex-direction: column;
@@ -173,8 +174,6 @@ ion-buttons ion-button {
   font-size: 22px;
 }
 
-
-
 /* ==========================================================================
    🌤️ WIDGET CLIMA
    ========================================================================== */
@@ -187,6 +186,10 @@ ion-buttons ion-button {
   display: block;
   height: auto;
 }
+
+
+
+
 
 /* ==========================================================================
    💡 APARTADO CONSEJOS
