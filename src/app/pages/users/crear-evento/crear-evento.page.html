@@ -11,7 +11,8 @@
 <!-- ========================= -->
 <!-- 📄 CONTENIDO PRINCIPAL -->
 <!-- ========================= -->
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <ng-container *ngIf="lugares$ | async as lugares">
 
@@ -58,7 +59,7 @@
         <ion-input
           type="text"
           formControlName="nombre"
-          placeholder="Ej: Trekking grupal El Plomo"
+          placeholder="Ej: Trekking grupal El Plomo (7 caracteres mín)"
         ></ion-input>
 
         <ion-note slot="error">
@@ -66,7 +67,7 @@
             El nombre es requerido
           </span>
           <span *ngIf="nombre?.errors?.['minlength']">
-            Mínimo 3 caracteres
+            Mínimo 7 caracteres
           </span>
         </ion-note>
 
@@ -82,7 +83,7 @@
         <ion-textarea
           formControlName="descripcion"
           rows="3"
-          placeholder="Describe el evento..."
+          placeholder="Describe el evento...(10 caracteres mín)"
         ></ion-textarea>
 
         <ion-note slot="error">

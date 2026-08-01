@@ -30,7 +30,8 @@
   <!-- ========================= -->
   <!-- 📄 CONTENIDO -->
   <!-- ========================= -->
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <ng-container class="ng-container" *ngIf="adminData?.rol === 'admin'; else noAcceso">
     <div class="welcome-container">      
@@ -352,7 +353,7 @@
 
                       <ion-col size="6">
                         <ion-item>
-                          <ion-label position="floating">Tiempo estimado (horas)</ion-label>
+                          <ion-label position="floating">Duracion en hora</ion-label>
                           <ion-input type="text" formControlName="tiempoEstimadoHoras"></ion-input>
                         </ion-item>
                       </ion-col>
@@ -491,6 +492,7 @@
                   <!-- MAPA DE LA RUTA -->
                   <ion-item>
                     <ion-label position="floating">URL del mapa de ruta (Wikiloc)</ion-label>
+                    <br>
                     <ion-input type="text" formControlName="mapaRutaUrl"
                       placeholder="https://es.wikiloc.com/wikiloc/embedv2.do?id=...">
                     </ion-input>

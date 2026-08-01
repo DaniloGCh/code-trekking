@@ -34,7 +34,8 @@
 <!-- ========================= -->
 <ng-container *ngIf="authReady && userData; else noAuth">
 
-  <ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
     <!-- ========================= -->
     <!-- 🖼️ PERFIL HEADER -->
@@ -114,7 +115,7 @@
         <ion-list lines="none">
 
           <ion-item>
-            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-icon class="icon-green" name="person-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Nombre</p>
               <h3>{{ userData.nombre }}</h3>
@@ -122,7 +123,7 @@
           </ion-item>
 
           <ion-item>
-            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            <ion-icon class="icon-green" name="mail-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Correo</p>
               <h3>{{ userData.email }}</h3>
@@ -168,7 +169,7 @@
             </ion-item>
 
             <!-- ⭐ LISTA -->
-            <ion-item *ngFor="let fav of favoritos">
+            <ion-item class="favorito-item" *ngFor="let fav of favoritos">
 
               <ion-label>
                 <h3>{{ fav.nombre }}</h3>
@@ -202,31 +203,36 @@
 
 </ng-container>
 
-<!-- ========================= -->
-<!-- 🚫 NO AUTH -->
-<!-- ========================= -->
-<ng-template #noAuth>
+  <!-- ========================= -->
+  <!-- 🚫 USUARIO NO LOGUEADO -->
+  <!-- ========================= -->
+  <ng-template #noAuth>
 
-  <ion-content class="welcome-container">
+    <div class="welcome-container">
 
-    <div class="welcome-header">
+      <!-- 👋 HEADER -->
+      <div class="welcome-header">
 
-      <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
+        <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
 
-      <h1>Bienvenido</h1>
+        <h1>Bienvenido</h1>
 
-      <p>Inicia sesión para ver tu perfil</p>
+        <p>Inicia sesión para acceder a todas las funciones de la aplicación.</p>
+
+      </div>
+
+      <!-- 🔑 LOGIN -->
+      <ion-button expand="block" class="btn-login" (click)="goLogin()">
+        Iniciar sesión
+      </ion-button>
+
+      <!-- 📝 REGISTER -->
+      <ion-button expand="block" fill="outline" (click)="goRegister()">
+        Registrarse
+      </ion-button>
 
     </div>
 
-    <ion-button expand="block" class="btn-login" (click)="goLogin()">
-      Iniciar sesión
-    </ion-button>
+  </ng-template>
 
-    <ion-button expand="block" fill="outline" color="success" (click)="goRegister()">
-      Registrarse
-    </ion-button>
 
-  </ion-content>
-
-</ng-template>

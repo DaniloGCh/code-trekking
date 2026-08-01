@@ -33,7 +33,8 @@
 <!-- ========================= -->
 <!-- 📄 CONTENIDO -->
 <!-- ========================= -->
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
 
 
@@ -68,6 +69,7 @@
 
         <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img"
           alt="Foto de perfil del usuario" />
+
 
         <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon">
         </ion-icon>
@@ -220,7 +222,7 @@
       </div>
 
       <!-- 🔑 LOGIN -->
-      <ion-button expand="block" class="btn-iniciar" (click)="goLogin()">
+      <ion-button expand="block" class="btn-login" (click)="goLogin()">
         Iniciar sesión
       </ion-button>
 

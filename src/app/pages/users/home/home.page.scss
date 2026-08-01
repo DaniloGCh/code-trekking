@@ -165,6 +165,7 @@ ion-buttons ion-button {
   transition: 0.3s ease;
 }
 
+
 .avatar-wrapper:hover .avatar-overlay {
   opacity: 1;
 }
@@ -273,11 +274,39 @@ ion-buttons ion-button {
 /* 3. Botón MANUAL DE EMERGENCIA */
 ion-button[fill="outline"], 
 .welcome-container ion-button[fill="outline"] {
-  --background: #14191f; 
-  background: #14191f; /* Ahora es un bloque sólido, no transparente */
+  --background: #14191f; /* Fondo oscuro sólido */
+  background: #14191f; /* Respaldo para el fondo */
   --border-width: 0px;
   --color: rgb(255, 70, 70);  /* color letras*/
-  border: 1px solid rgb(121, 29, 29);
+  border: 2px solid rgb(255, 70, 70);
   border-radius: 5px;
 }
+
+.welcome-header .avatar-icon {
+  font-size: 70px; /* Tamaño amplio del icono principal de entrada */
+  color: rgb(0, 248, 103); /* Color neón en la cabecera sin usuario */
+  margin-bottom: 12px; /* Espacio antes del título 'Bienvenido' */
+}
+
+/* Botón Iniciar Sesión */
+.btn-login {
+  --background: #14191f; /* Fondo oscuro sólido */
+  background: #14191f; /* Respaldo para el fondo */
+  --color: rgb(0, 248, 103); /* Texto neón */
+  border: 2px solid rgb(0, 248, 103); /* Borde verde brillante */
+  border-radius: 6px; /* Redondeo moderado */
+  font-weight: 700; /* Texto grueso */
+  margin-bottom: 12px; /* Separación con el botón inferior */
+}
+
+
+
+
+
+
+
+
+
+
+
 

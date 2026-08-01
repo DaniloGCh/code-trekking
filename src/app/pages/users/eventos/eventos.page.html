@@ -28,7 +28,8 @@
 <!-- ========================= -->
 <!-- 📄 CONTENIDO -->
 <!-- ========================= -->
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <ng-container *ngIf="misEventos$ | async as eventos">
 
