@@ -1,499 +1,292 @@
-/* =========================
-   🌲 PALETA TREKKING
-========================= */
-
-:root {
-  --trek-green-dark: #1f3b2d;
-  --trek-green: #2f5d45;
-  --trek-green-light: #4f7d5c;
-
-  --trek-earth: #7b5e3b;
-  --trek-sand: #d8c3a5;
-
-  --trek-orange: #d97706;
-  --trek-sky: #6fa3a8;
-
-  --trek-bg: #f4f1ea;
-  --trek-card: rgba(255, 255, 255, 0.92);
-
-  --trek-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  --trek-radius: 18px;
-}
-
-/* =========================
-   🌍 CONTENEDOR GENERAL
-========================= */
-
+/* ==========================================================================
+   🗺️ CONTENEDOR PRINCIPAL DEL MAPA
+   ========================================================================== */
 ion-content {
-  --background: var(--trek-bg);
-  font-family: 'Inter', sans-serif;
+  --background: #0a0c10; /* Establece el fondo oscuro base del contenedor Ionic mientras carga el mapa */
+  font-family: 'Lexend', sans-serif; /* Define la tipografía 'Lexend' como la fuente principal */
 }
-
-/* =========================
-   🗺️ MAPA
-========================= */
 
 .map-container {
-  position: relative;
-  width: 100%;
-  height: 88%;
-  overflow: hidden;
-  border-bottom-left-radius: 28px;
-  border-bottom-right-radius: 28px;
-  box-shadow: var(--trek-shadow);
+  position: relative; /* Define una base de posicionamiento relativo para alinear los controles flotantes hijos */
+  width: 100%; /* Ocupa el 100% del ancho disponible en la pantalla */
+  height: 55vh; /* Ocupa el 55% de la altura de la pantalla visible */
+  z-index: 1; /* Establece el nivel de apilamiento base del contenedor */
 }
 
 #map {
-  width: 100%;
-  height: 100%;
+  width: 100%; /* Ajusta el ancho del lienzo del mapa al 100% de su contenedor */
+  height: 100%; /* Ajusta el alto del lienzo del mapa al 100% de su contenedor */
+  background: #10141a; /* Muestra un fondo oscuro provisional mientras se cargan las capas e imágenes del mapa */
 }
 
-/* =========================
-   📍 BOTÓN CENTRAR
-========================= */
-
+/* 🔵 BOTÓN FLOTANTE CENTRAR MI UBICACIÓN */
 .center-btn {
-  position: absolute;
-  bottom: 20px;
-  right: 18px;
-  z-index: 999;
+  position: absolute; /* Posiciona el botón de forma absoluta respecto a .map-container */
+  bottom: 16px; /* Lo ubica a 16 píxeles de la parte inferior del mapa */
+  right: 16px; /* Lo ubica a 16 píxeles del borde derecho del mapa */
+  z-index: 1000; /* Eleva el botón para que aparezca por encima de todas las capas del mapa */
+  --background: #14191f; /* Asigna el fondo oscuro personalizado al botón de Ionic */
+  --color: rgb(0, 248, 103); /* Asigna el color verde neón al icono interno del botón */
+  --border-radius: 50%; /* Hace que el botón sea completamente circular */
+  width: 46px; /* Define el ancho del botón en 46 píxeles */
+  height: 46px; /* Define el alto del botón en 46 píxeles */
 
-  --background: rgba(31, 59, 45, 0.95);
-  --color: white;
-
-  width: 56px;
-  height: 56px;
-
-  border-radius: 50%;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-
-  ion-icon {
-    font-size: 1.5rem;
-  }
+  margin: 0; /* Elimina cualquier margen externo asignado por defecto */
 }
 
-/* =========================
-   🗺️ SELECTOR MAPA
-========================= */
-
-/* =========================
-   🗺️ SELECTOR CAPAS
-========================= */
-
+/* ==========================================================================
+   🗺️ SELECTOR FLOTANTE TIPO DE MAPA (ACCORDION DE ICONOS)
+   ========================================================================== */
 .map-type-selector {
-  position: absolute;
-
-  top: calc(env(safe-area-inset-top) + 16px);
-  right: 16px;
-
-  z-index: 1200;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  position: absolute; /* Posiciona el selector de tipo de mapa de forma absoluta */
+  top: 16px; /* Lo sitúa a 16 píxeles desde la parte superior del mapa */
+  right: 16px; /* Lo sitúa a 16 píxeles desde la esquina derecha del mapa */
+  z-index: 1000; /* Asegura que el selector flote por encima del visor del mapa */
+  display: flex; /* Activa el modelo de caja flexible */
+  flex-direction: column; /* Organiza los elementos desplegables verticalmente en columna */
+  align-items: flex-end; /* Alinea los botones al borde derecho */
+  gap: 6px; /* Añade una separación de 6 píxeles entre el botón disparador y las opciones */
 }
 
 .map-type-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  background: rgba(31, 59, 45, 0.92);
-  color: white;
-
-  border: none;
-  padding: 12px 16px;
-
-  border-radius: 14px;
-  font-weight: 600;
-
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-
-  box-shadow: var(--trek-shadow);
+  background: #14191f; /* Define el fondo oscuro del botón desplegable principal */
+  color: #ffffff; /* Establece el color del texto/icono en blanco */
+  border: 1px solid rgba(255, 255, 255, 0.15); /* Crea un borde tenue semi-transparente */
+  border-radius: 12px; /* Redondea las esquinas del botón a 12 píxeles */
+  padding: 8px 12px; /* Define el relleno interno vertical u horizontal */
+  display: flex; /* Utiliza flexbox para alinear el icono y la flecha */
+  align-items: center; /* Alinea el contenido verticalmente al centro */
+  gap: 6px; /* Establece un espacio de 6 píxeles entre los elementos internos */
+  font-size: 1.1rem; /* Define el tamaño de fuente para el icono principal */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Aplica una sombra suave para dar profundidad flotante */
+  cursor: pointer; /* Cambia el cursor a puntero al pasar el mouse por encima */
 }
 
 .map-type-options {
-  margin-top: 10px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  opacity: 0;
-  transform: translateY(-10px);
-  pointer-events: none;
-
-  transition: 0.25s ease;
+  display: none; /* Oculta el menú desplegable por defecto */
+  flex-direction: column; /* Alinea las opciones verticalmente cuando se muestra */
+  gap: 6px; /* Espaciado constante de 6 píxeles entre cada opción */
+  background: rgba(20, 25, 31, 0.95); /* Fondo oscuro casi opaco para lectura clara */
+  padding: 6px; /* Espaciado interno alrededor del grupo de botones */
+  border-radius: 12px; /* Bordes redondeados del contenedor desplegable */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde fino decorativo */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); /* Sombra intensa para resaltar sobre el mapa */
+  backdrop-filter: blur(8px); /* Aplica un desenfoque de fondo estilo cristal esmerilado */
 }
 
 .map-type-options.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  display: flex; /* Cambia la visibilidad a flexible cuando se añade la clase .visible */
 }
 
 .map-type-btn {
-  width: 54px;
-  height: 54px;
-
-  border: none;
-  border-radius: 16px;
-
-  background: rgba(31, 59, 45, 0.92);
-
-  font-size: 1.3rem;
-
-  box-shadow: var(--trek-shadow);
-
-  transition: 0.2s ease;
+  background: transparent; /* Hace transparente el fondo por defecto del botón */
+  border: none; /* Elimina cualquier borde por defecto */
+  font-size: 1.2rem; /* Tamaño de icono cómodo para interacciones táctiles */
+  padding: 8px; /* Espaciado interno uniforme para agrandar la zona de toque */
+  border-radius: 8px; /* Redondea los bordes individuales de los botones opcionales */
+  cursor: pointer; /* Muestra el puntero de interacción */
+  transition: background 0.2s; /* Transición suave de 0.2 segundos para el estado de cambio de fondo */
 }
 
+.map-type-btn:hover,
 .map-type-btn.active {
-  background: var(--trek-green);
-  color: white;
-  transform: scale(1.08);
+  background: rgba(0, 248, 103, 0.2); /* Fondo neón suave con opacidad al pasar el mouse o al estar activo */
+  border: 1px solid rgb(0, 248, 103); /* Resalta la opción seleccionada con un borde verde neón sólido */
 }
 
-/* =========================
-   📊 PANEL INFERIOR
-========================= */
-
+/* ==========================================================================
+   📊 PANEL INFERIOR Y ESTADÍSTICAS (TRACKING)
+   ========================================================================== */
 .map-info {
-  padding: 15px 18px 0px 18px;
-  position: relative;
-  z-index: 10;
-}
-
-.info-card {
-  background: var(--trek-card);
-
-  border-radius: 24px;
-  padding: 0px 18px 0px 18px;
-
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-
-  box-shadow: var(--trek-shadow);
-}
-
-/* =========================
-   📈 STATS EN FILA
-========================= */
-
-.stats-panel {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-
-  margin-bottom: 18px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  padding: 14px 10px;
-
-  border-radius: 16px;
-
-  background: rgba(0, 0, 0, 0.55);
-
-  min-height: 95px;
-}
-
-.stat-item ion-icon {
-  font-size: 1.3rem;
-  margin-bottom: 6px;
-
-  color: var(--forest);
-}
-
-.stat-item small {
-  display: block;
-
-  font-size: 0.72rem;
-
-  color: var(--text-soft);
-
-  margin-bottom: 4px;
-}
-
-.stat-item strong {
-  font-size: 0.82rem;
-  line-height: 1.2;
-
-  color: var(--text);
-}
-
-/* Coordenadas más compactas */
-
-.coordenadas strong {
-  font-size: 0.72rem;
-  word-break: break-word;
-}
-
-/* =========================
-   🔘 BOTONES SOLO ICONOS
-========================= */
-
-.action-buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.action-buttons ion-button {
-  height: 56px;
-
-  --border-radius: 18px;
-
-  margin: 0;
-
-  ion-icon {
-    font-size: 1.25rem;
-  }
-}
-
-/* =========================
-   📱 RESPONSIVE
-========================= */
-
-@media (max-width: 480px) {
-
-  .stats-panel {
-    gap: 8px;
-  }
-
-  .stat-item {
-    padding: 12px 6px;
-    min-height: 90px;
-  }
-
-  .stat-item strong {
-    font-size: 0.74rem;
-  }
-
-  .coordenadas strong {
-    font-size: 0.66rem;
-  }
-
-  .action-buttons {
-    gap: 8px;
-  }
-
-  .action-buttons ion-button {
-    font-size: 0.72rem;
-  }
-
-}
-
-/* =========================
-   🧭 SECCIÓN RUTA
-========================= */
-
-.ruta-section {
-  margin: 0px 18px 15px;
-
-  background: var(--trek-card);
-
-  padding: 20px;
-
-  border-radius: 24px;
-
-  box-shadow: var(--trek-shadow);
+  padding: 12px 14px; /* Otorga un margen interno general al panel inferior */
+  background: #0a0c10; /* Fondo oscuro continuo debajo de la vista del mapa */
 }
 
 .ruta-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  color: var(--trek-green-dark);
-
-  font-size: 1.1rem;
-  font-weight: 700;
-
-  margin-bottom: 18px;
+  color: #ffffff; /* Define el color blanco para el título de la sección */
+  font-size: 0.95rem; /* Establece un tamaño compacto de letra */
+  font-weight: 800; /* Asigna un grosor de fuente en negrita alta */
+  text-transform: uppercase; /* Convierte todo el texto del título a mayúsculas */
+  display: flex; /* Utiliza flexbox para alinear el icono con el texto */
+  align-items: center; /* Centra el icono verticalmente junto al texto */
+  gap: 6px; /* Espaciado de 6 píxeles entre icono y título */
+  margin: 0 0 10px 0; /* Elimina márgenes superior/laterales y da 10px abajo */
 }
 
-/* =========================
-   🥾 SELECTOR PERFIL
-========================= */
+.info-card {
+  background: #14191f; /* Fondo de la tarjeta contenedora de estadísticas */
+  border-radius: 14px; /* Bordes curvos acentuados a 14 píxeles */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Línea divisoria muy sutil alrededor de la tarjeta */
+  padding: 12px; /* Espaciado interno dentro de la tarjeta */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sombra para elevar la tarjeta del fondo */
+}
 
+.stats-panel {
+  display: grid; /* Utiliza maquetación en cuadrícula */
+  grid-template-columns: repeat(2, 1fr); /* Crea exactamente 2 columnas de igual ancho */
+  gap: 10px; /* Separación de 10 píxeles entre los bloques de estadísticas */
+  margin-bottom: 12px; /* Margen inferior para separarlo de los botones de acción */
+}
+
+.stat-item {
+  display: flex; /* Organiza el icono y el texto interior en fila horizontal */
+  align-items: center; /* Centra verticalmente el contenido dentro de cada celda */
+  gap: 10px; /* Separación de 10 píxeles entre icono y datos */
+  background: #0a0c10; /* Fondo más oscuro interno para contraste */
+  padding: 8px 10px; /* Relleno interno para los datos */
+  border-radius: 8px; /* Esquinas ligeramente redondeadas */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Borde extra fino de delimitación */
+}
+
+.stat-item ion-icon {
+  font-size: 1.3rem; /* Tamaño destacado para los iconos de las estadísticas */
+  color: rgb(0, 248, 103) !important; /* Fuerza el color verde neón brillante sobre los iconos Ionic */
+}
+
+.stat-item small {
+  display: block; /* Muestra el subtítulo como un bloque en su propia línea */
+  color: #94a3b8; /* Color gris azulado para etiquetas descriptivas */
+  font-size: 0.7rem; /* Texto pequeño para las etiquetas secundarias */
+  text-transform: uppercase; /* Fuerza el formato mayúscula en etiquetas secundarias */
+}
+
+.stat-item strong {
+  color: #ffffff; /* Texto blanco resaltado para los valores numéricos/datos */
+  font-size: 0.85rem; /* Tamaño de letra semi-destacado para lectura rápida */
+}
+
+.stat-item.coordenadas {
+  grid-column: span 2; /* Extiende el contenedor de coordenadas a lo largo de las 2 columnas */
+}
+
+/* Botones de control del GPS / Tracking */
+.action-buttons {
+  display: flex; /* Distribuye los botones de acción en línea horizontal */
+  gap: 8px; /* Espaciado horizontal de 8 píxeles entre cada botón */
+  justify-content: space-between; /* Extiende los botones a lo largo del contenedor */
+}
+
+.action-buttons ion-button {
+  flex: 1; /* Distribuye un tamaño equitativo proporcional a cada botón */
+  margin: 0; /* Elimina márgenes externos por defecto de Ionic */
+  --border-radius: 8px; /* Aplica bordes redondeados al componente Ionic */
+  font-weight: 800; /* Define texto/icono en negrita sólida */
+}
+
+/* ==========================================================================
+   🗺️ SECCIÓN Y CONTROL DE TRAZADO DE RUTAS
+   ========================================================================== */
+.ruta-section {
+  padding: 0 14px 24px 14px; /* Relleno inferior y lateral para no pegar al final de la pantalla */
+}
+
+/* Selector de Perfil (Sendero, Caminata, Auto) */
 .perfil-selector {
-  display: flex;
-  gap: 10px;
-
-  margin-bottom: 18px;
+  display: flex; /* Disposición en fila para las opciones de modo de viaje */
+  gap: 8px; /* Espaciado entre botones de perfil */
+  margin-bottom: 10px; /* Separación vertical antes de las acciones de ruta */
 }
 
 .perfil-btn {
-  flex: 1;
-
-  border: none;
-
-  padding: 12px;
-
-  border-radius: 14px;
-
-  background: rgba(79, 125, 92, 0.468);
-
-  color: var(--trek-green-dark);
-
-  font-weight: 600;
-
-  transition: 0.2s ease;
+  flex: 1; /* Distribución de ancho equitativo para cada botón de perfil */
+  background: #14191f; /* Fondo oscuro base del botón sin seleccionar */
+  color: #94a3b8; /* Color de texto deshabilitado/gris */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Borde ligero translúcido */
+  padding: 8px 4px; /* Relleno vertical y compacto horizontal */
+  border-radius: 8px; /* Bordes de las esquinas del botón perfil */
+  font-size: 0.8rem; /* Tamaño de letra compacto para encajar etiquetas */
+  font-weight: 700; /* Texto en negrita para mejor legibilidad */
+  cursor: pointer; /* Muestra el puntero de selección */
+  transition: all 0.2s ease; /* Anima suavemente cambios de color o estado activado */
 }
 
 .perfil-btn.active {
-  background: rgba(0, 255, 76, 0.468);
-  color: white;
-
-  transform: translateY(-2px);
+  background: rgba(0, 248, 103, 0.15); /* Fondo neón verde suave para el perfil activo */
+  color: rgb(0, 248, 103); /* Texto e icono en verde neón activo */
+  border-color: rgb(0, 248, 103); /* Resalta el borde en verde neón activo */
 }
 
-/* =========================
-   🛤️ BOTONES SOLO ICONOS
-========================= */
-
+/* Botones compactos de trazado de ruta */
 .ruta-buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-
-  margin-top: 10px;
+  display: flex; /* Alineación horizontal flex para la barra de herramientas de trazado */
+  gap: 8px; /* Espacio entre cada botón de acción de ruta */
+  margin-bottom: 8px; /* Margen inferior suave antes del mensaje de instrucción */
 }
 
 .ruta-buttons ion-button {
-  height: 54px;
-
-  --border-radius: 16px;
-
-  margin: 0;
+  flex: 1; /* Cada botón se expande de manera uniforme dentro de la fila */
+  margin: 0; /* Remueve márgenes residuales de Ionic */
+  --border-radius: 8px; /* Aplica redondeo de bordes estándar de 8px */
 }
 
-.ruta-buttons ion-icon {
-  font-size: 1.25rem;
+.ruta-instruccion {
+  background: rgba(0, 248, 103, 0.1); /* Fondo verde neón tenue tipo alerta/guía */
+  border: 1px solid rgba(0, 248, 103, 0.3); /* Borde sutil del mismo tono verde neón */
+  color: #ffffff; /* Texto en blanco para alta visibilidad */
+  font-size: 0.8rem; /* Tamaño de texto pequeño y descriptivo */
+  padding: 8px 12px; /* Relleno interno adecuado para la barra informativa */
+  border-radius: 8px; /* Redondeado de esquinas */
+  text-align: center; /* Centra el texto de la instrucción */
+  margin: 8px 0 0 0; /* Margen superior de separación */
 }
 
-/* Hover suave */
-
-.ruta-buttons ion-button:hover {
-  transform: translateY(-1px);
-}
-
-/* Responsive */
-
-@media (max-width: 480px) {
-
-  .ruta-buttons {
-    gap: 8px;
-  }
-
-  .ruta-buttons ion-button {
-    height: 50px;
-  }
-
-}
-
-/* =========================
-   📋 INSTRUCCIONES
-========================= */
-
+/* ==========================================================================
+   📋 PANEL DE INSTRUCCIONES / INDICACIONES PASO A PASO
+   ========================================================================== */
 .instrucciones-panel {
-  margin: 20px 18px;
-
-  background: var(--trek-card);
-
-  border-radius: 24px;
-
-  padding: 20px;
-
-  box-shadow: var(--trek-shadow);
+  background: #14191f; /* Fondo oscuro de la tarjeta de instrucciones */
+  margin: 0 14px 12px 14px; /* Márgenes laterales para alinear con las demás secciones */
+  padding: 12px; /* Relleno interior del panel de pasos */
+  border-radius: 12px; /* Curvatura suave de bordes a 12px */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Borde tenue exterior */
+  max-height: 200px; /* Limita la altura máxima del panel */
+  overflow-y: auto; /* Activa la barra de desplazamiento vertical cuando el contenido supera la altura */
 }
 
 .instrucciones-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  margin-bottom: 18px;
-
-  color: var(--trek-green-dark);
+  color: #ffffff; /* Título en color blanco */
+  font-size: 0.85rem; /* Tamaño de fuente compacto */
+  font-weight: 800; /* Negrita pesada para encabezado */
+  margin: 0 0 8px 0; /* Separación inferior hacia el primer paso */
+  display: flex; /* Flexbox para alineación con el icono */
+  align-items: center; /* Centrado vertical del icono con texto */
+  gap: 6px; /* Espacio horizontal de 6px entre icono y texto */
 }
 
 .instruccion-item {
-  display: flex;
-  gap: 14px;
-
-  padding: 14px 0;
-
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex; /* Disposición flexible en fila para cada paso individual */
+  align-items: flex-start; /* Alinea los elementos al tope superior de la fila */
+  gap: 10px; /* Espacio horizontal entre el número de paso y la indicación textual */
+  padding: 6px 0; /* Relleno vertical para distanciar cada fila de instrucción */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Línea divisoria muy tenue entre pasos */
 }
 
 .instruccion-item:last-child {
-  border-bottom: none;
+  border-bottom: none; /* Elimina la línea divisoria del último elemento de la lista */
 }
 
 .instruccion-numero {
-  min-width: 34px;
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-
-  background: var(--trek-green);
-
-  color: white;
-
-  font-weight: 700;
+  background: rgb(0, 248, 103); /* Fondo verde neón sólido para la insignia del número */
+  color: #0a0c10; /* Número oscuro para alto contraste */
+  font-weight: 800; /* Texto del número en negrita */
+  font-size: 0.75rem; /* Tamaño de letra pequeño */
+  width: 20px; /* Ancho fijo para mantener la forma circular */
+  height: 20px; /* Alto fijo para mantener la forma circular */
+  border-radius: 50%; /* Hace perfecto el círculo de la insignia */
+  display: flex; /* Flexbox interno para el centrado del texto */
+  align-items: center; /* Centra el número verticalmente */
+  justify-content: center; /* Centra el número horizontalmente */
+  flex-shrink: 0; /* Evita que el círculo del número se deforme al comprimirse la pantalla */
 }
 
 .instruccion-info p {
-  margin: 0;
-  font-weight: 600;
-  color: var(--trek-green-dark);
+  color: #ffffff; /* Texto principal de la dirección en blanco */
+  font-size: 0.8rem; /* Tamaño adecuado para indicaciones */
+  margin: 0; /* Elimina márgenes por defecto del párrafo */
+  line-height: 1.3; /* Ajusta la distancia entre líneas de texto en caso de quiebre */
 }
 
 .instruccion-info small {
-  color: #777;
-}
-
-/* =========================
-   📱 RESPONSIVE
-========================= */
-
-@media (max-width: 480px) {
-  .map-container {
-    height: 52vh;
-  }
-
-  .info-card,
-  .ruta-section,
-  .instrucciones-panel {
-    border-radius: 20px;
-  }
-
-  ion-button {
-    height: 48px;
-  }
-
-@media (max-width: 768px) {
-
-  /* El mapa ocupa casi toda la pantalla */
-  .map-container {
-    height: 72vh;
-  }
-}
+  color: #94a3b8; /* Muestra datos secundarios como metros/kms en gris claro */
+  font-size: 0.7rem; /* Texto secundario en tamaño reducido */
 }
