@@ -20,7 +20,7 @@
       <ion-item [class.ion-invalid]="email?.invalid && email?.touched">
 
         <ion-label position="floating">Correo electrónico</ion-label>
-
+        <br>
         <ion-input
           type="email"
           formControlName="email"
@@ -43,8 +43,8 @@
       <ion-item [class.ion-invalid]="password?.invalid && password?.touched">
 
         <ion-label position="floating">Contraseña</ion-label>
-
-        <ion-input
+        <br>
+        <ion-input class="password-input"
           [type]="showPassword ? 'text' : 'password'"
           formControlName="password">
         </ion-input>

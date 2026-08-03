@@ -7,7 +7,7 @@
 
     <!-- 🔙 VOLVER -->
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/eventos"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/lista-foros"></ion-back-button>
     </ion-buttons>
 
     <!-- 📌 TÍTULO -->
@@ -27,7 +27,8 @@
 <!-- ========================= -->
 <!-- 📄 CONTENIDO -->
 <!-- ========================= -->
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
   <!-- 🔄 REFRESH PULL -->
   <!-- <ion-refresher slot="fixed" (ionRefresh)="o($event)">
@@ -90,13 +91,9 @@
             <ion-icon name="trash-outline"></ion-icon>
 
           </ion-button>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
 
 </ion-content>

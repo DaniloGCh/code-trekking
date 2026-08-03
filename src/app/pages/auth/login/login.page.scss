@@ -1,127 +1,143 @@
-/* =========================================================
-   🌄 FONDO PRINCIPAL (LOGIN TREKKING)
-   ========================================================= */
-
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
 ion-content {
-  --background: none;
-
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.65),
-      rgba(0, 0, 0, 0.75)
-    ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470")
-    no-repeat center / cover;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Aplica capa oscura transparente sobre la imagen de fondo */
+  font-family: 'Lexend', sans-serif; /* Define la tipografía principal para la vista */
+  --color: #e2e8f0; /* Establece el color de texto secundario general */
 }
 
-/* =========================================================
-   📦 CONTENEDOR LOGIN
-   ========================================================= */
-
+/* ==========================================================================
+   📦 CONTENEDOR PRINCIPAL
+   ========================================================================== */
 .login-container {
-  width: 100%;
-  max-width: 420px;
-  margin: auto;
-  padding: 25px;
-  border-radius: 20px;
-
-  background: rgba(34, 49, 34, 0.55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  color: #fff;
+  max-width: 420px; /* Limita el ancho máximo del contenedor en pantallas grandes */
+  margin: 40px auto 20px auto; /* Centra horizontalmente el bloque y da espacio vertical */
+  padding: 24px; /* Relleno interno alrededor de todo el contenido */
+  background: #14191f; /* Fondo oscuro sólido igual a las tarjetas de la app */
+  border-radius: 16px; /* Redondeado pronunciado en las esquinas del contenedor */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Borde sutil para delimitar la caja */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); /* Proyección de sombra para dar profundidad */
 }
 
-/* =========================================================
-   🧭 HEADER LOGIN
-   ========================================================= */
-
+/* ==========================================================================
+   👤 CABECERA DEL LOGIN (Icono y Título)
+   ========================================================================== */
 .login-header {
-  text-align: center;
-  margin-bottom: 25px;
-
-  ion-icon {
-    font-size: 70px;
-    color: #a3d977;
-  }
-
-  h1 {
-    margin: 10px 0 0;
-    font-size: 1.6rem;
-    font-weight: 600;
-  }
+  display: flex; /* Activa la disposición flexible */
+  flex-direction: column; /* Apila el icono y el título verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
+  margin-bottom: 24px; /* Espaciado inferior para separar del formulario */
+  text-align: center; /* Centra el texto */
 }
 
-/* =========================================================
-   🧾 INPUTS
-   ========================================================= */
+.login-header ion-icon {
+  font-size: 70px; /* Tamaño destacado para el icono del perfil */
+  color: rgb(0, 248, 103); /* Color verde neón para el icono */
+  margin-bottom: 8px; /* Separación respecto al título */
+}
 
+.login-header h1 {
+  margin: 0; /* Elimina los márgenes por defecto */
+  font-size: 1.6rem; /* Tamaño de letra del título principal */
+  font-weight: 900; /* Grosor máximo de la letra */
+  color: #ffffff; /* Color blanco brillante */
+  text-transform: uppercase; /* Convierte el título a mayúsculas */
+  letter-spacing: -0.02em; /* Comprime levemente las letras */
+}
+
+/* ==========================================================================
+   📝 CAMPOS DE ENTRADA (Correo y Contraseña)
+   ========================================================================== */
 ion-item {
-  --background: rgba(255, 255, 255, 0.08);
-  --color: #fff;
-
-  margin-bottom: 15px;
-  border-radius: 12px;
-
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  --background: #1a232d; /* Fondo ligeramente más claro para la casilla */
+  --color: #ffffff; /* Texto que escribe el usuario en blanco */
+  --border-color: rgba(255, 255, 255, 0.1); /* Borde sutil por defecto */
+  --highlight-color-focused: rgb(0, 248, 103); /* Indicador verde neón al hacer foco */
+  border-radius: 8px; /* Redondea los bordes de cada casilla */
+  margin-bottom: 16px; /* Separación vertical entre campos */
 }
 
-/* =========================================================
-   🟥 ERRORES
-   ========================================================= */
-
-ion-note {
-  color: #ffb3b3;
-  font-size: 0.75rem;
+ion-label {
+  color: #94a3b8 !important; /* Color gris claro para la etiqueta Flotante */
+  font-size: 0.9rem; /* Tamaño de letra de la etiqueta */
 }
 
-/* =========================================================
-   🔘 BOTÓN LOGIN
-   ========================================================= */
+ion-input {
+  --color: #ffffff; /* Asegura el texto del input en blanco */
+  font-size: 0.95rem; /* Tamaño del texto del input */
+  margin-top: 6px; /* Espacio superior para separarlo del label */
+}
 
+/* Botón ver/ocultar contraseña (ojo) */
+ion-item ion-button[slot="end"] {
+  --color: #0265f0; /* Color gris suave para el icono del ojo */
+  margin: 0; /* Elimina márgenes extra */
+  --padding-start: 8px; /* Relleno a la izquierda del icono */
+  --padding-end: 8px; /* Relleno a la derecha del icono */
+}
+
+/* Validaciones y Mensajes de Error */
+ion-item.ion-invalid {
+  --border-color: #ff4d4d; /* Borde rojo cuando hay error de validación */
+}
+
+ion-note[slot="error"] {
+  color: #ff6b6b; /* Color rojo para el texto de error */
+  font-size: 0.8rem; /* Tamaño compacto para el mensaje de error */
+  margin-top: 4px; /* Espaciado por encima del mensaje */
+}
+
+/* ==========================================================================
+   🔘 BOTONES Y ACCIONES
+   ========================================================================== */
+/* Botón Principal Iniciar Sesión */
 ion-button[type="submit"] {
-  --background: #2e7d32;
-  --border-radius: 12px;
-
-  font-weight: bold;
-  margin-top: 15px;
-
-  --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  --background: #14191f; /* Fondo oscuro idéntico a las tarjetas */
+  background: #14191f; /* Respaldo del fondo */
+  --color: rgb(0, 248, 103); /* Texto e iconos en verde neón */
+  border: 2px solid rgb(0, 248, 103); /* Borde verde neón pronunciado */
+  border-radius: 8px; /* Redondeado de esquinas del botón */
+  font-weight: 700; /* Texto en negrita */
+  font-size: 1rem; /* Tamaño adecuado para el botón principal */
+  margin-top: 20px; /* Separación superior con los campos */
 }
 
-/* =========================================================
-   👁 BOTÓN PASSWORD
-   ========================================================= */
-
-ion-button[slot="end"] {
-  --color: #c7f9cc;
+/* Estado deshabilitado del botón cuando el formulario es inválido */
+ion-button[type="submit"][disabled] {
+  opacity: 0.5; /* Opacidad reducida para indicar que está deshabilitado */
+  border-color: rgba(255, 255, 255, 0.2); /* Borde tenue en estado deshabilitado */
+  --color: #94a3b8; /* Texto gris en estado deshabilitado */
 }
 
-/* =========================================================
-   🔗 LINK REGISTRO
-   ========================================================= */
+/* Botón Olvidaste tu contraseña */
+form ion-button[fill="clear"] {
+  --color: #94a3b8; /* Color gris suave para la pregunta */
+  font-size: 0.85rem; /* Tamaño pequeño */
+  margin-top: 8px; /* Separación superior */
+  text-transform: none; /* Conserva mayúsculas/minúsculas originales */
+}
 
+/* ==========================================================================
+   🔗 SECCIÓN REGISTRO
+   ========================================================================== */
 .register-link {
-  text-align: center;
-  margin-top: 20px;
+  text-align: center; /* Centra el texto inferior */
+  margin-top: 20px; /* Separación con el bloque del formulario */
+  padding-top: 16px; /* Relleno superior interno */
+  border-top: 1px solid rgba(255, 255, 255, 0.08); /* Línea divisoria superior sutil */
+}
 
-  p {
-    color: #ddd;
-    font-size: 0.9rem;
-  }
+.register-link p {
+  color: #94a3b8; /* Texto gris secundario */
+  font-size: 0.9rem; /* Tamaño de fuente estándar */
+  margin: 0; /* Quita márgenes por defecto */
+}
 
-  span {
-    color: #a3d977;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  span:hover {
-    text-decoration: underline;
-  }
+.register-link span {
+  color: rgb(0, 248, 103); /* Color verde neón para destacar el enlace */
+  font-weight: 700; /* Texto en negrita para llamar la atención */
+  cursor: pointer; /* Cambia el puntero a mano al pasar el ratón */
+  margin-left: 4px; /* Separación respecto a la pregunta */
+  text-decoration: underline; /* Subraya el texto para indicar que es clickeable */
 }

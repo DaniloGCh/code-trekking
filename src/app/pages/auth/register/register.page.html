@@ -117,7 +117,7 @@
       <!-- ❓ PREGUNTA DE SEGURIDAD -->
       <ion-item [class.ion-invalid]="preguntaSeguridad?.invalid && preguntaSeguridad?.touched">
         <ion-label position="floating">Pregunta de seguridad</ion-label>
-
+        <br>
         <ion-select formControlName="preguntaSeguridad" placeholder="Selecciona una pregunta">
           <ion-select-option *ngFor="let p of preguntasSeguridad" [value]="p">
             {{ p }}
