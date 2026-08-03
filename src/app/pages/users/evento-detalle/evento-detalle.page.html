@@ -24,7 +24,8 @@
 <!-- ========================= -->
 <!-- 📌 CONTENIDO PRINCIPAL -->
 <!-- ========================= -->
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true" *ngIf="evento">
+ <!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true" *ngIf="evento">
 
   <!-- ========================= -->
   <!-- 🏷️ CABECERA EVENTO -->
@@ -32,7 +33,7 @@
   <div class="evento-header">
     <h1>{{ evento.nombre }}</h1>
 
-    <ion-badge [color]="
+    <ion-badge class="badge-lugar" [color]="
       evento.lugar.dificultad === 'Baja' ? 'success' :
       evento.lugar.dificultad === 'Baja - Media' ? 'success' :
       evento.lugar.dificultad === 'Media' ? 'warning' :
@@ -189,9 +190,9 @@
         <ion-icon name="location-outline" color="primary"></ion-icon>
         {{ evento.lugar.nombre }}
       </ion-card-title>
-
+        
       <ion-card-subtitle>
-        <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+        <ion-badge class="badge-lugar" [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
                             evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
           {{ evento.lugar.dificultad }}
         </ion-badge>
@@ -286,8 +287,7 @@
 
           <ion-label>
             <p>Registro de acceso</p>
-            <h3> {{ evento.lugar.requiereRegistroAcceso ? 'Requiere registro de acceso' : 'No requiere registro de
-              acceso al parque' }} </h3>
+            <h3> {{ evento.lugar.requiereRegistroAcceso ? 'Requiere registro de acceso' : 'No requiere registro de acceso al parque' }} </h3>
           </ion-label>
         </ion-item>
 
@@ -298,9 +298,7 @@
 
           <ion-label>
             <p>Guia de montaña o turistico</p>
-            <h3> {{ evento.lugar.requiereGuiaMontana ? 'Se recomienda guía de montaña o turistico para una mejor
-              experiencia y cuidado' : 'No se requiere guía de montaña o turistico, pero para una mejor experiencia y
-              cuidado siempre es bueno ir con un guía' }} </h3>
+            <h3> {{ evento.lugar.requiereGuiaMontana ? 'Se recomienda guía de montaña o turistico para una mejor experiencia y cuidado' : 'No se requiere guía de montaña o turistico, pero para una mejor experiencia y cuidado siempre es bueno ir con un guía' }} </h3>
           </ion-label>
         </ion-item>
 
@@ -491,7 +489,7 @@
       <!-- Foro -->
       <div class="foro-btn-wrapper">
 
-        <ion-button expand="block" (click)="irAlForo()">
+        <ion-button  expand="block" (click)="irAlForo()">
           <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
           Foro del evento
         </ion-button>
@@ -503,14 +501,13 @@
       </div>
 
       <!-- Salir -->
-      <ion-button expand="block" fill="outline" color="warning" *ngIf="!esCreadoPor" (click)="onSalirEvento()">
-
+      <ion-button class="btn-salir-evento" expand="block" fill="outline" color="warning" *ngIf="!esCreadoPor" (click)="onSalirEvento()">
         <ion-icon name="exit-outline" slot="start"></ion-icon>
         Salir del evento
       </ion-button>
 
       <!-- Eliminar -->
-      <ion-button class="btn-eliminar-evento-full" expand="block" color="danger" *ngIf="esCreadoPor"
+      <ion-button class="btn-eliminar-evento-full" expand="block" *ngIf="esCreadoPor"
         (click)="onEliminarEvento()">
 
         <ion-icon name="trash-outline" slot="start"></ion-icon>
