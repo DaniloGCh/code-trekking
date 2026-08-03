@@ -51,7 +51,7 @@ ion-content {
 .map-type-toggle {
   background: #14191f; /* Define el fondo oscuro del botón desplegable principal */
   color: #ffffff; /* Establece el color del texto/icono en blanco */
-  border: 1px solid rgba(255, 255, 255, 0.15); /* Crea un borde tenue semi-transparente */
+  border: 2px solid rgba(255, 255, 255, 0.15); /* Crea un borde tenue semi-transparente */
   border-radius: 12px; /* Redondea las esquinas del botón a 12 píxeles */
   padding: 8px 12px; /* Define el relleno interno vertical u horizontal */
   display: flex; /* Utiliza flexbox para alinear el icono y la flecha */
@@ -69,7 +69,7 @@ ion-content {
   background: rgba(20, 25, 31, 0.95); /* Fondo oscuro casi opaco para lectura clara */
   padding: 6px; /* Espaciado interno alrededor del grupo de botones */
   border-radius: 12px; /* Bordes redondeados del contenedor desplegable */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde fino decorativo */
+  border: 2px solid rgba(255, 255, 255, 0.1); /* Borde fino decorativo */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); /* Sombra intensa para resaltar sobre el mapa */
   backdrop-filter: blur(8px); /* Aplica un desenfoque de fondo estilo cristal esmerilado */
 }
@@ -116,7 +116,7 @@ ion-content {
 .info-card {
   background: #14191f; /* Fondo de la tarjeta contenedora de estadísticas */
   border-radius: 14px; /* Bordes curvos acentuados a 14 píxeles */
-  border: 1px solid rgba(255, 255, 255, 0.08); /* Línea divisoria muy sutil alrededor de la tarjeta */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Línea divisoria muy sutil alrededor de la tarjeta */
   padding: 12px; /* Espaciado interno dentro de la tarjeta */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sombra para elevar la tarjeta del fondo */
 }
