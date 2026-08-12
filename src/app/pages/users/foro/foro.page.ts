@@ -124,16 +124,31 @@ export class ForoPage implements OnInit {
     this.nuevoMensaje = '';
     setTimeout(() => this.scrollAlFinal(), 100);
 
+
     try {
-      await this.eventoService.enviarMensaje(this.eventoId, {
-        texto:       textoSeguro,
-        autorUid:    this.userData.uid,
-        autorNombre: this.userData.nombre,
-        creadoEn:    new Date(),
-      });
+    await this.eventoService.enviarMensaje(this.eventoId, {
+    texto:       textoSeguro,
+    autorUid:    this.userData.uid,
+    autorNombre: this.userData.nombre,
+    creadoEn:    new Date()
+    // creadoEn se asigna automáticamente en el service con serverTimestamp()
+    } as any);
+
+    // Hacer scroll al recibir la confirmación de envío
+    setTimeout(() => this.scrollAlFinal(), 150);
     } catch {
-      await this.showToast('Error al enviar el mensaje', 'danger');
+    await this.showToast('Error al enviar el mensaje', 'danger');
     }
+    // try {
+    //   await this.eventoService.enviarMensaje(this.eventoId, {
+    //     texto:       textoSeguro,
+    //     autorUid:    this.userData.uid,
+    //     autorNombre: this.userData.nombre,
+    //     creadoEn:    new Date(),
+    //   });
+    // } catch {
+    //   await this.showToast('Error al enviar el mensaje', 'danger');
+    // }
   }
 
   // =========================
@@ -211,4 +226,27 @@ export class ForoPage implements OnInit {
     });
     await toast.present();
   }
+
+  // =========================
+  // 🕒 FORMATEAR FECHA / TIMESTAMP
+  // =========================
+  obtenerFecha(creadoEn: any): Date | null {
+    if (!creadoEn) return null;
+    
+    // Si viene como Timestamp de Firestore
+    if (typeof creadoEn.toDate === 'function') {
+      return creadoEn.toDate();
+    }
+    
+    // Si ya es un objeto Date
+    if (creadoEn instanceof Date) {
+      return creadoEn;
+    }
+
+    // Si es un string o número ejecutable por Date
+    return new Date(creadoEn);
+  }
+
 }
+
+

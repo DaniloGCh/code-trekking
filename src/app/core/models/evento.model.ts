@@ -65,12 +65,13 @@ export interface Evento {
 }
 
 // ✅ Agrega esta interfaz
+import { FieldValue, Timestamp } from '@angular/fire/firestore';
 export interface MensajeForo {
   id?: string;
   texto: string;
   autorUid: string;
   autorNombre: string;
-  creadoEn: any;
+  creadoEn: Date | Timestamp | FieldValue; // 👈 Actualiza aquí para admitir los tipos de Firebase
 }
 
 // ✅ Agrega esta interfaz

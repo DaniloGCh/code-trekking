@@ -20,7 +20,8 @@ import {
   where,
   orderBy,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  serverTimestamp
 } from '@angular/fire/firestore';
 
 
@@ -233,6 +234,12 @@ async unirseConCodigo(codigo: string): Promise<Evento | null> {
  async enviarMensaje(eventoId: string, mensaje: Omit<MensajeForo, 'id'>): Promise<void> {
   const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
 
+// Asignar fecha oficial del servidor
+  const mensajeConFechaServidor = {
+    ...mensaje,
+    creadoEn: serverTimestamp() // 👈 Asegura sincronización global exacta
+  };
+
   // 📩 Guardar mensaje en el foro
   await addDoc(ref, mensaje);
 
@@ -243,7 +250,7 @@ async unirseConCodigo(codigo: string): Promise<Evento | null> {
     ultimoMensaje: {
       texto: mensaje.texto,
       autorNombre: mensaje.autorNombre,
-      creadoEn: new Date()
+      creadoEn: serverTimestamp() // 👈 También usar serverTimestamp aquí
     }
   });
 }
@@ -256,25 +263,49 @@ async unirseConCodigo(codigo: string): Promise<Evento | null> {
   // =========================
   // 🔔 MENSAJES NUEVOS
   // =========================
-  async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
+async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
+  const key = `foro_ultima_visita_${eventoId}_${uid}`;
+  const ultimaVisita = localStorage.getItem(key);
 
-    const key = `foro_ultima_visita_${eventoId}_${uid}`;
-    const ultimaVisita = localStorage.getItem(key);
+  const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
+  const snap = await getDocs(query(ref));
 
-    const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
-    const snap = await getDocs(query(ref));
+  const mensajes = snap.docs.map(d => d.data());
 
-    const mensajes = snap.docs.map(d => d.data());
+  return mensajes.filter(m => {
+    const esMio = m['autorUid'] === uid;
+    if (esMio || !m['creadoEn']) return false;
 
-    return mensajes.filter(m => {
-      const esMio = m['autorUid'] === uid;
-      const esNuevo = ultimaVisita
-        ? m['creadoEn'].toDate() > new Date(ultimaVisita)
-        : true;
+    // Convertir Timestamp de Firestore o Date a milisegundos
+    const fechaMensaje = m['creadoEn']?.toDate 
+      ? m['creadoEn'].toDate().getTime() 
+      : new Date(m['creadoEn']).getTime();
 
-      return !esMio && esNuevo;
-    }).length;
-  }
+    const fechaVisita = ultimaVisita ? new Date(ultimaVisita).getTime() : 0;
+
+    return fechaMensaje > fechaVisita;
+  }).length;
+}
+
+  // async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
+
+  //   const key = `foro_ultima_visita_${eventoId}_${uid}`;
+  //   const ultimaVisita = localStorage.getItem(key);
+
+  //   const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
+  //   const snap = await getDocs(query(ref));
+
+  //   const mensajes = snap.docs.map(d => d.data());
+
+  //   return mensajes.filter(m => {
+  //     const esMio = m['autorUid'] === uid;
+  //     const esNuevo = ultimaVisita
+  //       ? m['creadoEn'].toDate() > new Date(ultimaVisita)
+  //       : true;
+
+  //     return !esMio && esNuevo;
+  //   }).length;
+  // }
 
   // =========================
   // 👁️ MARCAR FORO VISTO

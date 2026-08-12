@@ -76,7 +76,7 @@
         <div class="mensaje-footer">
 
           <span class="mensaje-hora">
-            {{ mensaje.creadoEn.toDate() | date:'HH:mm' }}
+          {{ obtenerFecha(mensaje.creadoEn) | date:'HH:mm' }}
           </span>
 
           <!-- 🗑️ ELIMINAR (solo organizador) -->
