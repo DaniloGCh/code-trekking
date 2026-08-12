@@ -74,7 +74,6 @@ ion-title {
 .mensajes-container {
   padding: 16px 12px; /* Relleno alrededor del chat */
   display: flex; /* Activa layout flexible */
-  flex-direction: column; /* Dispone las burbujas de arriba hacia abajo */
   gap: 10px; /* Separación constante entre cada mensaje */
 }
 
