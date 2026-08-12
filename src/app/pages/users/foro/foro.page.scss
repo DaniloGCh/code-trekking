@@ -175,7 +175,6 @@ ion-footer {
   font-size: 1.25rem; /* Tamaño amplio de cada emoji */
   cursor: pointer; /* Cursor en forma de mano al pasar por encima */
   transition: transform 0.15 ease; /* Efecto animado al tocar */
-  user-select: none; /* Previene la selección accidental del texto */
 }
 
 .emoji-btn:active {
