@@ -236,12 +236,12 @@ async unirseConCodigo(codigo: string): Promise<Evento | null> {
 
 // Asignar fecha oficial del servidor
   const mensajeConFechaServidor = {
-    ...mensaje,
+  ...mensaje,
     creadoEn: serverTimestamp() // 👈 Asegura sincronización global exacta
   };
 
   // 📩 Guardar mensaje en el foro
-  await addDoc(ref, mensaje);
+  await addDoc(ref, mensajeConFechaServidor);
 
   // 🔥 ACTUALIZAR ÚLTIMO MENSAJE EN EL EVENTO (ESTILO WHATSAPP)
   const eventoRef = doc(this.firestore, `eventos/${eventoId}`);
@@ -322,7 +322,7 @@ async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
   const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
   const q = query(ref, orderBy('creadoEn', 'asc'));
 
-  return collectionData(q, { idField: 'id' }) as Observable<MensajeForo[]>;
+  return collectionData(q, { idField: 'id',serverTimestamps:'estimate' }) as Observable<MensajeForo[]>;
 }
 
 
