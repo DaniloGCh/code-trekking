@@ -231,7 +231,7 @@ export class ForoPage implements OnInit {
   // 🕒 FORMATEAR FECHA / TIMESTAMP
   // =========================
   obtenerFecha(creadoEn: any): Date | null {
-    if (!creadoEn) return null;
+    if (!creadoEn) return new Date(); // Si el servidor aún no responde, usa la hora actual del flujo
     
     // Si viene como Timestamp de Firestore
     if (typeof creadoEn.toDate === 'function') {
