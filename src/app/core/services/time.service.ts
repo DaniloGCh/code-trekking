@@ -6,11 +6,16 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class TimeService {
 
+  // =========================
+  // 📡 ESTADO REACTIVO
+  // =========================
   dateTime = new BehaviorSubject<string>('');
-
   private intervalId: any;
 
-  startClock() {
+  // =========================
+  // ▶️ INICIAR RELOJ
+  // =========================
+  startClock(): void {
     this.update();
 
     this.intervalId = setInterval(() => {
@@ -18,24 +23,31 @@ export class TimeService {
     }, 1000);
   }
 
-  private update() {
+  // =========================
+  // 🔄 ACTUALIZAR FECHA Y HORA
+  // =========================
+  private update(): void {
     const now = new Date();
 
     const formatted = now.toLocaleString('es-CL', {
-      timeZone: 'America/Santiago', // 🇨🇱 CLAVE
+      timeZone: 'America/Santiago',
       weekday: 'short',
       day: '2-digit',
       month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      // second: '2-digit',
-      hour12: false
+      // hour: '2-digit',
+      // minute: '2-digit',
+      // hour12: false
     });
 
     this.dateTime.next(formatted);
   }
 
-  stopClock() {
-    if (this.intervalId) clearInterval(this.intervalId);
+  // =========================
+  // ⛔ DETENER RELOJ
+  // =========================
+  stopClock(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
 }

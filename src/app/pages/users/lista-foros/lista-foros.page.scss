@@ -1,0 +1,123 @@
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Aplica capa oscura sobre la imagen de fondo */
+  font-family: 'Lexend', sans-serif; /* Tipografía principal para la vista */
+  --color: #e2e8f0; /* Color de texto base */
+}
+
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN
+   ========================================================================== */
+ion-header {
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transición suave al ocultarse/mostrarse */
+}
+
+/* Clase dinámica para ocultar el header al hacer scroll */
+ion-header.hidden {
+  transform: translateY(-100%); /* Desplaza el header fuera de la pantalla hacia arriba */
+  opacity: 0; /* Oculta progresivamente la opacidad */
+}
+
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Fondo oscuro sólido acorde al sistema */
+  --color: rgb(0, 248, 103); /* Título del toolbar en verde neón */
+}
+
+ion-title {
+  font-weight: 900; /* Grosor máximo de letra */
+  text-transform: uppercase; /* Convierte el título a mayúsculas */
+  letter-spacing: -0.02em; /* Comprime ligeramente las letras */
+  font-size: 1.2rem; /* Tamaño de fuente para el título del foro */
+}
+
+/* ==========================================================================
+   📋 LISTA Y TARJETAS DE FOROS (ITEMS)
+   ========================================================================== */
+ion-list {
+  background: transparent !important; /* Limpia el fondo por defecto del ion-list */
+  padding: 16px 12px; /* Espaciado interno alrededor de la lista */
+}
+
+/* Cada tarjeta/fila de Foro */
+ion-item {
+  --background: #14191f; /* Fondo oscuro igual a las tarjetas del sistema */
+  --color: #ffffff; /* Color de texto del item */
+  --border-color: transparent; /* Elimina la línea divisoria por defecto de Ionic */
+  --padding-start: 16px; /* Relleno inicial del item */
+  --padding-end: 16px; /* Relleno final del item */
+  --inner-padding-end: 0px; /* Ajusta el espacio final interno */
+  margin-bottom: 12px; /* Separación vertical entre cada foro */
+  border-radius: 12px; /* Bordes suavemente redondeados */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Borde sutil delimitador */
+  border-left: 5px solid rgb(1, 179, 75); /* Borde izquierdo destacado en verde neón (usa #a855f7 si prefieres morado) */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Sombra para dar relieve */
+  position: relative; /* Posicionamiento relativo para evitar desbordes */
+  overflow: hidden; /* Mantiene el borde alineado a las esquinas redondeadas */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-left-color 0.2s ease; /* Transiciones agrupadas sin redundancias */
+}
+
+/* Estado al pasar el cursor o presionar el ítem */
+ion-item:active, 
+ion-item:hover {
+  transform: translateY(-2px); /* Eleva ligeramente la tarjeta */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5); /* Intensifica la sombra */
+  border-left-color: #55ff99; /* Brillo neón más intenso en el borde izquierdo al interactuar */
+}
+
+/* ==========================================================================
+   💬 ETIQUETAS Y CONTENIDO DEL MENSAJE
+   ========================================================================== */
+ion-label {
+  margin: 12px 0; /* Espaciado vertical interno de la etiqueta */
+}
+
+/* Nombre del Evento / Foro */
+ion-label h2 {
+  font-size: 1.05rem !important; /* Tamaño de letra del título del foro */
+  font-weight: 700 !important; /* Texto en negrita */
+  color: #ffffff !important; /* Blanco puro */
+  margin-bottom: 6px !important; /* Espacio inferior respecto al último mensaje */
+}
+
+/* Último mensaje publicado */
+ion-label p {
+  font-size: 0.88rem !important; /* Tamaño de fuente para la vista previa */
+  color: #94a3b8 !important; /* Gris claro secundario */
+  line-height: 1.4 !important; /* Interlineado legible */
+  display: -webkit-box; /* Prepara el texto para truncado */
+  -webkit-line-clamp: 1; /* Corta el texto a máximo 1 línea */
+  -webkit-box-orient: vertical; /* Define la orientación del corte */
+  overflow: hidden; /* Oculta el sobrante del texto truncado */
+}
+
+/* Nombre del autor dentro del mensaje */
+ion-label p strong {
+  color: #cbd5f5 !important; /* Color azulino claro para resaltar al autor */
+  font-weight: 600; /* Texto semi-negrita */
+}
+
+/* ==========================================================================
+   ⏰ HORA Y BADGE (CONTADOR NO LEÍDOS)
+   ========================================================================== */
+/* Contenedor de la hora */
+ion-item div[style*="text-align: right"] {
+  color: #94a3b8 !important; /* Sobrescribe el inline style gray por un gris más armónico */
+  font-size: 0.78rem !important; /* Tamaño de fuente compacto para la hora */
+  font-weight: 500; /* Grosor de letra medio */
+  margin-left: 8px; /* Separación con respecto a la etiqueta del mensaje */
+  white-space: nowrap; /* Evita que la hora se rompa en dos líneas */
+}
+
+/* Badge del contador de mensajes nuevos */
+ion-badge[color="danger"] {
+  --background: #ff4d4d; /* Fondo rojo neón intenso */
+  --color: #ffffff; /* Texto del contador en blanco */
+  font-size: 0.75rem; /* Tamaño compacto para el badge */
+  font-weight: 800; /* Texto en negrita pronunciada */
+  padding: 5px 8px; /* Relleno interno del badge */
+  border-radius: 12px; /* Bordes redondeados tipo píldora */
+  margin-left: 10px; /* Separación respecto a la hora */
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.5); /* Resplandor rojo neón alrededor */
+}

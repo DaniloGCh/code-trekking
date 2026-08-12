@@ -1,0 +1,215 @@
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Fondo oscuro espacial unificado */
+  font-family: 'Lexend', sans-serif; /* Tipografía del sistema */
+  --color: #e2e8f0; /* Color de texto base */
+}
+
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN
+   ========================================================================== */
+ion-header {
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transición para ocultar con scroll */
+}
+
+ion-header.hidden {
+  transform: translateY(-100%); /* Desplaza el header fuera de pantalla */
+  opacity: 0; /* Desvanece el header */
+}
+
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Fondo oscuro para el header */
+  --color: rgb(0, 248, 103); /* Texto principal en verde neón */
+}
+
+ion-back-button {
+  --color: rgb(0, 248, 103); /* Icono y texto de volver en verde neón */
+}
+
+ion-title {
+  font-weight: 900; /* Texto en negrita máxima */
+  text-transform: uppercase; /* Título en mayúsculas */
+  letter-spacing: -0.02em; /* Comprime ligeramente el espacio entre letras */
+  font-size: 1.1rem; /* Tamaño de fuente del título */
+}
+
+/* ==========================================================================
+   ⏳ ESTADOS CARGANDO Y VACÍO (EMPTY STATE)
+   ========================================================================== */
+.loading-state,
+.empty-state {
+  display: flex; /* Flexbox para centrar contenido */
+  flex-direction: column; /* Alinea los elementos en columna */
+  align-items: center; /* Centrado horizontal */
+  justify-content: center; /* Centrado vertical */
+  height: 70vh; /* Ocupa la mayor parte de la pantalla */
+  text-align: center; /* Texto centrado */
+  color: #94a3b8; /* Texto en gris secundario */
+}
+
+.loading-state ion-spinner {
+  --color: rgb(0, 248, 103); /* Spinner en verde neón */
+  width: 45px; /* Ancho del spinner */
+  height: 45px; /* Alto del spinner */
+  margin-bottom: 12px; /* Espacio inferior respecto al texto */
+}
+
+.empty-state ion-icon {
+  font-size: 64px; /* Icono grande de conversación vacía */
+  color: rgba(0, 248, 103, 0.4); /* Verde neón tenue */
+  margin-bottom: 12px; /* Espacio inferior */
+}
+
+.empty-state h3 {
+  color: #ffffff; /* Título en blanco puro */
+  margin: 0 0 6px 0; /* Margen inferior reducido */
+  font-weight: 700; /* Texto en negrita */
+}
+
+/* ==========================================================================
+   💬 CONTENEDOR DE MENSAJES Y BURBUJAS DE CHAT
+   ========================================================================== */
+.mensajes-container {
+  padding: 16px 12px; /* Relleno alrededor del chat */
+  display: flex; /* Activa layout flexible */
+  flex-direction: column; /* Dispone las burbujas de arriba hacia abajo */
+  gap: 10px; /* Separación constante entre cada mensaje */
+}
+
+/* Envoltorio individual del mensaje */
+.mensaje-wrapper {
+  display: flex; /* Prepara la posición de la burbuja */
+  justify-content: flex-start; /* Alinea por defecto a la izquierda (otros usuarios) */
+  width: 100%; /* Ocupa el ancho disponible */
+}
+
+/* Estado: Mensajes Propios (Enviados por el usuario actual) */
+.mensaje-wrapper.propio {
+  justify-content: flex-end; /* Alinea el mensaje a la derecha */
+}
+
+/* Estilo base de la burbuja de chat */
+.mensaje-bubble {
+  max-width: 80%; /* Ancho máximo para evitar que ocupe toda la pantalla */
+  padding: 10px 14px; /* Relleno interno del mensaje */
+  border-radius: 16px; /* Redondeado general */
+  border-bottom-left-radius: 4px; /* Esquina recta a la izquierda para mensajes ajenos */
+  background: #14191f; /* Fondo oscuro de la tarjeta ajena */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Borde sutil */
+  color: #ffffff; /* Texto en blanco */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra de profundidad */
+  position: relative; /* Posicionamiento interno */
+}
+
+/* Personalización para la burbuja PROPIA */
+.mensaje-wrapper.propio .mensaje-bubble {
+  border-radius: 16px; /* Redondeado general */
+  border-bottom-right-radius: 4px; /* Esquina recta a la derecha para mensajes propios */
+  background: rgba(0, 39, 16, 0.363); /* Fondo con tinte verde neón translúcido */
+  border: 1px solid rgba(0, 248, 103, 0.3); /* Borde en verde neón */
+}
+
+/* Nombre del autor (Mensajes ajenos) */
+.autor-nombre {
+  display: block; /* Ocupa su propia línea */
+  font-size: 0.78rem; /* Tamaño pequeño para el nombre */
+  font-weight: 700; /* Texto en negrita */
+  color: rgb(0, 248, 103); /* Color destacado verde neón */
+  margin-bottom: 4px; /* Espacio antes del texto del mensaje */
+}
+
+/* Texto del mensaje */
+.mensaje-texto {
+  margin: 0; /* Elimina márgenes por defecto */
+  font-size: 0.92rem; /* Tamaño de fuente de lectura */
+  line-height: 1.4; /* Interlineado confortable */
+  word-break: break-word; /* Rompe palabras largas para evitar desbordes */
+}
+
+/* Pie del mensaje (Hora y Botón Borrar) */
+.mensaje-footer {
+  display: flex; /* Alinea la hora y la papelera horizontalmente */
+  align-items: center; /* Centra los elementos verticalmente */
+  justify-content: flex-end; /* Mueve los elementos al final a la derecha */
+  gap: 6px; /* Espacio horizontal interno */
+  margin-top: 4px; /* Separación con el texto del mensaje */
+}
+
+.mensaje-hora {
+  font-size: 0.7rem; /* Tamaño de letra compacto para la hora */
+  color: #94a3b8; /* Gris secundario para la hora */
+}
+
+/* Botón de eliminar para el organizador */
+.btn-eliminar {
+  margin: 0; /* Elimina márgenes por defecto */
+  height: 20px; /* Altura compacta del botón */
+  --padding-start: 2px; /* Sin relleno inicial */
+  --padding-end: 2px; /* Sin relleno final */
+}
+
+.btn-eliminar ion-icon {
+  font-size: 14px; /* Tamañano reducido de la papelera */
+}
+
+/* ==========================================================================
+   ✍️ FOOTER E INPUT PARA ENVIAR MENSAJES
+   ========================================================================== */
+ion-footer {
+  background: #0a0c10; /* Fondo sólido oscuro para la barra de envío */
+  border-top: 1px solid rgba(255, 255, 255, 0.08); /* Línea separadora superior */
+  padding: 8px 12px; /* Relleno contenedor del footer */
+}
+
+/* Barra rápida de emojis */
+.emojis-bar {
+  display: flex; /* Disposición en fila */
+  gap: 12px; /* Espaciado uniforme entre emojis */
+  overflow-x: auto; /* Permite scroll horizontal si son muchos emojis */
+  padding-bottom: 8px; /* Margen inferior antes del campo de texto */
+}
+
+.emoji-btn {
+  font-size: 1.25rem; /* Tamaño amplio de cada emoji */
+  cursor: pointer; /* Cursor en forma de mano al pasar por encima */
+  transition: transform 0.15 ease; /* Efecto animado al tocar */
+}
+
+.emoji-btn:active {
+  transform: scale(1.3); /* Agranda el emoji brevemente al presionar */
+}
+
+/* Contenedor del área de entrada de texto */
+.input-container {
+  display: flex; /* Alinea el textarea y el botón de enviar en paralelo */
+  align-items: flex-end; /* Alinea ambos elementos a la base inferior */
+  background: #14191f; /* Fondo oscuro del campo */
+  border-radius: 20px; /* Bordes totalmente redondeados tipo cápsula */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde exterior tenue */
+  padding: 4px 6px 4px 14px; /* Relleno interno */
+}
+
+.mensaje-input {
+  --color: #ffffff; /* Texto que escribe el usuario en blanco */
+  --placeholder-color: #94a3b8; /* Color del texto flotante en gris */
+  --padding-top: 8px; /* Relleno superior interno */
+  --padding-bottom: 8px; /* Relleno inferior interno */
+  font-size: 0.95rem; /* Tamaño de fuente fluido */
+  max-height: 100px; /* Altura máxima para cuando la caja auto-crezca */
+}
+
+/* Botón Enviar */
+.input-container ion-button {
+  --color: rgb(0, 248, 103); /* Icono de envío en verde neón */
+  margin: 0; /* Elimina márgenes sobrantes */
+  height: 36px; /* Ancho ajustado para alineación */
+  width: 36px; /* Ancho idéntico para mantener proporción */
+}
+
+/* Botón Enviar deshabilitado */
+.input-container ion-button[disabled] {
+  opacity: 0.3; /* Desvanece el botón cuando el texto está vacío */
+  --color: #94a3b8; /* Cambia a gris inactivo */
+}

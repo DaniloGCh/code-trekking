@@ -1,193 +1,205 @@
-/* =========================================================
-   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
-   ========================================================= */
-
-/* toolbar transparente total */
-.transparent-toolbar {
-  --background: transparent !important;
-  --border-width: 0 !important;
-  --box-shadow: none !important;
-   --padding-start: 15px;
-  --padding-end: 15px;
-}
-
-/* header oculto sin dejar rastro */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 👇 CLAVE: evita fondo negro del header container */
-ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-}
-
-ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* verde bosque */
-}
-/* =========================================================
-   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
-   ========================================================= */
-
-ion-header {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-}
-
-/* toolbar sin elevación (clave real en Ionic) */
-ion-toolbar {
-  --box-shadow: none !important;
-  box-shadow: none !important;
-  --border-width: 0 !important;
-}
-
-/* asegura que botones no se muevan */
-ion-buttons {
-  z-index: 2;
-}
-
-/* =========================================================
-   👀 OCULTAR HEADER CON SCROLL
-   ========================================================= */
-
-ion-header {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* estado oculto */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-
-/* 🌄 FONDO GENERAL */
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
 ion-content {
-  --background: linear-gradient(
-      rgba(0, 0, 0, 0.45),
-      rgba(0, 0, 0, 0.45)
-    ),
-    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e') no-repeat center center / cover;
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Capa oscura translúcida sobre fondo espacial */
+  font-family: 'Lexend', sans-serif; /* Tipografía principal */
+  --color: #e2e8f0; /* Color de texto secundario general */
 }
 
-/* 🧭 HEADER */
-ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85);
-  --color: #ffffff;
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN
+   ========================================================================== */
+ion-header {
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Animación de scroll */
 }
 
-/* 🔙 BOTÓN BACK */
+ion-header.hidden {
+  transform: translateY(-100%); /* Oculta el header desplazándolo hacia arriba */
+  opacity: 0; /* Desvanece la opacidad */
+}
+
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Fondo oscuro sólido */
+  --color: rgb(0, 248, 103); /* Título en verde neón */
+}
+
 ion-buttons ion-button {
-  --color: #c7f9cc;
+  --color: rgb(0, 248, 103); /* Botón atrás en verde neón */
 }
 
-/* 📌 TITULO HEADER */
 ion-title {
-  font-weight: 600;
+  font-weight: 900; /* Grosor máximo para título */
+  text-transform: uppercase; /* Mayúsculas */
+  letter-spacing: -0.02em; /* Comprime ligeramente las letras */
+  font-size: 1.1rem; /* Tamaño de fuente estándar */
 }
 
-/* 🌿 SECTION TITLE */
+/* ==========================================================================
+   🏷️ TÍTULOS DE SECCIÓN
+   ========================================================================== */
 .section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  margin: 20px 0 10px 0;
-
-  color: #c7f9cc;
+  display: flex; /* Flexbox horizontal */
+  align-items: center; /* Centrado vertical del icono y texto */
+  gap: 10px; /* Separación horizontal entre icono y texto */
+  padding: 20px 16px 8px 16px; /* Relleno superior e inferior */
 }
 
-.section-title {
-  margin-left: 15px;
+.section-title ion-icon {
+  font-size: 1.3rem; /* Tamaño del icono del título */
+  --color: rgb(0, 248, 103); /* Iconos de sección en verde neón por defecto */
 }
-.section-title:first-of-type {
-  margin-top: 75px;
+
+/* Ajuste específico para iconos con color danger (Emergencia / Zona Peligro) */
+.section-title ion-icon[color="danger"] {
+  color: #ff4d4d !important; /* Rojo neón para emergencia/peligro */
 }
 
 .section-title h3 {
-  margin: 0;
-  font-weight: 600;
+  margin: 0; /* Sin márgenes por defecto */
+  font-size: 1rem; /* Tamaño de fuente de sección */
+  font-weight: 800; /* Texto en negrita pronunciada */
+  color: #ffffff; /* Texto blanco */
+  text-transform: uppercase; /* Texto en mayúsculas */
+  letter-spacing: 0.5px; /* Espaciado suave */
 }
 
-/* 🪵 CARDS estilo glass */
+/* ==========================================================================
+   📦 TARJETAS DE OPCIONES (ION-CARD)
+   ========================================================================== */
 ion-card {
-  background: rgba(34, 49, 34, 0.55);
-  border-radius: 16px;
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  margin-bottom: 16px;
-  color: #ffffff;
+  background: #14191f !important; /* Fondo oscuro igual al resto del sistema */
+  border-radius: 14px; /* Bordes redondeados */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Borde tenue delimitador */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sombra para dar profundidad */
+  margin: 0 14px 12px 14px; /* Margen horizontal y separación vertical */
 }
 
-/* ⚠️ CARD ZONA PELIGRO */
+/* Tarjeta específica para Zona de Peligro */
 ion-card[color="light"] {
-    
-  background: rgba(80, 0, 0, 0.4);
+  border: 1px solid rgba(255, 77, 77, 0.25); /* Borde rojo tenue advertencia */
 }
 
-/* 📄 LISTA */
-ion-list {
-  background: transparent;
+/* Ajuste interno para listas contenidas en tarjetas */
+ion-card ion-list {
+  background: transparent !important; /* Limpia fondo por defecto */
+  padding: 0; /* Sin rellenos extra */
 }
 
-/* 📦 ITEMS */
+/* ==========================================================================
+   📑 FILAS / OPCIONES (ION-ITEM)
+   ========================================================================== */
 ion-item {
-  --background: transparent;
-  border-radius: 12px;
-
-  margin-bottom: 6px;
-
-  transition: all 0.25s ease;
+  --background: transparent; /* Fondo transparente dentro de la tarjeta */
+  --color: #ffffff; /* Texto principal en blanco */
+  --border-color: rgba(255, 255, 255, 0.06); /* Línea divisoria tenue entre ítems */
+  --padding-start: 14px; /* Relleno inicial */
+  --padding-end: 14px; /* Relleno final */
+  --inner-padding-end: 0px; /* Ajuste espacio interno final */
 }
 
-/* 🖱️ HOVER ITEMS */
-ion-item:hover {
-  --background: rgba(255, 255, 255, 0.08);
-  transform: scale(1.01);
+/* Iconos al lado de cada opción */
+ion-item ion-icon[slot="start"] {
+  font-size: 1.25rem; /* Tamaño del icono izquierdo */
+  color: rgb(0, 248, 103) !important; /* Color primario verde neón por defecto */
+  margin-end: 12px; /* Espacio con el texto */
 }
 
-/* 👆 CLICK */
-ion-item:active {
-  transform: scale(0.98);
+/* Icono rojo en zona de peligro o eliminación */
+ion-item ion-icon[slot="start"][color="danger"] {
+  color: #ff4d4d !important; /* Rojo neón para eliminación */
 }
 
-/* 🌿 ICONOS NORMALES */
-ion-item ion-icon[color="primary"] {
-  color: #2e7d32 !important;
+/* Títulos y Subtítulos dentro del Item */
+ion-item ion-label h3 {
+  font-size: 0.95rem !important; /* Tamaño del título del ítem */
+  font-weight: 700 !important; /* Texto en negrita */
+  color: #ffffff !important; /* Blanco puro */
+  margin-bottom: 2px !important; /* Separación con el texto secundario */
 }
 
-/* 🔥 ICONOS PELIGRO */
-ion-item ion-icon[color="danger"] {
-  color: #ff5252 !important;
+ion-item ion-label p {
+  font-size: 0.82rem !important; /* Tamaño de texto secundario */
+  color: #94a3b8 !important; /* Gris suave */
 }
 
-/* 🧠 TEXTOS */
-ion-label h3 {
-  color: #ffffff;
-  font-weight: 500;
+/* ==========================================================================
+   🆘 CONTACTOS DE EMERGENCIA
+   ========================================================================== */
+/* Estado cuando no hay contactos */
+.empty-contactos {
+  text-align: center; /* Centrado de texto */
+  padding: 24px 12px; /* Relleno interno */
+  color: #94a3b8; /* Gris secundario */
 }
 
-ion-label p {
-  color: #a5d6a7;
-  font-size: 0.85rem;
+.empty-contactos ion-icon {
+  font-size: 48px; /* Tamaño del icono de contacto vacío */
+  color: rgba(255, 77, 77, 0.4); /* Rojo neón translúcido */
+  margin-bottom: 8px; /* Espaciado inferior */
 }
 
-/* 🔥 TEXTO PELIGRO */
+.empty-contactos p {
+  margin: 0; /* Quita márgenes por defecto */
+  font-size: 0.9rem; /* Tamaño compacto */
+}
+
+/* Botones de acción en lista de contactos (Llamar, Editar, Eliminar) */
+ion-item ion-button[slot="end"] {
+  margin: 0 0 0 2px; /* Sin márgenes entre botones */
+  height: 34px; /* Altura compacta */
+  --padding-start: 6px; /* Relleno reducido */
+  --padding-end: 6px; /* Relleno reducido */
+}
+
+ion-item ion-button[color="success"] {
+  --color: rgb(0, 248, 103); /* Botón llamar en verde neón */
+}
+
+ion-item ion-button[color="primary"] {
+  --color: #38bdf8; /* Botón editar en azul neón */
+}
+
+ion-item ion-button[color="danger"] {
+  --color: #ff4d4d; /* Botón eliminar en rojo neón */
+}
+
+/* Botón Agregar Contacto */
+ion-button.ion-margin-top[color="danger"] {
+  --color: #ff4d4d; /* Texto/icono en rojo neón */
+  --border-color: #ff4d4d; /* Borde rojo neón */
+  --border-radius: 8px; /* Bordes suavemente redondeados */
+  font-weight: 700; /* Texto en negrita */
+  margin-top: 14px; /* Separación con el elemento anterior */
+}
+
+/* Estado deshabilitado del botón agregar cuando hay 3 contactos */
+ion-button.ion-margin-top[color="danger"][disabled] {
+  opacity: 0.4; /* Opacidad reducida en estado inactivo */
+  --border-color: rgba(255, 255, 255, 0.2); /* Borde grisáceo */
+  --color: #94a3b8; /* Texto gris */
+}
+
+/* Contador de contactos (ej: 1/3 registrados) */
+.contactos-counter {
+  text-align: center; /* Centra el contador */
+  font-size: 0.78rem; /* Tamaño compacto */
+  color: #94a3b8; /* Color gris suave */
+  margin: 10px 0 0 0; /* Espaciado superior */
+  font-weight: 500; /* Grosor de letra medio */
+}
+
+/* ==========================================================================
+   🚨 ZONA DE PELIGRO Y ELIMINAR CUENTA
+   ========================================================================== */
+
+/* Contenedor principal de la tarjeta de peligro (<ion-card color="light">) */
+ion-card[color="light"] {
+  border: 2px solid rgba(255, 77, 77, 0.25); /* Borde sutil rojo neón como advertencia */
+}
+
+/* Título "Eliminar cuenta" (Reemplaza o refuerza el style="color: var(--ion-color-danger)") */
 ion-card[color="light"] ion-label h3 {
-  color: #ff8a80 !important;
-}
+  color: #ff4d4d; /* Forza el texto del título en color rojo neón */
 
-/* ✨ EFECTO DETALLE (flecha) */
-ion-item::part(detail-icon) {
-  color: #c7f9cc;
-  opacity: 0.7;
 }

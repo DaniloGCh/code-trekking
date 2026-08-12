@@ -1,0 +1,217 @@
+<!-- ========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
+
+    <!-- Título -->
+    <ion-title>Eventos Trekking</ion-title>
+
+    <!-- Acciones -->
+    <ion-buttons slot="end">
+
+      <!-- 🔑 Unirse con código -->
+      <ion-button (click)="onUnirseConCodigo()">
+        <ion-icon slot="icon-only" name="link-outline"></ion-icon>
+      </ion-button>
+
+      <!-- ➕ Crear evento -->
+      <ion-button (click)="goCrearEvento()">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<!-- ========================= -->
+<!-- 📄 CONTENIDO -->
+<!-- ========================= -->
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
+
+  <ng-container *ngIf="misEventos$ | async as eventos">
+
+    <!-- ========================= -->
+    <!-- 🚫 ESTADO VACÍO -->
+    <!-- ========================= -->
+    <div class="empty-state" *ngIf="eventos.length === 0">
+
+      <ion-icon name="map-outline"></ion-icon>
+
+      <h3>No tienes eventos aún</h3>
+      <p>Crea un evento o únete con un código de invitación</p>
+
+      <ion-button expand="block" class="btn-crear-evento" (click)="goCrearEvento()">
+        <ion-icon name="add-outline"></ion-icon>
+        Crear evento
+      </ion-button>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- 📋 LISTA DE EVENTOS -->
+    <!-- ========================= -->
+    <ion-card *ngFor="let evento of misEventosOrdenados$ | async" class="evento-card first-space">
+
+      <!-- ========================= -->
+      <!-- 🔝 HEADER CARD -->
+      <!-- ========================= -->
+      <ion-card-header>
+
+        <div class="evento-header">
+
+          <!-- INFO PRINCIPAL -->
+          <div>
+            <ion-card-title>{{ evento.nombre }}</ion-card-title>
+            <br>
+            <ion-card-subtitle>
+              <ion-icon name="location-outline"></ion-icon>
+              {{ evento.lugar.nombre }}
+            </ion-card-subtitle>
+          </div>
+
+          <!-- 🏷️ DIFICULTAD -->
+          <ion-badge [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+                     evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
+            {{ evento.lugar.dificultad }}
+          </ion-badge>
+
+        </div>
+
+      </ion-card-header>
+
+      <!-- ========================= -->
+      <!-- 📦 CONTENIDO CARD -->
+      <!-- ========================= -->
+      <ion-card-content>
+
+        <!-- DETALLES -->
+        <ion-list lines="none">
+
+          <!-- 📅 FECHA -->
+          <!-- <ion-item>
+            <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+            </ion-label>
+          </ion-item> -->
+
+          <!-- 📅 FECHA -->
+          <ion-item>
+            <ion-icon class="calendar" name="calendar-outline" slot="start"></ion-icon>
+            <ion-label>
+
+              <!-- 🔴 FINALIZADO -->
+              <ng-container *ngIf="esEventoFinalizado(evento); else noFinalizado">
+                <span style="color: red; font-weight: bold;">
+                  🔴 Evento finalizado
+                </span>
+              </ng-container>
+
+              <!-- ⬇️ SI NO ESTÁ FINALIZADO -->
+              <ng-template #noFinalizado>
+
+                <!-- 🟢 EN CURSO -->
+                <ng-container *ngIf="esEventoEnCurso(evento); else noEnCurso">
+                  <span style="color: green; font-weight: bold;">
+                    Evento en curso
+                  </span>
+                  <ion-label>
+                    {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                  </ion-label>
+                </ng-container>
+
+                <!-- ⬇️ SI NO ESTÁ EN CURSO -->
+                <ng-template #noEnCurso>
+
+                  <!-- 🔵 PRÓXIMO -->
+
+                  <ng-container *ngIf="esEventoProximo(evento); else fechaNormal">
+                    <span class="proximo-evento">
+                      Próximo evento
+                    </span>
+                    <ion-label>
+                      {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                    </ion-label>
+                  </ng-container>
+
+                  <!-- 📅 NORMAL (fallback) -->
+                  <ng-template #fechaNormal>
+                    {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                  </ng-template>
+
+                </ng-template>
+
+              </ng-template>
+
+            </ion-label>
+          </ion-item>
+
+          <!-- 👥 PARTICIPANTES -->
+          <ion-item>
+            <ion-icon name="people-outline" slot="start"></ion-icon>
+            <ion-label>
+              {{ evento.participantes.length }} participante(s)
+            </ion-label>
+          </ion-item>
+
+          <!-- ⛰️ ALTITUD -->
+          <ion-item>
+            <ion-icon name="trending-up-outline" slot="start"></ion-icon>
+            <ion-label>
+              {{ evento.lugar.altitud }} msnm
+            </ion-label>
+          </ion-item>
+
+        </ion-list>
+
+        <!-- ========================= -->
+        <!-- 🎮 ACCIONES -->
+        <!-- ========================= -->
+        <div class="evento-actions">
+
+          <!-- 👁️ VER DETALLE -->
+          <ion-button class="btn-ver-detalle-evento" fill="outline" size="small" (click)="verEvento(evento.id!)">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver detalle
+          </ion-button>
+
+          <!-- 🗑️ ELIMINAR -->
+          <ion-button *ngIf="evento.creadoPor.uid === currentUid" class="btn-eliminar-evento" fill="outline"size="small" (click)="onEliminarEvento(evento)">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar
+          </ion-button>
+
+
+          <!-- <div class="foro-container">
+
+            <ion-button expand="block" class="btn-foro" (click)="irAlForo(evento)">
+              <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+              Foro del evento
+            </ion-button>
+
+            <ion-badge class="foro-badge" *ngIf="getMensajesNuevos(evento.id) > 0">
+              {{ getMensajesNuevos(evento.id) > 99 ? '99+' : getMensajesNuevos(evento.id) }}
+            </ion-badge>
+
+          </div> -->
+
+
+          <!-- ⭐ FAVORITOS -->
+          <ion-button fill="clear" color="warning" (click)="toggleFavorito(evento)">
+            <ion-icon [name]="isFavorito(evento.id!) ? 'star' : 'star-outline'"
+              [color]="isFavorito(evento.id!) ? 'warning' : ''">
+            </ion-icon>
+          </ion-button>
+
+        </div>
+
+      </ion-card-content>
+
+    </ion-card>
+
+  </ng-container>
+
+</ion-content>

@@ -1,26 +1,27 @@
-<!-- src/app/pages/home/home.page.html -->
-
+<!-- ========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
 
+    <!-- 🔹 TÍTULO -->
     <ion-title>Inicio</ion-title>
 
-    <!-- 🌤️ CLIMA CENTRADO -->
-    <ion-button fill="clear" class="weather-header" (click)="openWeatherLink()">
-      <ion-icon [name]="weatherGlobal.icon | async"></ion-icon>
-      <span>{{ weatherGlobal.temperature | async }}° </span>
-      <span>| {{ timeService.dateTime | async }}</span>
-    </ion-button>
-
+    <!-- 🔘 ACCIONES DERECHA -->
     <ion-buttons slot="end">
 
-      <!-- 🏠 BOTÓN DASHBOARD - Solo visible para admin -->
+      <!-- profile -->
+      <ion-button *ngIf="userData" (click)="goProfile()">
+        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+      </ion-button>
+
+      <!-- 🏠 Dashboard (solo admin) -->
       <ion-button *ngIf="userData?.rol === 'admin'" (click)="goDashboard()">
         <ion-icon slot="icon-only" name="grid-outline"></ion-icon>
       </ion-button>
 
-      <!-- 🚪 LOGOUT -->
-      <ion-button (click)="onLogout()">
+      <!-- 🚪 Logout (usuario logueado) -->
+      <ion-button *ngIf="userData" (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
 
@@ -29,28 +30,209 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- ========================= -->
+<!-- 📄 CONTENIDO -->
+<!-- ========================= -->
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-  <!-- BIENVENIDA -->
-  <div class="welcome-container" *ngIf="userData">
 
-    <div class="welcome-header">
-      <ion-icon name="person-circle-outline" class="avatar-icon"></ion-icon>
-      <h1>¡Hola, {{ userData.nombre }}!</h1>
-      <p>Bienvenido a tu inicio. Explora tu información y mantente al día con la app.</p>
-      <p>Tus próxima aventura te esperan</p>
-      <ion-badge [color]="userData.rol === 'admin' ? 'danger' : 'primary'">
-        {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
-      </ion-badge>
+
+  <!-- ========================= -->
+  <!-- 🔐 USUARIO LOGUEADO -->
+  <!-- ========================= -->
+  <ng-container *ngIf="authReady && userData; else noAuth">
+
+
+
+    <div class="welcome-container">
+      <ion-button fill="clear" class="weather-chip" (click)="openWeatherLink()">
+
+        <div class="weather-info">
+
+          <ion-icon [name]="icon$ | async"></ion-icon>
+
+          <div>
+            <span class="temp">{{ temperature$ | async }}°C</span>
+            <span class="desc">{{ description$ | async }}</span>
+            <small class="location">📍 {{ locationName$ | async }}</small>
+          </div>
+
+        </div>
+
+      </ion-button>
+      <!-- 👋 HEADER BIENVENIDA -->
+      <div class="welcome-header">
+
+      <!-- 🖼️ AVATAR -->
+      <div class="avatar-wrapper">
+
+        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img"
+          alt="Foto de perfil del usuario" />
+
+
+        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon">
+        </ion-icon>
+        
+      </div>
+
+        <h1>¡Hola, {{ userData.nombre }}!</h1>
+
+        <p>Bienvenido a tu inicio. Explora tu información y mantente al día con la app.</p>
+
+        <p>Tus próxima aventura te esperan</p>
+
+        <!-- 🏷️ ROL ADMIN -->
+        <ion-badge *ngIf="userData.rol === 'admin'" color="danger">
+          Administrador
+        </ion-badge>
+
+      </div>
+
+      <!-- <ion-button>
+        <iframe frameBorder="0" scrolling="no" src="https://www.wikiloc.com/wikiloc/embedv2.do?id=794041&elevation=off&images=off&maptype=H" width="600" height="500"></iframe><div style="color:#777;font-size:11px;line-height:16px;">Powered by&nbsp;<a style="color:#4C8C2B;font-size:11px;line-height:16px;" target="_blank" href="https://www.wikiloc.com">Wikiloc</a></div>
+
+      </ion-button> -->
+
+      <!-- ➕ CREAR EVENTO -->
+      <ion-button expand="block" class="btn-crear-evento" (click)="goCrearEvento()">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Crear evento
+      </ion-button>
+
+      <ion-button expand="block" class="map-btn" (click)="goMapa()">
+        <ion-icon name="navigate-outline" slot="start"></ion-icon>
+        Ir al mapa
+      </ion-button>
+
+      <div class="consejos-section" *ngIf="consejos.length > 0">
+
+        <h2 class="consejos-section2">💡 Consejos</h2>
+
+        <swiper-container slides-per-view="1" space-between="0" centered-slides="false" loop="true"
+          autoplay-delay="10000" autoplay-disable-on-interaction="false">
+
+          <swiper-slide *ngFor="let c of consejos">
+
+            <ion-card class="consejo-card">
+
+              <ion-card-header>
+                <ion-card-title>{{ c.titulo }}</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                {{ c.descripcion }}
+              </ion-card-content>
+
+            </ion-card>
+
+          </swiper-slide>
+
+        </swiper-container>
+
+      </div> <!--Fin Consejos -->
+
+      <div class="kits-wrapper">
+
+        <!-- 🩺 KIT PRIMEROS AUXILIOS -->
+        <ng-container *ngIf="kitsPA$ | async as kitsPA">
+          <ion-card *ngIf="kitsPA.length > 0" class="kit-card1 kit-pa">
+
+            <ion-card-content>
+              <div *ngFor="let kit of kitsPA">
+                <h3>{{ kit.nombre }}</h3>
+                <p>{{ kit.descripcion }}</p>
+
+                <ion-chip *ngFor="let item of kit.items" class="chip-pa">
+                  {{ item }}
+                </ion-chip>
+
+                <hr />
+              </div>
+            </ion-card-content>
+
+          </ion-card>
+        </ng-container>
+
+        <!-- 🏕️ KIT SUPERVIVENCIA -->
+        <ng-container *ngIf="kitsSup$ | async as kitsSup">
+          <ion-card *ngIf="kitsSup.length > 0" class="kit-card2 kit-sup">
+
+            <ion-card-content>
+              <div *ngFor="let kit of kitsSup">
+                <h3>
+                  {{ kit.nombre }}
+                  <ion-badge color="success"></ion-badge>
+                </h3>
+
+                <p>{{ kit.descripcion }}</p>
+
+                <ion-chip *ngFor="let item of kit.items" class="chip-sup">
+                  {{ item }}
+                </ion-chip>
+
+                <hr />
+              </div>
+            </ion-card-content>
+
+          </ion-card>
+        </ng-container>
+
+      </div> <!-- Fin Kits -->
+
+      <ion-button expand="block" fill="outline" (click)="openManual()">
+        <ion-icon name="book-outline" slot="start"></ion-icon>
+        Manual de emergencia
+      </ion-button>
+
+
+      <!-- ========================= -->
+      <!-- 🆘 BOTÓN SOS FLOTANTE -->
+      <!-- ========================= -->
+      <!-- <div class="sos-container">
+        <button class="sos-btn" [class.sos-activo]="sosActivo" (click)="onSOS()">
+          <span class="sos-text">SOS</span>
+          <span class="sos-ripple"></span>
+        </button>
+        <p class="sos-label">Emergencia</p>
+      </div> -->
+
+    </div> <!--Fin Welcome -->
+
+
+
+  </ng-container>
+
+  <!-- ========================= -->
+  <!-- 🚫 USUARIO NO LOGUEADO -->
+  <!-- ========================= -->
+  <ng-template #noAuth>
+
+    <div class="welcome-container">
+
+      <!-- 👋 HEADER -->
+      <div class="welcome-header">
+
+        <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
+
+        <h1>Bienvenido</h1>
+
+        <p>Inicia sesión para acceder a todas las funciones de la aplicación.</p>
+
+      </div>
+
+      <!-- 🔑 LOGIN -->
+      <ion-button expand="block" class="btn-login" (click)="goLogin()">
+        Iniciar sesión
+      </ion-button>
+
+      <!-- 📝 REGISTER -->
+      <ion-button expand="block" fill="outline" (click)="goRegister()">
+        Registrarse
+      </ion-button>
+
     </div>
 
-
-  </div>
-
-  <!-- SKELETON mientras carga -->
-  <!-- <app-explore-container *ngIf="!userData">
-    <ion-skeleton-text animated style="height: 80px; border-radius: 8px;"></ion-skeleton-text>
-    <ion-skeleton-text animated style="height: 200px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
-  </app-explore-container> -->
+  </ng-template>
 
 </ion-content>

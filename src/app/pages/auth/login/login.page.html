@@ -1,56 +1,98 @@
-<!-- src/app/auth/login/login.page.html -->
-
+<!-- 📄 LOGIN PAGE -->
 <ion-content class="ion-padding">
 
   <div class="login-container">
 
+    <!-- ========================= -->
+    <!-- 👤 HEADER -->
+    <!-- ========================= -->
     <div class="login-header">
       <ion-icon name="person-circle-outline"></ion-icon>
       <h1>Iniciar Sesión</h1>
     </div>
 
+    <!-- ========================= -->
+    <!-- 📝 FORMULARIO -->
+    <!-- ========================= -->
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
 
-      <!-- EMAIL -->
+      <!-- 📧 EMAIL -->
       <ion-item [class.ion-invalid]="email?.invalid && email?.touched">
+
         <ion-label position="floating">Correo electrónico</ion-label>
-        <ion-input type="email" formControlName="email" placeholder="correo@ejemplo.com">
+        <br>
+        <ion-input
+          type="email"
+          formControlName="email"
+          placeholder="correo@ejemplo.com">
         </ion-input>
+
         <ion-note slot="error">
-          <span *ngIf="email?.errors?.['required']">El correo es requerido</span>
-          <span *ngIf="email?.errors?.['email']">Ingresa un correo válido</span>
+          <span *ngIf="email?.errors?.['required']">
+            El correo es requerido
+          </span>
+
+          <span *ngIf="email?.errors?.['email']">
+            Ingresa un correo válido
+          </span>
         </ion-note>
+
       </ion-item>
 
-      <!-- PASSWORD -->
+      <!-- 🔒 PASSWORD -->
       <ion-item [class.ion-invalid]="password?.invalid && password?.touched">
+
         <ion-label position="floating">Contraseña</ion-label>
-        <ion-input [type]="showPassword ? 'text' : 'password'" formControlName="password">
+        <br>
+        <ion-input class="password-input"
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password">
         </ion-input>
+
         <ion-button slot="end" fill="clear" (click)="togglePassword()">
           <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </ion-button>
+
         <ion-note slot="error">
-          <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
-          <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+          <span *ngIf="password?.errors?.['required']">
+            La contraseña es requerida
+          </span>
+
+          <span *ngIf="password?.errors?.['minlength']">
+            Mínimo 6 caracteres
+          </span>
         </ion-note>
+
       </ion-item>
 
-      <!-- BOTÓN LOGIN -->
-      <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="loginForm.invalid">
+      <!-- 🔘 LOGIN -->
+      <ion-button
+        expand="block"
+        type="submit"
+        class="ion-margin-top"
+        [disabled]="loginForm.invalid">
+
         Iniciar Sesión
       </ion-button>
 
-      <!-- ✅ Olvidaste tu contraseña -->
-      <ion-button expand="block" fill="clear" color="medium" (click)="onForgotPassword()">
+      <!-- 🔁 RECUPERAR -->
+      <ion-button
+        expand="block"
+        fill="clear"
+        color="medium"
+        (click)="onForgotPassword()">
+
         ¿Olvidaste tu contraseña?
       </ion-button>
 
     </form>
 
-    <!-- IR A REGISTRO -->
+    <!-- ========================= -->
+    <!-- 🔗 REGISTRO -->
+    <!-- ========================= -->
     <div class="register-link">
-      <p>¿No tienes cuenta?
+      <p>
+        ¿No tienes cuenta?
         <span (click)="goToRegister()">Regístrate aquí</span>
       </p>
     </div>

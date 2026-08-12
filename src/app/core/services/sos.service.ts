@@ -1,0 +1,183 @@
+// src/app/core/services/sos.service.ts
+
+import { Injectable, inject } from '@angular/core';
+import { Geolocation } from '@capacitor/geolocation';
+import { AuthService, UserData, ContactoEmergencia } from './auth.service';
+import { EventoService } from './evento.service';
+
+export interface UbicacionSOS {
+  latitud: number;
+  longitud: number;
+  precision: number;
+  timestamp: Date;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SosService {
+
+  private authService = inject(AuthService);
+  private eventoService = inject(EventoService);
+
+  // // ✅ OBTENER UBICACIÓN ACTUAL
+  // async obtenerUbicacion(): Promise<UbicacionSOS> {
+  //   const permiso = await Geolocation.requestPermissions();
+
+  //   if (permiso.location !== 'granted') {
+  //     throw new Error('permiso-denegado');
+  //   }
+
+  //   const posicion = await Geolocation.getCurrentPosition({
+  //     enableHighAccuracy: true,
+  //     timeout: 10000,
+  //   });
+
+  //   return {
+  //     latitud: posicion.coords.latitude,
+  //     longitud: posicion.coords.longitude,
+  //     precision: posicion.coords.accuracy,
+  //     timestamp: new Date(),
+  //   };
+  // }
+
+  async obtenerUbicacion(): Promise<UbicacionSOS> {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('GPS no disponible en este dispositivo'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (posicion) => {
+          resolve({
+            latitud: posicion.coords.latitude,
+            longitud: posicion.coords.longitude,
+            precision: posicion.coords.accuracy,
+            timestamp: new Date(),
+          });
+        },
+        (error) => {
+          switch (error.code) {
+            case 1:
+              reject(new Error('permiso-denegado'));
+              break;
+            case 2:
+              reject(new Error('Posición no disponible'));
+              break;
+            case 3:
+              // ✅ Timeout: reintentar con menor precisión
+              navigator.geolocation.getCurrentPosition(
+                (posicion) => {
+                  resolve({
+                    latitud: posicion.coords.latitude,
+                    longitud: posicion.coords.longitude,
+                    precision: posicion.coords.accuracy,
+                    timestamp: new Date(),
+                  });
+                },
+                (err) => reject(new Error('No se pudo obtener ubicación')),
+                {
+                  enableHighAccuracy: false, // ✅ Menor precisión pero más rápido
+                  timeout: 60000,
+                  maximumAge: 60000         // ✅ Acepta posición cacheada de hasta 1 min
+                }
+              );
+              break;
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 30000,
+          maximumAge: 10000
+        }
+      );
+    });
+  }
+
+  // ✅ CONSTRUIR MENSAJE SOS
+  construirMensajeSOS(
+    userData: UserData,
+    ubicacion: UbicacionSOS,
+    eventoNombre?: string
+  ): string {
+    const hora = ubicacion.timestamp.toLocaleTimeString('es-CL', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+
+    const fecha = ubicacion.timestamp.toLocaleDateString('es-CL');
+    const googleMapsUrl = `https://maps.google.com/?q=${ubicacion.latitud},${ubicacion.longitud}`;
+
+    let mensaje = `🆘 ALERTA DE EMERGENCIA 🆘\n\n`;
+    mensaje += `👤 Persona: ${userData.nombre}\n`;
+
+    if (eventoNombre) {
+      mensaje += `🏔️ Evento: ${eventoNombre}\n`;
+    }
+
+    mensaje += `📅 Fecha: ${fecha}\n`;
+    mensaje += `⏰ Hora: ${hora}\n\n`;
+    mensaje += `📍 Ubicación GPS:\n`;
+    mensaje += `Lat: ${ubicacion.latitud.toFixed(6)}\n`;
+    mensaje += `Lon: ${ubicacion.longitud.toFixed(6)}\n`;
+    mensaje += `Precisión: ±${Math.round(ubicacion.precision)}m\n\n`;
+    mensaje += `🗺️ Ver en Google Maps:\n${googleMapsUrl}\n\n`;
+    mensaje += `⚠️ Por favor contactar de inmediato o llamar al 131 (Carabineros) o 132 (Bomberos)`;
+
+    return mensaje;
+  }
+
+  // ✅ ENVIAR SOS POR SMS
+  // ✅ Soporta múltiples destinatarios separados por coma
+  enviarSosPorSMS(telefonos: string, mensaje: string) {
+    const mensajeCodificado = encodeURIComponent(mensaje);
+
+    // Android usa ; como separador, iOS usa ,
+    const esAndroid = /android/i.test(navigator.userAgent);
+    const separador = esAndroid ? ';' : ',';
+
+    // Si vienen separados por coma, convertir según el OS
+    const telefonosFormateados = telefonos.split(',').join(separador);
+
+    window.open(`sms:${telefonosFormateados}?body=${mensajeCodificado}`, '_system');
+  }
+
+  // ✅ ENVIAR SOS POR WHATSAPP
+  enviarSosPorWhatsApp(telefono: string, mensaje: string) {
+    // Limpiar el teléfono (solo números)
+    const telefonoLimpio = telefono.replace(/\D/g, '');
+    const mensajeCodificado = encodeURIComponent(mensaje);
+    window.open(`https://wa.me/${telefonoLimpio}?text=${mensajeCodificado}`, '_system');
+  }
+
+  watchUbicacion(callback: (ubicacion: UbicacionSOS) => void) {
+
+    if (!navigator.geolocation) {
+      console.error('GPS no disponible');
+      return;
+    }
+
+    return navigator.geolocation.watchPosition(
+      (posicion) => {
+        const ubicacion: UbicacionSOS = {
+          latitud: posicion.coords.latitude,
+          longitud: posicion.coords.longitude,
+          precision: posicion.coords.accuracy,
+          timestamp: new Date(),
+        };
+
+        callback(ubicacion);
+      },
+      (error) => {
+        console.error('Error GPS:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 30000
+      }
+    );
+  }
+}

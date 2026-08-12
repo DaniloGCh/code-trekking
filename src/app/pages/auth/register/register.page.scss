@@ -1,102 +1,209 @@
-/* 🌄 Fondo tipo trekking (igual que login) */
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
 ion-content {
-  --background: none;
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.65),
-      rgba(0, 0, 0, 0.75)
-    ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Aplica capa oscura transparente sobre la imagen de fondo */
+  font-family: 'Lexend', sans-serif; /* Define la tipografía principal para la vista */
+  --color: #e2e8f0; /* Establece el color de texto general */
 }
 
-/* 📦 Contenedor principal */
+/* ==========================================================================
+   📦 CONTENEDOR PRINCIPAL
+   ========================================================================== */
 .register-container {
-  width: 100%;
-  max-width: 440px;
-  margin: auto;
-  padding: 25px;
-  border-radius: 20px;
-
-  background: rgba(34, 49, 34, 0.55); /* verde bosque */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  color: #fff;
+  max-width: 450px; /* Ancho máximo para mantener un formato compacto en pantallas grandes */
+  margin: 30px auto 30px auto; /* Centrado horizontal con márgenes verticales */
+  padding: 24px; /* Relleno interno alrededor de todo el contenido */
+  background: #14191f; /* Fondo oscuro sólido acorde al sistema */
+  border-radius: 16px; /* Bordes suaves y redondeados */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Borde sutil para delimitar el contenedor */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); /* Proyección de sombra para dar profundidad */
 }
 
-/* 🧭 Header register */
+/* ==========================================================================
+   👤 CABECERA DEL REGISTRO (Icono y Título)
+   ========================================================================== */
 .register-header {
-  text-align: center;
-  margin-bottom: 25px;
-
-  ion-icon {
-    font-size: 70px;
-    color: #a3d977; /* verde trekking */
-  }
-
-  h1 {
-    margin: 10px 0 0;
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: #ffffff;
-  }
+  display: flex; /* Activa la disposición flexible */
+  flex-direction: column; /* Apila el icono y el título verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
+  margin-bottom: 24px; /* Separación respecto al primer campo */
+  text-align: center; /* Centra el alineado de texto */
 }
 
-/* 🧾 Inputs */
+.register-header ion-icon {
+  font-size: 64px; /* Tamaño destacado para el icono de registro */
+  color: rgb(0, 248, 103); /* Color verde neón para el icono */
+  margin-bottom: 8px; /* Espaciado inferior hacia el título */
+}
+
+.register-header h1 {
+  margin: 0; /* Elimina márgenes por defecto */
+  font-size: 1.5rem; /* Tamaño de fuente del título */
+  font-weight: 900; /* Grosor máximo de letra */
+  color: #ffffff; /* Color blanco brillante */
+  text-transform: uppercase; /* Texto en mayúsculas */
+  letter-spacing: -0.02em; /* Comprime levemente el espaciado entre letras */
+}
+
+/* ==========================================================================
+   📝 CAMPOS DE ENTRADA Y SELECTS
+   ========================================================================== */
 ion-item {
-  --background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  margin-bottom: 15px;
-
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-
-  --color: #fff;
+  --background: #1a232d; /* Fondo ligeramente más claro para la casilla */
+  --color: #ffffff; /* Texto que escribe el usuario en blanco */
+  --border-color: rgba(255, 255, 255, 0.1); /* Borde sutil por defecto */
+  --highlight-color-focused: rgb(0, 248, 103); /* Indicador verde neón al hacer foco */
+  border-radius: 8px; /* Redondea las esquinas de cada campo */
+  margin-bottom: 14px; /* Separación vertical entre elementos */
 }
 
-/* ❌ errores */
-ion-note {
-  color: #ffb3b3;
-  font-size: 0.75rem;
+ion-label {
+  color: #94a3b8 !important; /* Forza el color gris para las etiquetas flotantes */
+  font-size: 0.88rem; /* Tamaño de letra de la etiqueta */
 }
 
-/* 🔘 botón registrar */
+ion-input, 
+ion-select {
+  --color: #ffffff; /* Texto en color blanco puro */
+  font-size: 0.95rem; /* Tamaño del texto de entrada */
+  margin-top: 6px; /* Espacio superior para separarlo del label */
+}
+
+/* Botones para mostrar/ocultar contraseña (icono de ojo) */
+ion-item ion-button[slot="end"] {
+  --color: #94a3b8; /* Color gris suave para el icono del ojo */
+  margin: 0; /* Elimina márgenes adicionales */
+  --padding-start: 8px; /* Relleno inicial del icono */
+  --padding-end: 8px; /* Relleno final del icono */
+}
+
+/* Validaciones y Notificaciones de Error */
+ion-item.ion-invalid {
+  --border-color: #ff4d4d; /* Borde en color rojo cuando hay un error de validación */
+}
+
+ion-note[slot="error"] {
+  color: #ff6b6b; /* Texto de error en color rojo */
+  font-size: 0.8rem; /* Tamaño de texto compacto */
+  margin-top: 4px; /* Espaciado superior sobre la nota de error */
+}
+
+/* ==========================================================================
+   💪 FORTALEZA DE LA CONTRASEÑA
+   ========================================================================== */
+.password-strength {
+  margin: -4px 0 12px 0; /* Espaciado ajustado entre el input de contraseña y los requisitos */
+  padding: 0 4px; /* Relleno lateral sutil */
+}
+
+.strength-bar {
+  height: 6px; /* Altura de la barra de progreso */
+  background: #1a232d; /* Fondo oscuro de la barra contenedora */
+  border-radius: 4px; /* Esquinas redondeadas */
+  overflow: hidden; /* Corta el relleno interno al bordear */
+  margin-bottom: 6px; /* Espacio inferior respecto a la etiqueta */
+}
+
+.strength-fill {
+  height: 100%; /* Ocupa el 100% de la altura de la barra */
+  transition: width 0.3s ease, background-color 0.3s ease; /* Transición suave al cambiar fuerza */
+}
+
+/* Estados de la barra de fortaleza */
+.strength-fill.weak {
+  background-color: #ff4d4d; /* Barra en color rojo para nivel débil */
+}
+
+.strength-fill.medium {
+  background-color: #ffd166; /* Barra en color amarillo para nivel medio */
+}
+
+.strength-fill.strong {
+  background-color: rgb(0, 248, 103); /* Barra en verde neón para nivel fuerte */
+}
+
+/* Colores del texto descriptivo de la fortaleza */
+.password-strength small.text-weak {
+  color: #ff4d4d; /* Texto débil en rojo */
+  font-weight: 600; /* Texto en semi-negrita */
+}
+
+.password-strength small.text-medium {
+  color: #ffd166; /* Texto medio en amarillo */
+  font-weight: 600; /* Texto en semi-negrita */
+}
+
+.password-strength small.text-strong {
+  color: rgb(0, 248, 103); /* Texto fuerte en verde neón */
+  font-weight: 600; /* Texto en semi-negrita */
+}
+
+/* ==========================================================================
+   ✅ REQUISITOS DE LA CONTRASEÑA
+   ========================================================================== */
+.password-requirements {
+  display: flex; /* Activa la disposición flexible */
+  flex-direction: column; /* Apila los requisitos verticalmente */
+  gap: 4px; /* Separación vertical entre cada regla */
+  margin-bottom: 14px; /* Margen inferior antes del siguiente input */
+  padding: 10px 12px; /* Relleno interno de la caja de requisitos */
+  background: #0d1117; /* Fondo un poco más oscuro */
+  border-radius: 8px; /* Redondeado de esquinas */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Borde sutil */
+}
+
+.password-requirements small {
+  color: #94a3b8; /* Color gris claro por defecto para reglas no cumplidas */
+  font-size: 0.8rem; /* Tamaño de letra reducido */
+  transition: color 0.2s ease; /* Transición suave de color al validar */
+}
+
+.password-requirements small.met {
+  color: rgb(0, 248, 103); /* Color verde neón cuando el requisito se cumple */
+  font-weight: 600; /* Texto en semi-negrita para destacar */
+}
+
+/* ==========================================================================
+   🔘 BOTÓN DE REGISTRO Y ENLACE DE LOGIN
+   ========================================================================== */
+/* Botón Principal Crear Cuenta */
 ion-button[type="submit"] {
-  --background: #2e7d32; /* verde bosque */
-  --border-radius: 12px;
-  font-weight: bold;
-  margin-top: 15px;
-
-  --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  --background: #14191f; /* Fondo oscuro acorde a las tarjetas */
+  background: #14191f; /* Respaldo del fondo */
+  --color: rgb(0, 248, 103); /* Texto e icono en verde neón */
+  border: 2px solid rgb(0, 248, 103); /* Borde verde neón pronunciado */
+  border-radius: 8px; /* Esquinas redondeadas */
+  font-weight: 700; /* Texto en negrita */
+  font-size: 1rem; /* Tamaño de fuente principal */
+  margin-top: 16px; /* Separación superior respecto al último campo */
 }
 
-/* 👁 iconos password */
-ion-button[slot="end"] {
-  --color: #c7f9cc;
+/* Botón deshabilitado cuando el formulario es inválido */
+ion-button[type="submit"][disabled] {
+  opacity: 0.5; /* Opacidad reducida en estado inactivo */
+  border-color: rgba(255, 255, 255, 0.2); /* Borde opaco en estado deshabilitado */
+  --color: #94a3b8; /* Texto gris en estado deshabilitado */
 }
 
-/* 🔗 login link */
+/* Bloque inferior del enlace hacia Login */
 .login-link {
-  text-align: center;
-  margin-top: 20px;
+  text-align: center; /* Centra el texto */
+  margin-top: 20px; /* Espaciado superior */
+  padding-top: 16px; /* Relleno superior interno */
+  border-top: 1px solid rgba(255, 255, 255, 0.08); /* Línea divisoria superior sutil */
+}
 
-  p {
-    color: #ddd;
-    font-size: 0.9rem;
-  }
+.login-link p {
+  color: #94a3b8; /* Texto secundario en color gris */
+  font-size: 0.9rem; /* Tamaño de letra estándar */
+  margin: 0; /* Elimina márgenes por defecto */
+}
 
-  span {
-    color: #a3d977;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  span:hover {
-    text-decoration: underline;
-  }
-  
+.login-link span {
+  color: rgb(0, 248, 103); /* Verde neón para resaltar el enlace clicable */
+  font-weight: 700; /* Texto en negrita */
+  cursor: pointer; /* Cambia el cursor a mano al pasar el ratón */
+  margin-left: 4px; /* Separación horizontal respecto al texto anterior */
+  text-decoration: underline; /* Subraya el enlace para indicar interactividad */
 }

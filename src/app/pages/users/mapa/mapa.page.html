@@ -1,0 +1,214 @@
+<ion-content fullscreen>
+
+  <div class="map-container">
+    <div id="map"></div>
+
+    <!-- 🔵 BOTÓN CENTRAR -->
+    <ion-button class="center-btn" fill="clear" (click)="centrarEnUsuario()">
+      <ion-icon name="locate"></ion-icon>
+    </ion-button>
+
+
+
+  </div>
+
+  <!-- ✅ SELECTOR TIPO MAPA CON ACCORDION -->
+  <div class="map-type-selector">
+
+    <!-- Botón principal -->
+    <button class="map-type-toggle" (click)="mostrarTipos = !mostrarTipos">
+      🗺️
+      <ion-icon [name]="mostrarTipos ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+    </button>
+
+    <!-- Opciones desplegables -->
+    <div class="map-type-options" [class.visible]="mostrarTipos">
+
+      <button class="map-type-btn" [class.active]="tipoMapaActual === 'calle'"
+        (click)="cambiarTipaMapa('calle'); mostrarTipos = false">
+        🗺️
+      </button>
+
+      <button class="map-type-btn" [class.active]="tipoMapaActual === 'satelital'"
+        (click)="cambiarTipaMapa('satelital'); mostrarTipos = false">
+        🛰️
+      </button>
+
+      <button class="map-type-btn" [class.active]="tipoMapaActual === 'terreno'"
+        (click)="cambiarTipaMapa('terreno'); mostrarTipos = false">
+        🏔️
+      </button>
+
+      <button class="map-type-btn" [class.active]="tipoMapaActual === 'topo'"
+        (click)="cambiarTipaMapa('topo'); mostrarTipos = false">
+        📐
+      </button>
+
+
+    </div>
+
+  </div>
+
+  <!-- 📊 PANEL INFERIOR -->
+  <div class="map-info">
+        <h4 class="ruta-title">
+      <ion-icon name="navigate-outline" color="danger"></ion-icon>
+      Marca tu ruta
+    </h4>
+    <div class="info-card">
+
+      <!-- STATS -->
+      <div class="stats-panel">
+
+        <!-- 📏 DISTANCIA -->
+        <div class="stat-item">
+          <ion-icon name="map-outline" color="primary"></ion-icon>
+          <div>
+            <small>Distancia</small>
+            <strong>{{ distanceKm | number:'1.2-2' }} km</strong>
+          </div>
+        </div>
+
+        <!-- ⏱️ TIEMPO -->
+        <div class="stat-item">
+          <ion-icon name="time-outline" color="primary"></ion-icon>
+          <div>
+            <small>Tiempo</small>
+            <strong>{{ tiempoFormateado }}</strong>
+          </div>
+        </div>
+
+        <!-- 📍 COORDENADAS -->
+        <div class="stat-item coordenadas">
+          <ion-icon name="location-outline" color="primary"></ion-icon>
+          <div>
+            <small>Coordenadas</small>
+            <strong>{{ coordenadasFormateadas }}</strong>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOTONES -->
+      <div class="action-buttons">
+
+        <!-- ▶️ TOGGLE TRACKING -->
+        <ion-button [color]="trackingActive ? 'danger' : 'success'" (click)="toggleTracking()">
+
+          <ion-icon [name]="trackingActive ? 'pause' : 'play'">
+          </ion-icon>
+
+        </ion-button>
+
+        <!-- 📦 EXPORT GPX -->
+        <ion-button color="tertiary" (click)="exportGPX()" [disabled]="routePoints.length === 0">
+
+          <ion-icon name="download-outline"></ion-icon>
+
+        </ion-button>
+
+          <!-- 🗑️ LIMPIAR RUTA -->
+        <ion-button color="warning" (click)="onLimpiarRuta()">
+
+          <ion-icon name="trash-outline"></ion-icon>
+
+        </ion-button>
+
+        <!-- 🏠 HOME -->
+        <ion-button color="medium" (click)="goHome()">
+
+          <ion-icon name="home-outline"></ion-icon>
+
+        </ion-button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================= -->
+  <!-- 🗺️ SECCIÓN RUTAS -->
+  <!-- ========================= -->
+
+  <!-- ✅ PANEL DE INSTRUCCIONES -->
+  <div class="instrucciones-panel" *ngIf="mostrarInstrucciones && instrucciones.length > 0">
+    <h4 class="instrucciones-title">
+      <ion-icon name="list-outline" color="primary"></ion-icon>
+      Instrucciones
+    </h4>
+    <div class="instruccion-item" *ngFor="let paso of instrucciones; let i = index">
+      <span class="instruccion-numero">{{ i + 1 }}</span>
+      <div class="instruccion-info">
+        <p>{{ paso.instruccion }}</p>
+        <small>{{ paso.distancia }}</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="ruta-section">
+
+    <h4 class="ruta-title">
+      <ion-icon name="navigate-outline" color="danger"></ion-icon>
+      Trazar ruta
+    </h4>
+
+    <!-- ✅ SELECTOR DE PERFIL -->
+    <div class="perfil-selector">
+      <button class="perfil-btn" [class.active]="perfilRuta === 'hike'" (click)="perfilRuta = 'hike'">
+        🥾 Sendero
+      </button>
+      <button class="perfil-btn" [class.active]="perfilRuta === 'foot'" (click)="perfilRuta = 'foot'">
+        🚶 Caminata
+      </button>
+      <button class="perfil-btn" [class.active]="perfilRuta === 'car'" (click)="perfilRuta = 'car'">
+        🚗 Auto
+      </button>
+    </div>
+
+    <!-- 🛤️ BOTONES RUTA SOLO ICONOS -->
+
+    <div class="ruta-buttons">
+
+      <!-- 📍 MARCAR PUNTOS -->
+      <ion-button [color]="modoRuta ? 'danger' : 'primary'" fill="outline" size="small" (click)="toggleModoRuta()">
+
+        <ion-icon [name]="modoRuta ? 'close-outline' : 'map-outline'">
+        </ion-icon>
+
+      </ion-button>
+
+      <!-- 📌 DESDE MI UBICACIÓN -->
+      <ion-button color="success" fill="outline" size="small" (click)="rutaDesdeUbicacion()">
+
+        <ion-icon name="locate-outline"></ion-icon>
+
+      </ion-button>
+
+      <!-- 📋 VER INDICACIONES -->
+      <ion-button [color]="mostrarInstrucciones ? 'tertiary' : 'medium'" fill="outline" size="small"
+        (click)="toggleInstrucciones()" [disabled]="instrucciones.length === 0">
+
+        <ion-icon name="list-outline"></ion-icon>
+
+      </ion-button>
+
+      <!-- 🗑️ LIMPIAR -->
+      <ion-button color="medium" fill="outline" size="small" (click)="limpiarRutaTrazada()"
+        [disabled]="puntosRuta.length === 0 && !rutaControl">
+
+        <ion-icon name="trash-outline"></ion-icon>
+
+      </ion-button>
+
+    </div>
+
+    <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 0">
+      🟢 Toca el mapa para marcar el <strong>origen</strong>
+    </p>
+    <p class="ruta-instruccion" *ngIf="modoRuta && puntosRuta.length === 1">
+      🔴 Ahora toca el <strong>destino</strong>
+    </p>
+
+  </div>
+
+</ion-content>

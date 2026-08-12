@@ -1,11 +1,18 @@
-// src/app/auth/login/login.page.ts
-
+// 🔹 Angular core
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+
+// 🔹 Formularios reactivos
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LoadingController, AlertController } from '@ionic/angular';
+
+// 🔹 Ionic controllers
+import { LoadingController, AlertController, ToastController } from '@ionic/angular';
+
+// 🔹 Servicios
 import { AuthService } from 'src/app/core/services/auth.service';
-import { ToastController } from '@ionic/angular'; // ✅ Importado correctamente
+
+import { SecurityService } from 'src/app/core/services/security.service';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -14,69 +21,90 @@ import { ToastController } from '@ionic/angular'; // ✅ Importado correctamente
 })
 export class LoginPage {
 
+  // =========================
+  // 🔹 DEPENDENCIAS
+  // =========================
   private authService = inject(AuthService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private loadingCtrl = inject(LoadingController);
   private alertCtrl = inject(AlertController);
-  private toastCtrl = inject(ToastController); // ✅ Inyectado correctamente
+  private toastCtrl = inject(ToastController);
+  private security = inject(SecurityService);
 
-  // 👁️ Toggle mostrar/ocultar password
+  // =========================
+  // 👁️ PASSWORD VISIBILITY
+  // =========================
   showPassword = false;
-
-  // 📋 Formulario reactivo
-  loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-  });
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
-  // ✅ Getters para validaciones en el HTML
+  // =========================
+  // 📋 FORMULARIO LOGIN
+  // =========================
+  loginForm: FormGroup = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
+
+  // =========================
+  // 🔹 GETTERS (HTML)
+  // =========================
   get email() { return this.loginForm.get('email'); }
   get password() { return this.loginForm.get('password'); }
 
-  // 🚀 SUBMIT LOGIN
+  // =========================
+  // 🚀 LOGIN
+  // =========================
   async onLogin() {
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched(); // ✅ Muestra todos los errores si intenta enviar sin llenar
+      this.loginForm.markAllAsTouched();
       return;
     }
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Iniciando sesión...',
-    });
+    // ✅ Rate limiting en el frontend
+    if (!this.security.checkRateLimit('login-page', 5, 60000)) {
+      await this.showError('too-many-attempts');
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({ message: 'Iniciando sesión...' });
     await loading.present();
 
     try {
       const { email, password } = this.loginForm.value;
+
+      // ✅ Validar email antes de enviar
+      if (!this.security.isValidEmail(email)) {
+        throw { code: 'auth/invalid-email' };
+      }
+
       await this.authService.login(email, password);
-
       const rol = await this.authService.getUserRole();
-
       await loading.dismiss();
 
       if (rol === 'admin') {
-        this.router.navigateByUrl('/dashboard', { replaceUrl: true });
+        this.router.navigateByUrl('/admin/dashboard', { replaceUrl: true });
       } else {
-        this.router.navigateByUrl('tabs/home', { replaceUrl: true });
+        this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
       }
 
     } catch (error: any) {
       await loading.dismiss();
-      await this.showError(error.code);
+      await this.showError(error.code || error.message);
     }
   }
 
-  
-  
-  // ✅ OLVIDASTE TU CONTRASEÑA
+  // =========================
+  // 🔁 RECUPERAR CONTRASEÑA
+  // =========================
   async onForgotPassword() {
+
     const alert = await this.alertCtrl.create({
       header: 'Recuperar contraseña',
-      message: 'Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.',
+      message: 'Ingresa tu correo para restablecer tu contraseña.',
       inputs: [
         {
           name: 'email',
@@ -86,13 +114,11 @@ export class LoginPage {
         }
       ],
       buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Enviar',
           handler: async (data) => {
+
             if (!data.email) {
               await this.showToast('Ingresa un correo válido', 'warning');
               return false;
@@ -101,12 +127,15 @@ export class LoginPage {
             const loading = await this.loadingCtrl.create({
               message: 'Enviando correo...'
             });
+
             await loading.present();
 
             try {
               await this.authService.resetPassword(data.email);
+
               await loading.dismiss();
-              await this.showToast('Correo enviado, revisa tu bandeja de entrada', 'success');
+              await this.showToast('Correo enviado correctamente', 'success');
+
             } catch (error) {
               await loading.dismiss();
               await this.showToast('No existe una cuenta con ese correo', 'danger');
@@ -121,39 +150,46 @@ export class LoginPage {
     await alert.present();
   }
 
-  // ❌ Manejo de errores de Firebase
+  // =========================
+  // ❌ ERRORES LOGIN
+  // =========================
   private async showError(errorCode: string) {
     const messages: Record<string, string> = {
-      'auth/user-not-found': 'No existe una cuenta con este correo.',
-      'auth/wrong-password': 'Contraseña incorrecta.',
+      'auth/user-not-found': 'Credenciales inválidas.',        // ✅ Mensaje genérico (no revela si existe)
+      'auth/wrong-password': 'Credenciales inválidas.',        // ✅ Mismo mensaje por seguridad
       'auth/invalid-email': 'El correo no es válido.',
       'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.',
-      'auth/invalid-credential': 'Credenciales inválidas. Verifica tu correo y contraseña.',
+      'auth/invalid-credential': 'Credenciales inválidas.',
+      'too-many-attempts': 'Demasiados intentos. Espera 1 minuto.',
     };
 
-    const message = messages[errorCode] || 'Ocurrió un error. Intenta nuevamente.';
-
+    const message = messages[errorCode] || 'Error al iniciar sesión. Intenta nuevamente.';
     const alert = await this.alertCtrl.create({
-      header: 'Error al iniciar sesión',
+      header: 'Error',
       message,
       buttons: ['Aceptar'],
     });
-
     await alert.present();
   }
 
-  // Y el método showToast corregido
-private async showToast(message: string, color: string = 'success') {
-  const toast = await this.toastCtrl.create({
-    message,
-    duration: 3000,
-    color,
-    position: 'bottom'
-  });
-  await toast.present();
-}
+  // =========================
+  // 🍞 TOAST
+  // =========================
+  private async showToast(message: string, color: string = 'success') {
 
-  // 📝 Ir a registro
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 3000,
+      color,
+      position: 'bottom'
+    });
+
+    await toast.present();
+  }
+
+  // =========================
+  // 📝 NAVEGACIÓN
+  // =========================
   goToRegister() {
     this.router.navigateByUrl('/register');
   }

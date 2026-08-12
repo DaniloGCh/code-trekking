@@ -1,0 +1,140 @@
+<!-- Agregar mensajeria a los tabs/ mejorar para que sea en tiempo real la llegada de mensajes========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
+<ion-header [class.hidden]="hideHeader">
+
+  <ion-toolbar class="transparent-toolbar">
+
+    <!-- 🔙 VOLVER -->
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/lista-foros"></ion-back-button>
+    </ion-buttons>
+
+    <!-- 📌 TÍTULO -->
+    <ion-title>Foro del evento</ion-title>
+
+    <!-- 🔄 REFRESCAR -->
+    <!-- <ion-buttons slot="end">
+      <ion-button (click)="cargarMensajes()">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons> -->
+
+  </ion-toolbar>
+
+</ion-header>
+
+<!-- ========================= -->
+<!-- 📄 CONTENIDO -->
+<!-- ========================= -->
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
+
+  <!-- 🔄 REFRESH PULL -->
+  <!-- <ion-refresher slot="fixed" (ionRefresh)="o($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher> -->
+
+  <!-- ========================= -->
+  <!-- ⏳ CARGANDO -->
+  <!-- ========================= -->
+  <div class="loading-state" *ngIf="cargando">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando mensajes...</p>
+  </div>
+
+  <!-- ========================= -->
+  <!-- 🚫 SIN MENSAJES -->
+  <!-- ========================= -->
+  <div class="empty-state" *ngIf="!cargando && (mensajes$ | async)?.length === 0">
+    <ion-icon name="chatbubbles-outline"></ion-icon>
+    <h3>Sin mensajes aún</h3>
+    <p>¡Sé el primero en escribir!</p>
+  </div>
+
+  <!-- ========================= -->
+  <!-- 💬 MENSAJES -->
+  <!-- ========================= -->
+  <div class="mensajes-container" *ngIf="!cargando">
+
+    <div
+      *ngFor="let mensaje of mensajes$ | async"
+      class="mensaje-wrapper"
+      [class.propio]="mensaje.autorUid === currentUid">
+
+      <div class="mensaje-bubble">
+
+        <!-- 👤 AUTOR (solo otros usuarios) -->
+        <span class="autor-nombre" *ngIf="mensaje.autorUid !== currentUid">
+          {{ mensaje.autorNombre }}
+        </span>
+
+        <!-- 📝 TEXTO -->
+        <p class="mensaje-texto">{{ mensaje.texto }}</p>
+
+        <!-- ⏱️ FOOTER MENSAJE -->
+        <div class="mensaje-footer">
+
+          <span class="mensaje-hora">
+          {{ obtenerFecha(mensaje.creadoEn) | date:'dd/MM/yyyy HH:mm:ss' }}
+          </span>
+
+          <!-- 🗑️ ELIMINAR (solo organizador) -->
+          <ion-button
+            *ngIf="currentUid === organizadorUid"
+            fill="clear"
+            size="small"
+            color="danger"
+            class="btn-eliminar"
+            (click)="onEliminarMensaje(mensaje)">
+
+            <ion-icon name="trash-outline"></ion-icon>
+
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ion-content>
+
+<!-- ========================= -->
+<!-- ✍️ FOOTER INPUT -->
+<!-- ========================= -->
+<ion-footer>
+
+  <!-- 😀 EMOJIS RÁPIDOS -->
+  <div class="emojis-bar">
+    <span
+      *ngFor="let emoji of emojis"
+      class="emoji-btn"
+      (click)="agregarEmoji(emoji)">
+      {{ emoji }}
+    </span>
+  </div>
+
+  <!-- ✍️ INPUT MENSAJE -->
+  <div class="input-container">
+
+    <ion-textarea
+      [(ngModel)]="nuevoMensaje"
+      placeholder="Escribe un mensaje..."
+      rows="1"
+      auto-grow="true"
+      class="mensaje-input">
+    </ion-textarea>
+
+    <!-- 📤 ENVIAR -->
+    <ion-button
+      fill="clear"
+      color="primary"
+      [disabled]="!nuevoMensaje.trim()"
+      (click)="onEnviarMensaje()">
+
+      <ion-icon slot="icon-only" name="send"></ion-icon>
+
+    </ion-button>
+
+  </div>
+
+</ion-footer>

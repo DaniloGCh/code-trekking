@@ -1,1 +1,105 @@
+/* ==========================================================================
+   📱 BARRA DE NAVEGACIÓN INFERIOR (<ion-tab-bar>)
+   ========================================================================== */
+ion-tab-bar {
+  --background: #0a0c10;
+  --border: none;
+  background: #0a0c10;
+  border-top: 1px solid #0a0c10;
+  height: 60px;
+  contain: none; /* Permite que el botón SOS sobresalga */
+}
 
+/* Estado normal de los botones de la barra */
+ion-tab-button {
+  --background: transparent;
+  --color: #94a3b8;
+  --color-selected: rgb(0, 248, 103);
+  font-family: 'Lexend', sans-serif;
+}
+
+ion-tab-button ion-icon {
+  font-size: 22px;
+}
+
+ion-tab-button ion-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Espacio invisible en el centro para dar lugar al botón flotante */
+.empty-tab {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* ==========================================================================
+   🚨 BOTÓN SOS CENTRAL FLOTANTE (.sos-tab-btn)
+   ========================================================================== */
+.sos-tab-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -18px;
+  z-index: 10;
+  --background: transparent;
+  --color-selected: transparent;
+  overflow: visible;
+}
+
+/* Círculo rojo de emergencia */
+.sos-circle {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(135deg, #ff4d4d, #b30000);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #0a0c10;
+}
+
+/* Texto SOS interno */
+.sos-circle-text {
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  z-index: 2;
+}
+
+/* Efecto de pulso en el botón SOS */
+.sos-circle-ripple {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 0, 0, 0.623);
+  animation: sos-pulse 0.8s infinite;
+  z-index: 1;
+}
+
+@keyframes sos-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   💬 INDICADOR DE NOTIFICACIÓN EN FORO
+   ========================================================================== */
+/* Punto rojo para mensajes nuevos */
+ion-tab-button[tab="lista-foros"] span {
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.8);
+}

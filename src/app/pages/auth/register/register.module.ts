@@ -1,12 +1,14 @@
-// src/app/auth/register/register.module.ts
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms'; // ✅
+import { ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule, Routes } from '@angular/router';
+
 import { RegisterPage } from './register.page';
 
+// =========================
+// 🛣️ RUTAS DEL MÓDULO
+// =========================
 const routes: Routes = [
   {
     path: '',
@@ -14,11 +16,16 @@ const routes: Routes = [
   }
 ];
 
+// =========================
+// 📦 MÓDULO REGISTER
+// =========================
 @NgModule({
-  declarations: [RegisterPage],
+  declarations: [
+    RegisterPage
+  ],
   imports: [
     CommonModule,
-    ReactiveFormsModule, // ✅
+    ReactiveFormsModule,
     IonicModule,
     RouterModule.forChild(routes),
   ]

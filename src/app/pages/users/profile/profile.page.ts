@@ -1,10 +1,23 @@
-// src/app/pages/profile/profile.page.ts
-
+// =========================
+// 📦 IMPORTS
+// =========================
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, ToastController, LoadingController, ActionSheetController } from '@ionic/angular';
-import { AuthService, UserData } from 'src/app/core/services/auth.service';
+import {
+  AlertController, ToastController,
+  LoadingController, ActionSheetController
+} from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Firestore, collection, getDocs, deleteDoc, doc } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
+
+import { AuthService, UserData } from 'src/app/core/services/auth.service';
+import { SecurityService } from 'src/app/core/services/security.service';
+import { FotoService } from 'src/app/core/services/foto.service';
+
+// ✅ Agrega el import
+import { ModalController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-profile',
@@ -14,34 +27,71 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 })
 export class ProfilePage implements OnInit {
 
+  // =========================
+  // 🔌 DEPENDENCIAS
+  // =========================
   private authService = inject(AuthService);
+  private security = inject(SecurityService);
+  private fotoService = inject(FotoService);
+  private auth = inject(Auth);
   private router = inject(Router);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
   private actionSheetCtrl = inject(ActionSheetController);
-
-  userData: UserData | null = null;
+  private firestore = inject(Firestore);
   
-  // 🔽 header scroll
+  // ✅ Inyecta ModalController
+  private modalCtrl = inject(ModalController);
+
+  // =========================
+  // 📊 ESTADO
+  // =========================
+  userData: UserData | null = null;
+  favoritos: any[] = [];
+  authReady = false;
   hideHeader = false;
   lastScrollTop = 0;
 
-  // 😊 Opciones de estado de ánimo
+  // =========================
+  // 😊 ESTADOS DE ÁNIMO
+  // =========================
   estados = [
     { label: 'Excelente 😄', value: 'Excelente 😄' },
-    { label: 'Bien 🙂',      value: 'Bien 🙂' },
-    { label: 'Normal 😐',    value: 'Normal 😐' },
-    { label: 'Cansado 😴',   value: 'Cansado 😴' },
+    { label: 'Bien 🙂', value: 'Bien 🙂' },
+    { label: 'Normal 😐', value: 'Normal 😐' },
+    { label: 'Cansado 😴', value: 'Cansado 😴' },
     { label: 'Estresado 😤', value: 'Estresado 😤' },
-    { label: 'Triste 😢',    value: 'Triste 😢' },
+    { label: 'Triste 😢', value: 'Triste 😢' },
   ];
 
+  // =========================
+  // 🚀 INIT
+  // =========================
   async ngOnInit() {
-    this.userData = await this.authService.getCurrentUserData();
+    this.authService.currentUser$.subscribe(async user => {
+      this.authReady = true;
+
+      if (user) {
+        this.userData = await this.authService.getCurrentUserData();
+
+        // ✅ Cargar foto desde localStorage
+        const fotoGuardada = this.fotoService.cargarFoto(user.uid);
+        if (fotoGuardada && this.userData) {
+          this.userData.fotoBase64 = fotoGuardada;
+        }
+
+        await this.loadFavoritos();
+      } else {
+        this.userData = null;
+        this.favoritos = [];
+      }
+    });
   }
 
-  // 📷 SELECCIONAR FOTO (galería o cámara)
+  // =========================
+  // 📷 FOTO DE PERFIL
+  // =========================
   async onChangeFoto() {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Foto de perfil',
@@ -52,15 +102,11 @@ export class ProfilePage implements OnInit {
           handler: () => this.takePicture(CameraSource.Camera)
         },
         {
-          text: 'Elegir de galería',
+          text: 'Galería',
           icon: 'image-outline',
           handler: () => this.takePicture(CameraSource.Photos)
         },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          icon: 'close-outline'
-        }
+        { text: 'Cancelar', role: 'cancel' }
       ]
     });
 
@@ -70,41 +116,161 @@ export class ProfilePage implements OnInit {
   private async takePicture(source: CameraSource) {
     try {
       const image = await Camera.getPhoto({
-        quality: 70,
-        allowEditing: true,
+        quality: 90,           // ✅ Alta calidad inicial, comprimimos después
+        allowEditing: true,    // ✅ Permite ajustar el ángulo antes de confirmar
         resultType: CameraResultType.Base64,
-        source
+        source,
+
+        // ✅ Opciones adicionales para mejor experiencia de edición
+        correctOrientation: true, // ✅ Corrige orientación automáticamente
+        presentationStyle: 'fullscreen', // ✅ Editor en pantalla completa
       });
 
-      if (image.base64String) {
-        const base64 = `data:image/jpeg;base64,${image.base64String}`;
+      if (!image.base64String) return;
 
-        const loading = await this.loadingCtrl.create({ message: 'Guardando foto...' });
-        await loading.present();
+      const base64Original = `data:image/jpeg;base64,${image.base64String}`;
 
-        await this.authService.updateProfile({ fotoBase64: base64 });
+      // ✅ Validar foto
+      const validacion = this.fotoService.validarFoto(base64Original);
+      if (!validacion.valid) {
+        await this.showToast(validacion.message, 'warning');
+        return;
+      }
 
-        // Actualizar localmente
-        if (this.userData) this.userData.fotoBase64 = base64;
+      const loading = await this.loadingCtrl.create({ message: 'Procesando foto...' });
+      await loading.present();
+
+      try {
+        // ✅ Comprimir foto automáticamente
+        const base64Comprimida = await this.fotoService.comprimirFoto(base64Original);
+
+        const uid = this.auth.currentUser?.uid;
+        if (!uid) throw new Error('No autenticado');
+
+        // ✅ Guardar en localStorage (preparado para Firebase Storage)
+        const fotoGuardada = await this.fotoService.guardarFoto(uid, base64Comprimida);
+
+        // ✅ Actualizar referencia en Firestore (solo uid, no el base64)
+        // 🔥 Cuando migres a Storage, guarda aquí la URL de descarga
+        await this.authService.updateProfile({ fotoBase64: fotoGuardada });
+
+        if (this.userData) this.userData.fotoBase64 = fotoGuardada;
 
         await loading.dismiss();
-        await this.showToast('Foto actualizada correctamente', 'success');
+        await this.showToast('Foto actualizada', 'success');
+
+      } catch {
+        await loading.dismiss();
+        await this.showToast('Error al procesar la foto', 'danger');
       }
-    } catch (error) {
-      await this.showToast('No se pudo obtener la foto', 'danger');
+
+    } catch {
+      await this.showToast('Error al obtener la foto', 'danger');
     }
   }
 
-  // ✏️ EDITAR NOMBRE
-  async onEditNombre() {
+  // =========================
+  // ⭐ FAVORITOS
+  // =========================
+  async loadFavoritos() {
+    const user = this.auth.currentUser; // ✅ Usar auth inyectado, no acceso privado
+    if (!user) return;
+
+    try {
+      const ref = collection(this.firestore, `usuarios/${user.uid}/favoritos`);
+      const snap = await getDocs(ref);
+      this.favoritos = snap.docs.map(d => ({ eventoId: d.id, ...d.data() }));
+    } catch {
+      await this.showToast('Error al cargar favoritos', 'danger');
+    }
+  }
+
+  async removeFavorito(eventoId: string) {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    // ✅ Validar eventoId
+    if (!eventoId || !this.security.isSafeText(eventoId, 50)) {
+      await this.showToast('ID de favorito inválido', 'danger');
+      return;
+    }
+
+    try {
+      const ref = doc(this.firestore, `usuarios/${user.uid}/favoritos/${eventoId}`);
+      await deleteDoc(ref);
+      this.favoritos = this.favoritos.filter(f => f.eventoId !== eventoId);
+      await this.showToast('Eliminado de favoritos', 'medium');
+    } catch {
+      await this.showToast('Error al eliminar favorito', 'danger');
+    }
+  }
+
+  verEvento(id: string) {
+    // ✅ Validar ID antes de navegar
+    if (!id || !this.security.isSafeText(id, 50)) return;
+    this.router.navigateByUrl(`/tabs/evento-detalle/${id}`);
+  }
+
+  // =========================
+  // 🚪 AUTH
+  // =========================
+  async onLogout() {
+    await this.authService.logout();
+    this.router.navigateByUrl('/login', { replaceUrl: true });
+  }
+
+  goLogin() { this.router.navigateByUrl('/login'); }
+  goRegister() { this.router.navigateByUrl('/register'); }
+  goHome() { this.router.navigateByUrl('/tabs/home'); }
+
+  // =========================
+  // 😊 ESTADO DE ÁNIMO
+  // =========================
+  async onChangeEstado() {
     const alert = await this.alertCtrl.create({
-      header: 'Editar nombre',
+      header: '¿Cómo te sientes hoy?',
+      inputs: [
+        ...this.estados.map(e => ({
+          type: 'radio' as const,
+          label: e.label,
+          value: e.value,
+          checked: this.userData?.estado === e.value
+        })),
+        {
+          type: 'radio' as const,
+          label: '✏️ Escribir mi propio estado',
+          value: 'custom',
+          checked: this.userData?.estado !== '' &&
+            !this.estados.some(e => e.value === this.userData?.estado)
+        }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Siguiente',
+          handler: async (selected) => {
+            if (!selected) return false;
+            selected === 'custom'
+              ? await this.showCustomEstadoInput()
+              : await this.saveEstado(selected);
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async showCustomEstadoInput() {
+    const alert = await this.alertCtrl.create({
+      header: 'Estado personalizado',
       inputs: [
         {
-          name: 'nombre',
+          name: 'estadoCustom',
           type: 'text',
-          value: this.userData?.nombre || '',
-          placeholder: 'Tu nombre'
+          placeholder: 'Ej: Con energía 💪',
+          attributes: { maxlength: 50 }
         }
       ],
       buttons: [
@@ -112,19 +278,18 @@ export class ProfilePage implements OnInit {
         {
           text: 'Guardar',
           handler: async (data) => {
-            if (!data.nombre || data.nombre.trim().length < 3) {
-              await this.showToast('El nombre debe tener al menos 3 caracteres', 'warning');
+            if (!data.estadoCustom?.trim()) {
+              await this.showToast('Escribe un estado válido', 'warning');
               return false;
             }
 
-            const loading = await this.loadingCtrl.create({ message: 'Guardando...' });
-            await loading.present();
+            // ✅ Validar XSS en estado personalizado
+            if (!this.security.isSafeText(data.estadoCustom, 50)) {
+              await this.showToast('El estado contiene caracteres no permitidos', 'warning');
+              return false;
+            }
 
-            await this.authService.updateProfile({ nombre: data.nombre.trim() });
-            if (this.userData) this.userData.nombre = data.nombre.trim();
-
-            await loading.dismiss();
-            await this.showToast('Nombre actualizado', 'success');
+            await this.saveEstado(this.security.sanitizeInput(data.estadoCustom.trim()));
             return true;
           }
         }
@@ -134,150 +299,214 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-// 😊 CAMBIAR ESTADO DE ÁNIMO
-async onChangeEstado() {
-  const alert = await this.alertCtrl.create({
-    header: '¿Cómo te sientes hoy?',
-    inputs: [
-      // ✅ Opciones predefinidas
-      ...this.estados.map(e => ({
-        type: 'radio' as const,
-        label: e.label,
-        value: e.value,
-        checked: this.userData?.estado === e.value
-      })),
-      // ✅ Opción personalizada
-      {
-        type: 'radio' as const,
-        label: '✏️ Escribir mi propio estado',
-        value: 'custom',
-        checked: this.userData?.estado !== '' &&
-                 !this.estados.some(e => e.value === this.userData?.estado)
+  private async saveEstado(estado: string) {
+    const loading = await this.loadingCtrl.create({ message: 'Guardando estado...' });
+    await loading.present();
+
+    try {
+      await this.authService.updateProfile({ estado });
+      if (this.userData) this.userData.estado = estado;
+      await loading.dismiss();
+      await this.showToast('Estado actualizado', 'success');
+    } catch {
+      await loading.dismiss();
+      await this.showToast('Error al guardar estado', 'danger');
+    }
+  }
+
+  // =========================
+  // ✏️ CAMBIAR NOMBRE
+  // =========================
+  async onEditNombre() {
+    if (!this.userData) return;
+
+    if (this.userData.ultimoCambioNombre) {
+      const diasTranscurridos = Math.floor(
+        (new Date().getTime() - new Date(this.userData.ultimoCambioNombre).getTime())
+        / (1000 * 60 * 60 * 24)
+      );
+      const diasRestantes = 90 - diasTranscurridos;
+
+      if (diasRestantes > 0) {
+        const alert = await this.alertCtrl.create({
+          header: '⏳ Cambio no disponible',
+          message: `Podrás cambiar tu nombre en ${diasRestantes} día(s).`,
+          buttons: ['Entendido']
+        });
+        await alert.present();
+        return;
       }
-    ],
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Siguiente',
-        handler: async (selected) => {
-          if (!selected) return false;
+    }
 
-          if (selected === 'custom') {
-            // Mostrar input para escribir estado personalizado
-            await this.showCustomEstadoInput();
-          } else {
-            await this.saveEstado(selected);
-          }
-          return true;
-        }
-      }
-    ]
-  });
+    // ✅ Rate limiting
+    if (!this.security.checkRateLimit('cambio-nombre', 3, 3600000)) {
+      await this.showToast('Demasiados intentos. Espera 1 hora.', 'warning');
+      return;
+    }
 
-  await alert.present();
-}
+    const advertencia = await this.alertCtrl.create({
+      header: '⚠️ Antes de continuar',
+      message: 'Solo puedes cambiar tu nombre una vez cada 90 días. ¿Deseas continuar?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        { text: 'Continuar', handler: () => this.verificarPreguntaSeguridad() }
+      ]
+    });
 
-// ✏️ Input para estado personalizado
-private async showCustomEstadoInput() {
-  const alert = await this.alertCtrl.create({
-    header: 'Estado personalizado',
-    message: 'Escribe cómo te sientes hoy',
-    inputs: [
-      {
-        name: 'estadoCustom',
-        type: 'text',
-        placeholder: 'Ej: Con mucha energía 💪',
-        value: !this.estados.some(e => e.value === this.userData?.estado)
-               ? this.userData?.estado || ''
-               : '',
-        attributes: { maxlength: 50 }
-      }
-    ],
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Guardar',
-        handler: async (data) => {
-          if (!data.estadoCustom || data.estadoCustom.trim().length === 0) {
-            await this.showToast('Escribe algo para tu estado', 'warning');
-            return false;
-          }
-          await this.saveEstado(data.estadoCustom.trim());
-          return true;
-        }
-      }
-    ]
-  });
+    await advertencia.present();
+  }
 
-  await alert.present();
-}
-
-// 💾 Guardar estado en Firestore
-private async saveEstado(estado: string) {
-  const loading = await this.loadingCtrl.create({ message: 'Guardando estado...' });
-  await loading.present();
-
-  await this.authService.updateProfile({ estado });
-  if (this.userData) this.userData.estado = estado;
-
-  await loading.dismiss();
-  await this.showToast('Estado actualizado', 'success');
-}
-
-  // 🔐 CAMBIAR CONTRASEÑA
-  async onChangePassword() {
+  private async verificarPreguntaSeguridad() {
     const alert = await this.alertCtrl.create({
-      header: 'Cambiar contraseña',
+      header: '🔐 Verificación de seguridad',
+      message: `${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}`,
+      inputs: [
+        { name: 'respuesta', type: 'text', placeholder: 'Tu respuesta de seguridad' }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Siguiente',
+          handler: async (data) => {
+            if (!data.respuesta?.trim()) {
+              await this.showToast('Ingresa tu respuesta de seguridad', 'warning');
+              return false;
+            }
+
+            // ✅ Validar XSS en respuesta
+            if (!this.security.isSafeText(data.respuesta, 100)) {
+              await this.showToast('La respuesta contiene caracteres no permitidos', 'warning');
+              return false;
+            }
+
+            const respuestaIngresada = data.respuesta.toLowerCase().trim();
+            const respuestaGuardada = this.userData?.respuestaSeguridad?.toLowerCase().trim();
+
+            if (respuestaGuardada !== respuestaIngresada) {
+              await this.showToast('La respuesta de seguridad es incorrecta', 'danger');
+              return false;
+            }
+
+            await this.verificarContrasena();
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async verificarContrasena() {
+    const alert = await this.alertCtrl.create({
+      header: '🔑 Confirma tu contraseña',
+      inputs: [
+        { name: 'password', type: 'password', placeholder: 'Tu contraseña actual' }
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Siguiente',
+          handler: async (data) => {
+            if (!data.password) {
+              await this.showToast('Ingresa tu contraseña', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingCtrl.create({ message: 'Verificando...' });
+            await loading.present();
+
+            try {
+              const { EmailAuthProvider, reauthenticateWithCredential } = await import('@angular/fire/auth');
+              const currentUser = this.auth.currentUser;
+              if (!currentUser?.email) throw new Error('No autenticado');
+
+              const credential = EmailAuthProvider.credential(currentUser.email, data.password);
+              await reauthenticateWithCredential(currentUser, credential);
+
+              await loading.dismiss();
+              await this.mostrarFormCambioNombre();
+
+            } catch {
+              await loading.dismiss();
+              await this.showToast('Contraseña incorrecta', 'danger');
+            }
+
+            return true;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async mostrarFormCambioNombre() {
+    const alert = await this.alertCtrl.create({
+      header: '✏️ Cambiar nombre de usuario',
       inputs: [
         {
-          name: 'currentPassword',
-          type: 'password',
-          placeholder: 'Contraseña actual'
-        },
-        {
-          name: 'newPassword',
-          type: 'password',
-          placeholder: 'Nueva contraseña (mín. 6 caracteres)'
-        },
-        {
-          name: 'confirmPassword',
-          type: 'password',
-          placeholder: 'Confirmar nueva contraseña'
+          name: 'nombre',
+          type: 'text',
+          value: this.userData?.nombre || '',
+          placeholder: 'Nuevo nombre de usuario',
+          attributes: { maxlength: 30 }
         }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
-          text: 'Cambiar',
+          text: 'Guardar',
           handler: async (data) => {
-            if (!data.currentPassword || !data.newPassword || !data.confirmPassword) {
-              await this.showToast('Completa todos los campos', 'warning');
+            const nuevoNombre = data.nombre?.trim();
+
+            if (!nuevoNombre || nuevoNombre.length < 3) {
+              await this.showToast('El nombre debe tener mínimo 3 caracteres', 'warning');
               return false;
             }
 
-            if (data.newPassword.length < 6) {
-              await this.showToast('La contraseña debe tener mínimo 6 caracteres', 'warning');
+            // ✅ Validar nombre seguro
+            if (!this.security.isValidNombre(nuevoNombre)) {
+              await this.showToast('El nombre solo puede contener letras y espacios', 'warning');
               return false;
             }
 
-            if (data.newPassword !== data.confirmPassword) {
-              await this.showToast('Las contraseñas no coinciden', 'warning');
+            if (nuevoNombre === this.userData?.nombre) {
+              await this.showToast('El nombre es igual al actual', 'warning');
               return false;
             }
 
-            const loading = await this.loadingCtrl.create({ message: 'Actualizando contraseña...' });
+            const loading = await this.loadingCtrl.create({ message: 'Verificando disponibilidad...' });
             await loading.present();
 
             try {
-              await this.authService.changePassword(data.currentPassword, data.newPassword);
+              const disponible = await this.authService.isNombreDisponible(nuevoNombre);
+
+              if (!disponible) {
+                await loading.dismiss();
+                await this.showToast('Este nombre ya está en uso', 'danger');
+                return false;
+              }
+
+              // ✅ Sanitizar antes de guardar
+              const nombreSeguro = this.security.sanitizeInput(nuevoNombre);
+
+              await this.authService.updateProfile({
+                nombre: nombreSeguro,
+                ultimoCambioNombre: new Date().toISOString()
+              });
+
+              if (this.userData) {
+                this.userData.nombre = nombreSeguro;
+                this.userData.ultimoCambioNombre = new Date().toISOString();
+              }
+
               await loading.dismiss();
-              await this.showToast('Contraseña actualizada correctamente', 'success');
-            } catch (error: any) {
+              await this.showToast('Nombre actualizado correctamente', 'success');
+
+            } catch {
               await loading.dismiss();
-              const msg = error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential'
-                ? 'La contraseña actual es incorrecta'
-                : 'Error al cambiar la contraseña';
-              await this.showToast(msg, 'danger');
+              await this.showToast('Error al actualizar el nombre', 'danger');
             }
 
             return true;
@@ -289,126 +518,34 @@ private async saveEstado(estado: string) {
     await alert.present();
   }
 
-  // 🚪 CERRAR SESIÓN
-  async onLogout() {
-    const alert = await this.alertCtrl.create({
-      header: 'Cerrar sesión',
-      message: '¿Estás seguro que deseas cerrar sesión?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Cerrar sesión',
-          handler: async () => {
-            await this.authService.logout();
-            this.router.navigateByUrl('/login', { replaceUrl: true });
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+  getDiasRestantesCambioNombre(): number {
+    if (!this.userData?.ultimoCambioNombre) return 0;
+    const diasTranscurridos = Math.floor(
+      (new Date().getTime() - new Date(this.userData.ultimoCambioNombre).getTime())
+      / (1000 * 60 * 60 * 24)
+    );
+    return Math.max(0, 90 - diasTranscurridos);
   }
 
-  // 🍞 Toast helper
+  // =========================
+  // 📜 SCROLL
+  // =========================
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+    this.hideHeader = scrollTop > this.lastScrollTop && scrollTop > 50;
+    this.lastScrollTop = scrollTop;
+  }
+
+  // =========================
+  // 🍞 TOAST
+  // =========================
   private async showToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,
-      duration: 2500,
+      duration: 2000,
       color,
       position: 'bottom'
     });
     await toast.present();
-  }
-
-  // 🗑️ ELIMINAR CUENTA
-async onDeleteAccount() {
-
-  // Paso 1 - Advertencia inicial
-  const confirmAlert = await this.alertCtrl.create({
-    header: '⚠️ Eliminar cuenta',
-    message: 'Esta acción es irreversible. Se eliminarán todos tus datos permanentemente. ¿Deseas continuar?',
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Continuar',
-        role: 'confirm',
-        handler: () => this.showDeleteVerification()
-      }
-    ]
-  });
-
-  await confirmAlert.present();
-}
-
-// Paso 2 - Verificación con pregunta de seguridad y contraseña
-private async showDeleteVerification() {
-  const alert = await this.alertCtrl.create({
-    header: 'Verificación de seguridad',
-    message: `${this.userData?.preguntaSeguridad}`,
-    inputs: [
-      {
-        name: 'respuesta',
-        type: 'text',
-        placeholder: 'Tu respuesta de seguridad',
-      },
-      {
-        name: 'password',
-        type: 'password',
-        placeholder: 'Tu contraseña actual',
-      }
-    ],
-    buttons: [
-      { text: 'Cancelar', role: 'cancel' },
-      {
-        text: 'Eliminar cuenta',
-        handler: async (data) => {
-          if (!data.respuesta || !data.password) {
-            await this.showToast('Completa todos los campos', 'warning');
-            return false;
-          }
-
-          const loading = await this.loadingCtrl.create({ message: 'Eliminando cuenta...' });
-          await loading.present();
-
-          try {
-            await this.authService.deleteAccount(data.password, data.respuesta);
-            await loading.dismiss();
-            await this.showToast('Cuenta eliminada correctamente', 'success');
-            this.router.navigateByUrl('/login', { replaceUrl: true });
-
-          } catch (error: any) {
-            await loading.dismiss();
-
-            const messages: Record<string, string> = {
-              'respuesta-incorrecta': 'La respuesta de seguridad es incorrecta.',
-              'auth/wrong-password': 'La contraseña es incorrecta.',
-              'auth/invalid-credential': 'Las credenciales son inválidas.',
-              'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.',
-            };
-
-            const msg = messages[error.message] || messages[error.code] || 'Error al eliminar la cuenta.';
-            await this.showToast(msg, 'danger');
-          }
-
-          return true;
-        }
-      }
-    ]
-  });
-
-  await alert.present();
-}
-
-  // 👇 scroll header
-  onScroll(event: any) {
-    const scrollTop = event.detail.scrollTop;
-
-    if (scrollTop > this.lastScrollTop && scrollTop > 50) {
-      this.hideHeader = true;
-    } else {
-      this.hideHeader = false;
-    }
-
-    this.lastScrollTop = scrollTop;
   }
 }

@@ -1,116 +1,127 @@
-/* =========================================================
-   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
-   ========================================================= */
-
-/* toolbar transparente total */
-.transparent-toolbar {
-  --background: transparent !important;
-  --border-width: 0 !important;
-  --box-shadow: none !important;
-   --padding-start: 15px;
-  --padding-end: 15px;
-}
-
-/* header oculto sin dejar rastro */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 👇 CLAVE: evita fondo negro del header container */
-ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-}
-
-ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* verde bosque */
-}
-/* =========================================================
-   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
-   ========================================================= */
-
-ion-header {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-}
-
-/* toolbar sin elevación (clave real en Ionic) */
-ion-toolbar {
-  --box-shadow: none !important;
-  box-shadow: none !important;
-  --border-width: 0 !important;
-}
-
-/* asegura que botones no se muevan */
-ion-buttons {
-  z-index: 2;
-}
-
-/* =========================================================
-   👀 OCULTAR HEADER CON SCROLL
-   ========================================================= */
-
-ion-header {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* estado oculto */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-//-----------------------------------------------//
-
-/* 🌄 Fondo trekking global */
+/* Fondo general con la imagen visible pero oscura */
 ion-content {
-  --background: none;
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.65),
-      rgba(0, 0, 0, 0.75)
-    ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
-
-  color: #fff;
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)),
+                url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
+  font-family: 'Lexend', sans-serif;
+  --color: #e2e8f0;
 }
 
-/* 🧭 HEADER */
-ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85); /* verde bosque */
-  --color: #fff;
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
+   ========================================================================== */
+/* para esconder la barra */
+   ion-header {
+  transition: transform 0.3s ease-in-out;
+}
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+ion-header.hidden {
+  transform: translateY(-100%);
+}
+/* inicio */
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Totalmente sólido */
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border-bottom: 1px solid var(--glass-border);
+}
+/* Grosor del titulo */
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
+}
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* color y tamaño (inicio - usuario y salir) */
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103);  /* color iconos*/
+  font-size: 1rem;
 }
 
 
-/* 🏠 CONTENEDOR GENERAL */
+/* ==========================================================================
+   Contenedor principal (afecta todo)
+   ========================================================================== */
+.welcome-container {
+  margin: 40px 16px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* Texto bienvenido...*/
+.welcome-header {
+  text-align: left;
+  background: transparent;
+  padding: 0;
+}
+/* letra ¡Hola, (USUARIO)!*/
+.welcome-header h1 {
+  margin: 0;
+  font-size: 28px; /* tamaño letra HOLA*/
+  font-weight: 900; /* grosor letra HOLA*/
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   📊 TEXTO CONTENEDOR CLIMA 
+   ========================================================= */
+.weather-info div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+/* =========================
+   🌡️ TEMPERATURA
+========================= */
+.temp {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* =========================
+   ☁️ DESCRIPCIÓN
+========================= */
+.desc {
+  font-size: 11px;
+  color: #cbd5f5;
+  text-transform: capitalize;
+}
+
+/* =========================
+   📍 UBICACIÓN
+========================= */
+.location {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+/* =========================================================
+   👋 BIENVENIDA
+   ========================================================= */
+
 .welcome-container {
   margin: 15px;
 }
 
-/* 👋 HEADER DE BIENVENIDA */
 .welcome-header {
-  margin-top: 65px;
-  text-align: center;
+  margin-top: 15px;
   margin-bottom: 20px;
   padding: 20px;
+  text-align: center;
 
-  background: rgba(34, 49, 34, 0.55);
+  background: #14191f;
+  border-radius: 20px;
+
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 
-  border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 
   .avatar-icon {
     font-size: 80px;
-    color: #a3d977; /* verde trekking */
+    color: #a3d977;
   }
 
   h1 {
@@ -120,66 +131,182 @@ ion-header ion-toolbar {
   }
 }
 
-
-
-ion-list {
-  background: rgba(34, 49, 34, 0.55) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  border-radius: 16px;
-  padding: 10px;
+.avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
 }
 
-ion-item ion-icon {
-  color: rgb(0, 188, 9) !important; /* verde oscuro */
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* 🏷️ BADGE */
-ion-badge {
-  margin-top: 8px;
-  font-weight: bold;
-}
-
-/* 🪵 CARD PRINCIPAL */
-ion-card {
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-  color: #fff;
-}
-
-/* 🧾 LISTA */
-ion-item {
-  --background: transparent;
-  --color: #fff;
-}
-
-/* 📄 textos dentro */
-ion-label p {
+.avatar-icon {
+  font-size: 150px;
   color: #c7f9cc;
-  font-size: 0.8rem;
 }
 
-ion-label h3 {
+.avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 35%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: 0.3s ease;
+}
+
+
+.avatar-wrapper:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.avatar-overlay ion-icon {
   color: #fff;
-  font-weight: 600;
+  font-size: 22px;
 }
 
-/* 🎯 ICONOS */
-ion-icon {
-  color: #a3d977;
-}
-
-/* ⏳ SKELETON */
-ion-skeleton-text {
-  --background: rgba(255, 255, 255, 0.1);
-  --background-rgb: 255, 255, 255;
+/* ==========================================================================
+   🌤️ WIDGET CLIMA
+   ========================================================================== */
+.weather-chip {
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  display: block;
+  height: auto;
 }
 
 /**/
+
+
+
+/* ==========================================================================
+   💡 APARTADO CONSEJOS
+   ========================================================================== */
+   .consejo-card {
+  background: #14191f;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--accent-lime);
+  border-radius: 12px;
+  box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.9);
+  --color: rgb(221, 220, 220); /* color letras*/
+}
+
+/* ==========================================================================
+   🩺 & 🏕️ APARTADOS KITS DE EMERGENCIA (100% SÓLIDOS)
+   ========================================================================== */
+/* CARD afecta ambas 🩺 y 🏕️*/
+.kit-card1 {
+  background: #14191f;
+  border-radius: 12px;
+  padding: 16px; /* relleno a los lados (centra todo lo que tien dentro del contenedor)*/
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* sombra y su color */
+  border-radius: 5px; /* redondeo del borde*/
+  --color: rgb(221, 220, 220); /* color letras*/
+  border-left: 6px solid #ff6b4a; 
+}
+
+.kit-card2 {
+  background: #14191f;
+  border-radius: 12px;
+  padding: 16px; /* relleno a los lados (centra todo lo que tien dentro del contenedor)*/
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* sombra y su color */
+  border-radius: 5px; /* redondeo del borde*/
+  --color: rgb(221, 220, 220); /* color letras*/
+  border-left: 6px solid rgb(50, 255, 126); 
+}
+
+
+/* CHIPS INTERNOS (🩺 Kit de Primeros Auxilios Trekking) */
+.kit-pa ion-chip {
+  background: #1a2535;
+  --color: #ff6b4a;  /* color letras*/
+  border: 1px solid rgba(255, 77, 0, 0.705);
+}
+/* CHIPS INTERNOS (🏕️ Kit de Supervivencia) */
+.kit-sup ion-chip {
+  background: #1a2535;
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border: 1px solid rgba(50, 255, 126, 0.4);
+  
+}
+
+/* ==========================================================================
+   🔘 BOTONES DE ACCIÓN TOTALMENTE REPARADOS
+   ========================================================================== */
+
+/* 1. Botón + CREAR EVENTO */
+.btn-crear-evento {
+  --background: #14191f; 
+  background: #14191f; /* Ahora es un bloque sólido, no transparente */
+  --color: rgb(0, 248, 103); /* color letras*/
+  --border-color: rgb(0, 248, 103);
+  box-shadow: var(--neon-lime-glow);
+  border: 1px solid rgba(50, 255, 126, 0.4);
+  border-radius: 5px;
+}
+
+/* 2. Botón IR AL MAPA */
+.map-btn {
+  --background: #14191f; 
+  background: #14191f; /* Ahora es un bloque sólido, no transparente */
+  --color: rgb(0, 248, 103); /* color letras*/
+  --border-color: rgb(0, 248, 103);
+  box-shadow: var(--neon-lime-glow);
+  border: 1px solid rgba(50, 255, 126, 0.4);
+  border-radius: 5px;
+}
+
+/* 3. Botón MANUAL DE EMERGENCIA */
+ion-button[fill="outline"], 
+.welcome-container ion-button[fill="outline"] {
+  --background: #14191f; /* Fondo oscuro sólido */
+  background: #14191f; /* Respaldo para el fondo */
+  --border-width: 0px;
+  --color: rgb(255, 70, 70);  /* color letras*/
+  border: 2px solid rgb(255, 70, 70);
+  border-radius: 5px;
+}
+
+.welcome-header .avatar-icon {
+  font-size: 70px; /* Tamaño amplio del icono principal de entrada */
+  color: rgb(0, 248, 103); /* Color neón en la cabecera sin usuario */
+  margin-bottom: 12px; /* Espacio antes del título 'Bienvenido' */
+}
+
+/* Botón Iniciar Sesión */
+.btn-login {
+  --background: #14191f; /* Fondo oscuro sólido */
+  background: #14191f; /* Respaldo para el fondo */
+  --color: rgb(0, 248, 103); /* Texto neón */
+  border: 2px solid rgb(0, 248, 103); /* Borde verde brillante */
+  border-radius: 6px; /* Redondeo moderado */
+  font-weight: 700; /* Texto grueso */
+  margin-bottom: 12px; /* Separación con el botón inferior */
+}
+
+
+
+
+
+
+
+
+
+
 
 

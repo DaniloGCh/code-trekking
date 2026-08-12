@@ -1,0 +1,143 @@
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Aplica una capa oscura transparente sobre la imagen de fondo */
+  font-family: 'Lexend', sans-serif; /* Define la tipografía principal */
+  --color: #e2e8f0; /* Establece el color de texto general */
+}
+
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN SUPERIOR
+   ========================================================================== */
+ion-header.header-glass {
+  background: transparent; /* Fondo transparente para permitir ver la barra */
+}
+
+ion-toolbar.toolbar-glass {
+  --background: #0a0c10; /* Fondo oscuro sólido en la barra superior */
+  --color: rgb(0, 248, 103); /* Color de texto en verde neón */
+}
+
+ion-title {
+  font-weight: 900; /* Grosor máximo de la letra */
+  text-transform: uppercase; /* Convierte el título a mayúsculas */
+  letter-spacing: -0.02em; /* Comprime ligeramente las letras */
+  font-size: 0.8rem; /* Tamaño de fuente estándar */
+}
+
+/* Botón Cerrar en el Header */
+ion-buttons slot[name="end"] ion-button,
+ion-buttons[slot="end"] ion-button {
+  --color: rgb(0, 248, 103); /* Color del texto del botón cerrar en verde neón */
+  font-weight: 700; /* Texto en negrita */
+  font-size: 0.95rem; /* Tamaño de fuente adecuado */
+}
+
+/* ==========================================================================
+   ⏳ ESTADOS DE CARGA Y SIN DATOS
+   ========================================================================== */
+/* Spinner y mensaje de cargando */
+.ion-text-center ion-spinner {
+  color: rgb(0, 248, 103); /* Spinner giratorio en color verde neón */
+  width: 48px; /* Ancho del icono de carga */
+  height: 48px; /* Alto del icono de carga */
+  margin-top: 40px; /* Separación superior */
+}
+
+.ion-text-center p {
+  color: #94a3b8; /* Color de texto en gris claro */
+  font-size: 0.95rem; /* Tamaño de letra compacto */
+  margin-top: 12px; /* Separación respecto al spinner */
+}
+
+/* ==========================================================================
+   📖 CONTENEDOR PRINCIPAL DEL PASO (TARJETA PASO A PASO)
+   ========================================================================== */
+.step-container {
+  background: #14191f; /* Fondo oscuro idéntico a las tarjetas del sistema */
+  border-radius: 16px; /* Bordes suavemente redondeados */
+  border: 2px solid rgb(0, 248, 103); /* Borde con brillo neón tenue */
+  padding: 28px 20px; /* Espaciado interno generoso */
+  margin: 20px auto; /* Centrado con margen vertical */
+  max-width: 500px; /* Ancho máximo para evitar deformaciones */
+  display: flex; /* Activa la disposición en flexbox */
+  flex-direction: column; /* Apila el contenido verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
+  text-align: center; /* Alinea los textos al centro */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); /* Sombra intensa para dar relieve */
+}
+
+/* Emoji / Icono del Paso */
+.step-container .icon {
+  font-size: 64px; /* Tamaño grande para destacar el emoji/icono */
+  margin-bottom: 12px; /* Espacio inferior respecto al número del paso */
+  line-height: 1; /* Altura de línea ajustada para evitar desfases */
+}
+
+/* Etiqueta del Número de Paso (Ej: Paso 1) */
+.step-container h2 {
+  margin: 0; /* Elimina márgenes por defecto */
+  font-size: 0.85rem; /* Tamaño compacto */
+  font-weight: 800; /* Negrita pronunciada */
+  color: rgb(0, 248, 103); /* Texto en verde neón */
+  text-transform: uppercase; /* Convertido a mayúsculas */
+  letter-spacing: 1.5px; /* Espaciado amplio entre caracteres */
+  background: rgba(0, 48, 20, 0.301); /* Fondo translúcido verde */
+  padding: 6px 14px; /* Relleno para simular una etiqueta tipo badge */
+  border-radius: 20px; /* Esquinas totalmente redondeadas */
+  border: 1px solid rgba(0, 248, 103, 0.2); /* Borde sutil del badge */
+}
+
+/* Título del Paso */
+.step-container h3 {
+  margin: 16px 0 12px 0; /* Margen superior e inferior */
+  font-size: 1.35rem; /* Tamaño de fuente destacado */
+  font-weight: 700; /* Texto en negrita */
+  color: #ffffff; /* Texto en blanco puro */
+  line-height: 1.3; /* Interlineado cómodo */
+}
+
+/* Descripión del Paso */
+.step-container p {
+  margin: 0; /* Elimina márgenes extra */
+  font-size: 0.95rem; /* Tamaño estándar legible */
+  color: #cbd5f5; /* Texto claro con tinte azulino suave */
+  line-height: 1.6; /* Interlineado amplio para facilitar lectura */
+}
+
+/* ==========================================================================
+   🦶 NAVEGACIÓN INFERIOR (FOOTER)
+   ========================================================================== */
+ion-footer {
+  background: transparent; /* Mantiene el fondo limpio */
+}
+
+ion-toolbar.footer-glass {
+  --background: #0a0c10; /* Fondo sólido oscuro alineado al header */
+  --color: #ffffff; /* Texto claro general */
+  border-top: 1px solid rgba(255, 255, 255, 0.08); /* Línea divisoria en la parte superior */
+  padding: 4px 8px; /* Espaciado interno horizontal */
+}
+
+/* Contador Central (ej: 1 / 5) */
+ion-footer ion-title {
+  font-size: 0.95rem; /* Tamaño de fuente moderado */
+  font-weight: 700; /* Texto en negrita */
+  color: #cbd5f5; /* Color claro para la numeración */
+}
+
+/* Botones Anterior y Siguiente */
+ion-footer ion-button {
+  --color: rgb(0, 248, 103); /* Texto de navegación en verde neón */
+  font-weight: 700; /* Negrita */
+  font-size: 0.9rem; /* Tamaño del texto de los botones */
+  --padding-start: 12px; /* Relleno inicial del botón */
+  --padding-end: 12px; /* Relleno final del botón */
+}
+
+/* Estado Deshabilitado de Botones (Cuando no se puede ir más atrás o adelante) */
+ion-footer ion-button[disabled] {
+  opacity: 0.35; /* Opacidad reducida cuando el botón está inactivo */
+  --color: #94a3b8; /* Cambia a gris el color en estado deshabilitado */
+}

@@ -1,0 +1,220 @@
+/* ==========================================================================
+   🌄 CONTENEDOR PRINCIPAL & FONDO GENERAL
+   ========================================================================== */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)),
+                url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
+  font-family: 'Lexend', sans-serif;
+
+}
+
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
+   ========================================================================== */
+/* para latransicion (movimiento) de la barra */
+ion-header {
+  transition: transform 0.3s ease-in-out;
+}
+/* para esconder la barra */
+ion-header.hidden {
+  transform: translateY(-100%);
+}
+/* Eventos Trekking */
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Totalmente sólido */
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border-bottom: 1px solid var(--glass-border);
+}
+/* Grosor del titulo */
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
+}
+/* color y tamaño (inicio - usuario y salir) */
+ion-buttons ion-button {
+  --color: var(--accent-lime);
+  font-size: 1.2rem;
+  font-size: 1rem;
+}
+
+
+/* ==========================================================================
+   🚫 ESTADO VACÍO (NO HAY EVENTOS)
+   ========================================================================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  margin: 30px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.9);
+}
+/* Texto: No tienes eventos aún*/
+.empty-state ion-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+}
+
+/* Texto: No tienes eventos aún*/
+.empty-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+/* Texto: Crea un evento o únete con un código de invitación...*/
+.empty-state p {
+  font-size: 13px;
+  margin: 0 0 20px 0;
+}
+
+/* ==========================================================================
+   📋 TARJETAS DE EVENTOS
+   ========================================================================== */
+  /* tarjeta completa*/
+  .evento-card {
+  background: var(--surface-command);
+  margin: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  border-left: 4px solid var(--accent-lime);
+  box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.9);
+  background: #14191f; /* Ahora es un bloque sólido, no transparente */
+}
+/*espacio entre las tarjetas*/
+.evento-card.first-space {
+  margin-top: 20px;
+}
+
+/* padding de la tarjeta */
+ion-card-header {
+  padding: 16px 16px 8px 16px;
+}
+/* dificultad del evento baja/ baja-media / alta */
+.evento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+/* Titulo de la tarjeta */
+ion-card-title {
+  --color: rgb(255, 255, 255);  /* color letras*/
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+/* subtitulo, ubicacion en la tarjeta */
+ion-card-subtitle {
+  --color: rgb(255, 255, 255);  /* color letras*/
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Icono, ubicacion en la tarjeta */
+ion-card-subtitle ion-icon {
+  font-size: 20px;
+  color: var(--accent-lime);
+}
+
+/* Badge de Dificultad */
+ion-badge {
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+/* ==========================================================================
+   📦 CONTENIDO Y DETALLES DE TARJETA
+   ========================================================================== */
+/* padding de contenido del evento */
+   ion-card-content {
+  padding: 0px 16px 16px 16px;
+}
+/* color de proximo evento */
+.proximo-evento{
+  color: #007bff; 
+  font-weight: bold;
+}
+/* para fondo de proximo evento */
+ion-list {
+  background: #14191f; /* Ahora es un bloque sólido, no transparente */
+}
+/* Letras fecha - participante - msnm */
+ion-item {
+  --background: transparent;
+  --color: rgb(221, 220, 220);
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --min-height: 36px;
+  font-size: 13px;
+}
+/* iconos color y tamaño fecha - participante - msnm */
+ion-item ion-icon {
+  color: #007bff; 
+  font-size: 20px;
+  margin-right: 12px;
+}
+/* ==========================================================================
+   🎮 BOTONES Y ACCIONES DEL EVENTO
+   ========================================================================== */
+/* botones juntos: ver detale, eliminar y estrella */
+.evento-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: -5px;
+  padding-top: -5px;
+  border-top: 1px solid var(--glass-border);
+}
+
+/* Botón Ver Detalle */
+.btn-ver-detalle-evento {
+  --background: var(--surface-command);
+  background: var(--surface-command);
+  --color: rgb(0, 248, 103);  /* color letras*/
+  --border-color: rgba(0, 255, 94, 0.4);
+  --border-width: 2px;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+/* Botón Eliminar Evento */
+.btn-eliminar-evento {
+  --background: var(--surface-command);
+  background: var(--surface-command);
+  --color: rgb(255, 70, 70);
+  --border-color: rgb(121, 29, 29);
+  --border-width: 2px;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+/* Botón Favoritos (Estrella) */
+ion-button[fill="clear"] {
+  --padding-start: -15px;
+  --padding-end: 8px;
+  font-size: 18px;
+}
+
+/* Botón General Crear Evento (Estado Vacío) */
+.btn-crear-evento {
+  --background: #14191f;
+  --color: rgb(0, 248, 103);  /* color letras*/
+  box-shadow: 0 10px 6px -6px rgba(0, 0, 0, 0.9);
+  border: 2px solid rgb(0, 248, 103);
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: 900;
+}

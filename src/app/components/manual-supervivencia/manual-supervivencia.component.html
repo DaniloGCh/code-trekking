@@ -1,0 +1,62 @@
+<ion-header class="header-glass">
+  <ion-toolbar class="toolbar-glass">
+    <ion-title>Manual de Supervivencia</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+
+<ion-content class="ion-padding">
+
+  <!-- LOADING -->
+  <div *ngIf="cargando" class="ion-text-center">
+    <ion-spinner></ion-spinner>
+    <p>Cargando manual...</p>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div *ngIf="!cargando && pasos.length > 0" class="step-container">
+
+    <div class="icon">
+      {{ pasos[pasoActual].icono }}
+    </div>
+
+    <h2>Paso {{ pasoActual + 1 }}</h2>
+
+    <h3>{{ pasos[pasoActual].titulo }}</h3>
+
+    <p>{{ pasos[pasoActual].descripcion }}</p>
+
+  </div>
+
+  <!-- SIN DATOS -->
+  <div *ngIf="!cargando && pasos.length === 0" class="ion-text-center">
+    <p>No hay pasos en el manual</p>
+  </div>
+
+</ion-content>
+
+<ion-footer *ngIf="!cargando && pasos.length > 0">
+  <ion-toolbar class="footer-glass">
+
+    <ion-buttons slot="start">
+      <ion-button (click)="anterior()" [disabled]="pasoActual === 0">
+        Anterior
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title class="ion-text-center">
+      {{ pasoActual + 1 }} / {{ pasos.length }}
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="siguiente()" [disabled]="pasoActual === pasos.length - 1">
+        Siguiente
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-footer>

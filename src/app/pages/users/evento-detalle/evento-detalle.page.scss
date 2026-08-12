@@ -1,0 +1,341 @@
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Fondo espacial translúcido */
+  font-family: 'Lexend', sans-serif; /* Tipografía principal del sistema */
+  --color: #e2e8f0; /* Color de texto base */
+}
+
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN
+   ========================================================================== */
+ion-header {
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Animación de scroll */
+}
+
+ion-header.hidden {
+  transform: translateY(-100%); /* Oculta el header desplazándolo hacia arriba */
+  opacity: 0; /* Oculta por opacidad */
+}
+
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Fondo oscuro sólido para el header */
+  --color: rgb(0, 248, 103); /* Título principal en verde neón */
+}
+
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103); /* Botones de acción en verde neón */
+}
+
+ion-title {
+  font-weight: 900; /* Texto en negrita máxima */
+  text-transform: uppercase; /* Mayúsculas */
+  letter-spacing: -0.02em; /* Comprime ligeramente el texto */
+  font-size: 1.1rem; /* Tamaño de fuente del título */
+}
+
+/* ==========================================================================
+   🏷️ CABECERA DEL EVENTO (TÍTULO Y DIFICULTAD)
+   ========================================================================== */
+.evento-header {
+  padding: 20px 16px 10px 16px; /* Relleno superior e inferior */
+  text-align: center; /* Centra el contenido horizontalmente */
+  flex-direction: column; /* Organiza elementos en columna */
+  align-items: flex-start; /* Alinea al inicio a la izquierda */
+  gap: 8px; /* Espacio entre título y badge */
+
+}
+
+.evento-header h1 {
+  font-size: 1.6rem; /* Tamaño de fuente destacado para el título */
+  font-weight: 900; /* Texto en negrita sólida */
+  color: #ffffff; /* Texto en blanco */
+  margin: 0; /* Elimina margen por defecto */
+  line-height: 1.2; /* Interlineado compacto */
+  letter-spacing: -0.01em; /* Comprime el espaciado de letras */
+}
+
+ion-badge {
+  font-weight: 700; /* Texto en negrita para la insignia */
+  padding: 6px 12px; /* Relleno interno */
+  border-radius: 6px; /* Bordes suaves */
+  font-size: 0.75rem; /* Tamaño compacto */
+  letter-spacing: 0.5px; /* Espaciado sutil de texto */
+  text-transform: uppercase; /* Mayúsculas */
+}
+
+.badge-lugar{
+  margin-top: 10px; /* Espacio superior para separar del título */
+}
+
+/* ==========================================================================
+   📦 TARJETAS GENERALES (ION-CARD)
+   ========================================================================== */
+ion-card {
+  background: #14191f !important; /* Fondo de tarjetas consistente con el tema */
+  border-radius: 14px; /* Bordes redondeados */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Borde translúcido tenue */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Proyecta sombra para dar volumen */
+  margin: 0 14px 16px 14px; /* Margen lateral e inferior */
+}
+
+ion-card-header {
+  padding: 16px 16px 8px 16px; /* Relleno del encabezado de la tarjeta */
+}
+
+ion-card-title {
+  color: #ffffff !important; /* Título de la tarjeta en blanco */
+  font-size: 1.1rem !important; /* Tamaño de fuente del título de la tarjeta */
+  font-weight: 800 !important; /* Texto en negrita */
+  display: flex; /* Flexbox para alineación */
+  align-items: center; /* Alinea icono y texto al centro */
+  gap: 8px; /* Espacio entre icono y texto */
+}
+
+ion-card-title ion-icon {
+  color: rgb(0, 248, 103) !important; /* Icono del título en verde neón */
+  font-size: 1.25rem; /* Tamaño del icono */
+}
+
+ion-card-subtitle {
+  color: #94a3b8 !important; /* Subtítulo en gris claro */
+  font-size: 0.85rem !important; /* Tamaño compacto */
+  margin-top: 4px; /* Margen superior */
+}
+
+/* Relleno interno de listas dentro de tarjetas */
+ion-card-content {
+  padding: 8px 16px 16px 16px; /* Relleno interno del contenido */
+}
+
+/* ==========================================================================
+   🔑 CÓDIGO DE INVITACIÓN
+   ========================================================================== */
+.codigo-card {
+  border: 1px dashed rgba(0, 248, 103, 0.4); /* Borde punteado en verde neón */
+}
+
+.codigo-container {
+  display: flex; /* Flexbox horizontal */
+  align-items: center; /* Centrado vertical */
+  justify-content: space-between; /* Distribuye espacio entre código y botones */
+  background: #0a0c10; /* Fondo oscuro profundo */
+  padding: 8px 14px; /* Relleno del contenedor del código */
+  border-radius: 10px; /* Bordes redondeados */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Borde fino decorativo */
+  margin-bottom: 10px; /* Separación inferior */
+}
+
+.codigo-text {
+  font-family: monospace; /* Tipografía estilo código */
+  font-size: 1.2rem; /* Tamaño de texto de código */
+  font-weight: 800; /* Texto en negrita */
+  letter-spacing: 2px; /* Espaciado amplio entre caracteres */
+  color: rgb(0, 248, 103); /* Texto en verde neón */
+}
+
+.codigo-actions {
+  display: flex; /* Iconos de acción horizontal */
+  gap: 0px; /* Sin espacios entre los botones de ícono */
+}
+
+.codigo-actions ion-button {
+  --color: #94a3b8; /* Iconos de acción en gris */
+  height: 32px; /* Altura ajustada */
+}
+
+.codigo-actions ion-button:hover {
+  --color: rgb(0, 248, 103); /* Cambia a verde neón al interactuar */
+}
+
+.codigo-aviso {
+  display: flex; /* Centrado de ícono y texto de aviso */
+  align-items: center; /* Centrado vertical */
+  justify-content: center; /* Centrado horizontal */
+  gap: 6px; /* Espacio entre icono y texto */
+  font-size: 0.8rem; /* Tamaño de letra compacto */
+  color: #94a3b8; /* Texto gris secundario */
+  margin: 6px 0 12px 0; /* Márgenes del párrafo de aviso */
+}
+
+.btn-compartir {
+  --background: rgb(0, 248, 103); /* Fondo verde neón principal */
+  --color: #0a0c10; /* Texto oscuro para legibilidad contrastada */
+  --border-radius: 8px; /* Bordes redondeados */
+  font-weight: 800; /* Texto en negrita */
+  margin: 0; /* Elimina márgenes extra */
+}
+
+/* ==========================================================================
+   📑 LISTAS Y ÍTEMS DE INFORMACIÓN
+   ========================================================================== */
+ion-list {
+  background: transparent !important; /* Limpia fondo por defecto */
+  padding: 0; /* Elimina padding general */
+}
+
+ion-item {
+  --background: transparent; /* Permite ver el fondo de la tarjeta */
+  --color: #ffffff; /* Texto en blanco */
+  --padding-start: 0; /* Sin relleno a la izquierda */
+  --inner-padding-end: 0; /* Sin relleno a la derecha */
+  margin-bottom: 10px; /* Separación entre filas de información */
+}
+
+ion-item ion-icon[slot="start"] {
+  font-size: 1.25rem; /* Tamaño del icono a la izquierda */
+  color: rgb(0, 248, 103); /* Icono por defecto en verde neón */
+  margin-end: 12px; /* Espacio entre el icono y la etiqueta */
+}
+
+ion-item ion-label p {
+  color: #94a3b8 !important; /* Color gris para el título del dato */
+  font-size: 0.8rem !important; /* Tamaño compacto */
+  margin-bottom: 2px !important; /* Espacio antes del dato principal */
+}
+
+ion-item ion-label h3 {
+  color: #ffffff !important; /* Valor principal en blanco */
+  font-size: 0.95rem !important; /* Tamaño claro para lectura */
+  font-weight: 600 !important; /* Texto semi-negrita */
+  margin: 0 !important; /* Elimina márgenes extra */
+  line-height: 1.4; /* Interlineado */
+}
+
+/* ==========================================================================
+   🔽 ACORDEONES (MÁS INFORMACIÓN Y MAPA)
+   ========================================================================== */
+ion-accordion-group {
+  background: transparent; /* Fondo transparente */
+  margin-top: 10px; /* Separación con los otros ítems */
+}
+
+ion-accordion {
+  background: #0a0c10 !important; /* Fondo más oscuro para destacar la caja desplegable */
+  border-radius: 10px !important; /* Bordes redondeados */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Borde fino delimitador */
+  margin-bottom: 10px; /* Margen inferior */
+  overflow: hidden; /* Corta los bordes desbordados */
+}
+
+ion-accordion ion-item[slot="header"] {
+  --background: #10141a; /* Fondo para la cabecera del acordeón */
+  --padding-start: 12px; /* Relleno inicial */
+}
+
+ion-accordion [slot="content"] {
+  background: #0a0c10; /* Fondo del área desplegada */
+  color: #ffffff; /* Texto del contenido en blanco */
+  font-size: 0.9rem; /* Tamaño de letra adecuado */
+}
+
+/* Contenedor responsivo del iframe de Wikiloc/Mapa */
+.mapa-container {
+  border-radius: 10px; /* Bordes suavemente redondeados */
+  overflow: hidden; /* Evita que el iframe sobresalga de la caja */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil */
+  position: relative; /* Posicionamiento para créditos internos */
+  margin-bottom: 12px; /* Separación con el botón del mapa */
+}
+
+.mapa-container iframe {
+  border: none; /* Elimina borde nativo del iframe */
+  display: block; /* Elimina espacios residuales en el renderizado */
+}
+
+.wikiloc-credit {
+  background: rgba(10, 12, 16, 0.85); /* Fondo oscuro con transparencia */
+  color: #94a3b8; /* Texto gris claro */
+  font-size: 0.75rem; /* Tamaño compacto para el crédito */
+  padding: 4px 8px; /* Relleno del cuadro */
+  text-align: right; /* Alineado a la derecha */
+}
+
+.wikiloc-credit a {
+  color: rgb(0, 248, 103); /* Enlace en verde neón */
+  text-decoration: none; /* Sin subrayado */
+  font-weight: 700; /* Enlace en negrita */
+}
+
+.map-btn {
+  --background: transparent; /* Botón transparente */
+  --border-color: rgb(0, 248, 103); /* Borde en verde neón */
+  --border-style: solid; /* Estilo de borde sólido */
+  --border-width: 1px; /* Grosor del borde */
+  --color: rgb(0, 248, 103); /* Texto e icono en verde neón */
+  --border-radius: 8px; /* Bordes redondeados */
+  font-weight: 700; /* Texto en negrita */
+  margin: 0; /* Elimina márgenes extra */
+}
+
+/* ==========================================================================
+   👥 PARTICIPANTES Y AVATARES
+   ========================================================================== */
+ion-avatar {
+  width: 40px; /* Ancho del avatar */
+  height: 40px; /* Alto del avatar */
+  display: flex; /* Flexbox para centrar icono */
+  align-items: center; /* Centrado vertical */
+  justify-content: center; /* Centrado horizontal */
+}
+
+/* ==========================================================================
+   ⚡ ACCIONES (FORO, SALIR Y ELIMINAR EVENTO)
+   ========================================================================== */
+.acciones {
+  margin-top: 10px; /* Separación superior con el último bloque */
+  padding-bottom: 20px; /* Relleno inferior para scroll cómodo */
+}
+
+.acciones ion-card {
+  padding: 12px; /* Relleno interno de la tarjeta de acciones */
+  display: flex; /* Disposición en flexbox */
+  flex-direction: column; /* Apilado en columna */
+  gap: 10px; /* Espacio entre cada botón */
+}
+
+/* Envoltorio del botón Foro para posicionar la insignia */
+.foro-btn-wrapper {
+  position: relative; /* Posición de referencia para el badge flotante */
+  width: 100%; /* Ancho completo */
+}
+
+.foro-btn-wrapper ion-button {
+  --background: rgba(0, 56, 23, 0.562); /* Fondo en verde neón */
+  --color: #ffffff; /* Texto oscuro */
+  border-radius: 8px; /* Bordes redondeados */
+  border: 2px solid rgb(0, 255, 106); /* Borde oscuro separador */
+  font-weight: 800; /* Texto en negrita */
+  margin: 0; /* Sin márgenes extra */
+}
+
+/* Insignia de mensajes nuevos no leídos sobre el botón del foro */
+.foro-badge {
+  position: absolute; /* Posicionamiento flotante */
+  top: -6px; /* Desplaza hacia arriba */
+  right: -6px; /* Desplaza hacia la derecha */
+  border-radius: 50%; /* Badge perfectamente circular */
+  padding: 5px 8px; /* Relleno compacto */
+  font-size: 0.75rem; /* Tamaño de letra pequeñita */
+  border: 2px solid #0a0c10; /* Borde oscuro separador */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); /* Sombra flotante */
+  z-index: 10; /* Se renderiza por encima del botón */
+}
+
+/* Botón Eliminar Evento */
+.btn-eliminar-evento-full {
+  --background: #4400002d; /* Fondo rojo neón */
+  --color: #ffffff; /* Texto blanco */
+  border-radius: 8px; /* Bordes redondeados */
+  border: 2px solid #ff0000ce; /* Borde oscuro separador */
+  font-weight: 800; /* Texto en negrita */
+  margin: 0; /* Sin márgenes extra */
+}
+
+.btn-salir-evento{
+  --color:  #ffff00ce; /* Texto blanco */
+  border-radius: 8px; /* Bordes redondeados */
+  font-weight: 800; /* Texto en negrita */
+  margin: 0; /* Sin márgenes extra */
+}

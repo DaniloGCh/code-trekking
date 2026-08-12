@@ -1,226 +1,343 @@
-/* =========================================================
-   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
-   ========================================================= */
-
-/* toolbar transparente total */
-.transparent-toolbar {
-  --background: transparent !important;
-  --border-width: 0 !important;
-  --box-shadow: none !important;
-   --padding-start: 15px;
-  --padding-end: 15px;
-}
-
-/* header oculto sin dejar rastro */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 👇 CLAVE: evita fondo negro del header container */
-ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-}
-
-ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* verde bosque */
-}
-  
-/* =========================================================
-   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
-   ========================================================= */
-
-ion-header {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-}
-
-/* toolbar sin elevación (clave real en Ionic) */
-ion-toolbar {
-  --box-shadow: none !important;
-  box-shadow: none !important;
-  --border-width: 0 !important;
-}
-
-
-
-/* asegura que botones no se muevan */
-ion-buttons {
-  z-index: 2;
-}
-
-/* =========================================================
-   👀 OCULTAR HEADER CON SCROLL
-   ========================================================= */
-
-ion-header {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* estado oculto */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-/* 🌄 Fondo tipo trekking */
+/* Fondo general con la imagen visible pero oscura */
 ion-content {
-  --background: none;
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 0, 0, 0.7)
-    ),
-    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
-  color: #fff;
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Aplica una capa oscura transparente sobre la imagen de fondo */
+  font-family: 'Lexend', sans-serif; /* Define la tipografía principal para toda la vista */
+  --color: #e2e8f0; /* Define el color de texto general por defecto */
 }
 
-/* 🧭 HEADER */
-ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85); /* verde bosque */
-  --color: #fff;
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
+   ========================================================================== */
+/* para esconder la barra */
+ion-header {
+  transition: transform 0.3s ease-in-out; /* Transición suave cuando la barra sube o baja */
 }
 
+ion-header.hidden {
+  transform: translateY(-100%); /* Oculta la barra desplazándola hacia arriba fuera de la pantalla */
+}
 
-/* 🧭 Header bienvenida */
+/* ADMIN */
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Totalmente sólido */
+  --color: rgb(0, 248, 103);  /* color letras */
+  border-bottom: 1px solid var(--glass-border); /* Línea divisoria inferior usando variable global */
+}
+
+/* Grosor del titulo */
+ion-title {
+  font-weight: 900; /* Grosor de letra muy marcado para destacar */
+  text-transform: uppercase; /* Convierte el texto en mayúsculas */
+  letter-spacing: -0.02em; /* Comprime ligeramente el espacio entre letras */
+  font-size: 1rem; /* Tamaño de fuente estándar del título */
+}
+
+/* color y tamaño (inicio - usuario y salir) */
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103);  /* color iconos */
+  font-size: 1rem; /* Tamaño de fuente para los iconos del header */
+}
+
+/* =========================================================
+   📊 TEXTO CONTENEDOR CLIMA 
+   ========================================================= */
+.weather-info div {
+  display: flex; /* Activa la disposición flexible */
+  flex-direction: column; /* Alinea los datos del clima en columna vertical */
+  line-height: 1.1; /* Reduce el interlineado entre los textos */
+}
+
+/* =========================
+   🌡️ TEMPERATURA
+========================= */
+.temp {
+  font-size: 15px; /* Tamaño de letra para los grados */
+  font-weight: 600; /* Grosor de letra semi-negrita */
+  color: #ffffff; /* Color blanco puro para destacar la temperatura */
+}
+
+/* =========================
+   ☁️ DESCRIPCIÓN
+========================= */
+.desc {
+  font-size: 11px; /* Tamaño pequeño para el estado del clima */
+  color: #cbd5f5; /* Color azulino claro para lectura suave */
+  text-transform: capitalize; /* Pone en mayúscula la primera letra de cada palabra */
+}
+
+/* =========================
+   📍 UBICACIÓN
+========================= */
+.location {
+  font-size: 10px; /* Tamaño de fuente compacto para la ciudad */
+  color: #94a3b8; /* Color gris secundario */
+}
+
+/* ==========================================================================
+   🌤️ WIDGET CLIMA
+   ========================================================================== */
+.weather-chip {
+  --color: rgb(0, 248, 103);  /* color letras */
+  border: 1px solid var(--glass-border); /* Borde sutil del chip */
+  border-radius: 12px; /* Esquinas redondeadas */
+  padding: 16px; /* Espaciado interno general */
+  width: 100%; /* Ocupa el ancho completo del contenedor */
+  display: block; /* Define el tipo de bloque de visualización */
+  height: auto; /* Permite que la altura se adapte al contenido */
+}
+
+/* =========================================================
+   👋 BIENVENIDA
+   ========================================================= */
+/* Contenedor principal (afecta todo)*/
+.welcome-container {
+  margin: 15px 16px 20px 16px; /* Margen superior, lados y parte inferior */
+  display: flex; /* Activa Flexbox */
+  flex-direction: column; /* Organiza los elementos verticalmente */
+  gap: 16px; /* Espaciado automático entre cada hijo del contenedor */
+}
+
+/* Texto bienvenido...*/
 .welcome-header {
-  margin-top: 65px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding: 15px;
-  border-radius: 15px;
-
-  background: rgba(34, 49, 34, 0.6); /* verde oscuro translúcido */
-    /* Compatibilidad */
-  -webkit-backdrop-filter: blur(6px); /* Safari */
-  backdrop-filter: blur(6px);         /* Navegadores modernos */
-
-  ion-icon {
-    font-size: 40px;
-    color: #a3d977; /* verde trekking */
-  }
-
-  h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #dcdcdc;
-  }
+  padding: 20px; /* Relleno interno de la tarjeta de bienvenida */
+  text-align: center; /* Centra horizontalmente el contenido */
+  background: #14191f; /* Fondo oscuro sólido */
+  border-radius: 20px; /* Esquinas muy redondeadas */
+  backdrop-filter: blur(10px); /* Aplica el efecto de desenfoque de fondo en navegadores modernos */
+  -webkit-backdrop-filter: blur(10px); /* Compatibilidad del desenfoque para Safari y WebKit */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Sombra difuminada suave */
 }
 
-/* 🏔️ Títulos de sección */
-.section-title {
-  margin: 15px 0 10px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #c7f9cc; /* verde claro */
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+/* Icono de avatar admin */
+.avatar-icon {
+  font-size: 80px; /* Tamaño grande para el icono del avatar */
+  color: #a3d977; /* Color verde suave personalizado */
 }
 
-/* 📊 Cards estadísticas estilo trekking */
+/* letra ¡Hola, (admin)!*/
+.welcome-header h1 {
+  margin: 0; /* Quita el margen por defecto */
+  font-size: 28px; /* tamaño letra HOLA */
+  font-weight: 900; /* grosor letra HOLA */
+  text-transform: uppercase; /* Convierte el saludo a mayúsculas */
+}
+
+/* ==========================================================================
+   📝 TARJETAS DE FORMULARIO (Crear/Editar Kit y Manual)
+   ========================================================================== */
+.form-card {
+  background: #14191f; /* Fondo oscuro de la tarjeta de formulario */
+  border-radius: 12px; /* Esquinas redondeadas de la tarjeta */
+  margin: 16px; /* Espaciado exterior alrededor de la tarjeta */
+  border: 1px solid rgba(50, 255, 126, 0.3); /* Borde verde neón tenue */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); /* Sombra marcada para profundidad */
+  color: #e2e8f0; /* Color del texto general dentro de la tarjeta */
+}
+
+.form-card ion-card-title {
+  color: #ffffff; /* Texto blanco para el título del formulario */
+  font-size: 1.1rem; /* Tamaño de letra del título */
+  font-weight: 700; /* Texto en negrita */
+  padding-bottom: 5px; /* Espacio antes de la línea divisoria inferior */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Línea tenue bajo el título */
+}
+
+/* Inputs y Textareas en Formularios */
+.form-card ion-item {
+  --background: #1a232d; /* Fondo ligeramente más claro para la casilla de entrada */
+  --color: #ffffff; /* Color del texto que escribe el usuario */
+  --border-color: rgba(255, 255, 255, 0.1); /* Color del borde por defecto */
+  --highlight-color-focused: rgb(0, 248, 103); /* Color neón del indicador al enfocar el campo */
+  border-radius: 8px; /* Redondeado de esquinas del campo */
+  margin-bottom: 12px; /* Espaciado entre casillas */
+}
+
+.form-card ion-label {
+  color: #94a3b8 !important; /* Forza el color gris para las etiquetas del formulario */
+}
+
+.form-card ion-input, 
+.form-card ion-textarea {
+  --color: #ffffff; /* Asegura el texto de entrada en color blanco */
+  font-size: 0.95rem; /* Tamaño del texto tipeado */
+  margin-top: 12px; /* Espacio superior para separarlo del label */
+}
+
+/* Validaciones y Errores */
+ion-item.ion-invalid {
+  --border-color: #ff4d4d; /* Cambia el borde a rojo si el campo es inválido */
+}
+
+ion-note[slot="error"] {
+  color: #ff6b6b; /* Color rojo de la nota de error */
+  font-size: 0.8rem; /* Tamaño compacto para el mensaje de error */
+}
+
+/* Contenedor de Botones de Formulario */
+.form-buttons {
+  display: flex; /* Activa flexbox para apilar o alinear los botones */
+  flex-direction: column; /* Apila los botones de guardar y cancelar en vertical */
+  gap: 10px; /* Separación vertical entre botones */
+  margin-top: 16px; /* Espaciado por encima de la botonera */
+}
+
+/* Botón Guardar / Agregar */
+.form-buttons ion-button[type="submit"] {
+  --background: #14191f; /* Fondo oscuro del botón principal */
+  background: #14191f; /* Respaldo de fondo para el contenedor */
+  --color: rgb(0, 248, 103); /* Color de texto neón */
+  border: 1px solid rgba(50, 255, 126, 0.5); /* Borde verde neón translúcido */
+  border-radius: 6px; /* Redondeado leve del botón */
+  font-weight: 700; /* Texto del botón en negrita */
+}
+
+/* Botón Cancelar */
+.form-buttons ion-button[fill="outline"] {
+  --background: #14191f; /* Fondo oscuro idéntico para consistencia */
+  background: #14191f; /* Respaldo de fondo */
+  --color: #94a3b8; /* Color de texto gris secundario */
+  border: 1px solid rgba(255, 255, 255, 0.15); /* Borde gris tenue */
+  border-radius: 6px; /* Redondeado leve del botón */
+}
+
+/* ==========================================================================
+   🗂️ ACORDEONES Y LISTAS DE DATOS (Kits y Manuales)
+   ========================================================================== */
+
+ion-accordion {
+  background: #14191f; /* Fondo oscuro para el bloque acordeón */
+  border-radius: 12px; /* Esquinas redondeadas */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Borde tenue alrededor */
+  overflow: hidden; /* Oculta contenido sobrante al colapsar */
+}
+
+/* Cabecera del Acordeón */
+ion-accordion ion-item[slot="header"] {
+  --background: #14191f; /* Fondo oscuro para el título del acordeón */
+  --color: rgb(0, 248, 103); /* Texto neón para la cabecera */
+  font-weight: 700; /* Negrita para destacar la sección */
+}
+
+/* Contenido dentro del Acordeón */
+ion-accordion div[slot="content"] {
+  background: #0d1117; /* Fondo un poco más oscuro al desplegar información */
+}
+
+ion-accordion ion-list {
+  background: transparent; /* Permite ver el fondo del contenedor del acordeón */
+  padding: 0; /* Remueve los espacios internos por defecto de la lista */
+}
+
+/* Ítems de la lista desplegada */
+ion-accordion ion-item {
+  --background: #14191f; /* Fondo oscuro por cada ítem */
+  --color: #e2e8f0; /* Texto claro por cada fila */
+  --border-color: rgba(255, 255, 255, 0.05); /* Divisor sutil entre filas */
+}
+
+/* Textos dentro de los ítems de lista */
+ion-accordion ion-label h3 {
+  color: #ffffff; /* Título del elemento desplegado en blanco */
+  font-weight: 700; /* Negrita */
+  font-size: 1rem; /* Tamaño de fuente estándar */
+}
+
+ion-accordion ion-label p {
+  color: #94a3b8; /* Texto descriptivo en gris suave */
+  font-size: 0.85rem; /* Tamaño de letra secundario */
+}
+
+ion-accordion ion-label small {
+  color: rgb(0, 248, 103); /* Texto secundario pequeño en verde neón */
+  font-size: 0.8rem; /* Tamaño reducido para etiquetas pequeñas */
+}
+
+/* ==========================================================================
+   📊 TARJETAS DE ESTADÍSTICAS (STAT CARDS)
+   ========================================================================== */
+
+ion-grid ion-col {
+  padding: 4px; /* Espaciado entre columnas */
+}
+
+/* Estilo Base de las Tarjetas (Siguiendo el diseño de kit-card) */
 .stat-card {
-  border-radius: 15px;
-  text-align: center;
-  color: #fff;
-    /* Compatibilidad */
-  -webkit-backdrop-filter: blur(8px); /* Safari */
-  backdrop-filter: blur(8px);         /* Navegadores modernos */
-
-  ion-card-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-
-  ion-icon {
-    font-size: 28px;
-  }
-
-  h2 {
-    margin: 5px 0;
-    font-size: 1.5rem;
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.8rem;
-    opacity: 0.8;
-  }
+  background: #14191f; /* Fondo oscuro para la tarjeta métrica */
+  margin: 0; /* Elimina márgenes exteriores */
+  border-radius: 5px; /* Redondeo del borde alineado con kit-card */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Sombra y profundidad */
+  --color: rgb(221, 220, 220); /* Color de letras general */
+  height: 100%; /* Para que todas mantengan la misma altura */
 }
 
-/* 🌿 Variantes de tarjetas */
+/* Contenido dentro de la tarjeta */
+.stat-card ion-card-content {
+  padding: 12px 8px; /* Relleno interno centrado */
+  display: flex; /* Activa flexbox */
+  flex-direction: column; /* Dirección vertical de los componentes internos */
+  align-items: center; /* Centra horizontalmente los componentes */
+  justify-content: center; /* Centra verticalmente el contenido */
+  text-align: center; /* Alinea los textos al centro */
+}
+
+/* Iconos de las métricas */
+.stat-card ion-icon {
+  font-size: 24px; /* Tamaño del icono */
+  margin-bottom: 6px; /* Espacio por debajo del icono antes del número */
+}
+
+/* Número destacado (Métrica) */
+.stat-card h2 {
+  font-size: 1.4rem; /* Tamaño grande para destacar la cifra numérica */
+  font-weight: 800; /* Grosor alto para llamar la atención */
+  color: #ffffff; /* Número en blanco puro */
+  line-height: 1.1; /* Interlineado estrecho */
+}
+
+/* Etiqueta del texto bajo el número */
+.stat-card p {
+  margin: 4px 0 0 0; /* Separación de 4px respecto al número */
+  font-size: 0.75rem; /* Tamaño de fuente compacto */
+  color: #94a3b8; /* Color gris claro */
+  text-transform: uppercase; /* Texto en mayúsculas */
+  letter-spacing: 0.5px; /* Espaciado amplio entre letras */
+  font-weight: 600; /* Grosor semi-negrita */
+}
+
+/* TOTAL EVENTOS */
+
+/* --------------------------------------------------------------------------
+   🎨 VARIACIONES POR TIPO DE ESTADÍSTICA (Bordes laterales y colores)
+   -------------------------------------------------------------------------- */
+
+/* 1. TOTAL USUARIOS (Azul / Cian) */
 .stat-card.total {
-  background: rgba(85, 107, 47, 0.7); /* verde oliva */
+  border-left: 5px solid #38bdf8; /* Borde grueso a la izquierda en color cian */
+}
+.stat-card.total ion-icon {
+  color: #38bdf8; /* Icono en color cian a juego con el borde */
 }
 
+/* 2. ADMINS (Verde Neón) */
 .stat-card.admins {
-  background: rgba(139, 69, 19, 0.7); /* café tierra */
+  border-left: 5px solid rgb(50, 255, 126); /* Borde grueso a la izquierda en verde neón */
+}
+.stat-card.admins ion-icon {
+  color: rgb(0, 248, 103); /* Icono en verde neón a juego con el borde */
 }
 
+/* 3. USUARIOS REGULARES (Naranja / Coral) */
 .stat-card.users {
-  background: rgba(34, 139, 34, 0.7); /* verde bosque */
+  border-left: 5px solid #ff6b4a; /* Borde grueso a la izquierda en color coral/naranja */
+}
+.stat-card.users ion-icon {
+  color: #ff6b4a; /* Icono en color coral a juego con el borde */
 }
 
-/* 👥 Lista de usuarios */
-ion-list {
-  background: transparent;
-  margin: 15px;
+/* 4. TOTAL EVENTOS (violeta) */
+.stat-card.eventos {
+  border-left: 5px solid #a855f7; /* Borde violeta brillante */
 }
-
-/* 🪵 Items estilo natural */
-ion-item {
-  --background: rgba(163, 87, 0, 0.26);
-  margin-bottom: 8px;
-  border-radius: 12px;
-
-  /* Compatibilidad */
-  -webkit-backdrop-filter: blur(5px); /* Safari */
-  backdrop-filter: blur(5px);         /* Navegadores modernos */
-
-  ion-label h3 {
-    font-weight: 600;
-    color: #ffffff;
-  }
-
-  ion-label p {
-    color: #dcdcdc;
-    font-size: 0.85rem;
-  }
-}
-
-/* 🧍 Avatar */
-ion-avatar ion-icon {
-  color: #c7f9cc;
-}
-
-/* 🔘 Botones */
-ion-button {
-  --color: #c7f9cc;
-}
-
-/* 🏷️ Badge */
-ion-badge {
-  font-weight: bold;
-}
-
-.section-title {
-  margin: 20px 0 10px 15px;
-  padding-left: 5px;
-  font-weight: 600;
+.stat-card.eventos{
+  color: #a855f7; /* Color a juego con el borde */
 }

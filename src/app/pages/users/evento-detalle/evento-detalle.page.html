@@ -1,0 +1,521 @@
+<!-- ========================= -->
+<!-- 📌 HEADER -->
+<!-- ========================= -->
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
+
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>Detalle del Evento</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="onCompartir()">
+        <ion-icon slot="icon-only" name="share-social-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<!-- ========================= -->
+<!-- 📌 CONTENIDO PRINCIPAL -->
+<!-- ========================= -->
+ <!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true" *ngIf="evento">
+
+  <!-- ========================= -->
+  <!-- 🏷️ CABECERA EVENTO -->
+  <!-- ========================= -->
+  <div class="evento-header">
+    <h1>{{ evento.nombre }}</h1>
+
+    <ion-badge class="badge-lugar" [color]="
+      evento.lugar.dificultad === 'Baja' ? 'success' :
+      evento.lugar.dificultad === 'Baja - Media' ? 'success' :
+      evento.lugar.dificultad === 'Media' ? 'warning' :
+      evento.lugar.dificultad === 'Media - Alta' ? 'warning' :
+      evento.lugar.dificultad === 'Alta' ? 'danger' :
+      evento.lugar.dificultad === 'Alta - Muy Alta' ? 'danger' : 'medium'">
+
+      {{ evento.lugar.dificultad }}
+
+    </ion-badge>
+  </div>
+
+  <!-- ========================= -->
+  <!-- 🔑 CÓDIGO INVITACIÓN -->
+  <!-- ========================= -->
+  <ion-card class="codigo-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="key-outline" color="primary"></ion-icon>
+        Código de invitación
+      </ion-card-title>
+      <ion-card-subtitle>
+        Comparte este código para invitar a otros
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <div class="codigo-container">
+
+        <!-- ✅ Código oculto o visible -->
+        <span class="codigo-text">{{ codigoMostrado }}</span>
+
+        <div class="codigo-actions">
+          <!-- ✅ Toggle mostrar/ocultar -->
+          <ion-button fill="clear" (click)="toggleCodigoVisible()">
+            <ion-icon [name]="codigoVisible ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+
+          <!-- ✅ Copiar solo si está visible -->
+          <ion-button fill="clear" (click)="onCopiarCodigo()">
+            <ion-icon name="copy-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+      </div>
+
+      <!-- ✅ Aviso de seguridad -->
+      <p class="codigo-aviso" *ngIf="!codigoVisible">
+        <ion-icon name="shield-checkmark-outline" color="success"></ion-icon>
+        Toca el ojo para revelar el código
+      </p>
+
+      <ion-button class="btn-compartir" expand="block" (click)="onCompartir()">
+        <ion-icon name="share-social-outline" slot="start"></ion-icon>
+        Compartir invitación
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ========================= -->
+  <!-- 📄 INFORMACIÓN EVENTO -->
+  <!-- ========================= -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Información del evento</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list lines="none">
+
+        <ion-item>
+          <ion-icon name="document-text-outline" slot="start" color="primary"></ion-icon>
+          <ion-label class="ion-text-wrap">
+            <p>Descripción</p>
+            <h3>{{ evento.descripcion }}</h3>
+          </ion-label>
+        </ion-item>
+
+        <!-- <ion-item>
+          <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <p>Fecha y hora</p>
+            <h3>{{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} a las {{ evento.hora }}</h3>
+          </ion-label>
+        </ion-item> -->
+
+        <ion-item>
+          <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+
+            <!-- 🔴 FINALIZADO -->
+            <ng-container *ngIf="esEventoFinalizado(evento); else noFinalizado">
+              <span style="color: red; font-weight: bold;">
+                🔴 Evento finalizado
+              </span>
+            </ng-container>
+
+            <!-- ⬇️ SI NO ESTÁ FINALIZADO -->
+            <ng-template #noFinalizado>
+
+              <!-- 🟢 EN CURSO -->
+              <ng-container *ngIf="esEventoEnCurso(evento); else noEnCurso">
+                <span style="color: green; font-weight: bold;">
+                  Evento en curso
+                </span>
+                <ion-label>
+                  {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                </ion-label>
+              </ng-container>
+
+              <!-- ⬇️ SI NO ESTÁ EN CURSO -->
+              <ng-template #noEnCurso>
+
+                <!-- 🔵 PRÓXIMO -->
+                <ng-container *ngIf="esEventoProximo(evento); else fechaNormal">
+                  <span style="color: #007bff; font-weight: bold;">
+                    Próximo evento
+                  </span>
+                  <ion-label>
+                    {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                  </ion-label>
+                </ng-container>
+
+                <!-- 📅 NORMAL (fallback) -->
+                <ng-template #fechaNormal>
+                  {{ evento.fecha.toDate() | date:'dd/MM/yyyy' }} - {{ evento.hora }}
+                </ng-template>
+
+              </ng-template>
+
+            </ng-template>
+
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <p>Organizado por</p>
+            <h3>{{ evento.creadoPor.nombre }}</h3>
+          </ion-label>
+        </ion-item>
+
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ========================= -->
+  <!-- 📍 INFORMACIÓN LUGAR -->
+  <!-- ========================= -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="location-outline" color="primary"></ion-icon>
+        {{ evento.lugar.nombre }}
+      </ion-card-title>
+        
+      <ion-card-subtitle>
+        <ion-badge class="badge-lugar" [color]="evento.lugar.dificultad === 'Alta' ? 'danger' :
+                            evento.lugar.dificultad === 'Media' ? 'warning' : 'success'">
+          {{ evento.lugar.dificultad }}
+        </ion-badge>
+      </ion-card-subtitle>
+    </ion-card-header>
+
+
+    <ion-card-content>
+      <ion-list lines="none">
+
+        <ion-item>
+          <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
+          <ion-label class="ion-text-wrap">
+            <p>Información</p>
+            <h3>{{ evento.lugar.informacion }}</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+
+          <ion-icon [name]="evento.lugar.requiereHorarioVisita ? 'time-outline' : 'checkmark-circle-outline'"
+            slot="start" [color]="evento.lugar.requiereHorarioVisita ? 'primary' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Horario de visita</p>
+
+            <h3 *ngIf="evento?.lugar?.horarioVisita?.apertura && evento?.lugar?.horarioVisita?.cierre; else noHorario">
+              {{ evento.lugar.horarioVisita?.apertura }} - {{ evento.lugar.horarioVisita?.cierre }} hrs
+            </h3>
+
+            <ng-template #noHorario>
+              <h3>No definido</h3>
+            </ng-template>
+
+          </ion-label>
+
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="navigate-outline" slot="start" color="primary"></ion-icon>
+
+          <ion-label>
+            <p>Punto de inicio</p>
+
+            <h3>
+              <a *ngIf="evento.lugar.latitud && evento.lugar.longitud"
+                [href]="'https://www.google.com/maps?q=' + evento.lugar.latitud + ',' + evento.lugar.longitud"
+                target="_blank" style="text-decoration: none; color: var(--ion-color-primary); font-weight: 600;">
+
+                {{ evento.lugar.DireccionPuntoInicio }}
+
+              </a>
+
+              <span *ngIf="!evento.lugar.latitud || !evento.lugar.longitud">
+                {{ evento.lugar.DireccionPuntoInicio }}
+              </span>
+
+            </h3>
+
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="trending-up-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <p>Altitud</p>
+            <h3>{{ evento.lugar.altitud }} msnm</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="map-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <p>Distancia</p>
+            <h3>{{ evento.lugar.distanciaKm }} km</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="time-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <p>Tiempo estimado</p>
+            <h3>{{ evento.lugar.tiempoEstimadoHoras }} horas</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon [name]="evento.lugar.requiereRegistroAcceso ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start" [color]="evento.lugar.requiereRegistroAcceso ? 'warning' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Registro de acceso</p>
+            <h3> {{ evento.lugar.requiereRegistroAcceso ? 'Requiere registro de acceso' : 'No requiere registro de acceso al parque' }} </h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon [name]="evento.lugar.requiereGuiaMontana ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start" [color]="evento.lugar.requiereGuiaMontana ? 'warning' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Guia de montaña o turistico</p>
+            <h3> {{ evento.lugar.requiereGuiaMontana ? 'Se recomienda guía de montaña o turistico para una mejor experiencia y cuidado' : 'No se requiere guía de montaña o turistico, pero para una mejor experiencia y cuidado siempre es bueno ir con un guía' }} </h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon [name]="evento.lugar.requierePagoEntrada ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start" [color]="evento.lugar.requierePagoEntrada ? 'warning' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Pago de entrada</p>
+            <h3>{{ evento.lugar.requierePagoEntrada ? 'Requiere pago de entrada' : 'No requiere pago de entrada' }}</h3>
+          </ion-label>
+        </ion-item>
+
+        <!-- 💰 VALOR ENTRADA -->
+        <ion-item *ngIf="evento.lugar.requierePagoEntrada">
+
+          <ion-icon name="cash-outline" slot="start" color="success"></ion-icon>
+
+          <ion-label>
+            <p>Valor entrada</p>
+
+            <h3>
+              {{ evento.lugar.valorEntrada
+              ? (evento.lugar.valorEntrada | currency:'CLP':'symbol':'1.0-0')
+              : 'Acceso gratis - Consultar en acceso' }}
+            </h3>
+
+          </ion-label>
+
+        </ion-item>
+
+        <ion-item>
+          <ion-icon [name]="evento.lugar.requierePermiso ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+            slot="start" [color]="evento.lugar.requierePermiso ? 'warning' : 'success'">
+          </ion-icon>
+
+          <ion-label>
+            <p>Permiso</p>
+            <h3>{{ evento.lugar.requierePermiso ? 'Requiere permiso' : 'No requiere permiso' }}</h3>
+          </ion-label>
+        </ion-item>
+
+
+        <!-- ========================= -->
+        <!-- 🌐 MOSTRAR LINK EN DETALLE (USUARIO) -->
+        <!-- ========================= -->
+
+        <ion-accordion-group *ngIf="evento.lugar.requiereMasInformacion && evento.lugar.MasInformacion">
+
+          <ion-accordion value="info">
+
+            <!-- 🔹 HEADER -->
+            <ion-item slot="header">
+              <ion-icon name="information-circle-outline" slot="start" color="primary"></ion-icon>
+              <ion-label>Más información</ion-label>
+            </ion-item>
+
+            <!-- 🔹 CONTENIDO -->
+            <div class="ion-padding" slot="content">
+
+              <h3>
+                {{ evento.lugar.MasInformacion.Texto }}
+              </h3>
+
+              <h3>
+                <a [href]="evento.lugar.MasInformacion.URL" target="_blank"
+                  style="text-decoration: none; color: var(--ion-color-primary); font-weight: 600;">
+
+                  {{ evento.lugar.MasInformacion.URL }}
+
+                </a>
+              </h3>
+              <br>
+              <h3 *ngIf="evento.lugar.MasInformacion.Otro">
+                <a [href]="evento.lugar.MasInformacion.Otro" target="_blank"
+                  style="text-decoration: none; color: var(--ion-color-primary); font-weight: 600;">
+
+                  {{ evento.lugar.MasInformacion.Otro }}
+
+                </a>
+              </h3>
+
+            </div>
+
+          </ion-accordion>
+
+        </ion-accordion-group>
+
+
+        <!-- ========================= -->
+        <!-- 🗺️ MAPA DE LA RUTA (ACORDEÓN) -->
+        <!-- ========================= -->
+        <ion-accordion-group *ngIf="evento.lugar.mapaRutaUrl">
+
+          <ion-accordion value="mapa">
+
+            <!-- 🔹 HEADER -->
+            <ion-item slot="header">
+              <ion-icon name="map-outline" slot="start" color="primary"></ion-icon>
+              <ion-label>Mapa de la ruta</ion-label>
+            </ion-item>
+
+            <!-- 🔹 CONTENIDO -->
+            <div slot="content" class="ion-padding">
+
+              <div class="mapa-container">
+                <iframe [src]="mapaUrlSafe" width="100%" height="400" frameborder="0" scrolling="no">
+                </iframe>
+
+                <div class="wikiloc-credit">
+                  Powered by
+                  <a href="https://es.wikiloc.com" target="_blank" rel="noopener noreferrer">
+                    Wikiloc
+                  </a>
+                </div>
+              </div>
+
+              <ion-button expand="block" class="map-btn" (click)="goMapa()">
+                <ion-icon name="navigate-outline" slot="start"></ion-icon>
+                Crea tu propia ruta
+              </ion-button>
+
+            </div>
+
+
+
+          </ion-accordion>
+
+        </ion-accordion-group>
+
+
+
+
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+
+
+
+  <!-- ========================= -->
+  <!-- 👥 PARTICIPANTES -->
+  <!-- ========================= -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="people-outline" color="primary"></ion-icon>
+        Participantes ({{ evento.participantesInfo.length || evento.participantes.length }})
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list lines="none">
+
+        <ion-item *ngFor="let participante of evento.participantesInfo">
+
+          <ion-avatar slot="start">
+            <ion-icon name="person-circle-outline" style="font-size: 40px;"
+              [color]="participante.uid === evento.creadoPor.uid ? 'primary' : 'medium'">
+            </ion-icon>
+          </ion-avatar>
+
+          <ion-label>
+            <h3>
+              {{ participante.uid === currentUid ? participante.nombre + ' (Tú)' : participante.nombre }}
+            </h3>
+            <p>{{ participante.uid === evento.creadoPor.uid ? 'Organizador' : 'Participante' }}</p>
+          </ion-label>
+
+          <ion-badge slot="end" [color]="participante.uid === evento.creadoPor.uid ? 'primary' : 'medium'">
+            {{ participante.uid === evento.creadoPor.uid ? 'Org.' : 'Part.' }}
+          </ion-badge>
+
+        </ion-item>
+
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ========================= -->
+  <!-- ⚡ ACCIONES -->
+  <!-- ========================= -->
+  <div class="acciones">
+
+    <ion-card class="button-end">
+
+      <!-- Foro -->
+      <div class="foro-btn-wrapper">
+
+        <ion-button  expand="block" (click)="irAlForo()">
+          <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+          Foro del evento
+        </ion-button>
+
+        <ion-badge color="danger" class="foro-badge" *ngIf="mensajesNuevos > 0">
+          {{ mensajesNuevos > 99 ? '99+' : mensajesNuevos }}
+        </ion-badge>
+
+      </div>
+
+      <!-- Salir -->
+      <ion-button class="btn-salir-evento" expand="block" fill="outline" color="warning" *ngIf="!esCreadoPor" (click)="onSalirEvento()">
+        <ion-icon name="exit-outline" slot="start"></ion-icon>
+        Salir del evento
+      </ion-button>
+
+      <!-- Eliminar -->
+      <ion-button class="btn-eliminar-evento-full" expand="block" *ngIf="esCreadoPor"
+        (click)="onEliminarEvento()">
+
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Eliminar evento
+      </ion-button>
+
+    </ion-card>
+
+  </div>
+
+</ion-content>

@@ -1,304 +1,325 @@
-/* =========================================================
-   🫥 HEADER REALMENTE INVISIBLE AL OCULTARSE
-   ========================================================= */
-
-/* toolbar transparente total */
-.transparent-toolbar {
-  --background: transparent !important;
-  --border-width: 0 !important;
-  --box-shadow: none !important;
-   --padding-start: 15px;
-  --padding-end: 15px;
-}
-
-/* header oculto sin dejar rastro */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 👇 CLAVE: evita fondo negro del header container */
-ion-header {
-  background: transparent !important;
-  position: absolute;
-  width: 100%;
-  z-index: 10;
-}
-
-ion-header ion-toolbar ion-icon {
-  color: #8bd58e !important; /* verde bosque */
-}
-/* =========================================================
-   🚫 QUITAR SOMBRA DEL ION-HEADER / TOOLBAR
-   ========================================================= */
-
-ion-header {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-}
-
-/* toolbar sin elevación (clave real en Ionic) */
-ion-toolbar {
-  --box-shadow: none !important;
-  box-shadow: none !important;
-  --border-width: 0 !important;
-}
-
-/* asegura que botones no se muevan */
-ion-buttons {
-  z-index: 2;
-}
-
-/* =========================================================
-   👀 OCULTAR HEADER CON SCROLL
-   ========================================================= */
-
-ion-header {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* estado oculto */
-ion-header.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-
-/* 🌄 FONDO GENERAL */
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
 ion-content {
-  --background: linear-gradient(
-      rgba(0, 0, 0, 0.4),
-      rgba(0, 0, 0, 0.4)
-    ),
-    url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e') no-repeat center center / cover;
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)), url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover; /* Aplica capa oscura sobre la imagen de fondo */
+  font-family: 'Lexend', sans-serif; /* Define la fuente principal de la pantalla */
+  --color: #e2e8f0; /* Establece el color de texto secundario general */
 }
 
-/* 🧭 HEADER */
-ion-header ion-toolbar {
-  --background: rgba(34, 49, 34, 0.85);
-  --color: #fff;
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN
+   ========================================================================== */
+ion-header {
+  transition: transform 0.3s ease-in-out; /* Animación suave al ocultar/mostrar la barra */
 }
 
-/* 👤 PERFIL HEADER */
+ion-header.hidden {
+  transform: translateY(-100%); /* Desplaza la barra hacia arriba fuera de la pantalla */
+}
+
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Color de fondo sólido muy oscuro para la barra */
+  --color: rgb(0, 248, 103); /* Color verde neón para el título de la barra */
+
+}
+
+ion-title {
+  font-weight: 900; /* Grosor máximo para resaltar el título */
+  text-transform: uppercase; /* Convierte el texto del título a mayúsculas */
+  letter-spacing: -0.02em; /* Junta ligeramente las letras del título */
+  font-size: 1rem; /* Tamaño de fuente estándar para la barra */
+}
+
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103); /* Color verde neón para los iconos del header */
+  font-size: 1rem; /* Tamaño de fuente para los iconos/botones */
+}
+
+/* ==========================================================================
+   🖼️ SECCIÓN HEADER DE PERFIL (Avatar, Nombre y Badge)
+   ========================================================================== */
 .profile-header {
-  margin-top: 65px;
-  text-align: center;
-  margin-bottom: 20px;
-  color: #fff;
+  display: flex; /* Activa el modelo de caja flexible */
+  flex-direction: column; /* Apila los elementos verticalmente (avatar, nombre, badge) */
+  align-items: center; /* Centra horizontalmente todo el contenido */
+  justify-content: center; /* Centra verticalmente el contenido */
+  padding: 24px 16px 16px 16px; /* Espaciado interno superior, lateral e inferior */
+  text-align: center; /* Centra los textos internos */
 }
 
-/* 🧑‍🦱 AVATAR */
+/* Avatar Wrapper */
 .avatar-wrapper {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 10px;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
+  position: relative; /* Permite posicionar el overlay flotando dentro del contenedor */
+  width: 110px; /* Ancho fijo para el contenedor circular del avatar */
+  height: 110px; /* Alto fijo para mantener la forma perfecta */
+  border-radius: 50%; /* Transforma el recuadro en una circunferencia perfecta */
+  overflow: hidden; /* Oculta cualquier parte de la foto que sobresalga del círculo */
+  cursor: pointer; /* Cambia el cursor a mano para indicar que es clickeable */
+  border: 3px solid rgb(0, 248, 103); /* Borde verde neón alrededor de la foto */
+  box-shadow: 0 0 15px rgba(0, 248, 103, 0.3); /* Resplandor brillante neón tras la foto */
+  margin-bottom: 12px; /* Separa el avatar del nombre de usuario */
+  background: #14191f; /* Fondo oscuro por si no hay imagen asignada */
 }
 
 .avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 100%; /* Ocupa todo el ancho del circulo contenedor */
+  height: 100%; /* Ocupa todo el alto del circulo contenedor */
+  object-fit: cover; /* Ajusta la imagen para llenar el contenedor sin deformarse */
 }
 
 .avatar-icon {
-  font-size: 150px;
-  color: #c7f9cc;
+  font-size: 110px; /* Tamaño del icono por defecto cuando no hay foto */
+  color: rgb(0, 248, 103); /* Color del icono por defecto */
+  width: 100%; /* Ocupa todo el ancho */
+  height: 100%; /* Ocupa todo el alto */
 }
 
-/* 📸 overlay cámara */
+/* Overlay de la Cámara */
 .avatar-overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 35%;
-  background: rgba(0, 0, 0, 0.5);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  opacity: 0;
-  transition: 0.3s ease;
+  position: absolute; /* Superpone la capa sobre la imagen */
+  bottom: 0; /* Lo alinea en la parte inferior del avatar */
+  width: 100%; /* Ocupa todo el ancho inferior */
+  height: 35%; /* Ocupa solo el 35% de la altura inferior del circulo */
+  background: rgba(10, 12, 16, 0.75); /* Fondo negro semitransparente para legibilidad */
+  display: flex; /* Activa flexbox para el icono interno */
+  justify-content: center; /* Centra el icono horizontalmente */
+  align-items: center; /* Centra el icono verticalmente */
+  opacity: 0; /* Permanece oculto por defecto */
+  transition: opacity 0.3s ease; /* Transición suave cuando aparece la camarita */
 }
 
 .avatar-wrapper:hover .avatar-overlay {
-  opacity: 1;
+  opacity: 1; /* Muestra el overlay de la cámara al pasar el ratón/tocar */
 }
 
 .avatar-overlay ion-icon {
-  color: #fff;
-  font-size: 22px;
+  color: #ffffff; /* Color blanco para el icono de la cámara */
+  font-size: 25px; /* Tamaño del icono de la cámara */
 }
 
-/* 🌿 BADGE */
+/* Contenedor del Nombre */
+.nombre-container {
+  display: flex; /* Alinea el nombre y el botón de editar en línea */
+  align-items: center; /* Centra verticalmente el lápiz con el texto */
+  justify-content: center; /* Centra el bloque del nombre en pantalla */
+  gap: 4px; /* Espacio mínimo entre el nombre y el botón editar */
+  margin-top: 4px; /* Separación superior */
+}
+
+.nombre-container h2 {
+  margin: 0; /* Elimina márgenes por defecto del título */
+  font-size: 1.5rem; /* Tamaño destacado para el nombre del usuario */
+  font-weight: 800; /* Grosor alto para llamar la atención */
+  color: #ffffff; /* Color de texto blanco puro */
+}
+
+.nombre-container ion-button {
+  --padding-start: 10px; /* Reduce espacio a la izquierda del botón editar */
+  --padding-end: 4px; /* Reduce espacio a la derecha del botón editar */
+  margin: 0; /* Remueve márgenes adicionales */
+}
+
+/* Info de límite de cambio de nombre */
+.cambio-info {
+  font-size: 0.8rem; /* Tamaño de letra pequeño para la indicación */
+  color: #94a3b8; /* Color gris suave */
+  margin: 6px 0 10px 0; /* Separación superior e inferior */
+}
+
+/* Badge de Rol (Admin / Usuario) */
 ion-badge {
-  margin-top: 6px;
+  font-size: 0.75rem; /* Tamaño de letra compacto para la etiqueta */
+  font-weight: 700; /* Texto en negrita dentro del badge */
+  padding: 6px 12px; /* Relleno interno para darle forma de cápsula */
+  border-radius: 20px; /* Redondea completamente los lados del badge */
+  letter-spacing: 0.5px; /* Espaciado entre letras */
+  text-transform: uppercase; /* Convierte el texto del badge a mayúsculas */
+  margin-top: 4px; /* Separación superior respecto al nombre */
 }
 
-/* 🪵 CARDS estilo glass */
+/* ==========================================================================
+   🃏 TARJETAS DE CONTENIDO (Estado y Datos Personales)
+   ========================================================================== */
 ion-card {
-  background: rgba(34, 49, 34, 0.55);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  color: #fff;
-  margin-bottom: 16px;
+  background: #14191f; /* Fondo oscuro sólido para la tarjeta */
+  border-radius: 12px; /* Redondeado moderado de las esquinas */
+  margin: 16px; /* Separación respecto a los bordes exteriores */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sombra para dar efecto flotante */
+  color: #e2e8f0; /* Color de texto general dentro de la tarjeta */
 }
 
-
-
-
-
-/* 🌿 BASE (animación para TODOS) */
-.btn-estado,
-.btn-trekking,
-.btn-logout,
-.btn-delete {
-  transition: 
-    background 0.35s ease,
- 
-    border-color 0.35s ease,
-    transform 0.15s ease;
+ion-card-header {
+  padding: 16px 16px 8px 16px; /* Relleno en la cabecera de la tarjeta */
 }
 
-/* 🌿 ESTADO */
-.btn-estado {
-  --color: #ffffff;
-  --border-color: #2e7d32;
-}
-
-.btn-estado:hover {
-  --background: #2e7d32;
-  --color: #fff;
-  --border-color: #2e7d32;
-}
-
-.btn-estado:active {
-  --background: #1b5e20;
-  --border-color: #1b5e20;
-  transform: scale(0.96);
-}
-
-/* 🔐 CONTRASEÑA */
-.btn-trekking {
-  --color: #ffffff;
-  --border-color: #2e7d32;
-}
-
-.btn-trekking:hover {
-  --background: #2e7d32;
-  --color: #fff;
-  --border-color: #2e7d32;
-}
-
-.btn-trekking:active {
-  --background: #1b5e20;
-  --border-color: #1b5e20;
-  transform: scale(0.96);
-}
-
-/* 🚪 LOGOUT */
-.btn-logout {
-  --color: #ffffff;
-  --border-color: #c62828;
-}
-
-.btn-logout:hover {
-  --background: #c62828;
-  --color: #fff;
-  --border-color: #c62828;
-}
-
-.btn-logout:active {
-  --background: #8e0000;
-  --border-color: #8e0000;
-  transform: scale(0.96);
-}
-
-/* 💀 DELETE */
-.btn-delete {
-  --color: #fdfdfd;
-  --border-color: #ff5252;
-}
-
-.btn-delete:hover {
-  --background: #ff5252;
-  --color: #fff;
-  --border-color: #ff5252;
-}
-
-.btn-delete:active {
-  --background: #b71c1c;
-  --border-color: #b71c1c;
-  transform: scale(0.96);
-}
-
-/* 📌 TITULOS */
 ion-card-title {
-  color: #c7f9cc;
-  font-weight: 600;
+  color: #ffffff; /* Color blanco para el título de la tarjeta */
+  font-size: 1.1rem; /* Tamaño de letra para el título */
+  font-weight: 700; /* Grosor de letra para el título */
 }
 
-/* 📄 LISTA */
+ion-card-subtitle {
+  color: #ffffff; /* Color verde neón para el estado actual */
+  font-size: 1rem; /* Tamaño más pequeño para el subtítulo */
+  margin-top: 4px; /* Separación respecto al título */
+}
+
+ion-card-content {
+  padding: 8px 16px 16px 16px; /* Relleno interno para los componentes */
+}
+
+/* Botón Cambiar Estado */
+.btn-estado {
+  --background: #14191f; /* Fondo sólido oscuro alineado a las tarjetas */
+  background: #14191f; /* Respaldo para el fondo oscuro del botón */
+  --color: rgb(0, 248, 103); /* Color de texto neón */
+  border: 2px solid rgb(0, 248, 103); /* Borde fino neón */
+  border-radius: 6px; /* Redondeado leve del botón */
+  font-weight: 700; /* Texto en negrita dentro del botón */
+  margin: 0; /* Quita márgenes predeterminados */
+}
+
+/* Lista de Datos Personales */
 ion-list {
-  background: transparent;
+  background: transparent; /* Fondo transparente para usar el de la tarjeta */
+  padding: 0; /* Remueve relleno por defecto */
 }
 
-ion-item {
-  --background: transparent;
-  border-radius: 12px;
-  margin-bottom: 6px;
+ion-list ion-item {
+  --background: #1a232d; /* Fondo ligeramente más claro que la tarjeta */
+  border-radius: 8px; /* Redondea los extremos de cada item */
+  margin-bottom: 8px; /* Separación vertical entre items de la lista */
+  --inner-padding-end: 12px; /* Relleno interno en el lado derecho */
 }
 
-/* 🌿 ICONOS VERDES */
-ion-item ion-icon {
-  color: #2e7d32 !important;
+ion-list ion-item ion-icon {
+  font-size: 25px; /* Tamaño para los iconos de la lista */
 }
 
-/* ✏️ BOTÓN EDIT */
-ion-item ion-button {
-  --color: #c7f9cc;
+ion-list ion-item p {
+  color: #94a3b8; /* Color de etiqueta (ej. Nombre, Correo) */
+  font-size: 0.75rem; /* Letra pequeña para etiquetas */
+  margin: 0 0 2px 0; /* Margen inferior mínimo */
+  text-transform: uppercase; /* Pone las etiquetas en mayúsculas */
 }
 
-/* 🔘 BOTONES */
-ion-button {
-  --border-radius: 12px;
-  font-weight: 500;
+ion-list ion-item h3 {
+  color: #ffffff; /* Color del valor ingresado */
+  font-weight: 600; /* Semi negrita */
+  font-size: 0.95rem; /* Tamaño adecuado para legibilidad */
+  margin: 0; /* Quita márgenes por defecto */
 }
 
-/* 🌿 BOTÓN NORMAL */
-ion-button[color="primary"] {
-  --color: #c7f9cc;
-  --border-color: #2e7d32;
+/* ==========================================================================
+   ⭐ ACORDEÓN DE FAVORITOS
+   ========================================================================== */
+.accordion_fav {
+  margin: 16px; /* Espaciado lateral para alinearse con las tarjetas */
 }
 
-/* 🔥 BOTONES PELIGRO */
-ion-button[color="danger"] {
-  --color: #ff8a80;
-  --border-color: #c62828;
+.accordion_fav ion-accordion {
+  background: #14191f; /* Fondo oscuro idéntico al resto de bloques */
+  border-radius: 12px; /* Redondeo de esquinas */
+  border: 2px solid rgba(255, 255, 255, 0.08); /* Borde sutil */
+  overflow: hidden; /* Oculta esquinas sobrantes al desplegar */
 }
 
-/* 🧠 TEXTO LABEL */
-ion-label p {
-  color: #a5d6a7;
-  font-size: 0.8rem;
+.accordion_fav ion-item[slot="header"] {
+  --background: #14191f; /* Fondo oscuro para el encabezado del acordeón */
+  --color: #ffffff; /* Texto blanco en la cabecera */
+  font-weight: 700; /* Texto en negrita */
 }
 
-ion-label h3 {
-  color: #fff;
-  font-weight: 500;
+.accordion_fav div[slot="content"] {
+  background: #0d1117; /* Fondo ligeramente más oscuro al desplegar contenido */
 }
 
-/* 💀 SKELETON */
-ion-skeleton-text {
-  --background: rgba(255, 255, 255, 0.2);
+/* Botón Recargar Favoritos */
+.refresh-container {
+  display: flex; /* Flexbox para posicionar el botón de recarga */
+  justify-content: flex-end; /* Alinea el botón a la derecha */
+  padding: 10px 5px 6px 6px; /* Relleno superior e interno */
+}
+
+.icon-green {
+  color: rgb(0, 248, 103); /* Icono de actualizar en color verde neón */
+  font-size: 18px; /* Tamaño compacto para el icono recargar */
+}
+
+/* Lista de Favoritos */
+.accordion_fav ion-list ion-item {
+  --background: #14191f; /* Fondo oscuro por item favorito */
+  margin: 0px 8px 8px 8px ; /* Quita espacio entre ítems */
+  border-radius: 10; /* Quita bordes redondeados internos */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Sombra sutil para resaltar cada favorito */
+}
+
+.accordion_fav ion-label h3 {
+  color: #ffffff; /* Texto blanco para el título del evento favorito */
+  font-weight: 700; /* Negrita */
+  font-size: 0.95rem; /* Tamaño de fuente medio */
+}
+
+
+
+
+
+
+/* ==========================================================================
+   🔒 VISTA NO AUTENTICADO (#noAuth)
+   ========================================================================== */
+.welcome-container {
+  margin: 40px 16px 20px 16px; /* Márgenes exteriores (arriba, lados, abajo) */
+  display: flex; /* Activa el modelo de caja flexible */
+  flex-direction: column; /* Apila los elementos verticalmente */
+  gap: 16px; /* Espaciado uniforme entre los elementos hijos */
+}
+
+.welcome-header {
+  text-align: left; /* Alinea todo el texto del encabezado a la izquierda */
+  background: transparent; /* Fondo completamente transparente */
+  padding: 0; /* Remueve cualquier relleno interno */
+}
+
+/* letra ¡Hola, (USUARIO)!*/
+.welcome-header h1 {
+  margin: 0; /* Quita los márgenes por defecto del título */
+  font-size: 28px; /* tamaño letra HOLA*/
+  font-weight: 900; /* grosor letra HOLA*/
+  text-transform: uppercase; /* Convierte el título a mayúsculas */
+}
+
+.welcome-header .avatar-icon {
+  font-size: 70px; /* Tamaño amplio del icono principal de entrada */
+  color: rgb(0, 248, 103); /* Color neón en la cabecera sin usuario */
+  margin-bottom: 12px; /* Espacio antes del título 'Bienvenido' */
+}
+
+.welcome-header p {
+  color: #94a3b8; /* Color gris neutro */
+  margin: 0; /* Quita márgenes externos */
+  font-size: 0.95rem; /* Tamaño de la bajada de texto */
+}
+
+/* Botón Iniciar Sesión */
+.btn-login {
+  --background: #14191f; /* Fondo oscuro sólido */
+  background: #14191f; /* Respaldo para el fondo */
+  --color: rgb(0, 248, 103); /* Texto neón */
+  border: 1px solid rgba(50, 255, 126, 0.4); /* Borde verde brillante */
+  border-radius: 6px; /* Redondeo moderado */
+  font-weight: 700; /* Texto grueso */
+  margin-bottom: 12px; /* Separación con el botón inferior */
+}
+
+/* Botón Registrarse */
+ion-button[fill="outline"], 
+.welcome-container ion-button[fill="outline"] {
+  --background: #14191f; /* Fondo oscuro sólido */
+  background: #14191f; /* Respaldo para el fondo */
+  --border-width: 0px; /* Elimina el borde nativo generado por Ionic */
+  --color: rgb(255, 70, 70);  /* color letras*/
+  border: 2px solid rgb(255, 70, 70); /* Borde rojo personalizado */
+  border-radius: 5px; /* Redondeado de esquinas del botón */
 }

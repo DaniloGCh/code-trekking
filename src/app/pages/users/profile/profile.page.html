@@ -1,111 +1,238 @@
-<!-- src/app/pages/profile/profile.page.html -->
-
+<!-- ========================= -->
+<!-- 👤 HEADER -->
+<!-- ========================= -->
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
+
     <ion-title>Mi Perfil</ion-title>
 
     <ion-buttons slot="end">
 
-      <!-- ✅ Botón de configuración -->
-      <ion-button routerLink="/tabs/settings">
+
+      <ion-button *ngIf="userData" (click)="goHome()">
+        <ion-icon slot="icon-only" name="home-outline"></ion-icon>
+      </ion-button>
+
+
+      <!-- ⚙️ SETTINGS -->
+      <ion-button class="btn-settings" routerLink="/settings">
         <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
 
       <!-- 🚪 LOGOUT -->
-      <ion-button (click)="onLogout()">
+      <ion-button *ngIf="userData" (click)="onLogout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
-       
+
     </ion-buttons>
 
   </ion-toolbar>
 </ion-header>
 
-<ion-content (ionScroll)="onScroll($event)" [scrollEvents]="true">
+<!-- ========================= -->
+<!-- 👤 USUARIO LOGUEADO -->
+<!-- ========================= -->
+<ng-container *ngIf="authReady && userData; else noAuth">
 
-  <div *ngIf="userData">
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-    <!-- FOTO Y NOMBRE -->
+    <!-- ========================= -->
+    <!-- 🖼️ PERFIL HEADER -->
+    <!-- ========================= -->
     <div class="profile-header">
+
+      <!-- 🖼️ AVATAR -->
       <div class="avatar-wrapper" (click)="onChangeFoto()">
-        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img" />
-        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon"></ion-icon>
+
+        <img *ngIf="userData.fotoBase64" [src]="userData.fotoBase64" class="avatar-img"
+          alt="Foto de perfil del usuario" />
+
+        <ion-icon *ngIf="!userData.fotoBase64" name="person-circle-outline" class="avatar-icon">
+        </ion-icon>
+
+        <!-- 📷 OVERLAY -->
         <div class="avatar-overlay">
           <ion-icon name="camera-outline"></ion-icon>
         </div>
       </div>
-      <h2>{{ userData.nombre }}</h2>
-      <ion-badge [color]="userData.rol === 'admin' ? 'danger' : 'primary'">
+
+      <!-- Nombre + botón editar -->
+      <div class="nombre-container">
+        <h2>{{ userData.nombre }}</h2>
+
+        <ion-button fill="clear" size="small" (click)="onEditNombre()">
+          <ion-icon name="pencil-outline" color="success"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Info cambio nombre -->
+      <p *ngIf="userData.ultimoCambioNombre" class="cambio-info">
+        {{ getDiasRestantesCambioNombre() > 0 
+        ? '🔒 Puedes cambiar el nombre en ' + getDiasRestantesCambioNombre() + ' día(s)'
+        : '✅ Puedes cambiar tu nombre' }}
+      </p>
+
+      <ion-badge *ngIf="userData.rol === 'admin'" color="danger">
         {{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}
       </ion-badge>
+
     </div>
 
-    <!-- ESTADO DE ÁNIMO -->
+    <!-- ========================= -->
+    <!-- 😊 ESTADO DEL USUARIO -->
+    <!-- ========================= -->
     <ion-card>
+
       <ion-card-header>
         <ion-card-title>¿Cómo te sientes hoy?</ion-card-title>
+
         <ion-card-subtitle *ngIf="userData.estado">
           Estado actual: {{ userData.estado }}
         </ion-card-subtitle>
       </ion-card-header>
+
       <ion-card-content>
-        <!-- ✅ Un solo botón que abre el selector -->
-        <!-- 🌿 ESTADO -->
-<ion-button expand="block" fill="outline" class="btn-estado" (click)="onChangeEstado()">
-  <ion-icon name="happy-outline" slot="start"></ion-icon>
-  {{ userData.estado ? 'Cambiar estado' : 'Seleccionar estado' }}
-</ion-button>
+        <ion-button expand="block" class="btn-estado" (click)="onChangeEstado()">
+          <ion-icon name="happy-outline" slot="start"></ion-icon>
+          {{ userData.estado ? 'Cambiar estado' : 'Seleccionar estado' }}
+        </ion-button>
       </ion-card-content>
+
     </ion-card>
 
-    <!-- DATOS PERSONALES -->
+    <!-- ========================= -->
+    <!-- 🧾 DATOS PERSONALES -->
+    <!-- ========================= -->
     <ion-card>
+
       <ion-card-header>
         <ion-card-title>Datos personales</ion-card-title>
       </ion-card-header>
+
       <ion-card-content>
+
         <ion-list lines="none">
 
           <ion-item>
-            <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon class="icon-green" name="person-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Nombre</p>
               <h3>{{ userData.nombre }}</h3>
             </ion-label>
-            <ion-button slot="end" fill="clear" (click)="onEditNombre()">
-              <ion-icon name="pencil-outline"></ion-icon>
-            </ion-button>
           </ion-item>
 
           <ion-item>
-            <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+            <ion-icon class="icon-green" name="mail-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Correo</p>
               <h3>{{ userData.email }}</h3>
             </ion-label>
           </ion-item>
 
-          <ion-item>
-            <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
-            <ion-label>
-              <p>Rol</p>
-              <h3>{{ userData.rol === 'admin' ? 'Administrador' : 'Usuario' }}</h3>
-            </ion-label>
-          </ion-item>
 
         </ion-list>
+
       </ion-card-content>
+
     </ion-card>
 
+    <!-- ========================= -->
+    <!-- ⭐ FAVORITOS -->
+    <!-- ========================= -->
+    <ion-accordion-group class="accordion_fav">
 
-  </div>
+      <ion-accordion value="favoritos">
 
-  <!-- SKELETON mientras carga -->
-  <div *ngIf="!userData">
-    <ion-skeleton-text animated
-      style="height: 150px; border-radius: 50%; width: 150px; margin: auto;"></ion-skeleton-text>
-    <ion-skeleton-text animated style="height: 200px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
-    <ion-skeleton-text animated style="height: 150px; border-radius: 8px; margin-top: 16px;"></ion-skeleton-text>
-  </div>
+        <!-- 📌 HEADER -->
+        <ion-item slot="header">
+          <ion-icon name="star" slot="start" color="warning"></ion-icon>
+          <ion-label>Eventos favoritos</ion-label>
+        </ion-item>
 
-</ion-content>
+        <!-- 📦 CONTENIDO -->
+        <div slot="content">
+
+          <div class="refresh-container">
+            <ion-button fill="clear" size="small" (click)="loadFavoritos()">
+              <ion-icon name="refresh-outline" slot="start" class="icon-green"></ion-icon>
+            </ion-button>
+          </div>
+
+          <ion-list>
+
+            <!-- 🚫 VACÍO -->
+            <ion-item *ngIf="favoritos.length === 0">
+              <ion-label class="ion-text-center" color="medium">
+                <p>No tienes eventos favoritos aún</p>
+              </ion-label>
+            </ion-item>
+
+            <!-- ⭐ LISTA -->
+            <ion-item class="favorito-item" *ngFor="let fav of favoritos">
+
+              <ion-label>
+                <h3>{{ fav.nombre }}</h3>
+                <!-- <p>Código: {{ fav.eventoId }}</p> -->
+              </ion-label>
+
+              <!-- ⭐ ICONO -->
+              <ion-icon name="star" color="warning" slot="end"></ion-icon>
+
+              <!-- 👁️ VER -->
+              <ion-button slot="end" fill="clear" color="primary" (click)="verEvento(fav.eventoId)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button>
+
+              <!-- 🗑️ ELIMINAR -->
+              <ion-button slot="end" fill="clear" color="danger" (click)="removeFavorito(fav.eventoId)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+
+            </ion-item>
+
+          </ion-list>
+
+        </div>
+
+      </ion-accordion>
+
+    </ion-accordion-group>
+
+  </ion-content>
+
+</ng-container>
+
+  <!-- ========================= -->
+  <!-- 🚫 USUARIO NO LOGUEADO -->
+  <!-- ========================= -->
+  <ng-template #noAuth>
+
+    <div class="welcome-container">
+
+      <!-- 👋 HEADER -->
+      <div class="welcome-header">
+
+        <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
+
+        <h1>Bienvenido</h1>
+
+        <p>Inicia sesión para acceder a todas las funciones de la aplicación.</p>
+
+      </div>
+
+      <!-- 🔑 LOGIN -->
+      <ion-button expand="block" class="btn-login" (click)="goLogin()">
+        Iniciar sesión
+      </ion-button>
+
+      <!-- 📝 REGISTER -->
+      <ion-button expand="block" fill="outline" (click)="goRegister()">
+        Registrarse
+      </ion-button>
+
+    </div>
+
+  </ng-template>
+
+
