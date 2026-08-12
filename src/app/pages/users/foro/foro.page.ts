@@ -135,7 +135,7 @@ export class ForoPage implements OnInit {
     } as any);
 
     // Hacer scroll al recibir la confirmación de envío
-    setTimeout(() => this.scrollAlFinal(), 150);
+    setTimeout(() => this.scrollAlFinal(), 100);
     } catch {
     await this.showToast('Error al enviar el mensaje', 'danger');
     }
