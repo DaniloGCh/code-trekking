@@ -47,5 +47,20 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>La app necesita tu ubicación para el tracking de rutas de trekking</string>
+
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>La app necesita tu ubicación en segundo plano para continuar el tracking cuando minimices la app</string>
+
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>La app necesita tu ubicación en segundo plano para el tracking de rutas</string>
+
+	<key>UIBackgroundModes</key>
+	<array>
+	<string>location</string>
+	</array>
+
 </dict>
 </plist>
