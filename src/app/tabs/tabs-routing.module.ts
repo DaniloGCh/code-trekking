@@ -10,6 +10,7 @@ const routes: Routes = [
     children: [
       {
         path: 'home',
+        //title: 'Code Trekking - Inicio', <-- Nombre para la pestaña
         loadChildren: () =>
           import('../pages/users/home/home.module').then(m => m.HomePageModule),
         //canActivate: [authGuard]
