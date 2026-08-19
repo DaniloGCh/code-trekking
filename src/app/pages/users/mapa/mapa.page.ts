@@ -234,11 +234,11 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   // =========================
   // ▶️ TRACKING ACTIONS
   // =========================
-  toggleTracking() {
+  async toggleTracking() {
     if (this.trackingService.estadoActual.activo) {
-      this.trackingService.detenerTracking();
+      await this.trackingService.detenerTracking();
     } else {
-      this.trackingService.iniciarTracking();
+      await this.trackingService.iniciarTracking();
     }
   }
 
@@ -263,22 +263,60 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   // ✅ Exportar GPX con advertencia de privacidad
   async exportGPX() {
     if (this.routePoints.length === 0) {
-      await this.showToast('No hay puntos de ruta para exportar', 'warning');
+      await this.showToast(
+        'No hay puntos de ruta para exportar',
+        'warning'
+      );
       return;
     }
 
-    // ✅ Advertencia de privacidad antes de exportar
     const alert = await this.alertCtrl.create({
       header: '⚠️ Privacidad',
-      message: 'El archivo GPX contendrá tus coordenadas GPS exactas. ¿Deseas continuar?',
+
+      message:
+        'El archivo GPX contendrá tus coordenadas GPS exactas. ¿Deseas continuar?',
+
       buttons: [
-        { text: 'Cancelar', role: 'cancel' },
+
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+
         {
           text: 'Exportar',
-          handler: () => this.trackingService.exportarGPX()
+
+          handler: async () => {
+
+            try {
+
+              await this.trackingService.exportarGPX();
+
+              await this.showToast(
+                'GPX generado correctamente',
+                'success'
+              );
+
+            } catch (error) {
+
+              console.error(
+                '❌ Error exportando GPX:',
+                error
+              );
+
+              await this.showToast(
+                'No se pudo exportar la ruta',
+                'danger'
+              );
+
+            }
+
+          }
         }
+
       ]
     });
+
     await alert.present();
   }
 
