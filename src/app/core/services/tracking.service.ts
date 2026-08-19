@@ -2,6 +2,19 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { registerPlugin } from '@capacitor/core';
+
+import {
+  BackgroundGeolocationPlugin,
+  CallbackError,
+  Location
+} from '@capacitor-community/background-geolocation';
+
+import { Capacitor } from '@capacitor/core';
+
+
+const BackgroundGeolocation =
+  registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
 export interface PuntoRuta {
   lat: number;
@@ -17,34 +30,25 @@ export interface EstadoTracking {
   posicionActual: { lat: number; lng: number } | null;
 }
 
-// ✅ Agrega estas interfaces
-export interface PuntoRutaTrazada {
-  lat: number;
-  lng: number;
-}
-
 export interface EstadoRutaTrazada {
   activa: boolean;
-  puntos: PuntoRutaTrazada[];
+  puntos: { lat: number; lng: number }[];
   instrucciones: { instruccion: string; distancia: string }[];
-  perfilRuta: 'hike' | 'foot' | 'car';
+  perfilRuta: string;
   puntosMarcados: { lat: number; lng: number }[];
 }
 
 @Injectable({
-  providedIn: 'root' // ✅ Singleton, vive toda la app
+  providedIn: 'root'
 })
 export class TrackingService {
 
-  private watchId: number | null = null;
-  private posicionWatchId: number | null = null;
-  private timerInterval: any = null;
-  private lastValidPoint: { lat: number; lng: number; time: number } | null = null;
-
-  // ✅ BehaviorSubject para que el mapa se suscriba y reciba updates
+  // =========================
+  // 📊 ESTADO
+  // =========================
   private estado = new BehaviorSubject<EstadoTracking>({
-    activo: false,
-    puntos: [],
+    activo:         false,
+    puntos:         [],
     distanciaTotal: 0,
     tiempoSegundos: 0,
     posicionActual: null,
@@ -52,64 +56,93 @@ export class TrackingService {
 
   estado$ = this.estado.asObservable();
 
-  // ✅ Getter del estado actual
-  get estadoActual(): EstadoTracking {
-    return this.estado.getValue();
+  private estadoRuta: EstadoRutaTrazada = {
+    activa:         false,
+    puntos:         [],
+    instrucciones:  [],
+    perfilRuta:     'hike',
+    puntosMarcados: []
+  };
+
+  // =========================
+  // ⚙️ INTERNOS
+  // =========================
+  private timerInterval: any       = null;
+  private lastValidPoint: { lat: number; lng: number; time: number } | null = null;
+  private watchId: string | null   = null; // ✅ Background geolocation watch ID
+  private posicionWatchId: string | null = null; // ✅ Para watcher de posición
+
+  // ✅ Detectar si estamos en dispositivo nativo o web
+  private esNativo = Capacitor.isNativePlatform();
+
+  // =========================
+  // 📡 WATCHER POSICIÓN (siempre activo)
+  // =========================
+  iniciarWatcherPosicion() {
+    if (this.posicionWatchId !== null) return;
+
+    if (this.esNativo) {
+      // ✅ En dispositivo: usar BackgroundGeolocation
+      this.posicionWatchId = BackgroundGeolocation.addWatcher(
+        {
+          backgroundMessage:  'Trekking App está usando tu ubicación',
+          backgroundTitle:    'Ubicación activa',
+          requestPermissions: true,
+          stale:              false,
+          distanceFilter:     5, // ✅ Actualizar cada 5 metros
+        },
+        (location: Location | undefined, error: CallbackError | undefined) => {
+          if (error || !location) return;
+
+          this.estado.next({
+            ...this.estadoActual,
+            posicionActual: { lat: location.latitude, lng: location.longitude }
+          });
+        }
+      ) as unknown as string;
+
+    } else {
+      // ✅ En web/browser: usar navigator.geolocation
+      const id = navigator.geolocation.watchPosition(
+        (position) => {
+          this.estado.next({
+            ...this.estadoActual,
+            posicionActual: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            }
+          });
+        },
+        (error) => console.warn('Watcher posición error:', error.code),
+        {
+          enableHighAccuracy: true,
+          maximumAge:         10000,
+          timeout:            60000
+        }
+      );
+      this.posicionWatchId = id.toString();
+    }
   }
 
-  // =========================
-  // 📍 WATCHER POSICIÓN (siempre activo)
-  // =========================
-iniciarWatcherPosicion() {
-  if (this.posicionWatchId !== null) return;
+  async detenerWatcherPosicion() {
+    if (this.posicionWatchId === null) return;
 
-  this.posicionWatchId = navigator.geolocation.watchPosition(
-    (position) => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      this.estado.next({
-        ...this.estadoActual,
-        posicionActual: { lat, lng }
-      });
-    },
-    (error) => {
-      // ✅ Manejo específico por tipo de error
-      switch (error.code) {
-        case 1: // PERMISSION_DENIED
-          console.warn('GPS: Permiso denegado');
-          break;
-        case 2: // POSITION_UNAVAILABLE
-          console.warn('GPS: Posición no disponible');
-          break;
-        case 3: // TIMEOUT
-          // ✅ Timeout es normal, simplemente ignorarlo y seguir intentando
-          console.warn('GPS: Timeout, reintentando...');
-          break;
-      }
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 10000,  // ✅ Acepta posición cacheada de hasta 10 segundos
-      timeout: 60000,     // ✅ Aumentar timeout a 60 segundos
+    if (this.esNativo) {
+      await BackgroundGeolocation.removeWatcher({ id: this.posicionWatchId });
+    } else {
+      navigator.geolocation.clearWatch(Number(this.posicionWatchId));
     }
-  );
-}
 
-  detenerWatcherPosicion() {
-    if (this.posicionWatchId !== null) {
-      navigator.geolocation.clearWatch(this.posicionWatchId);
-      this.posicionWatchId = null;
-    }
+    this.posicionWatchId = null;
   }
 
   // =========================
   // ▶️ INICIAR TRACKING
   // =========================
   iniciarTracking() {
-    if (!navigator.geolocation || this.estadoActual.activo) return;
+    if (this.estadoActual.activo) return;
 
-    // Iniciar timer
+    // ✅ Iniciar timer
     this.timerInterval = setInterval(() => {
       this.estado.next({
         ...this.estadoActual,
@@ -117,55 +150,94 @@ iniciarWatcherPosicion() {
       });
     }, 1000);
 
-    this.watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const accuracy = position.coords.accuracy;
-        const now = Date.now();
+    if (this.esNativo) {
+      // ✅ En dispositivo: BackgroundGeolocation con optimización de batería
+      this.watchId = BackgroundGeolocation.addWatcher(
+        {
+          backgroundMessage:  'Registrando tu ruta de trekking...',
+          backgroundTitle:    '🥾 Tracking activo',
+          requestPermissions: true,
+          stale:              false,
+          distanceFilter:     8, // ✅ Actualizar cada 8 metros para ahorrar batería
+        },
+        (location: Location | undefined, error: CallbackError | undefined) => {
+          if (error || !location) return;
 
-        if (accuracy > 30) return;
+          const lat      = location.latitude;
+          const lng      = location.longitude;
+          const accuracy = location.accuracy || 999;
+          const now      = Date.now();
 
-        if (!this.lastValidPoint) {
-          this.lastValidPoint = { lat, lng, time: now };
-          this.agregarPunto(lat, lng);
-          return;
+          // ✅ Filtro de precisión
+          if (accuracy > 30) return;
+
+          if (!this.lastValidPoint) {
+            this.lastValidPoint = { lat, lng, time: now };
+            this.agregarPunto(lat, lng);
+            return;
+          }
+
+          const dist     = this.calcularDistancia(
+            this.lastValidPoint.lat, this.lastValidPoint.lng, lat, lng
+          );
+          const timeDiff = (now - this.lastValidPoint.time) / 1000;
+
+          // ✅ Filtros anti-ruido
+          if (dist < 5 || dist > 80 || timeDiff < 1) return;
+
+          const nuevaDistancia = this.estadoActual.distanciaTotal + dist;
+          this.lastValidPoint  = { lat, lng, time: now };
+          this.agregarPunto(lat, lng, nuevaDistancia);
         }
+      ) as unknown as string;
 
-        const dist = this.calcularDistancia(
-          this.lastValidPoint.lat,
-          this.lastValidPoint.lng,
-          lat, lng
-        );
+    } else {
+      // ✅ En web/browser: navigator.geolocation
+      const id = navigator.geolocation.watchPosition(
+        (position) => {
+          const lat      = position.coords.latitude;
+          const lng      = position.coords.longitude;
+          const accuracy = position.coords.accuracy;
+          const now      = Date.now();
 
-        const timeDiff = (now - this.lastValidPoint.time) / 1000;
+          if (accuracy > 30) return;
 
-        if (dist < 5 || dist > 80 || timeDiff < 1) return;
+          if (!this.lastValidPoint) {
+            this.lastValidPoint = { lat, lng, time: now };
+            this.agregarPunto(lat, lng);
+            return;
+          }
 
-        const nuevaDistancia = this.estadoActual.distanciaTotal + dist;
-        this.lastValidPoint = { lat, lng, time: now };
-        this.agregarPunto(lat, lng, nuevaDistancia);
-      },
-      (error) => console.error('GPS error:', error),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 2000,
-        timeout: 30000
-      }
-    );
+          const dist     = this.calcularDistancia(
+            this.lastValidPoint.lat, this.lastValidPoint.lng, lat, lng
+          );
+          const timeDiff = (now - this.lastValidPoint.time) / 1000;
 
-    this.estado.next({
-      ...this.estadoActual,
-      activo: true
-    });
+          if (dist < 5 || dist > 80 || timeDiff < 1) return;
+
+          const nuevaDistancia = this.estadoActual.distanciaTotal + dist;
+          this.lastValidPoint  = { lat, lng, time: now };
+          this.agregarPunto(lat, lng, nuevaDistancia);
+        },
+        (error) => console.warn('GPS error:', error.code),
+        { enableHighAccuracy: true, maximumAge: 2000, timeout: 30000 }
+      );
+      this.watchId = id.toString();
+    }
+
+    this.estado.next({ ...this.estadoActual, activo: true });
   }
 
   // =========================
   // ⏹ DETENER TRACKING
   // =========================
-  detenerTracking() {
+  async detenerTracking() {
     if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId);
+      if (this.esNativo) {
+        await BackgroundGeolocation.removeWatcher({ id: this.watchId });
+      } else {
+        navigator.geolocation.clearWatch(Number(this.watchId));
+      }
       this.watchId = null;
     }
 
@@ -174,121 +246,95 @@ iniciarWatcherPosicion() {
       this.timerInterval = null;
     }
 
-    this.estado.next({
-      ...this.estadoActual,
-      activo: false
-    });
+    this.estado.next({ ...this.estadoActual, activo: false });
   }
 
   // =========================
   // 🗑️ LIMPIAR RUTA
   // =========================
-  limpiarRuta() {
-    this.detenerTracking();
+  async limpiarRuta() {
+    await this.detenerTracking();
     this.lastValidPoint = null;
 
     this.estado.next({
-      activo: false,
-      puntos: [],
+      activo:         false,
+      puntos:         [],
       distanciaTotal: 0,
       tiempoSegundos: 0,
-      posicionActual: this.estadoActual.posicionActual // ✅ Mantiene posición
+      posicionActual: this.estadoActual.posicionActual
     });
   }
 
   // =========================
-  // 📦 EXPORT GPX
+  // 📦 EXPORTAR GPX
   // =========================
   exportarGPX() {
     const puntos = this.estadoActual.puntos;
     if (puntos.length === 0) return;
 
     let gpx = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    gpx += `<gpx version="1.1" creator="TrekkingApp">\n`;
-    gpx += `<trk><name>Ruta Trekking</name><trkseg>\n`;
-
-    puntos.forEach((p) => {
-      gpx += `<trkpt lat="${p.lat}" lon="${p.lng}"></trkpt>\n`;
-    });
-
-    gpx += `</trkseg></trk>\n</gpx>`;
+    gpx    += `<gpx version="1.1" creator="TrekkingApp">\n`;
+    gpx    += `<trk><name>Ruta Trekking</name><trkseg>\n`;
+    puntos.forEach(p => { gpx += `<trkpt lat="${p.lat}" lon="${p.lng}"></trkpt>\n`; });
+    gpx    += `</trkseg></trk>\n</gpx>`;
 
     const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
     a.download = `ruta-trekking-${Date.now()}.gpx`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   // =========================
+  // 🛣️ RUTA TRAZADA
+  // =========================
+  get estadoRutaActual(): EstadoRutaTrazada {
+    return this.estadoRuta;
+  }
+
+  guardarRutaTrazada(
+    puntos: { lat: number; lng: number }[],
+    instrucciones: { instruccion: string; distancia: string }[],
+    perfilRuta: string,
+    puntosMarcados: { lat: number; lng: number }[]
+  ) {
+    this.estadoRuta = { activa: true, puntos, instrucciones, perfilRuta, puntosMarcados };
+  }
+
+  limpiarRutaTrazada() {
+    this.estadoRuta = {
+      activa: false, puntos: [], instrucciones: [], perfilRuta: 'hike', puntosMarcados: []
+    };
+  }
+
+  // =========================
   // 🔧 HELPERS
   // =========================
+  get estadoActual(): EstadoTracking {
+    return this.estado.getValue();
+  }
+
   private agregarPunto(lat: number, lng: number, nuevaDistancia?: number) {
     const nuevoPunto: PuntoRuta = { lat, lng, timestamp: Date.now() };
-
     this.estado.next({
       ...this.estadoActual,
-      puntos: [...this.estadoActual.puntos, nuevoPunto],
+      puntos:         [...this.estadoActual.puntos, nuevoPunto],
       distanciaTotal: nuevaDistancia ?? this.estadoActual.distanciaTotal,
       posicionActual: { lat, lng }
     });
   }
 
   private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371e3;
+    const R  = 6371e3;
     const φ1 = lat1 * Math.PI / 180;
     const φ2 = lat2 * Math.PI / 180;
     const Δφ = (lat2 - lat1) * Math.PI / 180;
     const Δλ = (lon2 - lon1) * Math.PI / 180;
-    const a =
+    const a  =
       Math.sin(Δφ / 2) ** 2 +
-      Math.cos(φ1) * Math.cos(φ2) *
-      Math.sin(Δλ / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
-
-  // ✅ Estado de ruta trazada persistente
-private estadoRuta = new BehaviorSubject<EstadoRutaTrazada>({
-  activa: false,
-  puntos: [],
-  instrucciones: [],
-  perfilRuta: 'hike',
-  puntosMarcados: [],
-});
-
-estadoRuta$ = this.estadoRuta.asObservable();
-
-get estadoRutaActual(): EstadoRutaTrazada {
-  return this.estadoRuta.getValue();
-}
-
-// ✅ Guardar ruta trazada
-guardarRutaTrazada(
-  puntos: { lat: number; lng: number }[],
-  instrucciones: { instruccion: string; distancia: string }[],
-  perfilRuta: 'hike' | 'foot' | 'car',
-  puntosMarcados: { lat: number; lng: number }[]
-) {
-  this.estadoRuta.next({
-    activa: true,
-    puntos,
-    instrucciones,
-    perfilRuta,
-    puntosMarcados,
-  });
-}
-
-// ✅ Limpiar ruta trazada
-limpiarRutaTrazada() {
-  this.estadoRuta.next({
-    activa: false,
-    puntos: [],
-    instrucciones: [],
-    perfilRuta: 'hike',
-    puntosMarcados: [],
-  });
-}
 }

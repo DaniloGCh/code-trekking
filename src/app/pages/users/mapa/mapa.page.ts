@@ -21,10 +21,10 @@ import { SecurityService } from 'src/app/core/services/security.service';
 export class MapaPage implements AfterViewInit, OnDestroy {
 
   private trackingService = inject(TrackingService);
-  private alertCtrl       = inject(AlertController);
-  private toastCtrl       = inject(ToastController);
-  private router          = inject(Router);
-  private auth            = inject(Auth); // ✅ Para verificar sesión
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
+  private router = inject(Router);
+  private auth = inject(Auth); // ✅ Para verificar sesión
   private security = inject(SecurityService);
 
   // =========================
@@ -34,8 +34,8 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   userMarker!: L.CircleMarker;
   accuracyCircle!: L.Circle;
   routeLine!: L.Polyline;
-  followUser      = true;
-  mostrarTipos    = false;
+  followUser = true;
+  mostrarTipos = false;
   tipoMapaActual: 'calle' | 'satelital' | 'terreno' | 'topo' = 'topo';
   private capas: Record<string, L.TileLayer> = {};
   private capaActual!: L.TileLayer;
@@ -47,12 +47,12 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   estado: EstadoTracking = this.trackingService.estadoActual;
 
   get trackingActive() { return this.estado.activo; }
-  get distanceKm()     { return this.estado.distanciaTotal / 1000; }
+  get distanceKm() { return this.estado.distanciaTotal / 1000; }
   get tiempoSegundos() { return this.estado.tiempoSegundos; }
-  get routePoints()    { return this.estado.puntos; }
+  get routePoints() { return this.estado.puntos; }
 
   get tiempoFormateado(): string {
-    const horas   = Math.floor(this.tiempoSegundos / 3600);
+    const horas = Math.floor(this.tiempoSegundos / 3600);
     const minutos = Math.floor((this.tiempoSegundos % 3600) / 60);
     const segundos = this.tiempoSegundos % 60;
     const hh = horas.toString().padStart(2, '0');
@@ -71,9 +71,9 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   // =========================
   // 🛣️ RUTAS
   // =========================
-  modoRuta            = false;
+  modoRuta = false;
   puntosRuta: L.LatLng[] = [];
-  rutaControl: any    = null;
+  rutaControl: any = null;
   marcadoresRuta: L.Marker[] = [];
   mostrarInstrucciones = false;
   perfilRuta: 'hike' | 'foot' | 'car' = 'hike';
@@ -87,7 +87,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   // 🚀 INIT
   // =========================
   async ngAfterViewInit() {
-    // ✅ Verificar autenticación
     if (!this.auth.currentUser) {
       this.router.navigateByUrl('/login', { replaceUrl: true });
       return;
@@ -95,7 +94,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
     setTimeout(() => {
       this.initMap();
-      this.trackingService.iniciarWatcherPosicion();
+      this.trackingService.iniciarWatcherPosicion(); // ✅ Ya usa BackgroundGeolocation
       this.suscribirseAlEstado();
     }, 300);
   }
@@ -219,11 +218,11 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.instrucciones = rutaGuardada.instrucciones;
-    this.perfilRuta    = rutaGuardada.perfilRuta;
+    this.perfilRuta = rutaGuardada.perfilRuta;
 
     const emojis = ['🟢', '🔴'];
     rutaGuardada.puntosMarcados.forEach((p: any, i: number) => {
-      const icono   = this.crearIconoMarcador(emojis[i], '');
+      const icono = this.crearIconoMarcador(emojis[i], '');
       const marcador = L.marker([p.lat, p.lng], { icon: icono }).addTo(this.map);
       this.marcadoresRuta.push(marcador);
       this.puntosRuta.push(L.latLng(p.lat, p.lng));
@@ -354,7 +353,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     const origen = L.latLng(pos.lat, pos.lng);
     this.puntosRuta.push(origen);
 
-    const icono   = this.crearIconoMarcador('🟢', 'Tu ubicación');
+    const icono = this.crearIconoMarcador('🟢', 'Tu ubicación');
     const marcador = L.marker(origen, { icon: icono }).addTo(this.map);
     this.marcadoresRuta.push(marcador);
 
@@ -367,7 +366,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
     // ✅ Validar ambos puntos antes de llamar a la API
     if (!this.security.isValidCoordinates(origen.lat, origen.lng) ||
-        !this.security.isValidCoordinates(destino.lat, destino.lng)) {
+      !this.security.isValidCoordinates(destino.lat, destino.lng)) {
       await this.showToast('Coordenadas inválidas para trazar ruta', 'danger');
       this.limpiarRutaTrazada();
       return;
@@ -390,7 +389,7 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     const perfilORS: Record<string, string> = {
       hike: 'foot-hiking',
       foot: 'foot-walking',
-      car:  'driving-car'
+      car: 'driving-car'
     };
 
     if (this.perfilRuta === 'car') {
@@ -430,9 +429,9 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         return;
       }
 
-      const feature   = data.features[0];
+      const feature = data.features[0];
       const coordenadas = feature.geometry.coordinates;
-      const resumen   = feature.properties.summary;
+      const resumen = feature.properties.summary;
 
       // ✅ Validar coordenadas de la respuesta
       const latLngs: L.LatLng[] = coordenadas
@@ -444,17 +443,17 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         return;
       }
 
-      const colorRuta = this.perfilRuta === 'car'   ? '#2563eb'
-                      : this.perfilRuta === 'foot'  ? '#f59e0b'
-                      : '#16a34a';
+      const colorRuta = this.perfilRuta === 'car' ? '#2563eb'
+        : this.perfilRuta === 'foot' ? '#f59e0b'
+          : '#16a34a';
 
       this.rutaControl = L.polyline(latLngs, {
-        color:       colorRuta,
-        weight:      this.perfilRuta === 'car' ? 7 : 6,
-        opacity:     0.92,
-        lineJoin:    'round',
-        lineCap:     'round',
-        dashArray:   this.perfilRuta === 'hike' ? '10, 12' : undefined,
+        color: colorRuta,
+        weight: this.perfilRuta === 'car' ? 7 : 6,
+        opacity: 0.92,
+        lineJoin: 'round',
+        lineCap: 'round',
+        dashArray: this.perfilRuta === 'hike' ? '10, 12' : undefined,
         smoothFactor: 1.5
       }).addTo(this.map);
 
@@ -463,13 +462,13 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       const pasos = feature.properties.segments[0].steps;
       this.instrucciones = pasos.map((paso: any) => ({
         instruccion: this.traducirInstruccion(paso.instruction),
-        distancia:   paso.distance < 1000
+        distancia: paso.distance < 1000
           ? `${Math.round(paso.distance)} m`
           : `${(paso.distance / 1000).toFixed(1)} km`
       }));
 
       const distancia = (resumen.distance / 1000).toFixed(2);
-      const tiempo    = Math.round(resumen.duration / 60);
+      const tiempo = Math.round(resumen.duration / 60);
       await this.showToast(`🥾 ${distancia} km · ~${tiempo} min`, 'success');
 
       this.trackingService.guardarRutaTrazada(
@@ -508,32 +507,32 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
     resultado = resultado
       .replace(/turn sharp right/gi, '🔁 Gira fuerte a la derecha')
-      .replace(/turn sharp left/gi,  '🔁 Gira fuerte a la izquierda')
-      .replace(/turn right/gi,       '➡️ Gira a la derecha')
-      .replace(/turn left/gi,        '⬅️ Gira a la izquierda')
-      .replace(/slight right/gi,     '↗️ Mantente a la derecha')
-      .replace(/slight left/gi,      '↖️ Mantente a la izquierda')
+      .replace(/turn sharp left/gi, '🔁 Gira fuerte a la izquierda')
+      .replace(/turn right/gi, '➡️ Gira a la derecha')
+      .replace(/turn left/gi, '⬅️ Gira a la izquierda')
+      .replace(/slight right/gi, '↗️ Mantente a la derecha')
+      .replace(/slight left/gi, '↖️ Mantente a la izquierda')
       .replace(/continue straight/gi, '⬆️ Continúa recto')
-      .replace(/continue onto/gi,    '➡️ Continúa hacia')
-      .replace(/keep right/gi,       '➡️ Mantente a la derecha')
-      .replace(/keep left/gi,        '⬅️ Mantente a la izquierda')
-      .replace(/continue/gi,         '➡️ Continúa')
-      .replace(/onto/gi,             'hacia')
-      .replace(/toward/gi,           'hacia')
-      .replace(/on the left/gi,      '⬅️ a la izquierda')
-      .replace(/on the right/gi,     '➡️ a la derecha')
+      .replace(/continue onto/gi, '➡️ Continúa hacia')
+      .replace(/keep right/gi, '➡️ Mantente a la derecha')
+      .replace(/keep left/gi, '⬅️ Mantente a la izquierda')
+      .replace(/continue/gi, '➡️ Continúa')
+      .replace(/onto/gi, 'hacia')
+      .replace(/toward/gi, 'hacia')
+      .replace(/on the left/gi, '⬅️ a la izquierda')
+      .replace(/on the right/gi, '➡️ a la derecha')
       .replace(/at the roundabout/gi, '🔄 en la rotonda')
       .replace(/enter the roundabout/gi, '🔄 entra a la rotonda')
-      .replace(/exit the roundabout/gi,  '➡️ sal de la rotonda')
-      .replace(/take exit (\d+)/gi,      '➡️ toma la salida $1')
+      .replace(/exit the roundabout/gi, '➡️ sal de la rotonda')
+      .replace(/take exit (\d+)/gi, '➡️ toma la salida $1')
       .replace(/take the (\d+)(st|nd|rd|th) exit/gi, '➡️ toma la salida $1')
-      .replace(/roundabout/gi,           'rotonda')
-      .replace(/make a u-turn/gi,        '🔁 haz un retorno')
-      .replace(/u-turn/gi,               '🔁 retorno')
+      .replace(/roundabout/gi, 'rotonda')
+      .replace(/make a u-turn/gi, '🔁 haz un retorno')
+      .replace(/u-turn/gi, '🔁 retorno')
       .replace(/north/gi, 'norte')
       .replace(/south/gi, 'sur')
-      .replace(/east/gi,  'este')
-      .replace(/west/gi,  'oeste');
+      .replace(/east/gi, 'este')
+      .replace(/west/gi, 'oeste');
 
     return resultado.replace(/\s+/g, ' ').trim();
   }
@@ -545,11 +544,11 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     }
 
     this.marcadoresRuta.forEach(m => m.remove());
-    this.marcadoresRuta      = [];
-    this.puntosRuta          = [];
-    this.instrucciones       = [];
+    this.marcadoresRuta = [];
+    this.puntosRuta = [];
+    this.instrucciones = [];
     this.mostrarInstrucciones = false;
-    this.modoRuta            = false;
+    this.modoRuta = false;
     this.map.off('click');
 
     this.trackingService.limpiarRutaTrazada();
@@ -591,8 +590,10 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   // =========================
   // 🧹 DESTROY
   // =========================
-  ngOnDestroy(): void {
+  // ✅ Actualiza ngOnDestroy para usar async
+  async ngOnDestroy() {
     this.trackingSub?.unsubscribe();
+    await this.trackingService.detenerWatcherPosicion(); // ✅ Limpia correctamente
     if (this.map) this.map.remove();
   }
 }

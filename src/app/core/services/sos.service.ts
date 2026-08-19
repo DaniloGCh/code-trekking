@@ -4,6 +4,18 @@ import { Injectable, inject } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
 import { AuthService, UserData, ContactoEmergencia } from './auth.service';
 import { EventoService } from './evento.service';
+import { registerPlugin } from '@capacitor/core';
+
+import {
+  BackgroundGeolocationPlugin,
+  CallbackError,
+  Location
+} from '@capacitor-community/background-geolocation';
+
+import { Capacitor } from '@capacitor/core';
+
+const BackgroundGeolocation =
+  registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
 
 export interface UbicacionSOS {
   latitud: number;
@@ -41,59 +53,68 @@ export class SosService {
   //   };
   // }
 
-  async obtenerUbicacion(): Promise<UbicacionSOS> {
+async obtenerUbicacion(): Promise<UbicacionSOS> {
+  const esNativo = Capacitor.isNativePlatform();
+
+  if (esNativo) {
+    // ✅ En dispositivo: usar BackgroundGeolocation para mayor precisión
+    return new Promise((resolve, reject) => {
+      const watchId = BackgroundGeolocation.addWatcher(
+        {
+          backgroundMessage:  'Obteniendo ubicación para SOS...',
+          backgroundTitle:    '🆘 SOS - Ubicación',
+          requestPermissions: true,
+          stale:              false,
+          distanceFilter:     0,
+        },
+        async (location, error) => {
+          // ✅ Remover watcher inmediatamente después de obtener posición
+          await BackgroundGeolocation.removeWatcher({ id: await watchId });
+
+          if (error || !location) {
+            reject(new Error('No se pudo obtener ubicación'));
+            return;
+          }
+
+          resolve({
+            latitud:   location.latitude,
+            longitud:  location.longitude,
+            precision: location.accuracy || 0,
+            timestamp: new Date(),
+          });
+        }
+      );
+    });
+
+  } else {
+    // ✅ En web/browser: usar navigator.geolocation
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject(new Error('GPS no disponible en este dispositivo'));
+        reject(new Error('GPS no disponible'));
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
-        (posicion) => {
+        (position) => {
           resolve({
-            latitud: posicion.coords.latitude,
-            longitud: posicion.coords.longitude,
-            precision: posicion.coords.accuracy,
+            latitud:   position.coords.latitude,
+            longitud:  position.coords.longitude,
+            precision: position.coords.accuracy,
             timestamp: new Date(),
           });
         },
         (error) => {
-          switch (error.code) {
-            case 1:
-              reject(new Error('permiso-denegado'));
-              break;
-            case 2:
-              reject(new Error('Posición no disponible'));
-              break;
-            case 3:
-              // ✅ Timeout: reintentar con menor precisión
-              navigator.geolocation.getCurrentPosition(
-                (posicion) => {
-                  resolve({
-                    latitud: posicion.coords.latitude,
-                    longitud: posicion.coords.longitude,
-                    precision: posicion.coords.accuracy,
-                    timestamp: new Date(),
-                  });
-                },
-                (err) => reject(new Error('No se pudo obtener ubicación')),
-                {
-                  enableHighAccuracy: false, // ✅ Menor precisión pero más rápido
-                  timeout: 60000,
-                  maximumAge: 60000         // ✅ Acepta posición cacheada de hasta 1 min
-                }
-              );
-              break;
+          if (error.code === error.PERMISSION_DENIED) {
+            reject(new Error('permiso-denegado'));
+          } else {
+            reject(new Error('No se pudo obtener ubicación'));
           }
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 30000,
-          maximumAge: 10000
-        }
+        { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
       );
     });
   }
+}
 
   // ✅ CONSTRUIR MENSAJE SOS
   construirMensajeSOS(
