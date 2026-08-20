@@ -1,0 +1,36 @@
+<!-- ========================= -->
+<!-- 🧭 HEADER -->
+<!-- ========================= -->
+<ion-header [class.hidden]="hideHeader">
+  <ion-toolbar class="transparent-toolbar">
+
+    <!-- 🔹 TÍTULO -->
+    <ion-title>Galeria</ion-title>
+
+    <!-- 🔘 ACCIONES DERECHA -->
+    <ion-buttons slot="end">
+
+      <!-- profile -->
+      <ion-button *ngIf="userData" (click)="goProfile()">
+        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+      </ion-button>
+
+      <!-- 🚪 Logout (usuario logueado) -->
+      <ion-button *ngIf="userData" (click)="onLogout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<!-- Agrega fullscreen="true" para barra transparente al subir  -->
+<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Galeria</ion-title>
+    </ion-toolbar>
+  </ion-header>
+</ion-content>
+
