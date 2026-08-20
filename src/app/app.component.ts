@@ -33,40 +33,23 @@ export class AppComponent
     // 🕐 Reloj global
     this.timeService.startClock();
 
-
-    // 🌤️ Cargar clima inicial
-    await this.weatherGlobal.loadWeather();
-
-
+    
     // 📡 Actualizar clima al desplazarse
-    await this.weatherGlobal
-      .startLocationTracking();
+    await this.weatherGlobal.startLocationTracking();
 
 
-    // 📱 Botón atrás Android
-    this.backButtonListener =
-      await App.addListener(
-        'backButton',
-        ({ canGoBack }) => {
-
-          if (canGoBack) {
-
-            window.history.back();
-
-          } else {
-
-            this.router.navigateByUrl(
-              '/tabs/home',
-              {
-                replaceUrl: true
-              }
-            );
-
-          }
-
-        }
-      );
-  }
+  // 📱 Botón atrás Android
+  this.backButtonListener = await App.addListener(
+    'backButton',
+    ({ canGoBack }) => {
+      if (canGoBack) {
+        window.history.back();
+      } else {
+        this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
+      }
+    }
+  );
+}
 
 
   // =========================================================
