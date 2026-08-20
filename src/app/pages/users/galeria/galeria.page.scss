@@ -1,0 +1,39 @@
+/* Fondo general con la imagen visible pero oscura */
+ion-content {
+  --background: linear-gradient(rgba(10, 12, 16, 0.973), rgba(10, 12, 16, 0.904)),
+                url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
+  font-family: 'Lexend', sans-serif;
+  --color: #e2e8f0;
+}
+
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (inicio - usuario y salir)
+   ========================================================================== */
+/* para esconder la barra */
+   ion-header {
+  transition: transform 0.3s ease-in-out;
+}
+
+ion-header.hidden {
+  transform: translateY(-100%);
+}
+/* inicio */
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Totalmente sólido */
+  --color: rgb(0, 248, 103);  /* color letras*/
+  border-bottom: 1px solid var(--glass-border);
+}
+/* Grosor del titulo */
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
+}
+
+/* color y tamaño (inicio - usuario y salir) */
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103);  /* color iconos*/
+  font-size: 1rem;
+}
+
