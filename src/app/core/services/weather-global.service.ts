@@ -1,10 +1,19 @@
 // src/app/core/services/weather-global.service.ts
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import {
+  BehaviorSubject,
+  firstValueFrom
+} from 'rxjs';
 
-import { WeatherService } from './weather.service';
-import { SosService, UbicacionSOS } from './sos.service';
+import {
+  WeatherService
+} from './weather.service';
+
+import {
+  SosService,
+  UbicacionSOS
+} from './sos.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +28,12 @@ export class WeatherGlobalService {
     new BehaviorSubject<number | null>(null);
 
   description =
-    new BehaviorSubject<string>('Cargando...');
+    new BehaviorSubject<string>('');
 
   icon =
-    new BehaviorSubject<string>('partly-sunny');
+    new BehaviorSubject<string>(
+      'partly-sunny'
+    );
 
   humidity =
     new BehaviorSubject<number | null>(null);
@@ -32,7 +43,7 @@ export class WeatherGlobalService {
 
   locationName =
     new BehaviorSubject<string>(
-      'Obteniendo ubicación...'
+      'Ubicación desconocida'
     );
 
 
@@ -40,10 +51,14 @@ export class WeatherGlobalService {
   // 📍 CONTROL GPS
   // =========================================================
 
-  private watchId: string | null = null;
+  private watchId:
+    string | null = null;
 
   private lastCoords:
-    { lat: number; lon: number } | null = null;
+    {
+      lat: number;
+      lon: number;
+    } | null = null;
 
 
   // =========================================================
@@ -52,6 +67,10 @@ export class WeatherGlobalService {
 
   private lastLocationName:
     string | null = null;
+
+
+  // Evita varias cargas simultáneas
+  private loadingWeather = false;
 
 
   constructor(
@@ -64,25 +83,46 @@ export class WeatherGlobalService {
   // 🌤️ CARGAR CLIMA
   // =========================================================
 
-  async loadWeather(): Promise<void> {
+  async loadWeather(
+    ubicacion?: UbicacionSOS
+  ): Promise<void> {
+
+    // =======================================================
+    // 🛑 EVITAR PETICIONES SIMULTÁNEAS
+    // =======================================================
+
+    if (this.loadingWeather) {
+
+      console.log(
+        '⏳ Ya se está cargando el clima'
+      );
+
+      return;
+    }
+
+    this.loadingWeather = true;
 
     try {
 
       console.log(
-        '🌤️ Iniciando carga del clima...'
+        '🌤️ Cargando clima...'
       );
 
 
       // =====================================================
-      // 📍 GPS
+      // 📍 SI NO RECIBIMOS UBICACIÓN,
+      //    OBTENER GPS
       // =====================================================
 
-      const ubicacion =
-        await this.sosService.obtenerUbicacion();
+      if (!ubicacion) {
+
+        ubicacion =
+          await this.sosService.obtenerUbicacion();
+      }
 
 
       console.log(
-        '📍 Coordenadas GPS:',
+        '📍 Coordenadas:',
         ubicacion.latitud,
         ubicacion.longitud
       );
@@ -94,27 +134,26 @@ export class WeatherGlobalService {
 
       const weatherData: any =
         await firstValueFrom(
-          this.weatherService.getWeatherByCoords(
-            ubicacion.latitud,
-            ubicacion.longitud
-          )
+
+          this.weatherService
+            .getWeatherByCoords(
+              ubicacion.latitud,
+              ubicacion.longitud
+            )
         );
-
-
-      console.log(
-        '🌤️ OpenWeather:',
-        weatherData
-      );
 
 
       // =====================================================
       // 🌡️ TEMPERATURA
       // =====================================================
 
-      this.temperature.next(
+      const temp =
         Math.round(
           weatherData.main.temp
-        )
+        );
+
+      this.temperature.next(
+        temp
       );
 
 
@@ -123,53 +162,62 @@ export class WeatherGlobalService {
       // =====================================================
 
       const main =
-        weatherData.weather?.[0]?.main || '';
+        weatherData.weather[0].main;
 
       const desc =
-        weatherData.weather?.[0]?.description || '';
+        weatherData.weather[0]
+          .description
+          .toLowerCase();
 
-      this.description.next(desc);
+      this.description.next(
+        weatherData.weather[0]
+          .description
+      );
 
 
       // =====================================================
       // 🎨 ICONO
       // =====================================================
 
-      const descLower =
-        desc.toLowerCase();
-
-
       if (
-        descLower.includes('lluvia') ||
-        descLower.includes('rain') ||
-        descLower.includes('drizzle') ||
-        descLower.includes('shower')
+        desc.includes('lluvia') ||
+        desc.includes('rain') ||
+        desc.includes('drizzle') ||
+        desc.includes('shower')
       ) {
 
-        this.icon.next('rainy');
+        this.icon.next(
+          'rainy'
+        );
 
       }
       else if (
-        main === 'Thunderstorm' ||
-        descLower.includes('tormenta')
+        desc.includes('tormenta') ||
+        main === 'Thunderstorm'
       ) {
 
-        this.icon.next('thunderstorm');
+        this.icon.next(
+          'thunderstorm'
+        );
 
       }
       else if (
-        main === 'Clouds' ||
-        descLower.includes('nube')
+        desc.includes('nube') ||
+        main === 'Clouds'
       ) {
 
-        this.icon.next('cloudy');
+        this.icon.next(
+          'cloudy'
+        );
 
       }
       else if (
         main === 'Clear'
       ) {
 
-        this.icon.next('sunny');
+        this.icon.next(
+          'sunny'
+        );
 
       }
       else {
@@ -193,10 +241,13 @@ export class WeatherGlobalService {
       // 🌬️ VIENTO
       // =====================================================
 
-      this.windSpeed.next(
+      const windSpeed =
         Math.round(
           weatherData.wind.speed * 3.6
-        )
+        );
+
+      this.windSpeed.next(
+        windSpeed
       );
 
 
@@ -204,22 +255,20 @@ export class WeatherGlobalService {
       // 📍 NOMBRE DE UBICACIÓN
       // =====================================================
 
-      if (this.lastLocationName) {
-
-        this.locationName.next(
-          this.lastLocationName
-        );
-
-      } else {
+      if (
+        !this.lastLocationName
+      ) {
 
         try {
 
           const locationData: any =
             await firstValueFrom(
-              this.weatherService.getLocationName(
-                ubicacion.latitud,
-                ubicacion.longitud
-              )
+
+              this.weatherService
+                .getLocationName(
+                  ubicacion.latitud,
+                  ubicacion.longitud
+                )
             );
 
 
@@ -240,23 +289,23 @@ export class WeatherGlobalService {
           this.lastLocationName =
             lugar;
 
-
-          this.locationName.next(
-            lugar
-          );
-
         } catch (error) {
 
           console.warn(
-            '⚠️ Nominatim no disponible:',
+            '⚠️ No se pudo obtener nombre de ubicación:',
             error
           );
 
-          this.locationName.next(
-            'Ubicación actual'
-          );
+          this.lastLocationName =
+            'Ubicación actual';
         }
       }
+
+
+      this.locationName.next(
+        this.lastLocationName ||
+        'Ubicación actual'
+      );
 
 
       console.log(
@@ -266,10 +315,18 @@ export class WeatherGlobalService {
     } catch (error: any) {
 
       console.error(
-        '❌ ERROR COMPLETO DEL CLIMA:',
+        '❌ Error cargando clima:',
         error
       );
 
+      /*
+       * IMPORTANTE:
+       *
+       * NO borramos el clima anterior.
+       *
+       * Si el GPS falla temporalmente,
+       * mantenemos el último clima válido.
+       */
 
       if (
         error?.message ===
@@ -279,8 +336,8 @@ export class WeatherGlobalService {
         this.locationName.next(
           'Permiso de ubicación denegado'
         );
-
       }
+
       else if (
         error?.message ===
         'tiempo-excedido'
@@ -289,53 +346,39 @@ export class WeatherGlobalService {
         this.locationName.next(
           'GPS lento, intenta de nuevo'
         );
-
       }
-      else if (
-        error?.message ===
-        'ubicacion-no-disponible'
-      ) {
+
+      else {
 
         this.locationName.next(
           'Ubicación no disponible'
         );
-
-      }
-      else {
-
-        this.locationName.next(
-          'Error de ubicación'
-        );
       }
 
+    } finally {
 
-      this.temperature.next(null);
-
-      this.description.next(
-        'Sin datos'
-      );
-
-      this.icon.next(
-        'help-circle'
-      );
-
-      this.humidity.next(null);
-
-      this.windSpeed.next(null);
+      this.loadingWeather =
+        false;
     }
   }
 
 
   // =========================================================
-  // 📡 SEGUIMIENTO GPS
+  // 📡 INICIAR SEGUIMIENTO
   // =========================================================
 
   async startLocationTracking(): Promise<void> {
 
-    if (this.watchId !== null) {
+    // =======================================================
+    // 🛑 EVITAR DUPLICAR WATCHER
+    // =======================================================
+
+    if (
+      this.watchId !== null
+    ) {
 
       console.log(
-        '⚠️ Watcher ya iniciado'
+        '⚠️ El seguimiento GPS ya está activo'
       );
 
       return;
@@ -347,84 +390,161 @@ export class WeatherGlobalService {
     );
 
 
-    // =====================================================
-    // 📍 PRIMERA UBICACIÓN
-    // =====================================================
+    // =======================================================
+    // 📍 OBTENER PRIMERA UBICACIÓN
+    // =======================================================
 
-    await this.loadWeather();
+    try {
+
+      const ubicacion =
+        await this.sosService
+          .obtenerUbicacion();
 
 
-    // =====================================================
-    // 📡 CREAR WATCHER
-    // =====================================================
+      this.lastCoords = {
+
+        lat:
+          ubicacion.latitud,
+
+        lon:
+          ubicacion.longitud
+      };
+
+
+      // IMPORTANTE:
+      // usamos la ubicación que ya obtuvimos
+
+      await this.loadWeather(
+        ubicacion
+      );
+
+    } catch (error) {
+
+      console.error(
+        '❌ No se pudo obtener ubicación inicial:',
+        error
+      );
+
+      return;
+    }
+
+
+    // =======================================================
+    // 📡 INICIAR WATCHER
+    // =======================================================
 
     this.watchId =
-      await this.sosService.watchUbicacion(
-        async (ubicacion: UbicacionSOS) => {
+      await this.sosService
+        .watchUbicacion(
 
-          console.log(
-            '📍 Nueva posición GPS:',
-            ubicacion.latitud,
-            ubicacion.longitud
-          );
+          async (
+            ubicacion: UbicacionSOS
+          ) => {
 
-
-          // Primera posición
-          if (!this.lastCoords) {
-
-            this.lastCoords = {
-              lat: ubicacion.latitud,
-              lon: ubicacion.longitud
-            };
-
-            return;
-          }
-
-
-          const distancia =
-            this.calcularDistancia(
-              this.lastCoords.lat,
-              this.lastCoords.lon,
+            console.log(
+              '📍 Nueva posición:',
               ubicacion.latitud,
               ubicacion.longitud
             );
 
 
-          console.log(
-            '📏 Distancia:',
-            Math.round(distancia),
-            'm'
-          );
+            // ===============================================
+            // 📍 PRIMERA POSICIÓN
+            // ===============================================
+
+            if (
+              !this.lastCoords
+            ) {
+
+              this.lastCoords = {
+
+                lat:
+                  ubicacion.latitud,
+
+                lon:
+                  ubicacion.longitud
+              };
+
+              return;
+            }
 
 
-          // Actualizar clima cada 200 m
-          if (distancia > 200) {
+            // ===============================================
+            // 📏 DISTANCIA
+            // ===============================================
+
+            const distancia =
+              this.calcularDistancia(
+
+                this.lastCoords.lat,
+
+                this.lastCoords.lon,
+
+                ubicacion.latitud,
+
+                ubicacion.longitud
+              );
+
 
             console.log(
-              '🔄 Actualizando clima...'
+              '📏 Distancia:',
+              Math.round(
+                distancia
+              ),
+              'metros'
             );
 
 
-            this.lastCoords = {
-              lat: ubicacion.latitud,
-              lon: ubicacion.longitud
-            };
+            // ===============================================
+            // 🔄 SOLO ACTUALIZAR +200m
+            // ===============================================
+
+            if (
+              distancia > 200
+            ) {
+
+              console.log(
+                '🔄 Actualizando clima por movimiento...'
+              );
 
 
-            this.lastLocationName =
-              null;
+              this.lastCoords = {
+
+                lat:
+                  ubicacion.latitud,
+
+                lon:
+                  ubicacion.longitud
+              };
 
 
-            await this.loadWeather();
+              // Limpiar cache
+              this.lastLocationName =
+                null;
+
+
+              // IMPORTANTE:
+              // usamos directamente la ubicación
+              // recibida por el watcher
+
+              await this.loadWeather(
+                ubicacion
+              );
+            }
           }
-        }
-      );
+        );
 
 
     if (!this.watchId) {
 
       console.error(
         '❌ No se pudo iniciar watcher GPS'
+      );
+
+    } else {
+
+      console.log(
+        '✅ Seguimiento GPS activo'
       );
     }
   }
@@ -436,7 +556,10 @@ export class WeatherGlobalService {
 
   async stopLocationTracking(): Promise<void> {
 
-    if (!this.watchId) {
+    if (
+      !this.watchId
+    ) {
+
       return;
     }
 
@@ -447,7 +570,9 @@ export class WeatherGlobalService {
       );
 
 
-    this.watchId = null;
+    this.watchId =
+      null;
+
 
     console.log(
       '🛑 Seguimiento GPS detenido'
@@ -456,45 +581,69 @@ export class WeatherGlobalService {
 
 
   // =========================================================
-  // 📏 DISTANCIA
+  // 📏 CALCULAR DISTANCIA
   // =========================================================
 
   private calcularDistancia(
+
     lat1: number,
     lon1: number,
+
     lat2: number,
     lon2: number
+
   ): number {
 
-    const R = 6371e3;
+    const R =
+      6371e3;
+
 
     const φ1 =
-      lat1 * Math.PI / 180;
+      lat1 *
+      Math.PI /
+      180;
+
 
     const φ2 =
-      lat2 * Math.PI / 180;
+      lat2 *
+      Math.PI /
+      180;
+
 
     const Δφ =
       (lat2 - lat1) *
-      Math.PI / 180;
+      Math.PI /
+      180;
+
 
     const Δλ =
       (lon2 - lon1) *
-      Math.PI / 180;
+      Math.PI /
+      180;
 
 
     const a =
-      Math.sin(Δφ / 2) ** 2 +
+      Math.sin(
+        Δφ / 2
+      ) ** 2 +
+
       Math.cos(φ1) *
       Math.cos(φ2) *
-      Math.sin(Δλ / 2) ** 2;
+
+      Math.sin(
+        Δλ / 2
+      ) ** 2;
 
 
     const c =
       2 *
       Math.atan2(
+
         Math.sqrt(a),
-        Math.sqrt(1 - a)
+
+        Math.sqrt(
+          1 - a
+        )
       );
 
 
