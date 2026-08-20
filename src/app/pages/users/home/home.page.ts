@@ -94,42 +94,49 @@ export class HomePage implements OnInit, OnDestroy {
   // =========================
   ngOnInit() {
 
+    this.weatherGlobal.startLocationTracking();
+
     this.authSub =
-      this.authService.currentUser$.subscribe(async user => {
+      this.authService.currentUser$
+        .subscribe(async user => {
 
-        this.authReady = true;
+          this.authReady = true;
 
-        if (user) {
+          if (user) {
 
-          this.userData =
-            await this.authService.getCurrentUserData();
+            this.userData =
+              await this.authService
+                .getCurrentUserData();
 
-          this.consejoService
-            .getConsejos()
-            .subscribe(data => {
-              this.consejos =
-                this.shuffleArray(data);
-            });
+            this.consejoService
+              .getConsejos()
+              .subscribe(data => {
 
-          this.eventosSub =
-            this.eventoService
-              .getMisEventos()
-              .subscribe(eventos => {
-                this.misEventos = eventos;
+                this.consejos =
+                  this.shuffleArray(data);
               });
 
-          // 🌤️ Iniciar clima después de confirmar sesión
-          await this.weatherGlobal.startLocationTracking();
+            this.eventosSub =
+              this.eventoService
+                .getMisEventos()
+                .subscribe(eventos => {
 
-        } else {
+                  this.misEventos =
+                    eventos;
+                });
 
-          this.userData = null;
-          this.misEventos = [];
-          this.consejos = [];
+          } else {
 
-          await this.weatherGlobal.stopLocationTracking();
-        }
-      });
+            this.userData =
+              null;
+
+            this.misEventos =
+              [];
+
+            this.consejos =
+              [];
+          }
+        });
   }
 
   // =========================
@@ -326,7 +333,8 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.eventosSub?.unsubscribe();
 
-    this.weatherGlobal.stopLocationTracking();
+    this.weatherGlobal
+      .stopLocationTracking();
   }
 
   // =========================

@@ -24,41 +24,39 @@ export class SosService {
 
     try {
 
-      console.log('📍 Solicitando permisos GPS...');
+      console.log('📍 Solicitando permisos de ubicación...');
 
       const permisos = await Geolocation.checkPermissions();
 
-      console.log('📍 Estado permisos:', permisos);
+      let estado = permisos.location;
 
-      if (permisos.location !== 'granted') {
+      if (estado !== 'granted') {
 
         const nuevosPermisos =
           await Geolocation.requestPermissions();
 
-        console.log(
-          '📍 Permisos después de solicitar:',
-          nuevosPermisos
-        );
-
-        if (nuevosPermisos.location !== 'granted') {
-          throw new Error('permiso-denegado');
-        }
+        estado = nuevosPermisos.location;
       }
 
-      console.log('📡 Obteniendo posición GPS...');
+      if (estado !== 'granted') {
+
+        console.error('❌ Permiso de ubicación denegado');
+
+        throw new Error('permiso-denegado');
+      }
+
+      console.log('✅ Permiso de ubicación concedido');
+
+      // =====================================================
+      // 📍 OBTENER GPS
+      // =====================================================
 
       const posicion =
         await Geolocation.getCurrentPosition({
           enableHighAccuracy: true,
-          timeout: 30000,
-          maximumAge: 0
+          timeout: 60000,
+          maximumAge: 10000
         });
-
-      console.log(
-        '📍 Posición obtenida:',
-        posicion.coords.latitude,
-        posicion.coords.longitude
-      );
 
       const lat =
         posicion.coords.latitude;
@@ -70,48 +68,95 @@ export class SosService {
         !Number.isFinite(lat) ||
         !Number.isFinite(lon)
       ) {
+
+        console.error(
+          '❌ Coordenadas inválidas:',
+          lat,
+          lon
+        );
+
         throw new Error('ubicacion-no-disponible');
       }
 
+      console.log(
+        '✅ GPS obtenido:',
+        lat,
+        lon
+      );
+
       return {
+
         latitud: lat,
+
         longitud: lon,
-        precision: posicion.coords.accuracy ?? 0,
-        timestamp: new Date()
+
+        precision:
+          posicion.coords.accuracy ?? 0,
+
+        timestamp:
+          new Date(posicion.timestamp)
+
       };
 
     } catch (error: any) {
 
       console.error(
-        '❌ Error obteniendo ubicación GPS:',
+        '❌ Error obteniendo ubicación:',
         error
       );
 
-      console.error(
-        '❌ Código:',
-        error?.code
-      );
+      const code =
+        error?.code;
 
-      console.error(
-        '❌ Mensaje:',
-        error?.message
-      );
+      // =====================================================
+      // 🔐 PERMISO DENEGADO
+      // =====================================================
 
       if (
-        error?.message === 'permiso-denegado' ||
-        error?.code === 'OS-PLUG-GLOC-0003'
+        code === 'OS-PLUG-GLOC-0003' ||
+        error?.message === 'permiso-denegado'
       ) {
-        throw new Error('permiso-denegado');
+
+        throw new Error(
+          'permiso-denegado'
+        );
       }
+
+      // =====================================================
+      // 📍 SERVICIOS DE UBICACIÓN DESACTIVADOS
+      // =====================================================
 
       if (
-        error?.code === 'OS-PLUG-GLOC-0010' ||
-        error?.message?.toLowerCase()?.includes('timeout')
+        code === 'OS-PLUG-GLOC-0007' ||
+        code === 'OS-PLUG-GLOC-0009' ||
+        code === 'OS-PLUG-GLOC-0017'
       ) {
-        throw new Error('tiempo-excedido');
+
+        throw new Error(
+          'ubicacion-no-disponible'
+        );
       }
 
-      throw new Error('ubicacion-no-disponible');
+      // =====================================================
+      // ⏱️ TIMEOUT
+      // =====================================================
+
+      if (
+        code === 'OS-PLUG-GLOC-0010'
+      ) {
+
+        throw new Error(
+          'tiempo-excedido'
+        );
+      }
+
+      // =====================================================
+      // ❌ ERROR GENERAL
+      // =====================================================
+
+      throw new Error(
+        'ubicacion-no-disponible'
+      );
     }
   }
 
@@ -126,45 +171,84 @@ export class SosService {
 
     try {
 
+      console.log(
+        '📡 Iniciando watcher GPS...'
+      );
+
+      // =====================================================
+      // 🔐 PERMISOS
+      // =====================================================
+
       const permisos =
         await Geolocation.checkPermissions();
 
-      if (permisos.location !== 'granted') {
+      let estado =
+        permisos.location;
+
+      if (estado !== 'granted') {
 
         const nuevosPermisos =
           await Geolocation.requestPermissions();
 
-        if (nuevosPermisos.location !== 'granted') {
-
-          console.error(
-            '❌ Permiso GPS denegado'
-          );
-
-          return null;
-        }
+        estado =
+          nuevosPermisos.location;
       }
+
+      if (estado !== 'granted') {
+
+        console.error(
+          '❌ No hay permiso para seguimiento GPS'
+        );
+
+        return null;
+      }
+
+      // =====================================================
+      // 📡 WATCH POSITION
+      // =====================================================
 
       const watchId =
         await Geolocation.watchPosition(
+
           {
             enableHighAccuracy: true,
-            maximumAge: 5000,
-            timeout: 30000
+
+            timeout: 60000,
+
+            maximumAge: 10000
           },
 
           (position, error) => {
 
+            // =================================================
+            // ⚠️ ERROR TEMPORAL DEL WATCHER
+            // =================================================
+
             if (error) {
 
-              console.error(
-                '❌ Error watcher GPS:',
+              console.warn(
+                '⚠️ Error temporal del watcher GPS:',
                 error
               );
+
+              // IMPORTANTE:
+              // No lanzamos error.
+              // No borramos el clima.
+              // Esperamos la siguiente posición.
 
               return;
             }
 
+            // =================================================
+            // 📍 SIN POSICIÓN
+            // =================================================
+
             if (!position) {
+
+              console.warn(
+                '⚠️ Watcher no entregó posición'
+              );
+
               return;
             }
 
@@ -174,33 +258,55 @@ export class SosService {
             const lon =
               position.coords.longitude;
 
+            // =================================================
+            // 🔎 VALIDAR COORDENADAS
+            // =================================================
+
             if (
               !Number.isFinite(lat) ||
               !Number.isFinite(lon)
             ) {
 
               console.warn(
-                '⚠️ Coordenadas GPS inválidas'
+                '⚠️ Coordenadas inválidas'
               );
 
               return;
             }
 
+            // =================================================
+            // 📦 CONSTRUIR UBICACIÓN
+            // =================================================
+
             const ubicacion: UbicacionSOS = {
 
-              latitud: lat,
+              latitud:
+                lat,
 
-              longitud: lon,
+              longitud:
+                lon,
 
               precision:
                 position.coords.accuracy ?? 0,
 
               timestamp:
-                new Date()
+                new Date(position.timestamp)
 
             };
 
-            callback(ubicacion);
+            console.log(
+              '📍 Nueva ubicación GPS:',
+              lat,
+              lon
+            );
+
+            // =================================================
+            // 📤 ENTREGAR POSICIÓN
+            // =================================================
+
+            callback(
+              ubicacion
+            );
           }
         );
 
@@ -290,6 +396,7 @@ export class SosService {
       `👤 Persona: ${userData.nombre}\n`;
 
     if (eventoNombre) {
+
       mensaje +=
         `🏔️ Evento: ${eventoNombre}\n`;
     }
