@@ -1,12 +1,10 @@
-import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
-import { TimeService } from 'src/app/core/services/time.service';
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { App } from '@capacitor/app';
 import { Router } from '@angular/router';
 
-import { Fullscreen } from '@boengli/capacitor-fullscreen';
+import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
+import { TimeService } from 'src/app/core/services/time.service';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +12,8 @@ import { Fullscreen } from '@boengli/capacitor-fullscreen';
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent
+  implements OnInit, OnDestroy {
 
   private backButtonListener: any;
 
@@ -24,73 +23,64 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
-  async ngOnInit() {
 
-    // 🌤️ Clima global
-    this.weatherGlobal.loadWeather();
+  // =========================================================
+  // 🚀 INICIO
+  // =========================================================
+
+  async ngOnInit() {
 
     // 🕐 Reloj global
     this.timeService.startClock();
 
-    // 📱 BOTÓN ATRÁS DE ANDROID
-    this.backButtonListener = await App.addListener(
-      'backButton',
-      ({ canGoBack }) => {
 
-        if (canGoBack) {
+    // 🌤️ Cargar clima inicial
+    await this.weatherGlobal.loadWeather();
 
-          window.history.back();
 
-        } else {
+    // 📡 Actualizar clima al desplazarse
+    await this.weatherGlobal
+      .startLocationTracking();
 
-          this.router.navigateByUrl(
-            '/tabs/home',
-            { replaceUrl: true }
-          );
+
+    // 📱 Botón atrás Android
+    this.backButtonListener =
+      await App.addListener(
+        'backButton',
+        ({ canGoBack }) => {
+
+          if (canGoBack) {
+
+            window.history.back();
+
+          } else {
+
+            this.router.navigateByUrl(
+              '/tabs/home',
+              {
+                replaceUrl: true
+              }
+            );
+
+          }
 
         }
-
-      }
-    );
-
-    // 🖥️ MODO PANTALLA COMPLETA
-    await this.activarPantallaCompleta();
-
+      );
   }
 
-  private async activarPantallaCompleta() {
 
-    // Solo Android
-    if (this.esAndroid()) {
-
-      try {
-
-        await Fullscreen.activateImmersiveMode();
-
-        console.log('✅ Modo pantalla completa activado');
-
-      } catch (error) {
-
-        console.error(
-          '❌ No se pudo activar pantalla completa:',
-          error
-        );
-
-      }
-
-    }
-
-  }
-
-  private esAndroid(): boolean {
-    return /Android/i.test(navigator.userAgent);
-  }
+  // =========================================================
+  // 🧹 DESTRUIR
+  // =========================================================
 
   async ngOnDestroy() {
 
-    // 🧹 Limpiar listener del botón atrás
-    await this.backButtonListener?.remove();
+    await this.weatherGlobal
+      .stopLocationTracking();
 
+
+    await this.backButtonListener
+      ?.remove();
   }
 
 }
