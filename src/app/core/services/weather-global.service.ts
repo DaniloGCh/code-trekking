@@ -1,7 +1,7 @@
 // src/app/core/services/weather-global.service.ts
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { WeatherService } from './weather.service';
 import { SosService, UbicacionSOS } from './sos.service';
@@ -38,6 +38,8 @@ export class WeatherGlobalService {
   // Evita varias cargas simultáneas
   private loadingWeather = false;
 
+  private apiKey = 'f8e0d33985f63435dd27a164a34eabba';
+
   constructor(
     private weatherService: WeatherService,
     private sosService: SosService
@@ -46,9 +48,6 @@ export class WeatherGlobalService {
   // =========================================================
   // 🧭 TRADUCIR ERROR DE UBICACIÓN A MENSAJE PARA EL USUARIO
   // =========================================================
-  //
-  // Centralizado acá para no repetir la misma lógica en
-  // loadWeather() y en startLocationTracking().
 
   private mensajeErrorUbicacion(error: any): string {
 
@@ -60,19 +59,12 @@ export class WeatherGlobalService {
       return 'GPS lento, intenta de nuevo';
     }
 
-    // "ubicacion-no-disponible" u otro error no clasificado
     return 'GPS no disponible';
   }
 
   // =========================================================
   // 🌤️ CARGAR CLIMA
   // =========================================================
-  //
-  // IMPORTANTE: dividido en dos pasos con try/catch separados.
-  // Antes, un error del GPS y un error de la API de OpenWeather
-  // caían en el mismo catch y mostraban el mismo mensaje
-  // ("Ubicación no disponible"), lo que impedía saber cuál de
-  // los dos había fallado realmente en dispositivo real.
 
   async loadWeather(ubicacion?: UbicacionSOS): Promise<void> {
 
@@ -85,7 +77,6 @@ export class WeatherGlobalService {
 
     // =======================================================
     // 📍 PASO 1: OBTENER UBICACIÓN
-    //    (si falla, el problema es el GPS/permisos)
     // =======================================================
 
     if (!ubicacion) {
@@ -99,7 +90,6 @@ export class WeatherGlobalService {
 
         console.error('❌ Error obteniendo GPS en loadWeather():', error);
 
-        // NO borramos el clima anterior si ya había uno cargado.
         this.locationName.next(this.mensajeErrorUbicacion(error));
 
         this.loadingWeather = false;
@@ -110,28 +100,26 @@ export class WeatherGlobalService {
     console.log('📍 Coordenadas:', ubicacion.latitud, ubicacion.longitud);
 
     // =======================================================
-    // 🌤️ PASO 2: PEDIR EL CLIMA A OPENWEATHER
-    //    (si falla, el problema es la API/red, NO el GPS)
+    // 🌤️ PASO 2: PEDIR EL CLIMA A OPENWEATHER (CON FETCH NATIVO)
     // =======================================================
 
     let weatherData: any;
 
     try {
 
-      weatherData = await firstValueFrom(
-        this.weatherService.getWeatherByCoords(
-          ubicacion.latitud,
-          ubicacion.longitud
-        )
-      );
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${ubicacion.latitud}&lon=${ubicacion.longitud}&appid=${this.apiKey}&units=metric&lang=es`;
+      
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`HTTP Status: ${response.status}`);
+      }
+
+      weatherData = await response.json();
 
     } catch (error: any) {
 
-      // 🔎 Revisa este log con chrome://inspect o adb logcat:
-      // si aparece status 401 → la API key no es válida o no
-      // está activada todavía; si aparece status 0 o
-      // "Unknown Error" → problema de red/CSP.
-      console.error('❌ Error consultando OpenWeatherMap:', error?.status, error);
+      console.error('❌ Error consultando OpenWeatherMap via fetch:', error);
 
       this.locationName.next(
         'No se pudo obtener el clima (API o conexión)'
@@ -195,38 +183,36 @@ export class WeatherGlobalService {
     this.windSpeed.next(windSpeed);
 
     // =======================================================
-    // 📍 PASO 3: NOMBRE DE UBICACIÓN (best-effort, no crítico)
-    //    Si falla, no es grave: dejamos un nombre genérico
-    //    y el clima ya cargado en los pasos anteriores se
-    //    mantiene visible igual.
+    // 📍 PASO 3: NOMBRE DE UBICACIÓN (FETCH NATIVO O NOMINATIM)
     // =======================================================
 
     if (!this.lastLocationName) {
 
       try {
 
-        const locationData: any = await firstValueFrom(
-          this.weatherService.getLocationName(
-            ubicacion.latitud,
-            ubicacion.longitud
-          )
-        );
+        const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${ubicacion.latitud}&lon=${ubicacion.longitud}`;
+        const geoResponse = await fetch(geoUrl);
 
-        const address = locationData?.address;
+        if (geoResponse.ok) {
+          const locationData = await geoResponse.json();
+          const address = locationData?.address;
 
-        this.lastLocationName =
-          address?.suburb ||
-          address?.city ||
-          address?.town ||
-          address?.village ||
-          address?.county ||
-          address?.state ||
-          'Ubicación actual';
+          this.lastLocationName =
+            address?.suburb ||
+            address?.city ||
+            address?.town ||
+            address?.village ||
+            address?.county ||
+            address?.state ||
+            'Ubicación actual';
+        } else {
+          this.lastLocationName = weatherData.name || 'Ubicación actual';
+        }
 
       } catch (error) {
 
         console.warn('⚠️ No se pudo obtener nombre de ubicación:', error);
-        this.lastLocationName = 'Ubicación actual';
+        this.lastLocationName = weatherData.name || 'Ubicación actual';
       }
     }
 
@@ -250,10 +236,6 @@ export class WeatherGlobalService {
 
     console.log('📡 Iniciando seguimiento GPS...');
 
-    // =======================================================
-    // 📍 OBTENER PRIMERA UBICACIÓN
-    // =======================================================
-
     let ubicacion: UbicacionSOS;
 
     try {
@@ -265,23 +247,16 @@ export class WeatherGlobalService {
         lon: ubicacion.longitud
       };
 
-      // Usamos la ubicación que ya obtuvimos
       await this.loadWeather(ubicacion);
 
     } catch (error: any) {
 
       console.error('❌ No se pudo obtener ubicación inicial:', error);
 
-      // Antes esto quedaba en silencio para el usuario;
-      // ahora sí reflejamos el error en pantalla.
       this.locationName.next(this.mensajeErrorUbicacion(error));
 
       return;
     }
-
-    // =======================================================
-    // 📡 INICIAR WATCHER
-    // =======================================================
 
     this.watchId = await this.sosService.watchUbicacion(
       async (ubicacionNueva: UbicacionSOS) => {
@@ -318,7 +293,6 @@ export class WeatherGlobalService {
             lon: ubicacionNueva.longitud
           };
 
-          // Limpiar cache de nombre de ubicación
           this.lastLocationName = null;
 
           await this.loadWeather(ubicacionNueva);
