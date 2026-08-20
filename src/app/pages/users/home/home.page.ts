@@ -93,30 +93,43 @@ export class HomePage implements OnInit, OnDestroy {
   // 🚀 INIT
   // =========================
   ngOnInit() {
-    this.weatherGlobal.startLocationTracking();
 
-    this.authSub = this.authService.currentUser$.subscribe(async user => {
-      this.authReady = true;
+    this.authSub =
+      this.authService.currentUser$.subscribe(async user => {
 
-      if (user) {
-        this.userData = await this.authService.getCurrentUserData();
+        this.authReady = true;
 
-        // ✅ Cargar consejos DESPUÉS de confirmar sesión
-        this.consejoService.getConsejos().subscribe(data => {
-          this.consejos = this.shuffleArray(data);
-        });
+        if (user) {
 
-        // ✅ Cargar eventos del usuario
-        this.eventosSub = this.eventoService.getMisEventos().subscribe(eventos => {
-          this.misEventos = eventos;
-        });
+          this.userData =
+            await this.authService.getCurrentUserData();
 
-      } else {
-        this.userData = null;
-        this.misEventos = [];
-        this.consejos = []; // ✅ Limpiar consejos al cerrar sesión
-      }
-    });
+          this.consejoService
+            .getConsejos()
+            .subscribe(data => {
+              this.consejos =
+                this.shuffleArray(data);
+            });
+
+          this.eventosSub =
+            this.eventoService
+              .getMisEventos()
+              .subscribe(eventos => {
+                this.misEventos = eventos;
+              });
+
+          // 🌤️ Iniciar clima después de confirmar sesión
+          await this.weatherGlobal.startLocationTracking();
+
+        } else {
+
+          this.userData = null;
+          this.misEventos = [];
+          this.consejos = [];
+
+          await this.weatherGlobal.stopLocationTracking();
+        }
+      });
   }
 
   // =========================
@@ -308,8 +321,11 @@ export class HomePage implements OnInit, OnDestroy {
   // 🧹 DESTROY
   // =========================
   ngOnDestroy() {
+
     this.authSub?.unsubscribe();
-    this.eventosSub?.unsubscribe(); // ✅ Limpiar suscripción de eventos
+
+    this.eventosSub?.unsubscribe();
+
     this.weatherGlobal.stopLocationTracking();
   }
 

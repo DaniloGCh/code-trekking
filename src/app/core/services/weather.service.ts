@@ -2,7 +2,6 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -10,12 +9,11 @@ import { environment } from 'src/environments/environment';
 })
 export class WeatherService {
 
-  // =========================================================
-  // 🌤️ OPENWEATHER
-  // =========================================================
-
   private readonly weatherApiUrl =
     'https://api.openweathermap.org/data/2.5/weather';
+
+  private readonly nominatimApiUrl =
+    'https://nominatim.openstreetmap.org/reverse';
 
 
   constructor(
@@ -24,7 +22,7 @@ export class WeatherService {
 
 
   // =========================================================
-  // 🌤️ OBTENER CLIMA POR COORDENADAS
+  // 🌤️ OPENWEATHER
   // =========================================================
 
   getWeatherByCoords(
@@ -44,7 +42,7 @@ export class WeatherService {
 
 
   // =========================================================
-  // 📍 OBTENER NOMBRE DE UBICACIÓN
+  // 📍 NOMINATIM
   // =========================================================
 
   getLocationName(
@@ -53,7 +51,7 @@ export class WeatherService {
   ) {
 
     return this.http.get(
-      `https://nominatim.openstreetmap.org/reverse` +
+      `${this.nominatimApiUrl}` +
       `?lat=${lat}` +
       `&lon=${lon}` +
       `&format=json` +

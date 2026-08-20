@@ -1,8 +1,8 @@
 // src/app/core/services/sos.service.ts
+
 import { Injectable } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
 import { UserData } from './auth.service';
-
 
 export interface UbicacionSOS {
   latitud: number;
@@ -19,33 +19,52 @@ export class SosService {
   // =========================================================
   // 📍 OBTENER UBICACIÓN ACTUAL
   // =========================================================
+
   async obtenerUbicacion(): Promise<UbicacionSOS> {
 
     try {
 
-      // -----------------------------------------------------
-      // 🔐 SOLICITAR PERMISOS
-      // -----------------------------------------------------
-      const permisos = await Geolocation.requestPermissions();
+      console.log('📍 Solicitando permisos GPS...');
+
+      const permisos = await Geolocation.checkPermissions();
+
+      console.log('📍 Estado permisos:', permisos);
 
       if (permisos.location !== 'granted') {
-        throw new Error('permiso-denegado');
+
+        const nuevosPermisos =
+          await Geolocation.requestPermissions();
+
+        console.log(
+          '📍 Permisos después de solicitar:',
+          nuevosPermisos
+        );
+
+        if (nuevosPermisos.location !== 'granted') {
+          throw new Error('permiso-denegado');
+        }
       }
 
-      // -----------------------------------------------------
-      // 📍 OBTENER POSICIÓN ACTUAL
-      // -----------------------------------------------------
-      const posicion = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 30000,
-        maximumAge: 0
-      });
+      console.log('📡 Obteniendo posición GPS...');
 
-      // -----------------------------------------------------
-      // 🔎 VALIDAR COORDENADAS
-      // -----------------------------------------------------
-      const lat = posicion.coords.latitude;
-      const lon = posicion.coords.longitude;
+      const posicion =
+        await Geolocation.getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout: 30000,
+          maximumAge: 0
+        });
+
+      console.log(
+        '📍 Posición obtenida:',
+        posicion.coords.latitude,
+        posicion.coords.longitude
+      );
+
+      const lat =
+        posicion.coords.latitude;
+
+      const lon =
+        posicion.coords.longitude;
 
       if (
         !Number.isFinite(lat) ||
@@ -54,9 +73,6 @@ export class SosService {
         throw new Error('ubicacion-no-disponible');
       }
 
-      // -----------------------------------------------------
-      // 📦 DEVOLVER UBICACIÓN
-      // -----------------------------------------------------
       return {
         latitud: lat,
         longitud: lon,
@@ -67,13 +83,20 @@ export class SosService {
     } catch (error: any) {
 
       console.error(
-        '❌ Error obteniendo ubicación:',
+        '❌ Error obteniendo ubicación GPS:',
         error
       );
 
-      // -----------------------------------------------------
-      // 🔐 PERMISO DENEGADO
-      // -----------------------------------------------------
+      console.error(
+        '❌ Código:',
+        error?.code
+      );
+
+      console.error(
+        '❌ Mensaje:',
+        error?.message
+      );
+
       if (
         error?.message === 'permiso-denegado' ||
         error?.code === 'OS-PLUG-GLOC-0003'
@@ -81,9 +104,6 @@ export class SosService {
         throw new Error('permiso-denegado');
       }
 
-      // -----------------------------------------------------
-      // ⏱️ TIEMPO EXCEDIDO
-      // -----------------------------------------------------
       if (
         error?.code === 'OS-PLUG-GLOC-0010' ||
         error?.message?.toLowerCase()?.includes('timeout')
@@ -91,9 +111,6 @@ export class SosService {
         throw new Error('tiempo-excedido');
       }
 
-      // -----------------------------------------------------
-      // 📍 UBICACIÓN NO DISPONIBLE
-      // -----------------------------------------------------
       throw new Error('ubicacion-no-disponible');
     }
   }
@@ -102,92 +119,94 @@ export class SosService {
   // =========================================================
   // 📡 SEGUIMIENTO DE UBICACIÓN
   // =========================================================
+
   async watchUbicacion(
     callback: (ubicacion: UbicacionSOS) => void
   ): Promise<string | null> {
 
     try {
 
-      // -----------------------------------------------------
-      // 🔐 VERIFICAR PERMISOS
-      // -----------------------------------------------------
-      const permisos = await Geolocation.requestPermissions();
+      const permisos =
+        await Geolocation.checkPermissions();
 
       if (permisos.location !== 'granted') {
 
-        console.error(
-          '❌ Permiso de ubicación denegado'
-        );
+        const nuevosPermisos =
+          await Geolocation.requestPermissions();
 
-        return null;
+        if (nuevosPermisos.location !== 'granted') {
+
+          console.error(
+            '❌ Permiso GPS denegado'
+          );
+
+          return null;
+        }
       }
 
-      // -----------------------------------------------------
-      // 📡 INICIAR WATCHER
-      // -----------------------------------------------------
-      const watchId = await Geolocation.watchPosition(
-        {
-          enableHighAccuracy: true,
-          maximumAge: 5000,
-          timeout: 30000
-        },
-        (position, error) => {
+      const watchId =
+        await Geolocation.watchPosition(
+          {
+            enableHighAccuracy: true,
+            maximumAge: 5000,
+            timeout: 30000
+          },
 
-          if (error) {
+          (position, error) => {
 
-            console.error(
-              '❌ Error en watcher GPS:',
-              error
-            );
+            if (error) {
 
-            return;
+              console.error(
+                '❌ Error watcher GPS:',
+                error
+              );
+
+              return;
+            }
+
+            if (!position) {
+              return;
+            }
+
+            const lat =
+              position.coords.latitude;
+
+            const lon =
+              position.coords.longitude;
+
+            if (
+              !Number.isFinite(lat) ||
+              !Number.isFinite(lon)
+            ) {
+
+              console.warn(
+                '⚠️ Coordenadas GPS inválidas'
+              );
+
+              return;
+            }
+
+            const ubicacion: UbicacionSOS = {
+
+              latitud: lat,
+
+              longitud: lon,
+
+              precision:
+                position.coords.accuracy ?? 0,
+
+              timestamp:
+                new Date()
+
+            };
+
+            callback(ubicacion);
           }
+        );
 
-          if (!position) return;
-
-          const lat =
-            position.coords.latitude;
-
-          const lon =
-            position.coords.longitude;
-
-          // -------------------------------------------------
-          // 🔎 VALIDAR COORDENADAS
-          // -------------------------------------------------
-          if (
-            !Number.isFinite(lat) ||
-            !Number.isFinite(lon)
-          ) {
-
-            console.warn(
-              '⚠️ Coordenadas GPS inválidas'
-            );
-
-            return;
-          }
-
-          // -------------------------------------------------
-          // 📦 CONSTRUIR UBICACIÓN
-          // -------------------------------------------------
-          const ubicacion: UbicacionSOS = {
-
-            latitud: lat,
-
-            longitud: lon,
-
-            precision:
-              position.coords.accuracy ?? 0,
-
-            timestamp: new Date()
-
-          };
-
-          // -------------------------------------------------
-          // 📤 ENTREGAR UBICACIÓN
-          // -------------------------------------------------
-          callback(ubicacion);
-
-        }
+      console.log(
+        '✅ Watcher GPS iniciado:',
+        watchId
       );
 
       return watchId;
@@ -195,7 +214,7 @@ export class SosService {
     } catch (error) {
 
       console.error(
-        '❌ Error iniciando seguimiento GPS:',
+        '❌ Error iniciando watcher GPS:',
         error
       );
 
@@ -205,13 +224,16 @@ export class SosService {
 
 
   // =========================================================
-  // 🛑 DETENER SEGUIMIENTO DE UBICACIÓN
+  // 🛑 DETENER WATCHER
   // =========================================================
+
   async detenerWatchUbicacion(
     watchId: string | null
   ): Promise<void> {
 
-    if (!watchId) return;
+    if (!watchId) {
+      return;
+    }
 
     try {
 
@@ -229,7 +251,6 @@ export class SosService {
         '❌ Error deteniendo watcher GPS:',
         error
       );
-
     }
   }
 
@@ -237,6 +258,7 @@ export class SosService {
   // =========================================================
   // 🆘 CONSTRUIR MENSAJE SOS
   // =========================================================
+
   construirMensajeSOS(
     userData: UserData,
     ubicacion: UbicacionSOS,
@@ -268,7 +290,6 @@ export class SosService {
       `👤 Persona: ${userData.nombre}\n`;
 
     if (eventoNombre) {
-
       mensaje +=
         `🏔️ Evento: ${eventoNombre}\n`;
     }
@@ -302,8 +323,9 @@ export class SosService {
 
 
   // =========================================================
-  // 📱 ENVIAR SOS POR SMS
+  // 📱 SMS
   // =========================================================
+
   enviarSosPorSMS(
     telefonos: string,
     mensaje: string
@@ -333,8 +355,9 @@ export class SosService {
 
 
   // =========================================================
-  // 🟢 ENVIAR SOS POR WHATSAPP
+  // 🟢 WHATSAPP
   // =========================================================
+
   enviarSosPorWhatsApp(
     telefono: string,
     mensaje: string
