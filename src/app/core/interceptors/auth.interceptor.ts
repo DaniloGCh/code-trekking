@@ -14,16 +14,20 @@ export class AuthInterceptor implements HttpInterceptor {
   private router = inject(Router);
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // 1. Si la petición es para OpenWeatherMap, dejarla pasar limpia sin token
+    if (req.url.includes('openweathermap.org')) {
+      return next.handle(req);
+    }
+
+    // 2. Para el resto de peticiones (tu propia API / Firebase), adjuntar token
     return from(this.getToken()).pipe(
       switchMap(token => {
-        // ✅ Agregar token a cada request
         const authReq = token
           ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
           : req;
 
         return next.handle(authReq).pipe(
           catchError((error: HttpErrorResponse) => {
-            // ✅ Si token expirado, redirigir al login
             if (error.status === 401) {
               this.auth.signOut();
               this.router.navigateByUrl('/login', { replaceUrl: true });
@@ -38,6 +42,6 @@ export class AuthInterceptor implements HttpInterceptor {
   private async getToken(): Promise<string | null> {
     const user = this.auth.currentUser;
     if (!user) return null;
-    return user.getIdToken(true); // ✅ Forzar refresh del token
+    return user.getIdToken(true);
   }
 }
