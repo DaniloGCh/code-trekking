@@ -11,11 +11,11 @@ ion-content {
    ========================================================================== */
 /* para esconder la barra */
    ion-header {
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out; /* Agrega una transición suave de 0.3 segundos al mover la barra */
 }
 
 ion-header.hidden {
-  transform: translateY(-100%);
+  transform: translateY(-100%); /* Desplaza la barra hacia arriba fuera de la pantalla para ocultarla */
 }
 /* inicio */
 ion-toolbar.transparent-toolbar {
@@ -25,15 +25,168 @@ ion-toolbar.transparent-toolbar {
 }
 /* Grosor del titulo */
 ion-title {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-size: 1rem;
+  font-weight: 900; /* Define un grosor de letra extra negrita para el título */
+  text-transform: uppercase; /* Convierte todo el texto del título a mayúsculas */
+  letter-spacing: -0.02em; /* Reduce ligeramente el espacio entre letras */
+  font-size: 1rem; /* Define el tamaño de letra del título */
 }
 
 /* color y tamaño (inicio - usuario y salir) */
 ion-buttons ion-button {
-  --color: rgb(0, 248, 103);  /* color iconos*/
-  font-size: 1rem;
+  --color: rgb(0, 248, 103); /* Aplica el color verde neón a los botones del encabezado */
+  font-size: 1rem; /* Establece el tamaño de los botones e iconos del header */
 }
 
+
+/* ==========================================================================
+   Contenedor principal (afecta todo)
+   ========================================================================== */
+.welcome-container {
+  margin: 40px 16px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* Texto bienvenido...*/
+.welcome-header {
+  text-align: left;
+  background: transparent;
+  padding: 0;
+}
+/* letra ¡Hola, (USUARIO)!*/
+.welcome-header h1 {
+  margin: 0;
+  font-size: 28px; /* tamaño letra HOLA*/
+  font-weight: 900; /* grosor letra HOLA*/
+  text-transform: uppercase;
+}
+
+
+/* ==========================================================================
+   🪗 ACORDEÓN DE SUSCRIPCIONES
+   ========================================================================== */
+ion-accordion-group {
+  background: transparent; /* Mantiene el fondo del grupo de acordeones transparente */
+  border-radius: 12px; /* Redondea las esquinas del contenedor global */
+  overflow: hidden; /* Oculta cualquier contenido que sobresalga de los bordes */
+}
+
+ion-accordion {
+  margin-bottom: 12px; /* Agrega un espacio vertical entre cada tarjeta de suscripción */
+  border-radius: 12px; /* Fuerza las esquinas redondeadas en cada opción */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Proyecta una sombra oscura para dar profundidad */
+  overflow: hidden; /* Asegura que el contenido respete las esquinas redondeadas */
+  
+}
+
+ion-accordion ion-item[slot="header"] {
+  --background: #14191f; /* Define el fondo oscuro para el encabezado del acordeón */
+  --color: #ffffff; /* Ajusta el color principal del texto del encabezado a blanco */
+  --border-width: 0px; /* Elimina la línea divisoria por defecto de Ionic */
+
+  h2 {
+    font-weight: 700; /* Establece texto en negrita para el nombre del plan */
+    font-size: 1rem; /* Define el tamaño de letra del nombre del plan */
+    color: #ffffff; /* Asigna color blanco al título del plan */
+  }
+
+  p {
+    color: #94a3b8; /* Asigna un tono gris claro al subtítulo o descripción corta */
+    font-size: 0.85rem; /* Establece un tamaño de letra más pequeño para la descripción */
+  }
+}
+
+.premium-mensual{
+  border-left: 6px solid rgb(0, 248, 103);
+}
+
+.premium-trimestral{
+  border-left: 6px solid rgb(0, 248, 103);
+}
+
+.premium-anual{
+  border-left: 6px solid rgb(0, 248, 103);
+}
+
+ion-accordion div[slot="content"] {
+  background: #0d1117; /* Asigna un fondo un poco más oscuro al desplegar los detalles */
+  border-top: 3px solid rgba(255, 255, 255, 0.05); /* Agrega una pequeña línea divisoria superior */
+
+  /* lista de beneficios */
+  ion-list {
+    background: transparent; /* Hace transparente el fondo de la lista de beneficios */
+    padding: 0; /* Elimina los rellenos internos de la lista */
+
+    /* elementos de la lista de beneficios */
+    ion-item {
+      --background: transparent; /* Quita el fondo por defecto de los elementos de la lista */
+      --color: #e2e8f0; /* Aplica color gris claro al texto de los beneficios */
+      font-size: 0.9rem; /* Ajusta el tamaño de letra de los puntos de la lista */
+
+      ion-icon {
+        font-size: 1.5rem; /* Define el tamaño de los iconos de verificación/check*/
+      }
+    }
+  }
+}
+
+ion-badge {
+  --color: rgb(255, 255, 255); /* Asigna el color de texto verde neón al botón */
+  --background:rgba(0, 141, 52, 0.753); /* Define el fondo oscuro sólido del botón de suscripción */
+  font-weight: 700; /* Aplica negrita a las etiquetas distintivas (Popular, Ahorro) */
+  padding: 6px 10px; /* Otorga relleno interno a las etiquetas */
+  border-radius: 6px; /* Redondea los bordes de las etiquetas */
+  text-transform: uppercase; /* Muestra el texto de las etiquetas en mayúsculas */
+  font-size: 0.7rem; /* Define un tamaño compacto para el texto del badge */
+  
+}
+
+/* ==========================================================================
+   🔘 BOTONES DE ACCIÓN para la suscripcion
+   ========================================================================== */
+ion-accordion ion-button {
+  --background: #14191f; /* Define el fondo oscuro sólido del botón de suscripción */
+  background: #14191f; /* Respaldo directo para asegurar el fondo oscuro */
+  --color: rgb(0, 248, 103); /* Asigna el color de texto verde neón al botón */
+  --border-color: rgb(0, 248, 103); /* Define el color del borde del botón en verde neón */
+  border: 2px solid rgba(42, 250, 118, 0.692); /* Aplica el borde con brillo neón */
+  border-radius: 6px; /* Redondea levemente las esquinas del botón */
+  font-weight: 700; /* Aplica negrita al texto del botón */
+  margin-top: 15px; /* Separa el botón del contenido superior */
+}
+
+
+
+/* ==========================================================================
+   🚫 CONTENEDOR DE ERROR / SIN ACCESO
+   ========================================================================== */
+.no-acceso {
+  text-align: center; /* Centra todo el contenido de la tarjeta de error */
+  padding: 40px 20px; /* Agrega espacio interno arriba, abajo y a los lados */
+  background: #14191f; /* Asigna el fondo oscuro característico a la tarjeta */
+  border-radius: 16px; /* Redondea bastante las esquinas del contenedor de error */
+  border: 1px solid rgba(255, 70, 70, 0.4); /* Crea un borde rojo de advertencia suave */
+  margin-top: 20px; /* Añade margen en la parte superior para separarlo */
+
+  ion-icon {
+    font-size: 64px; /* Ajusta a un tamaño grande el icono de error */
+    margin-bottom: 12px; /* Separa el icono del título de error */
+  }
+
+  h2 {
+    color: #ffffff; /* Define en color blanco el título de error */
+    font-weight: 800; /* Aplica negrita marcada al título */
+  }
+
+  p {
+    color: #94a3b8; /* Aplica color gris claro al mensaje explicativo del error */
+    margin-bottom: 20px; /* Separa el texto del botón de retorno */
+  }
+
+  ion-button {
+    --background: #14191f; /* Aplica el fondo oscuro al botón de retorno */
+    --color: rgb(255, 70, 70); /* Define el texto del botón en tono rojo de alerta */
+    border: 1px solid rgb(255, 70, 70); /* Aplica un borde rojo al botón de retorno */
+    border-radius: 6px; /* Redondea los bordes del botón */
+  }
+}
