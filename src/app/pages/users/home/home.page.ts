@@ -23,7 +23,6 @@ import { EventoService } from 'src/app/core/services/evento.service';
 import { Auth } from '@angular/fire/auth';
 
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment.prod';
 import { WeatherService } from 'src/app/core/services/weather.service';
 
 @Component({
