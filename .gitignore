@@ -72,5 +72,7 @@ Thumbs.db
 # Variables de entorno y claves privadas
 .env
 .env.local
+
+# Archivos de entorno generados dinámicamente por set-env.ts
 src/environments/environment.ts
 src/environments/environment.prod.ts
