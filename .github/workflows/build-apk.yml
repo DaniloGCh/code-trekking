@@ -25,7 +25,7 @@ jobs:
           java-version: 21
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       # Genera el archivo .env desde los Secrets de GitHub
       - name: Create .env file
@@ -47,7 +47,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
-      # Se agrega --stacktrace para obtener el detalle exacto del error de Gradle
       - name: Build APK
         run: |
           cd android
