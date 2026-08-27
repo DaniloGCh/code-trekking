@@ -1,50 +1,58 @@
 name: Build Android APK
- 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
- 
+
 jobs:
   build:
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
- 
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
- 
-      - name: Install dependencies
-        run: npm install
- 
-      - name: Build Angular/Ionic app
-        run: npm run build
- 
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
- 
+
+      - name: Install dependencies
+        run: npm install
+
+      # Genera el archivo .env desde los Secrets de GitHub
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Build Angular/Ionic app
+        run: npm run build
+
       - name: Add Android platform (if not present)
         run: npx cap add android || true
- 
+
       - name: Sync Capacitor
         run: npx cap sync android
- 
+
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
- 
+
+      # Se agrega --stacktrace para obtener el detalle exacto del error de Gradle
       - name: Build APK
         run: |
           cd android
-          ./gradlew assembleDebug
- 
+          ./gradlew assembleDebug --stacktrace
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
