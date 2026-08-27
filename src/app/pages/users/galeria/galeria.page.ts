@@ -47,7 +47,7 @@ this.userData = await this.authService.getCurrentUserData();
   async seleccionarPlan(planKey: 'mensual' | 'trimestral' | 'anual') {
     const detallesPlan = {
       mensual: { nombre: 'Plan Mensual', precio: '$4.000' },
-      trimestral: { nombre: 'Plan Trimestral (3 Meses)', precio: '$10.000' },
+      trimestral: { nombre: 'Plan Trimestral (3 Meses)', precio: '$13.350' },
       anual: { nombre: 'Plan Anual (12 Meses)', precio: '$39.000' }
     };
 
