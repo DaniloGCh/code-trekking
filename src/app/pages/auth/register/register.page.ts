@@ -34,8 +34,7 @@ export class RegisterPage {
   // =========================
   showPassword = false; // Estado booleano para alternar la visibilidad de la contraseña principal
   showConfirmPassword = false; // Estado booleano para alternar la visibilidad de la confirmación de contraseña
-  // ✅ Estado del checkbox
-  //terminosAceptados = false;
+
 
   togglePassword() { this.showPassword = !this.showPassword; } // Alterna el valor booleano de showPassword
   toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; } // Alterna el valor booleano de showConfirmPassword
