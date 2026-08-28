@@ -65,58 +65,83 @@
 }
 
 /* ==========================================================================
- 🧭 TAB BAR GLASS TREKKING
+   🌤️ WIDGET CLIMA CENTRADO (ion-toolbar / ion-header)
+   ========================================================================== */
+.weather-header {
+  position: absolute; /* Posiciona el widget de clima de forma absoluta dentro de su contenedor padre */
+  left: 50%; /* Desplaza el punto de origen del contenedor al 50% del ancho desde la izquierda */
+  top: 50%; /* Desplaza el punto de origen del contenedor al 50% de la altura desde arriba */
+  transform: translate(-50%, -50%); /* Centra el elemento de forma exacta sobre su propio eje X e Y */
+  display: flex; /* Activa la maquetación flexbox para alinear los elementos internos en fila */
+  align-items: center; /* Alinea verticalmente al centro los iconos y textos del clima */
+  gap: 6px; /* Espaciado horizontal constante de 6 píxeles entre el icono y la temperatura */
+  color: #c7f9cc; /* Color verde menta suave para el texto general del widget */
+  font-weight: 600; /* Define un grosor de letra seminegrita para mejorar la lectura */
+  --background: transparent; /* Fuerza a que el fondo del componente Ionic sea totalmente transparente */
+  --box-shadow: none; /* Elimina cualquier sombra de caja nativa asignada por Ionic */
+}
+.weather-header span {
+  color: #ffffff !important; /* Fuerza el color blanco brillante exclusivamente para el texto dentro del span */
+  font-weight: 600; /* Asigna un grosor seminegrito al texto del span */
+}
+.weather-header ion-icon {
+  font-size: 18px; /* Establece el tamaño del icono del clima a 18 píxeles */
+  color: #a3d977; /* Aplica un tono verde manzana claro al icono del clima */
+}
+
+/* ==========================================================================
+   🧭 TAB BAR GLASS TREKKING
 ========================================================================== */
 ion-tab-bar {
-  --background: rgba(20, 35, 20, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  height: 65px;
+  --background: rgba(20, 35, 20, 0.85); /* Asigna un fondo verde oscuro espacial con 85% de opacidad */
+  backdrop-filter: blur(12px); /* Desenfoca 12 píxeles lo que se encuentra detrás del menú inferior */
+  -webkit-backdrop-filter: blur(12px); /* Aplica el desenfoque traslúcido para compatibilidad en navegadores Safari/iOS */
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Crea un borde superior sutil translúcido como separador */
+  height: 65px; /* Define la altura fija de la barra de navegación inferior en 65 píxeles */
 }
 
 /* 📌 TAB BUTTON */
 ion-tab-button {
-  --color: #a5d6a7;
-  --color-selected: #ffffff;
-  transition: all 0.3s ease;
+  --color: #a5d6a7; /* Establece el color verde claro inactivo para los botones de las pestañas */
+  --color-selected: #ffffff; /* Define el color blanco para el botón de la pestaña que esté activa */
+  transition: all 0.3s ease; /* Transición de 0.3 segundos para suavizar cambios de estado (hover, selección) */
 }
 
 /* ICONOS */
 ion-tab-button ion-icon {
-  font-size: 22px;
-  transition: all 0.3s ease;
+  font-size: 22px; /* Define un tamaño base de 22 píxeles para todos los iconos de las pestañas */
+  transition: all 0.3s ease; /* Transición suave de 0.3 segundos para transformaciones o cambios de color */
 }
 
 /* ==========================================================================
    ✨ ESTADO SELECCIONADO / TAB ACTIVO (.tab-selected) BARRA DE ABAJO
    ========================================================================== */
 ion-tab-button.tab-selected {
-  --color: #ffffff;
-  background: rgba(50, 100, 126, 0.15);
-  border-radius: 12px;
-  margin: 6px 4px;
-  border: 1px solid rgba(50, 255, 126, 0.3);
-  transform: translateY(-2px);
+  --color: #ffffff; /* Asegura el color blanco para el texto e icono de la pestaña seleccionada */
+  background: rgba(50, 100, 126, 0.15); /* Aplica un fondo azul/verde translúcido al botón activo */
+  border-radius: 12px; /* Redondea los bordes del botón activo a 12 píxeles */
+  margin: 6px 4px; /* Crea una separación externa de 6px arriba/abajo y 4px a los lados */
+  border: 1px solid rgba(50, 255, 126, 0.3); /* Borde verde brillante semitransparente que resalta la selección */
+  transform: translateY(-2px); /* Desplaza sutilmente el botón 2 píxeles hacia arriba para dar efecto de levitación */
 }
 
 /* Ícono color y agrandado cuando está activo */
 ion-tab-button.tab-selected ion-icon {
-  color: rgb(2, 218, 92);
-  transform: scale(1.15);
+  color: rgb(2, 218, 92); /* Cambia el color del icono activo a un verde neón brillante */
+  transform: scale(1.15); /* Aumenta el tamaño del icono en un 15% mediante una escala */
 }
 /* ======================================================================== */
 
 
 /* 🌿 EFECTO HOVER (desktop) */
 ion-tab-button:hover {
-  --color: #03c516;
+  --color: #03c516; /* Cambia el color del botón a verde intenso cuando el usuario pasa el cursor sobre él */
 }
 
 ion-tab-button.tab-selected {
-  box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.4); /* Genera un resplandor luminoso verde neón alrededor de la pestaña activa */
 }
 
 .terminos-modal {
-  --border-radius: 16px 16px 0 0;
+  --border-radius: 16px 16px 0 0; /* Curva las esquinas superiores de la ventana modal a 16px y deja planas las inferiores */
 }
