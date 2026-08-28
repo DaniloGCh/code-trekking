@@ -195,8 +195,8 @@ export class RegisterPage {
   async onVerTerminos() {
     const modal = await this.modalCtrl.create({
       component: TerminosModalComponent,
-      breakpoints: [0, 0.9],
-      initialBreakpoint: 0.9,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
       cssClass: 'terminos-modal'
     });
 
