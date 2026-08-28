@@ -146,6 +146,14 @@
         </ion-note>
       </ion-item>
 
+      <!-- ✅ TÉRMINOS Y CONDICIONES -->
+      <ion-item lines="none">
+        <ion-checkbox slot="start" formControlName="terminos"></ion-checkbox>
+        <ion-label>
+          <span class="link" (click)="onVerTerminos()">Acepto los términos y condiciones</span>
+        </ion-label>
+      </ion-item>
+
       <!-- 🔘 BOTÓN REGISTRO -->
       <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="registerForm.invalid">
 

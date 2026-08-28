@@ -207,3 +207,31 @@ ion-button[type="submit"][disabled] {
   margin-left: 4px; /* Separación horizontal respecto al texto anterior */
   text-decoration: underline; /* Subraya el enlace para indicar interactividad */
 }
+
+/* ==========================================================================
+   🔘 TERMINOS Y CONDICIONES
+   ========================================================================== */
+.terminos-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px;
+
+  ion-checkbox {
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--ion-color-dark);
+    line-height: 1.4;
+  }
+
+  .terminos-link {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
