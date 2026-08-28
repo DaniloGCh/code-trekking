@@ -17,7 +17,7 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./pages/users/home/home.module').then(m => m.HomePageModule),
-    canActivate: [authGuard]
+    // canActivate: [authGuard]
   },
   {
     path: 'login',
@@ -42,7 +42,7 @@ const routes: Routes = [
   {
     path: 'eventos',
     loadChildren: () => import('./pages/users/eventos/eventos.module').then(m => m.EventosPageModule),
-    canActivate: [authGuard]
+    // canActivate: [authGuard]
   },
   {
     path: 'crear-evento',

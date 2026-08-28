@@ -1,0 +1,389 @@
+/* ==========================================================================
+   🌲 FONDO GENERAL Y TIPOGRAFÍA
+   ========================================================================== */
+
+ion-content.terminos-content {
+  --background:
+    linear-gradient(rgba(10, 12, 16, 0.973),
+      rgba(10, 12, 16, 0.96)),
+    url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center / cover;
+
+  --color: #e2e8f0;
+
+  font-family: 'Lexend', sans-serif;
+}
+
+
+/* ==========================================================================
+   🧭 HEADER
+   ========================================================================== */
+
+ion-header.header-glass {
+  background: transparent;
+}
+
+ion-toolbar.toolbar-glass {
+  --background: #0a0c10;
+  --color: rgb(0, 248, 103);
+
+  border-bottom: 1px solid rgba(0, 248, 103, 0.15);
+}
+
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 0.85rem;
+}
+
+
+/* ==========================================================================
+   ❌ BOTÓN CERRAR
+   ========================================================================== */
+
+.btn-cerrar {
+  --color: rgb(0, 248, 103);
+
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+
+/* ==========================================================================
+   📄 INTRODUCCIÓN
+   ========================================================================== */
+
+.terminos-intro {
+
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  max-width: 600px;
+
+  margin: 24px auto 16px;
+
+  padding: 20px;
+
+  background: #14191f;
+
+  border: 1px solid rgba(0, 248, 103, 0.25);
+
+  border-left: 3px solid rgb(0, 248, 103);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.45);
+}
+
+
+/* Icono */
+
+.document-icon {
+
+  min-width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(0, 248, 103, 0.08);
+
+  border: 1px solid rgba(0, 248, 103, 0.2);
+}
+
+.document-icon ion-icon {
+
+  font-size: 28px;
+
+  color: rgb(0, 248, 103);
+}
+
+
+/* Texto */
+
+.terminos-intro h2 {
+
+  margin: 0 0 5px;
+
+  color: #ffffff;
+
+  font-size: 1.1rem;
+
+  font-weight: 800;
+}
+
+.terminos-intro p {
+
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 0.8rem;
+}
+
+
+/* ==========================================================================
+   📝 TEXTO INTRODUCTORIO
+   ========================================================================== */
+
+.intro-text {
+
+  max-width: 600px;
+
+  margin: 0 auto 20px;
+
+  padding: 0 20px;
+
+  color: #cbd5f5;
+
+  font-size: 0.92rem;
+
+  line-height: 1.6;
+
+  text-align: left;
+}
+
+.intro-text strong {
+
+  color: rgb(0, 248, 103);
+
+  font-weight: 800;
+}
+
+
+/* ==========================================================================
+   📖 SECCIONES DE TÉRMINOS
+   ========================================================================== */
+
+.terminos-seccion {
+
+  position: relative;
+
+  max-width: 600px;
+
+  margin: 16px auto;
+
+  padding: 22px 20px 22px 20px;
+
+  background: #14191f;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+
+/* Línea verde lateral */
+
+.terminos-seccion::before {
+
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+
+  width: 3px;
+
+  background: rgb(0, 248, 103);
+
+  border-radius: 0 4px 4px 0;
+
+  opacity: 0.8;
+}
+
+
+/* ==========================================================================
+   🔢 NÚMERO DE SECCIÓN
+   ========================================================================== */
+
+.seccion-numero {
+
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  padding: 5px 11px;
+
+  border-radius: 20px;
+
+  background: rgba(0, 48, 20, 0.301);
+
+  border: 1px solid rgba(0, 248, 103, 0.2);
+
+  color: rgb(0, 248, 103);
+
+  font-size: 0.72rem;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+
+/* ==========================================================================
+   📌 TÍTULOS
+   ========================================================================== */
+
+.terminos-seccion h3 {
+
+  margin: 0 0 12px;
+
+  color: #ffffff;
+
+  font-size: 1.15rem;
+
+  font-weight: 800;
+
+  line-height: 1.3;
+}
+
+
+/* ==========================================================================
+   📄 PÁRRAFOS
+   ========================================================================== */
+
+.terminos-seccion p {
+
+  margin: 0 0 12px;
+
+  color: #cbd5f5;
+
+  font-size: 0.9rem;
+
+  line-height: 1.65;
+}
+
+
+/* ==========================================================================
+   📋 LISTAS
+   ========================================================================== */
+
+.terminos-seccion ul {
+
+  margin: 10px 0 14px;
+
+  padding-left: 20px;
+}
+
+.terminos-seccion li {
+
+  margin-bottom: 9px;
+
+  padding-left: 4px;
+
+  color: #cbd5f5;
+
+  font-size: 0.88rem;
+
+  line-height: 1.55;
+}
+
+
+/* Viñetas verdes */
+
+.terminos-seccion li::marker {
+
+  color: rgb(0, 248, 103);
+}
+
+
+/* Texto importante */
+
+.terminos-seccion strong {
+
+  color: #ffffff;
+
+  font-weight: 700;
+}
+
+
+/* ==========================================================================
+   ⚠️ ACCIONES
+   ========================================================================== */
+
+.acciones-terminos {
+
+  max-width: 600px;
+
+  margin: 24px auto 35px;
+
+  padding: 0 20px;
+}
+
+
+/* ==========================================================================
+   ✅ BOTÓN ACEPTAR
+   ========================================================================== */
+
+.btn-aceptar {
+
+  --background: rgb(0, 248, 103);
+
+  --background-activated: rgb(0, 210, 85);
+
+  --background-hover: rgb(0, 230, 95);
+
+  --color: #0a0c10;
+
+  --border-radius: 12px;
+
+  --box-shadow:
+    0 6px 20px rgba(0, 248, 103, 0.18);
+
+  font-weight: 900;
+
+  font-size: 0.9rem;
+
+  text-transform: none;
+
+  margin-bottom: 6px;
+}
+
+
+/* ==========================================================================
+   ❌ CERRAR SIN ACEPTAR
+   ========================================================================== */
+
+.btn-cerrar-sin-aceptar {
+
+  --color: #94a3b8;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  text-transform: none;
+}
+
+
+/* ==========================================================================
+   📱 RESPONSIVE
+   ========================================================================== */
+
+@media (min-width: 768px) {
+
+  .terminos-content {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .terminos-seccion {
+    padding: 24px;
+  }
+
+  .terminos-intro {
+    padding: 22px;
+  }
+}

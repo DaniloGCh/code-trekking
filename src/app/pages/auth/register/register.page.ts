@@ -7,6 +7,9 @@ import { LoadingController, AlertController } from '@ionic/angular';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
 
+import { ModalController } from '@ionic/angular';
+import { TerminosModalComponent } from 'src/app/components/terminos-modal/terminos-modal.component';
+
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
@@ -24,12 +27,15 @@ export class RegisterPage {
   private fb = inject(FormBuilder);
   private loadingCtrl = inject(LoadingController);
   private alertCtrl = inject(AlertController);
+  private modalCtrl = inject(ModalController);
 
   // =========================
   // 👁️ CONTROL VISUAL PASSWORD
   // =========================
   showPassword = false;
   showConfirmPassword = false;
+  // ✅ Estado del checkbox
+  //terminosAceptados = false;
 
   togglePassword() { this.showPassword = !this.showPassword; }
   toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; }
@@ -56,6 +62,8 @@ export class RegisterPage {
     confirmPassword: ['', [Validators.required]],
     preguntaSeguridad: ['', [Validators.required]],
     respuestaSeguridad: ['', [Validators.required, Validators.minLength(2)]],
+    // ✅ Aceptación de términos
+    terminos: [false, Validators.requiredTrue]
   }, { validators: this.passwordMatchValidator });
 
   // =========================
@@ -67,7 +75,7 @@ export class RegisterPage {
   get confirmPassword() { return this.registerForm.get('confirmPassword'); }
   get preguntaSeguridad() { return this.registerForm.get('preguntaSeguridad'); }
   get respuestaSeguridad() { return this.registerForm.get('respuestaSeguridad'); }
-
+  get terminos() { return this.registerForm.get('terminos'); }
   // =========================
   // 🔐 VALIDADOR CONTRASEÑAS
   // =========================
@@ -113,7 +121,7 @@ export class RegisterPage {
       return;
     }
 
-    const { email, password, nombre, preguntaSeguridad, respuestaSeguridad } = this.registerForm.value;
+    const { email, password, nombre, preguntaSeguridad, respuestaSeguridad, terminos } = this.registerForm.value;
 
     // ✅ Validar email
     if (!this.security.isValidEmail(email)) {
@@ -140,6 +148,14 @@ export class RegisterPage {
       return;
     }
 
+    // ✅ Validar aceptación de términos
+    if (this.terminos?.value !== true) {
+      await this.showError(
+        'Debes aceptar los términos y condiciones para registrarte'
+      );
+      return;
+    }
+
     // ✅ Rate limiting: máx 3 registros por minuto
     if (!this.security.checkRateLimit('register', 3, 60000)) {
       await this.showError('Demasiados intentos. Espera 1 minuto.');
@@ -153,7 +169,9 @@ export class RegisterPage {
       // ✅ Sanitizar nombre antes de guardar
       const nombreSeguro = this.security.sanitizeInput(nombre.trim());
 
-      await this.authService.register(email, password, nombreSeguro, 'user');
+      // console.log('Antes de registrar:', this.terminosAceptados);
+
+      await this.authService.register(email, password, nombreSeguro, 'user', terminos);
 
       await this.authService.updateProfile({
         preguntaSeguridad,
@@ -170,6 +188,29 @@ export class RegisterPage {
       await this.showError(error.code);
     }
   }
+
+  // =========================
+  // ✅ Terminos y condiciones
+  // =========================
+  async onVerTerminos() {
+    const modal = await this.modalCtrl.create({
+      component: TerminosModalComponent,
+      breakpoints: [0, 0.9],
+      initialBreakpoint: 0.9,
+      cssClass: 'terminos-modal'
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+
+    if (data?.aceptado) {
+      this.registerForm.patchValue({
+        terminos: true
+      });
+    }
+  }
+
 
   // =========================
   // ✅ ÉXITO
@@ -192,6 +233,7 @@ export class RegisterPage {
       'auth/email-already-in-use': 'Este correo ya está registrado.',
       'auth/invalid-email': 'El correo no es válido.',
       'auth/weak-password': 'La contraseña es muy débil.',
+      'terminos-no-aceptados': 'Debes aceptar los términos y condiciones para registrarte.',
     };
 
     const message = messages[errorCode] || errorCode;

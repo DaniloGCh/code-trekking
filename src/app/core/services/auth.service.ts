@@ -34,6 +34,7 @@ import {
   deleteDoc
 } from '@angular/fire/firestore';
 
+
 // =========================
 // 🔹 RXJS
 // =========================
@@ -63,6 +64,10 @@ export interface UserData {
   respuestaSeguridad?: string;
   contactosEmergencia?: ContactoEmergencia[]; // ✅ Nuevo
   ultimoCambioNombre?: string; // ✅ Fecha en ISO string
+  // 📄 TÉRMINOS Y CONDICIONES
+  terminosAceptados?: boolean;
+  fechaAceptacionTerminos?: string;
+  versionTerminos?: string;
 }
 
 @Injectable({
@@ -87,30 +92,72 @@ export class AuthService {
   // =========================
   // ✅ REGISTRO
   // =========================
-  // ✅ REGISTRO con validaciones
-  async register(email: string, password: string, nombre: string, rol: 'admin' | 'user' = 'user'): Promise<void> {
+  // =========================
+  // ✅ REGISTRO
+  // =========================
+  async register(
+    email: string,
+    password: string,
+    nombre: string,
+    rol: 'admin' | 'user' = 'user',
+    terminosAceptados: boolean = false
+  ): Promise<void> {
+
     // Validaciones de seguridad
-    if (!this.security.isValidEmail(email)) throw new Error('invalid-email');
-    if (!this.security.isSafeText(nombre, 50)) throw new Error('invalid-nombre');
+    if (!this.security.isValidEmail(email)) {
+      throw new Error('invalid-email');
+    }
+
+    if (!this.security.isSafeText(nombre, 50)) {
+      throw new Error('invalid-nombre');
+    }
 
     const passwordCheck = this.security.isStrongPassword(password);
-    if (!passwordCheck.valid) throw new Error(passwordCheck.message);
+
+    if (!passwordCheck.valid) {
+      throw new Error(passwordCheck.message);
+    }
+
+    // 📄 Validar aceptación de términos
+    if (!terminosAceptados) {
+      throw new Error('terminos-no-aceptados');
+    }
 
     // Sanitizar nombre
     const nombreSeguro = this.security.sanitizeInput(nombre);
 
-    const credential = await createUserWithEmailAndPassword(this.auth, email, password);
-    const uid = credential.user.uid;
-    const userRef = doc(this.firestore, `usuarios/${uid}`);
+    // 🔥 Crear usuario en Firebase Authentication
+    const credential = await createUserWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    );
 
+    const uid = credential.user.uid;
+
+    const userRef = doc(
+      this.firestore,
+      `usuarios/${uid}`
+    );
+
+    // 💾 Crear documento en Firestore
     await setDoc(userRef, {
+
       uid,
       email,
       nombre: nombreSeguro,
       rol,
+
       fotoBase64: '',
       estado: '',
-      creadoEn: new Date().toISOString()
+
+      creadoEn: new Date().toISOString(),
+
+      // 📄 TÉRMINOS Y CONDICIONES
+      terminosAceptados: terminosAceptados,
+      fechaAceptacionTerminos: new Date().toISOString(),
+      versionTerminos: '1.0'
+
     } as UserData);
   }
 

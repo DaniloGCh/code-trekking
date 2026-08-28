@@ -5,6 +5,8 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule, Routes } from '@angular/router';
 
 import { RegisterPage } from './register.page';
+import { TerminosModalComponent } from 'src/app/components/terminos-modal/terminos-modal.component';
+
 
 // =========================
 // 🛣️ RUTAS DEL MÓDULO
@@ -12,7 +14,8 @@ import { RegisterPage } from './register.page';
 const routes: Routes = [
   {
     path: '',
-    component: RegisterPage
+    component: RegisterPage,
+    
   }
 ];
 
@@ -21,7 +24,8 @@ const routes: Routes = [
 // =========================
 @NgModule({
   declarations: [
-    RegisterPage
+    RegisterPage,
+    TerminosModalComponent 
   ],
   imports: [
     CommonModule,
