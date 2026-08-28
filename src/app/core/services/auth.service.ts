@@ -66,6 +66,7 @@ export interface UserData {
   versionTerminos?: string; // Versión legal de los términos aceptados por el usuario
 }
 
+
 @Injectable({
   providedIn: 'root' // Define que el servicio se instanciará como un Singleton accesible en toda la app
 })

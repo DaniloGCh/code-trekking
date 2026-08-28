@@ -34,8 +34,8 @@
 <!-- ========================= -->
 <ng-container *ngIf="authReady && userData; else noAuth">
 
-<!-- Agrega fullscreen="true" para barra transparente al subir  -->
-<ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
+  <!-- Agrega fullscreen="true" para barra transparente al subir  -->
+  <ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
     <!-- ========================= -->
     <!-- 🖼️ PERFIL HEADER -->
@@ -68,7 +68,7 @@
 
       <!-- Info cambio nombre -->
       <p *ngIf="userData.ultimoCambioNombre" class="cambio-info">
-        {{ getDiasRestantesCambioNombre() > 0 
+        {{ getDiasRestantesCambioNombre() > 0
         ? '🔒 Puedes cambiar el nombre en ' + getDiasRestantesCambioNombre() + ' día(s)'
         : '✅ Puedes cambiar tu nombre' }}
       </p>
@@ -199,40 +199,124 @@
 
     </ion-accordion-group>
 
+    <!-- ========================= -->
+    <!-- 📄 TÉRMINOS Y CONDICIONES -->
+    <!-- ========================= -->
+    <ion-card class="terminos-card">
+
+      <ion-card-header>
+
+        <ion-card-title>
+          <ion-icon name="document-text-outline"></ion-icon>
+          Términos y condiciones
+        </ion-card-title>
+
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <!-- ESTADO -->
+        <div class="terminos-estado" *ngIf="userData.terminosAceptados; else noAceptados">
+
+          <div class="estado-aceptado">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <strong>Estado: Aceptados</strong>
+          </div>
+
+          <!-- FECHA -->
+          <div class="terminos-info" *ngIf="userData.fechaAceptacionTerminos">
+
+            <span>Aceptados el:</span>
+
+            <strong>
+              {{ formatearFechaTerminos(userData.fechaAceptacionTerminos) }}
+            </strong>
+
+          </div>
+
+          <!-- VERSIÓN -->
+          <div class="terminos-info" *ngIf="userData.versionTerminos">
+
+            <span>Versión:</span>
+
+            <strong>
+              {{ userData.versionTerminos }}
+            </strong>
+
+          </div>
+
+          <!-- VER TÉRMINOS -->
+          <ion-button expand="block" fill="outline" class="btn-ver-terminos" (click)="verTerminos()">
+
+            <ion-icon name="document-text-outline" slot="start">
+            </ion-icon>
+
+            Ver términos y condiciones
+
+          </ion-button>
+
+        </div>
+
+        <!-- SI NO EXISTEN -->
+        <ng-template #noAceptados>
+
+          <div class="estado-no-aceptado">
+
+            <ion-icon name="alert-circle-outline"></ion-icon>
+
+            <p>
+              No se ha registrado la aceptación de los términos y condiciones.
+            </p>
+
+          </div>
+
+          <ion-button expand="block" fill="outline" class="btn-ver-terminos" (click)="verTerminos()">
+
+            <ion-icon name="document-text-outline" slot="start">
+            </ion-icon>
+
+            Ver términos y condiciones
+
+          </ion-button>
+
+        </ng-template>
+
+      </ion-card-content>
+
+    </ion-card>
+
   </ion-content>
 
 </ng-container>
 
-  <!-- ========================= -->
-  <!-- 🚫 USUARIO NO LOGUEADO -->
-  <!-- ========================= -->
-  <ng-template #noAuth>
+<!-- ========================= -->
+<!-- 🚫 USUARIO NO LOGUEADO -->
+<!-- ========================= -->
+<ng-template #noAuth>
 
-    <div class="welcome-container">
+  <div class="welcome-container">
 
-      <!-- 👋 HEADER -->
-      <div class="welcome-header">
+    <!-- 👋 HEADER -->
+    <div class="welcome-header">
 
-        <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
+      <ion-icon name="log-in-outline" class="avatar-icon"></ion-icon>
 
-        <h1>Bienvenido</h1>
+      <h1>Bienvenido</h1>
 
-        <p>Inicia sesión para acceder a todas las funciones de la aplicación.</p>
-
-      </div>
-
-      <!-- 🔑 LOGIN -->
-      <ion-button expand="block" class="btn-login" (click)="goLogin()">
-        Iniciar sesión
-      </ion-button>
-
-      <!-- 📝 REGISTER -->
-      <ion-button expand="block" fill="outline" (click)="goRegister()">
-        Registrarse
-      </ion-button>
+      <p>Inicia sesión para acceder a todas las funciones de la aplicación.</p>
 
     </div>
 
-  </ng-template>
+    <!-- 🔑 LOGIN -->
+    <ion-button expand="block" class="btn-login" (click)="goLogin()">
+      Iniciar sesión
+    </ion-button>
 
+    <!-- 📝 REGISTER -->
+    <ion-button expand="block" fill="outline" (click)="goRegister()">
+      Registrarse
+    </ion-button>
 
+  </div>
+
+</ng-template>

@@ -17,6 +17,7 @@ import { FotoService } from 'src/app/core/services/foto.service';
 
 // ✅ Agrega el import
 import { ModalController } from '@ionic/angular';
+import { TerminosModalComponent } from 'src/app/components/terminos-modal/terminos-modal.component';
 
 
 @Component({
@@ -40,7 +41,7 @@ export class ProfilePage implements OnInit {
   private loadingCtrl = inject(LoadingController);
   private actionSheetCtrl = inject(ActionSheetController);
   private firestore = inject(Firestore);
-  
+
   // ✅ Inyecta ModalController
   private modalCtrl = inject(ModalController);
 
@@ -525,6 +526,38 @@ export class ProfilePage implements OnInit {
       / (1000 * 60 * 60 * 24)
     );
     return Math.max(0, 90 - diasTranscurridos);
+  }
+
+  formatearFechaTerminos(fecha?: string): string {
+    if (!fecha) {
+      return 'No disponible';
+    }
+
+    const fechaLocal = new Date(fecha);
+
+    return fechaLocal.toLocaleString('es-CL', {
+      timeZone: 'America/Santiago',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+
+  // =========================
+  // 📄 TÉRMINOS Y CONDICIONES
+  // =========================
+  async verTerminos() {
+    const modal = await this.modalCtrl.create({
+      component: TerminosModalComponent,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      cssClass: 'terminos-modal'
+    });
+
+    await modal.present();
   }
 
   // =========================

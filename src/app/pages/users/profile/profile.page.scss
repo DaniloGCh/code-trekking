@@ -323,3 +323,102 @@ ion-button[fill="outline"],
   border: 2px solid rgb(255, 70, 70); /* Borde rojo personalizado */
   border-radius: 5px; /* Redondeado de esquinas del botón */
 }
+
+
+/* ================================
+   📄 TÉRMINOS Y CONDICIONES
+================================ */
+
+.terminos-card {
+  background: #14191f;
+  border: 1px solid rgba(0, 248, 103, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+}
+
+.terminos-card ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.terminos-card ion-card-title ion-icon {
+  color: rgb(0, 248, 103);
+  font-size: 24px;
+}
+
+/* Estado aceptado */
+
+.estado-aceptado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: rgb(0, 248, 103);
+  font-size: 0.95rem;
+
+  margin-bottom: 18px;
+}
+
+.estado-aceptado ion-icon {
+  font-size: 22px;
+}
+
+/* Información */
+
+.terminos-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.terminos-info span {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.terminos-info strong {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+/* Botón */
+
+.btn-ver-terminos {
+  margin-top: 20px;
+
+  --border-color: rgba(0, 248, 103, 0.5);
+  --color: rgb(0, 248, 103);
+
+  font-weight: 700;
+}
+
+/* Sin aceptación */
+
+.estado-no-aceptado {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  color: #94a3b8;
+}
+
+.estado-no-aceptado ion-icon {
+  color: #f59e0b;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.estado-no-aceptado p {
+  margin: 0;
+  line-height: 1.5;
+}
