@@ -24,7 +24,7 @@ export class SosService {
 
     try {
 
-      console.log('📍 Solicitando permisos de ubicación...');
+      // console.log('📍 Solicitando permisos de ubicación...');
 
       const permisos = await Geolocation.checkPermissions();
       let estado = permisos.location;
@@ -39,7 +39,7 @@ export class SosService {
         throw new Error('permiso-denegado');
       }
 
-      console.log('✅ Permiso de ubicación concedido');
+      // console.log('✅ Permiso de ubicación concedido');
 
       // =====================================================
       // 📍 OBTENER GPS
@@ -59,7 +59,7 @@ export class SosService {
         throw new Error('ubicacion-no-disponible');
       }
 
-      console.log('✅ GPS obtenido:', lat, lon);
+      // console.log('✅ GPS obtenido:', lat, lon);
 
       return {
         latitud: lat,
@@ -135,7 +135,7 @@ export class SosService {
 
     try {
 
-      console.log('📡 Iniciando watcher GPS...');
+      // console.log('📡 Iniciando watcher GPS...');
 
       const permisos = await Geolocation.checkPermissions();
       let estado = permisos.location;
@@ -185,13 +185,13 @@ export class SosService {
             timestamp: new Date(position.timestamp)
           };
 
-          console.log('📍 Nueva ubicación GPS:', lat, lon);
+          // console.log('📍 Nueva ubicación GPS:', lat, lon);
 
           callback(ubicacion);
         }
       );
 
-      console.log('✅ Watcher GPS iniciado:', watchId);
+      // console.log('✅ Watcher GPS iniciado:', watchId);
       return watchId;
 
     } catch (error) {
@@ -212,7 +212,7 @@ export class SosService {
 
     try {
       await Geolocation.clearWatch({ id: watchId });
-      console.log('✅ Watcher GPS detenido');
+      // console.log('✅ Watcher GPS detenido');
     } catch (error) {
       console.error('❌ Error deteniendo watcher GPS:', error);
     }

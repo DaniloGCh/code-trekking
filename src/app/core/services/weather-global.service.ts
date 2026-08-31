@@ -69,7 +69,7 @@ export class WeatherGlobalService {
   async loadWeather(ubicacion?: UbicacionSOS): Promise<void> {
 
     if (this.loadingWeather) {
-      console.log('⏳ Ya se está cargando el clima');
+      // console.log('⏳ Ya se está cargando el clima');
       return;
     }
 
@@ -83,7 +83,7 @@ export class WeatherGlobalService {
 
       try {
 
-        console.log('📍 Solicitando ubicación...');
+        // console.log('📍 Solicitando ubicación...');
         ubicacion = await this.sosService.obtenerUbicacion();
 
       } catch (error: any) {
@@ -97,7 +97,7 @@ export class WeatherGlobalService {
       }
     }
 
-    console.log('📍 Coordenadas:', ubicacion.latitud, ubicacion.longitud);
+    // console.log('📍 Coordenadas:', ubicacion.latitud, ubicacion.longitud);
 
     // =======================================================
     // 🌤️ PASO 2: PEDIR EL CLIMA A OPENWEATHER (CON FETCH NATIVO)
@@ -218,7 +218,7 @@ export class WeatherGlobalService {
 
     this.locationName.next(this.lastLocationName || 'Ubicación actual');
 
-    console.log('✅ Clima cargado correctamente');
+    // console.log('✅ Clima cargado correctamente');
 
     this.loadingWeather = false;
   }
@@ -230,11 +230,11 @@ export class WeatherGlobalService {
   async startLocationTracking(): Promise<void> {
 
     if (this.watchId !== null) {
-      console.log('⚠️ El seguimiento GPS ya está activo');
+      // console.log('⚠️ El seguimiento GPS ya está activo');
       return;
     }
 
-    console.log('📡 Iniciando seguimiento GPS...');
+    // console.log('📡 Iniciando seguimiento GPS...');
 
     let ubicacion: UbicacionSOS;
 
@@ -261,11 +261,11 @@ export class WeatherGlobalService {
     this.watchId = await this.sosService.watchUbicacion(
       async (ubicacionNueva: UbicacionSOS) => {
 
-        console.log(
-          '📍 Nueva posición:',
-          ubicacionNueva.latitud,
-          ubicacionNueva.longitud
-        );
+        // console.log(
+        //   '📍 Nueva posición:',
+        //   ubicacionNueva.latitud,
+        //   ubicacionNueva.longitud
+        // );
 
         if (!this.lastCoords) {
           this.lastCoords = {
@@ -282,11 +282,11 @@ export class WeatherGlobalService {
           ubicacionNueva.longitud
         );
 
-        console.log('📏 Distancia:', Math.round(distancia), 'metros');
+        // console.log('📏 Distancia:', Math.round(distancia), 'metros');
 
         if (distancia > 200) {
 
-          console.log('🔄 Actualizando clima por movimiento...');
+          // console.log('🔄 Actualizando clima por movimiento...');
 
           this.lastCoords = {
             lat: ubicacionNueva.latitud,
@@ -303,7 +303,7 @@ export class WeatherGlobalService {
     if (!this.watchId) {
       console.error('❌ No se pudo iniciar watcher GPS');
     } else {
-      console.log('✅ Seguimiento GPS activo');
+      // console.log('✅ Seguimiento GPS activo');
     }
   }
 
@@ -320,7 +320,7 @@ export class WeatherGlobalService {
     await this.sosService.detenerWatchUbicacion(this.watchId);
     this.watchId = null;
 
-    console.log('🛑 Seguimiento GPS detenido');
+    // console.log('🛑 Seguimiento GPS detenido');
   }
 
   // =========================================================
