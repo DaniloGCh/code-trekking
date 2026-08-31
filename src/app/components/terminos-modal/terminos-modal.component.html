@@ -5,9 +5,7 @@
 
     <ion-buttons slot="end">
       <ion-button (click)="cerrar()" class="btn-cerrar">
-        <ion-icon
-          slot="icon-only"
-          name="close-outline">
+        <ion-icon slot="icon-only" name="close-outline">
         </ion-icon>
       </ion-button>
     </ion-buttons>
@@ -1266,18 +1264,25 @@
 
 
   <!-- =========================================================
-       ACCIONES
-  ========================================================== -->
+     ACCIONES
+========================================================== -->
 
-  <div class="acciones-terminos">
+  <div class="acciones-terminos" *ngIf="!terminosAceptados">
 
-    <ion-button expand="block" class="btn-aceptar"(click)="aceptar()">
-      <ion-icon name="checkmark-circle-outline" slot="start"> </ion-icon>
+    <ion-button expand="block" class="btn-aceptar" (click)="aceptar()">
+
+      <ion-icon name="checkmark-circle-outline" slot="start">
+      </ion-icon>
+
       Acepto los términos y condiciones
+
     </ion-button>
 
+
     <ion-button expand="block" fill="clear" class="btn-cerrar-sin-aceptar" (click)="cerrar()">
+
       Cerrar sin aceptar
+
     </ion-button>
 
   </div>

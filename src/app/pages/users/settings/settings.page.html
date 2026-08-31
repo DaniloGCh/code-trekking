@@ -12,102 +12,186 @@
 <!-- Agrega fullscreen="true" para barra transparente al subir  -->
 <ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true">
 
-  <!-- CUENTA -->
-  <div class="section-title">
-    <ion-icon name="person-outline" color="primary"></ion-icon>
-    <h3>Cuenta</h3>
-  </div>
+  <ng-container *ngIf="userData as user">
 
-  <ion-card>
-    <ion-list lines="full">
-      <ion-item button detail (click)="onChangePassword()">
-        <ion-icon name="lock-closed-outline" slot="start" color="primary"></ion-icon>
-        <ion-label>
-          <h3>Cambiar contraseña</h3>
-          <p>Actualiza tu contraseña de acceso</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ion-card>
+    <!-- CUENTA -->
+    <div class="section-title">
+      <ion-icon name="person-outline" color="primary"></ion-icon>
+      <h3>Cuenta</h3>
+    </div>
 
-  <!-- ========================= -->
-  <!-- 🆘 CONTACTOS DE EMERGENCIA -->
-  <!-- ========================= -->
-  <div class="section-title">
-    <ion-icon name="call-outline" color="danger"></ion-icon>
-    <h3>Contactos de emergencia</h3>
-  </div>
-
-  <ion-card>
-    <ion-card-content>
-
-      <!-- Sin contactos -->
-      <div class="empty-contactos" *ngIf="contactos.length === 0">
-        <ion-icon name="person-add-outline"></ion-icon>
-        <p>No tienes contactos de emergencia</p>
-      </div>
-
-      <!-- Lista de contactos -->
-      <ion-list lines="full" *ngIf="contactos.length > 0">
-        <ion-item *ngFor="let contacto of contactos; let i = index">
-
-          <ion-icon name="person-outline" slot="start" color="danger"></ion-icon>
-
+    <ion-card>
+      <ion-list lines="full">
+        <ion-item button detail (click)="onChangePassword()">
+          <ion-icon name="lock-closed-outline" slot="start" color="primary"></ion-icon>
           <ion-label>
-            <h3>{{ contacto.nombre }}</h3>
-            <p>{{ contacto.telefono }}</p>
+            <h3>Cambiar contraseña</h3>
+            <p>Actualiza tu contraseña de acceso</p>
           </ion-label>
-
-
-          <!-- 📞 Llamar -->
-          <ion-button slot="end" fill="clear" color="success" (click)="llamarContacto(contacto.telefono)">
-            <ion-icon name="call-outline"></ion-icon>
-          </ion-button>
-
-          <!-- ✏️ Editar -->
-          <ion-button slot="end" fill="clear" color="primary" (click)="onEditarContacto(i)">
-            <ion-icon name="pencil-outline"></ion-icon>
-          </ion-button>
-
-          <!-- 🗑️ Eliminar -->
-          <ion-button slot="end" fill="clear" color="danger" (click)="onEliminarContacto(i)">
-            <ion-icon name="trash-outline"></ion-icon>
-          </ion-button>
-
         </ion-item>
       </ion-list>
+    </ion-card>
 
-      <!-- Botón agregar -->
-      <ion-button expand="block" fill="outline" color="danger" class="ion-margin-top" [disabled]="contactos.length >= 3"
-        (click)="onAgregarContacto()">
-        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-        {{ contactos.length >= 3 ? 'Máximo 3 contactos' : 'Agregar contacto' }}
-      </ion-button>
+    <!-- ========================= -->
+    <!-- 🆘 CONTACTOS DE EMERGENCIA -->
+    <!-- ========================= -->
+    <div class="section-title">
+      <ion-icon name="call-outline" color="danger"></ion-icon>
+      <h3>Contactos de emergencia</h3>
+    </div>
 
-      <!-- Indicador de contactos -->
-      <p class="contactos-counter" *ngIf="contactos.length > 0">
-        {{ contactos.length }}/3 contactos registrados
-      </p>
+    <ion-card>
+      <ion-card-content>
 
-    </ion-card-content>
-  </ion-card>
+        <!-- Sin contactos -->
+        <div class="empty-contactos" *ngIf="contactos.length === 0">
+          <ion-icon name="person-add-outline"></ion-icon>
+          <p>No tienes contactos de emergencia</p>
+        </div>
 
-  <!-- ZONA DE PELIGRO -->
-  <div class="section-title">
-    <ion-icon name="warning-outline" color="danger"></ion-icon>
-    <h3>Zona de peligro</h3>
-  </div>
+        <!-- Lista de contactos -->
+        <ion-list lines="full" *ngIf="contactos.length > 0">
+          <ion-item *ngFor="let contacto of contactos; let i = index">
 
-  <ion-card color="light">
-    <ion-list lines="full">
-      <ion-item button detail (click)="onDeleteAccount()">
-        <ion-icon name="trash-outline" slot="start" color="danger"></ion-icon>
-        <ion-label>
-          <h3 style="color: var(--ion-color-danger)">Eliminar cuenta</h3>
-          <p>Esta acción es irreversible</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ion-card>
+            <ion-icon name="person-outline" slot="start" color="danger"></ion-icon>
+
+            <ion-label>
+              <h3>{{ contacto.nombre }}</h3>
+              <p>{{ contacto.telefono }}</p>
+            </ion-label>
+
+
+            <!-- 📞 Llamar -->
+            <ion-button slot="end" fill="clear" color="success" (click)="llamarContacto(contacto.telefono)">
+              <ion-icon name="call-outline"></ion-icon>
+            </ion-button>
+
+            <!-- ✏️ Editar -->
+            <ion-button slot="end" fill="clear" color="primary" (click)="onEditarContacto(i)">
+              <ion-icon name="pencil-outline"></ion-icon>
+            </ion-button>
+
+            <!-- 🗑️ Eliminar -->
+            <ion-button slot="end" fill="clear" color="danger" (click)="onEliminarContacto(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+
+          </ion-item>
+        </ion-list>
+
+        <!-- Botón agregar -->
+        <ion-button expand="block" fill="outline" color="danger" class="ion-margin-top"
+          [disabled]="contactos.length >= 3" (click)="onAgregarContacto()">
+          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+          {{ contactos.length >= 3 ? 'Máximo 3 contactos' : 'Agregar contacto' }}
+        </ion-button>
+
+        <!-- Indicador de contactos -->
+        <p class="contactos-counter" *ngIf="contactos.length > 0">
+          {{ contactos.length }}/3 contactos registrados
+        </p>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- ========================= -->
+    <!-- 📄 TÉRMINOS Y CONDICIONES -->
+    <!-- ========================= -->
+
+    <div class="section-title">
+      <ion-icon name="shield-checkmark-outline" class="icon-terminos"></ion-icon>
+      <h3>Terminos y condiciones</h3>
+    </div>
+    <ion-accordion-group class="terminos-accordion-group">
+
+      <ion-accordion value="terminos">
+        <!-- ENCABEZADO DEL ACORDEÓN -->
+        <ion-item slot="header" class="terminos-accordion-header">
+          <ion-icon name="document-text-outline" slot="start">
+          </ion-icon>
+          <ion-label>
+            <h3>
+              Consulta el estado de aceptación
+            </h3>
+          </ion-label>
+        </ion-item>
+
+        <!-- CONTENIDO DEL ACORDEÓN -->
+        <div slot="content" class="terminos-accordion-content">
+          <!-- ========================= -->
+          <!-- ESTADO ACEPTADO -->
+          <!-- ========================= -->
+          <div class="terminos-estado" *ngIf="userData.terminosAceptados; else noAceptados">
+            <div class="estado-aceptado">
+              <ion-icon name="checkmark-circle-outline">
+              </ion-icon>
+              <strong>
+                Estado: Aceptados
+              </strong>
+            </div>
+            <!-- FECHA DE ACEPTACIÓN -->
+            <div class="terminos-info" *ngIf="userData.fechaAceptacionTerminos">
+              <span>Aceptados el:</span>
+              <strong>
+                {{ formatearFechaTerminos(userData.fechaAceptacionTerminos!) }}
+              </strong>
+            </div>
+            <!-- VERSIÓN -->
+            <div class="terminos-info" *ngIf="userData.versionTerminos">
+              <span>Versión:</span>
+              <strong>
+                {{ userData.versionTerminos }}
+              </strong>
+            </div>
+            <!-- VER TÉRMINOS -->
+            <ion-button expand="block" fill="outline" class="btn-ver-terminos" (click)="verTerminos()">
+              <ion-icon name="document-text-outline" slot="start">
+              </ion-icon>
+              Ver términos y condiciones
+            </ion-button>
+          </div>
+          <!-- ========================= -->
+          <!-- 🚫 NO ACEPTADOS -->
+          <!-- ========================= -->
+          <ng-template #noAceptados>
+            <div class="estado-no-aceptado">
+              <ion-icon name="alert-circle-outline">
+              </ion-icon>
+              <p>
+                No se ha registrado la aceptación de los términos y condiciones.
+              </p>
+            </div>
+            <ion-button expand="block" fill="outline" class="btn-ver-terminos" (click)="verTerminos()">
+              <ion-icon name="document-text-outline" slot="start">
+              </ion-icon>
+              Ver términos y condiciones
+            </ion-button>
+          </ng-template>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+
+    <!-- ZONA DE PELIGRO -->
+    <div class="section-title">
+      <ion-icon name="warning-outline" color="danger"></ion-icon>
+      <h3>Zona de peligro</h3>
+    </div>
+
+    <ion-card color="light">
+      <ion-list lines="full">
+        <ion-item button detail (click)="onDeleteAccount()">
+          <ion-icon name="trash-outline" slot="start" color="danger"></ion-icon>
+          <ion-label>
+            <h3 style="color: var(--ion-color-danger)">Eliminar cuenta</h3>
+            <p>Esta acción es irreversible</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+
+
+  </ng-container>
+
+
 
 </ion-content>

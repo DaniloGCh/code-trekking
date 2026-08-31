@@ -190,6 +190,158 @@ ion-button.ion-margin-top[color="danger"][disabled] {
 }
 
 /* ==========================================================================
+   📄 TÉRMINOS Y CONDICIONES
+   ========================================================================== */
+
+/* Icono principal de Términos y Condiciones */
+.icon-terminos {
+  color: rgb(0, 248, 103); /* Verde neón */
+}
+
+/* Contenedor principal del acordeón */
+/* Contenedor principal del acordeón */
+.terminos-accordion-group {
+  background: #14191f; /* Fondo oscuro */
+  border: 1px solid rgba(148, 163, 184, 0.25); /* Borde gris/plomo */
+  border-radius: 16px; /* Bordes redondeados */
+  overflow: hidden; /* Mantiene el contenido dentro de los bordes */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45); /* Sombra */
+  margin: 0 14px 20px 14px; /* Separación exterior */
+}
+
+/* ==========================================================================
+   ENCABEZADO DEL ACORDEÓN
+   ========================================================================== */
+
+/* Estilo principal del encabezado */
+.terminos-accordion-header {
+  --background: #14191f; /* Fondo oscuro */
+  --color: #ffffff; /* Color principal del texto */
+  --padding-start: 16px; /* Relleno izquierdo */
+  --inner-padding-end: 16px; /* Relleno derecho */
+  border: none; /* Elimina bordes */
+}
+
+/* Icono del encabezado */
+.terminos-accordion-header ion-icon {
+  color: rgb(0, 248, 103); /* Verde neón */
+  font-size: 24px; /* Tamaño del icono */
+  margin-right: 10px; /* Separación respecto al texto */
+}
+
+/* Etiqueta del encabezado */
+.terminos-accordion-header ion-label {
+  margin: 12px 0; /* Separación vertical */
+}
+
+/* Título del acordeón */
+.terminos-accordion-header h2 {
+  margin: 0; /* Elimina margen por defecto */
+  color: #ffffff; /* Texto blanco */
+  font-weight: 800; /* Texto destacado */
+  font-size: 1.1rem; /* Tamaño del título */
+}
+
+/* Descripción del encabezado */
+.terminos-accordion-header p {
+  margin: 4px 0 0; /* Separación superior */
+  color: #94a3b8; /* Gris secundario */
+  font-size: 0.85rem; /* Tamaño compacto */
+}
+
+/* ==========================================================================
+   CONTENIDO DEL ACORDEÓN
+   ========================================================================== */
+
+/* Contenedor del contenido */
+.terminos-accordion-content {
+  background: #14191f; /* Fondo oscuro */
+  padding: 16px; /* Relleno interno */
+}
+
+/* ==========================================================================
+   ESTADO: TÉRMINOS ACEPTADOS
+   ========================================================================== */
+
+/* Mensaje cuando los términos fueron aceptados */
+.estado-aceptado {
+  display: flex; /* Distribución flexible */
+  align-items: center; /* Centra verticalmente */
+  gap: 8px; /* Separación entre icono y texto */
+  color: rgb(0, 248, 103); /* Verde neón */
+  font-size: 0.95rem; /* Tamaño del texto */
+  margin-bottom: 18px; /* Separación inferior */
+}
+
+/* Icono del estado aceptado */
+.estado-aceptado ion-icon {
+  font-size: 22px; /* Tamaño del icono */
+}
+
+/* ==========================================================================
+   INFORMACIÓN DE LOS TÉRMINOS
+   ========================================================================== */
+
+/* Fila de información */
+.terminos-info {
+  display: flex; /* Distribución horizontal */
+  justify-content: space-between; /* Separa etiqueta y valor */
+  align-items: center; /* Centra verticalmente */
+  padding: 10px 0; /* Relleno vertical */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06); /* Separador */
+}
+
+/* Etiqueta de información */
+.terminos-info span {
+  color: #94a3b8; /* Gris secundario */
+  font-size: 0.9rem; /* Tamaño del texto */
+}
+
+/* Valor de información */
+.terminos-info strong {
+  color: #e2e8f0; /* Blanco grisáceo */
+  font-size: 0.9rem; /* Tamaño del texto */
+  text-align: right; /* Alinea el valor a la derecha */
+}
+
+/* ==========================================================================
+   BOTÓN VER TÉRMINOS
+   ========================================================================== */
+
+/* Botón para visualizar los términos completos */
+.btn-ver-terminos {
+  margin-top: 20px; /* Separación superior */
+  --border-color: rgba(0, 248, 103, 0.5); /* Borde verde neón */
+  --color: rgb(0, 248, 103); /* Texto verde neón */
+  font-weight: 700; /* Texto destacado */
+}
+
+/* ==========================================================================
+   ESTADO: TÉRMINOS NO ACEPTADOS
+   ========================================================================== */
+
+/* Mensaje cuando los términos aún no fueron aceptados */
+.estado-no-aceptado {
+  display: flex; /* Distribución flexible */
+  align-items: flex-start; /* Alinea el contenido arriba */
+  gap: 10px; /* Separación entre icono y texto */
+  color: #94a3b8; /* Gris secundario */
+}
+
+/* Icono de advertencia */
+.estado-no-aceptado ion-icon {
+  color: #f59e0b; /* Amarillo de advertencia */
+  font-size: 22px; /* Tamaño del icono */
+  flex-shrink: 0; /* Evita que el icono se reduzca */
+}
+
+/* Texto del estado no aceptado */
+.estado-no-aceptado p {
+  margin: 0; /* Elimina margen por defecto */
+  line-height: 1.5; /* Mejora la lectura */
+}
+
+/* ==========================================================================
    🚨 ZONA DE PELIGRO Y ELIMINAR CUENTA
    ========================================================================== */
 

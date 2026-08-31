@@ -6,6 +6,9 @@ import { Router } from '@angular/router';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
 import { AuthService, UserData, ContactoEmergencia } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
+// ✅ Agrega el import
+import { ModalController } from '@ionic/angular';
+import { TerminosModalComponent } from 'src/app/components/terminos-modal/terminos-modal.component';
 
 @Component({
   selector: 'app-settings',
@@ -18,13 +21,13 @@ export class SettingsPage implements OnInit {
   // =========================
   // 🔌 DEPENDENCIAS
   // =========================
-  private authService  = inject(AuthService);
-  private security     = inject(SecurityService);
-  private router       = inject(Router);
-  private alertCtrl    = inject(AlertController);
-  private toastCtrl    = inject(ToastController);
-  private loadingCtrl  = inject(LoadingController);
-
+  private authService = inject(AuthService);
+  private security = inject(SecurityService);
+  private router = inject(Router);
+  private alertCtrl = inject(AlertController);
+  private toastCtrl = inject(ToastController);
+  private loadingCtrl = inject(LoadingController);
+  private modalCtrl = inject(ModalController);
   // =========================
   // 📊 ESTADO
   // =========================
@@ -47,10 +50,10 @@ export class SettingsPage implements OnInit {
   private validarContacto(nombre: string, telefono: string): string | null {
     if (!nombre || !telefono) return 'Completa todos los campos';
 
-    const nombreLimpio   = nombre.trim();
+    const nombreLimpio = nombre.trim();
     const telefonoLimpio = telefono.trim();
 
-    if (nombreLimpio.length < 3)  return 'El nombre debe tener mínimo 3 caracteres';
+    if (nombreLimpio.length < 3) return 'El nombre debe tener mínimo 3 caracteres';
     if (nombreLimpio.length > 50) return 'El nombre no puede superar 50 caracteres';
 
     // ✅ Validar nombre con SecurityService
@@ -87,8 +90,8 @@ export class SettingsPage implements OnInit {
     const alert = await this.alertCtrl.create({
       header: 'Agregar contacto de emergencia',
       inputs: [
-        { name: 'nombre',   type: 'text', placeholder: 'Nombre completo' },
-        { name: 'telefono', type: 'tel',  placeholder: 'Teléfono (ej: +56912345678)' }
+        { name: 'nombre', type: 'text', placeholder: 'Nombre completo' },
+        { name: 'telefono', type: 'tel', placeholder: 'Teléfono (ej: +56912345678)' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
@@ -106,7 +109,7 @@ export class SettingsPage implements OnInit {
 
             try {
               const nuevoContacto: ContactoEmergencia = {
-                nombre:   this.security.sanitizeInput(data.nombre.trim()),
+                nombre: this.security.sanitizeInput(data.nombre.trim()),
                 telefono: data.telefono.trim().replace(/\s/g, ''),
               };
 
@@ -138,8 +141,8 @@ export class SettingsPage implements OnInit {
     const alert = await this.alertCtrl.create({
       header: 'Editar contacto',
       inputs: [
-        { name: 'nombre',   type: 'text', value: contacto.nombre,   placeholder: 'Nombre completo' },
-        { name: 'telefono', type: 'tel',  value: contacto.telefono, placeholder: 'Teléfono' }
+        { name: 'nombre', type: 'text', value: contacto.nombre, placeholder: 'Nombre completo' },
+        { name: 'telefono', type: 'tel', value: contacto.telefono, placeholder: 'Teléfono' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
@@ -157,7 +160,7 @@ export class SettingsPage implements OnInit {
 
             try {
               this.contactos[index] = {
-                nombre:   this.security.sanitizeInput(data.nombre.trim()),
+                nombre: this.security.sanitizeInput(data.nombre.trim()),
                 telefono: data.telefono.trim().replace(/\s/g, ''),
               };
               this.contactos = [...this.contactos];
@@ -280,9 +283,9 @@ export class SettingsPage implements OnInit {
     const alert = await this.alertCtrl.create({
       header: 'Cambiar contraseña',
       inputs: [
-        { name: 'currentPassword',  type: 'password', placeholder: 'Contraseña actual' },
-        { name: 'newPassword',      type: 'password', placeholder: 'Nueva contraseña (mín. 8 caracteres)' },
-        { name: 'confirmPassword',  type: 'password', placeholder: 'Confirmar contraseña' }
+        { name: 'currentPassword', type: 'password', placeholder: 'Contraseña actual' },
+        { name: 'newPassword', type: 'password', placeholder: 'Nueva contraseña (mín. 8 caracteres)' },
+        { name: 'confirmPassword', type: 'password', placeholder: 'Confirmar contraseña' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
@@ -366,8 +369,8 @@ export class SettingsPage implements OnInit {
       header: 'Verificación de seguridad',
       message: `${this.security.sanitizeInput(this.userData?.preguntaSeguridad || '')}`,
       inputs: [
-        { name: 'respuesta', type: 'text',     placeholder: 'Tu respuesta de seguridad' },
-        { name: 'password',  type: 'password', placeholder: 'Tu contraseña actual' }
+        { name: 'respuesta', type: 'text', placeholder: 'Tu respuesta de seguridad' },
+        { name: 'password', type: 'password', placeholder: 'Tu contraseña actual' }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
@@ -412,10 +415,10 @@ export class SettingsPage implements OnInit {
       await loading.dismiss();
 
       const messages: Record<string, string> = {
-        'respuesta-incorrecta':    'La respuesta de seguridad es incorrecta.',
-        'auth/wrong-password':     'La contraseña es incorrecta.',
+        'respuesta-incorrecta': 'La respuesta de seguridad es incorrecta.',
+        'auth/wrong-password': 'La contraseña es incorrecta.',
         'auth/invalid-credential': 'Las credenciales son inválidas.',
-        'auth/too-many-requests':  'Demasiados intentos. Intenta más tarde.',
+        'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde.',
       };
 
       const msg = messages[error.message] || messages[error.code] || 'Error al eliminar la cuenta.';
@@ -423,6 +426,38 @@ export class SettingsPage implements OnInit {
     }
 
     return true;
+  }
+
+  // =========================
+  // 📄 TÉRMINOS Y CONDICIONES
+  // =========================
+  async verTerminos() {
+    const modal = await this.modalCtrl.create({
+      component: TerminosModalComponent,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      cssClass: 'terminos-modal'
+    });
+
+    await modal.present();
+  }
+
+  formatearFechaTerminos(fecha?: string): string {
+    if (!fecha) {
+      return 'No disponible';
+    }
+
+    const fechaLocal = new Date(fecha);
+
+    return fechaLocal.toLocaleString('es-CL', {
+      timeZone: 'America/Santiago',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
   }
 
   // =========================
