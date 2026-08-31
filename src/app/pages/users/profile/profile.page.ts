@@ -99,6 +99,160 @@ export class ProfilePage implements OnInit {
   }
 
   // =========================
+  // 👤 EDITAR SOBRE MÍ
+  // =========================
+  async editarSobreMi(
+    campo:
+      | 'ocupacion'
+      | 'lugarSonado'
+      | 'mascotas'
+      | 'actividadesFavoritas'
+      | 'trekkingFavorito'
+      | 'proximoDesafio'
+      | 'sobreMi'
+  ) {
+
+    if (!this.userData) return;
+
+    const configuracion = {
+      ocupacion: {
+        titulo: '💼 Ocupación',
+        placeholder: 'Ej: Estudiante de informática',
+        maxLength: 50
+      },
+
+      lugarSonado: {
+        titulo: '🗺️ Lugar que siempre quise visitar',
+        placeholder: 'Ej: Torres del Paine',
+        maxLength: 80
+      },
+
+      mascotas: {
+        titulo: '🐾 Mascotas',
+        placeholder: 'Ej: Tengo 2 perros',
+        maxLength: 80
+      },
+
+      actividadesFavoritas: {
+        titulo: '🥾 Actividades favoritas',
+        placeholder: 'Ej: Trekking, camping y fotografía',
+        maxLength: 100
+      },
+
+      trekkingFavorito: {
+        titulo: '🏔️ Trekking favorito',
+        placeholder: 'Ej: Parque Nacional Conguillío',
+        maxLength: 100
+      },
+
+      proximoDesafio: {
+        titulo: '🎯 Próximo desafío',
+        placeholder: 'Ej: Subir mi primer volcán',
+        maxLength: 100
+      },
+
+      sobreMi: {
+        titulo: '✍️ Sobre mí',
+        placeholder: 'Cuéntanos algo sobre ti',
+        maxLength: 200
+      }
+    };
+
+    const config = configuracion[campo];
+
+    const valorActual = this.userData[campo] || '';
+
+    const alert = await this.alertCtrl.create({
+      header: config.titulo,
+
+      inputs: [
+        {
+          name: 'valor',
+          type: campo === 'sobreMi' ? 'textarea' : 'text',
+          value: valorActual,
+          placeholder: config.placeholder,
+          attributes: {
+            maxlength: config.maxLength
+          }
+        }
+      ],
+
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+
+        {
+          text: valorActual ? 'Guardar' : 'Agregar',
+
+          handler: async (data) => {
+
+            const valor = data.valor?.trim() || '';
+
+            // Permitir dejar el campo vacío
+            if (!valor) {
+
+              await this.authService.updateProfile({
+                [campo]: ''
+              });
+
+              if (this.userData) {
+                this.userData[campo] = '';
+              }
+
+              return true;
+            }
+
+            // 🔐 Validación de seguridad
+            if (!this.security.isSafeText(valor, config.maxLength)) {
+
+              await this.showToast(
+                'El contenido contiene caracteres no permitidos',
+                'warning'
+              );
+
+              return false;
+            }
+
+            // 🧹 Sanitización
+            const valorSeguro = this.security.sanitizeInput(valor);
+
+            try {
+
+              await this.authService.updateProfile({
+                [campo]: valorSeguro
+              });
+
+              if (this.userData) {
+                this.userData[campo] = valorSeguro;
+              }
+
+              await this.showToast(
+                'Información actualizada correctamente',
+                'success'
+              );
+
+              return true;
+
+            } catch {
+
+              await this.showToast(
+                'Error al actualizar la información',
+                'danger'
+              );
+
+              return false;
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  // =========================
   // 📊 ESTADÍSTICAS DEL USUARIO
   // =========================
   private cargarEstadisticas() {

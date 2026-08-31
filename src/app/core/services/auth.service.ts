@@ -60,22 +60,35 @@ export interface EstadisticasUsuario {
 // 👤 MODELO USUARIO
 // =========================
 export interface UserData {
-  uid: string; // Identificador único de usuario provisto por Firebase Auth
-  email: string; // Dirección de correo electrónico del usuario
-  nombre: string; // Nombre público o de perfil del usuario
-  rol: 'admin' | 'user'; // Rol asignado para control de acceso y permisos
-  fotoBase64?: string; // Cadena opcional que almacena la imagen de perfil en formato Base64
-  estado?: string; // Estado personalizado del perfil del usuario
-  preguntaSeguridad?: string; // Pregunta elegida para la recuperación o verificación de la cuenta
-  respuestaSeguridad?: string; // Respuesta hasheada o procesada para la pregunta de seguridad
-  contactosEmergencia?: ContactoEmergencia[]; // Lista opcional de contactos de emergencia asignados
-  ultimoCambioNombre?: string; // Fecha en formato ISO que registra la última actualización del nombre
-  // 📄 TÉRMINOS Y CONDICIONES
-  terminosAceptados?: boolean; // Indicador booleano que confirma si el usuario aceptó los términos
-  fechaAceptacionTerminos?: string; // Marca de tiempo ISO del momento en que aceptó los términos
-  versionTerminos?: string; // Versión legal de los términos aceptados por el usuario
+  uid: string;
+  email: string;
+  nombre: string;
+  rol: 'admin' | 'user';
+
+  fotoBase64?: string;
+  estado?: string;
+
+  // ⭐ INFORMACIÓN PERSONAL OPCIONAL
+  sobreMi?: string;
+  ocupacion?: string;
+  lugarSonado?: string;
+  mascotas?: string;
+  actividadesFavoritas?: string;
+  trekkingFavorito?: string;
+  proximoDesafio?: string;
+
+  preguntaSeguridad?: string;
+  respuestaSeguridad?: string;
+  contactosEmergencia?: ContactoEmergencia[];
+  ultimoCambioNombre?: string;
+
   // 📊 ESTADÍSTICAS
   estadisticas?: EstadisticasUsuario;
+
+  // 📄 TÉRMINOS Y CONDICIONES
+  terminosAceptados?: boolean;
+  fechaAceptacionTerminos?: string;
+  versionTerminos?: string;
 }
 
 

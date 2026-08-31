@@ -104,11 +104,7 @@
     <!-- ========================= -->
     <!-- 🧾 DATOS PERSONALES -->
     <!-- ========================= -->
-    <ion-card>
-
-      <ion-card-header>
-        <ion-card-title>Datos personales</ion-card-title>
-      </ion-card-header>
+    <!-- <ion-card>
 
       <ion-card-content>
 
@@ -135,8 +131,194 @@
 
       </ion-card-content>
 
-    </ion-card>
+    </ion-card> -->
 
+    <!-- ========================= -->
+
+    <!-- 👤 SOBRE MÍ -->
+
+    <!-- ========================= -->
+
+    <div class="sobre-mi-grid">
+      <!-- ========================= -->
+      <!-- 👤 INFORMACIÓN PERSONAL -->
+      <!-- ========================= -->
+      <ion-card class="sobre-mi-card">
+        <ion-card-header>
+          <div class="sobre-mi-header">
+            <ion-card-title>
+              👤 Sobre mí
+            </ion-card-title>
+          </div>
+          <ion-card-subtitle>
+            Conoce un poco más sobre mí
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list lines="none" class="sobre-mi-list">
+            <!-- 💼 OCUPACIÓN -->
+            <ion-item class="sobre-mi-item">
+              <ion-icon class="icon-green" name="briefcase-outline" slot="start">
+              </ion-icon>
+              <ion-label>
+                <p>Ocupación</p>
+                <h3 *ngIf="userData.ocupacion; else sinOcupacion">
+                  {{ userData.ocupacion }}
+                </h3>
+                <ng-template #sinOcupacion>
+                  <span class="campo-vacio">
+                    Agregar ocupación
+                  </span>
+                </ng-template>
+              </ion-label>
+              <ion-button fill="clear" size="small" (click)="editarSobreMi('ocupacion')">
+                <ion-icon name="pencil-outline" color="success">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+            <!-- 🗺️ LUGAR SOÑADO -->
+            <ion-item class="sobre-mi-item">
+              <ion-icon class="icon-green" name="map-outline" slot="start">
+              </ion-icon>
+              <ion-label>
+                <p>Lugar que siempre quise visitar</p>
+                <h3 *ngIf="userData.lugarSonado; else sinLugar">
+                  {{ userData.lugarSonado }}
+                </h3>
+                <ng-template #sinLugar>
+                  <span class="campo-vacio">
+                    Agregar lugar
+                  </span>
+                </ng-template>
+              </ion-label>
+              <ion-button fill="clear" size="small" (click)="editarSobreMi('lugarSonado')">
+                <ion-icon name="pencil-outline" color="success">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+            <!-- 🐾 MASCOTAS -->
+            <ion-item class="sobre-mi-item">
+              <ion-icon class="icon-green" name="paw-outline" slot="start">
+              </ion-icon>
+              <ion-label>
+                <p>Mascotas</p>
+                <h3 *ngIf="userData.mascotas; else sinMascotas">
+                  {{ userData.mascotas }}
+                </h3>
+                <ng-template #sinMascotas>
+                  <span class="campo-vacio">
+                    Agregar información
+                  </span>
+                </ng-template>
+              </ion-label>
+              <ion-button fill="clear" size="small" (click)="editarSobreMi('mascotas')">
+                <ion-icon name="pencil-outline" color="success">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+      <!-- ========================= -->
+      <!-- 🥾 INFORMACIÓN DE AVENTURA -->
+      <!-- ========================= -->
+      <ion-card class="sobre-mi-card">
+        <ion-card-header>
+          <div class="sobre-mi-header">
+            <ion-card-title>
+              🥾 Aventura
+            </ion-card-title>
+          </div>
+          <ion-card-subtitle>
+            Tus intereses y próximos desafíos
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list lines="none" class="sobre-mi-list">
+            <!-- 🥾 ACTIVIDADES FAVORITAS -->
+            <ion-item class="sobre-mi-item">
+              <ion-icon class="icon-green" name="heart-outline" slot="start">
+              </ion-icon>
+              <ion-label>
+                <p>Actividades favoritas</p>
+                <h3 *ngIf="userData.actividadesFavoritas; else sinActividades">
+                  {{ userData.actividadesFavoritas }}
+                </h3>
+                <ng-template #sinActividades>
+                  <span class="campo-vacio">
+                    Agregar actividades
+                  </span>
+                </ng-template>
+              </ion-label>
+              <ion-button fill="clear" size="small" (click)="editarSobreMi('actividadesFavoritas')">
+                <ion-icon name="pencil-outline" color="success">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+            <!-- 🏔️ TREKKING FAVORITO -->
+            <ion-item class="sobre-mi-item">
+              <ion-icon class="icon-green" name="trail-sign-outline" slot="start">
+              </ion-icon>
+              <ion-label>
+                <p>Trekking favorito</p>
+                <h3 *ngIf="userData.trekkingFavorito; else sinTrekking">
+                  {{ userData.trekkingFavorito }}
+                </h3>
+                <ng-template #sinTrekking>
+                  <span class="campo-vacio">
+                    Agregar trekking favorito
+                  </span>
+                </ng-template>
+              </ion-label>
+              <ion-button fill="clear" size="small" (click)="editarSobreMi('trekkingFavorito')">
+                <ion-icon name="pencil-outline" color="success">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+            <!-- 🎯 PRÓXIMO DESAFÍO -->
+            <ion-item class="sobre-mi-item">
+              <ion-icon class="icon-green" name="flag-outline" slot="start">
+              </ion-icon>
+              <ion-label>
+                <p>Próximo desafío</p>
+                <h3 *ngIf="userData.proximoDesafio; else sinDesafio">
+                  {{ userData.proximoDesafio }}
+                </h3>
+                <ng-template #sinDesafio>
+                  <span class="campo-vacio">
+                    Agregar próximo desafío
+                  </span>
+                </ng-template>
+              </ion-label>
+              <ion-button fill="clear" size="small" (click)="editarSobreMi('proximoDesafio')">
+                <ion-icon name="pencil-outline" color="success">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+            <!-- ✍️ SOBRE MÍ -->
+            <ion-item class="sobre-mi-item">
+              <ion-icon class="icon-green" name="person-outline" slot="start">
+              </ion-icon>
+              <ion-label>
+                <p>Sobre mí</p>
+                <h3 *ngIf="userData.sobreMi; else sinSobreMi">
+                  {{ userData.sobreMi }}
+                </h3>
+                <ng-template #sinSobreMi>
+                  <span class="campo-vacio">
+                    Cuéntanos algo sobre ti
+                  </span>
+                </ng-template>
+              </ion-label>
+              <ion-button fill="clear" size="small" (click)="editarSobreMi('sobreMi')">
+                <ion-icon name="pencil-outline" color="success">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+    </div>
     <!-- ========================= -->
     <!-- 📊 ESTADÍSTICAS -->
     <!-- ========================= -->

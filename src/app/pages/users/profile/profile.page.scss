@@ -166,7 +166,7 @@ ion-card-subtitle {
 }
 
 ion-card-content {
-  padding: 8px 16px 16px 16px; /* Relleno interno para los componentes */
+  padding: 20px 16px 16px 16px; /* Relleno interno para los componentes */
 }
 
 /* Botón Cambiar Estado */
@@ -324,126 +324,26 @@ ion-button[fill="outline"],
   border-radius: 5px; /* Redondeado de esquinas del botón */
 }
 
-
-/* ================================
-   📄 TÉRMINOS Y CONDICIONES
-================================ */
-
-.terminos-card {
-  background: #14191f;
-  border: 1px solid rgba(0, 248, 103, 0.25);
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
-}
-
-.terminos-card ion-card-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 1.1rem;
-}
-
-.terminos-card ion-card-title ion-icon {
-  color: rgb(0, 248, 103);
-  font-size: 24px;
-}
-
-/* Estado aceptado */
-
-.estado-aceptado {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  color: rgb(0, 248, 103);
-  font-size: 0.95rem;
-
-  margin-bottom: 18px;
-}
-
-.estado-aceptado ion-icon {
-  font-size: 22px;
-}
-
-/* Información */
-
-.terminos-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 10px 0;
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.terminos-info span {
-  color: #94a3b8;
-  font-size: 0.9rem;
-}
-
-.terminos-info strong {
-  color: #e2e8f0;
-  font-size: 0.9rem;
-  text-align: right;
-}
-
-/* Botón */
-
-.btn-ver-terminos {
-  margin-top: 20px;
-
-  --border-color: rgba(0, 248, 103, 0.5);
-  --color: rgb(0, 248, 103);
-
-  font-weight: 700;
-}
-
-/* Sin aceptación */
-
-.estado-no-aceptado {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-
-  color: #94a3b8;
-}
-
-.estado-no-aceptado ion-icon {
-  color: #f59e0b;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.estado-no-aceptado p {
-  margin: 0;
-  line-height: 1.5;
-}
-
 /* ================================ */
-/* 📊 ESTADÍSTICAS DEL PERFIL      */
+/* 📊 ESTADÍSTICAS DEL PERFIL        */
 /* ================================ */
 
 .estadisticas-card {
-  background: #14191f;
-  border-radius: 16px;
-
-  /* Borde gris suave */
-  border: 1px solid #3a4148;
-
-  margin: 16px;
-  box-shadow: none;
+background: #14191f; /* Fondo oscuro sólido */
+border: 1px solid #3a4148; /* Borde gris */
+border-radius: 16px; /* Redondeado de esquinas */
+margin: 16px; /* Separación exterior */
+box-shadow: none; /* Sin sombra */
 }
 
-/* Título */
+/* ================================ */
+/* 📝 TÍTULO                        */
+/* ================================ */
 
 .estadisticas-card ion-card-title {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 600;
+color: #ffffff; /* Texto blanco */
+font-size: 18px; /* Tamaño del título */
+font-weight: 600; /* Grosor del texto */
 }
 
 /* ================================ */
@@ -451,11 +351,9 @@ ion-button[fill="outline"],
 /* ================================ */
 
 .estadisticas-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: 12px;
+display: grid; /* Utiliza CSS Grid */
+grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+gap: 12px; /* Separación entre cards */
 }
 
 /* ================================ */
@@ -463,26 +361,23 @@ ion-button[fill="outline"],
 /* ================================ */
 
 .estadistica-box {
-  background: #1a2027;
+background: #1a2027; /* Fondo de la mini card */
+border: 1px solid #343b42; /* Borde gris */
+border-radius: 14px; /* Redondeado de esquinas */
 
-  border: 1px solid #343b42;
-  border-radius: 14px;
+padding: 16px 12px; /* Espaciado interno */
+min-height: 120px; /* Altura mínima */
 
-  padding: 16px 12px;
+display: flex; /* Utiliza Flexbox */
+flex-direction: column; /* Elementos en columna */
+align-items: center; /* Centra horizontalmente */
+justify-content: center; /* Centra verticalmente */
+text-align: center; /* Centra el texto */
 
-  min-height: 120px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
+transition:
+transform 0.2s ease,
+border-color 0.2s ease,
+background 0.2s ease; /* Transición suave */
 }
 
 /* ================================ */
@@ -490,25 +385,26 @@ ion-button[fill="outline"],
 /* ================================ */
 
 .estadistica-icon-container {
-  width: 42px;
-  height: 42px;
+width: 42px; /* Ancho del círculo */
+height: 42px; /* Alto del círculo */
 
-  border-radius: 50%;
+border-radius: 50%; /* Forma circular */
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+display: flex; /* Utiliza Flexbox */
+align-items: center; /* Centra verticalmente */
+justify-content: center; /* Centra horizontalmente */
 
-  background: rgba(0, 248, 103, 0.10);
+background: rgba(0, 248, 103, 0.10); /* Fondo verde suave */
+border: 1px solid rgba(0, 248, 103, 0.25); /* Borde verde suave */
 
-  border: 1px solid rgba(0, 248, 103, 0.25);
-
-  margin-bottom: 10px;
+margin-bottom: 10px; /* Separación del contenido */
 }
 
+/* Icono */
+
 .estadistica-icon-container ion-icon {
-  font-size: 23px;
-  color: rgb(0, 248, 103);
+font-size: 23px; /* Tamaño del icono */
+color: rgb(0, 248, 103); /* Verde principal */
 }
 
 /* ================================ */
@@ -516,29 +412,28 @@ ion-button[fill="outline"],
 /* ================================ */
 
 .estadistica-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  width: 100%;
+display: flex; /* Utiliza Flexbox */
+flex-direction: column; /* Elementos en columna */
+align-items: center; /* Centra horizontalmente */
+width: 100%; /* Ocupa todo el ancho */
 }
+
+/* Número */
 
 .estadistica-info strong {
-  color: #ffffff;
-
-  font-size: 22px;
-  font-weight: 700;
-
-  line-height: 1.2;
-
-  margin-bottom: 5px;
+color: #ffffff; /* Texto blanco */
+font-size: 22px; /* Tamaño del número */
+font-weight: 700; /* Grosor del número */
+line-height: 1.2; /* Altura de línea */
+margin-bottom: 5px; /* Separación inferior */
 }
 
-.estadistica-info span {
-  color: #9ba3aa;
+/* Descripción */
 
-  font-size: 13px;
-  font-weight: 500;
+.estadistica-info span {
+color: #9ba3aa; /* Texto gris */
+font-size: 13px; /* Tamaño del texto */
+font-weight: 500; /* Grosor del texto */
 }
 
 /* ================================ */
@@ -546,13 +441,14 @@ ion-button[fill="outline"],
 /* ================================ */
 
 .estadistica-tiempo {
-  grid-column: 1 / -1;
-
-  min-height: 100px;
+grid-column: 1 / -1; /* Ocupa las dos columnas */
+min-height: 100px; /* Altura mínima */
 }
 
+/* Texto de tiempo */
+
 .estadistica-tiempo .estadistica-info strong {
-  font-size: 18px;
+font-size: 18px; /* Tamaño del tiempo */
 }
 
 /* ================================ */
@@ -561,12 +457,176 @@ ion-button[fill="outline"],
 
 @media (max-width: 360px) {
 
-  .estadisticas-grid {
-    grid-template-columns: 1fr;
-  }
+.estadisticas-grid {
+grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+}
 
-  .estadistica-tiempo {
-    grid-column: auto;
-  }
+.estadistica-tiempo {
+grid-column: auto; /* Restablece el ancho */
+}
+}
 
+
+/* ================================ */
+/* 👤 GRID SOBRE MÍ                 */
+/* ================================ */
+
+.sobre-mi-grid {
+display: grid; /* Activa el sistema de cuadrícula */
+grid-template-columns: repeat(2, minmax(0, 1fr)); /* Divide el contenido en dos columnas */
+gap: 12px; /* Separación entre las cards */
+margin: 16px; /* Separación exterior */
+}
+
+/* ================================ */
+/* 🃏 CARDS                         */
+/* ================================ */
+
+.sobre-mi-grid .sobre-mi-card {
+margin: 0; /* Elimina el margen individual de las cards */
+width: 100%; /* Ocupa todo el ancho disponible de su columna */
+}
+
+/* ================================ */
+/* 📱 RESPONSIVE                    */
+/* ================================ */
+
+@media (max-width: 700px) {
+
+.sobre-mi-grid {
+grid-template-columns: 1fr; /* Muestra una sola columna en pantallas pequeñas */
+gap: 0; /* Elimina la separación del grid */
+}
+
+.sobre-mi-grid .sobre-mi-card {
+margin-bottom: 16px; /* Separa las cards verticalmente */
+}
+
+}
+
+/* ================================ */
+/* 👤 SOBRE MÍ                      */
+/* ================================ */
+
+.sobre-mi-card {
+background: #14191f; /* Fondo oscuro sólido */
+border: 1px solid #3a4148; /* Borde gris */
+border-radius: 16px; /* Redondeado de esquinas */
+margin: 16px; /* Separación exterior */
+box-shadow: none; /* Sin sombra */
+}
+
+/* ================================ */
+/* 📝 TÍTULO                        */
+/* ================================ */
+
+.sobre-mi-card ion-card-title {
+color: #ffffff; /* Texto blanco */
+font-size: 18px; /* Tamaño del título */
+font-weight: 600; /* Grosor del texto */
+}
+
+/* ================================ */
+/* ℹ️ SUBTÍTULO                     */
+/* ================================ */
+
+.sobre-mi-card ion-card-subtitle {
+color: #8f989f; /* Texto gris */
+font-size: 13px; /* Tamaño del texto */
+margin-top: 5px; /* Separación superior */
+}
+
+/* ================================ */
+/* 📋 LISTA                         */
+/* ================================ */
+
+.sobre-mi-list {
+background: transparent; /* Fondo transparente */
+padding: 0; /* Elimina espacio interno */
+}
+
+/* ================================ */
+/* 📌 CAMPOS                        */
+/* ================================ */
+
+.sobre-mi-item {
+--background: #1a2027; /* Fondo oscuro del campo */
+background: #1a2027; /* Respaldo para el fondo */
+
+--border-color: #343b42; /* Color del borde Ionic */
+
+--padding-start: 12px; /* Espaciado izquierdo */
+--padding-end: 6px; /* Espaciado derecho */
+
+margin-bottom: 8px; /* Separación entre campos */
+
+border: 1px solid #343b42; /* Borde gris */
+border-radius: 12px; /* Redondeado de esquinas */
+
+overflow: hidden; /* Mantiene el contenido dentro del borde */
+}
+
+/* Último campo */
+
+.sobre-mi-item:last-child {
+margin-bottom: 0; /* Elimina el espacio inferior */
+}
+
+/* ================================ */
+/* 🟢 ICONOS                        */
+/* ================================ */
+
+.sobre-mi-item .icon-green {
+color: rgb(0, 248, 103); /* Verde principal */
+font-size: 21px; /* Tamaño del icono */
+margin-right: 4px; /* Separación del texto */
+}
+
+/* ================================ */
+/* 📝 TEXTO                         */
+/* ================================ */
+
+.sobre-mi-item ion-label p {
+color: #8f989f; /* Texto secundario gris */
+font-size: 12px; /* Tamaño del título del campo */
+margin-bottom: 4px; /* Separación inferior */
+}
+
+.sobre-mi-item ion-label h3 {
+color: #ffffff; /* Texto principal blanco */
+font-size: 14px; /* Tamaño del contenido */
+font-weight: 500; /* Grosor del texto */
+
+white-space: normal; /* Permite saltos de línea */
+
+margin: 0; /* Elimina margen */
+
+line-height: 1.35; /* Altura de línea */
+}
+
+/* ================================ */
+/* ✏️ BOTÓN EDITAR                  */
+/* ================================ */
+
+.sobre-mi-item ion-button {
+--color: rgb(0, 248, 103); /* Verde principal */
+color: rgb(0, 248, 103); /* Respaldo del color */
+
+margin: 0; /* Elimina margen */
+}
+
+/* Icono del botón */
+
+.sobre-mi-item ion-button ion-icon {
+font-size: 18px; /* Tamaño del lápiz */
+}
+
+/* ================================ */
+/* 💤 CAMPO VACÍO                   */
+/* ================================ */
+
+.campo-vacio {
+color: #6f787f; /* Gris tenue */
+font-size: 13px; /* Tamaño del texto */
+font-style: italic; /* Texto en cursiva */
 }
