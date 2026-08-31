@@ -126,12 +126,73 @@
             <ion-icon class="icon-green" name="mail-outline" slot="start"></ion-icon>
             <ion-label>
               <p>Correo</p>
-              <h3>{{ userData.email }}</h3>
+              <h3>{{ ocultarEmail(userData.email) }}</h3>
             </ion-label>
           </ion-item>
 
 
         </ion-list>
+
+      </ion-card-content>
+
+    </ion-card>
+
+    <!-- ========================= -->
+    <!-- 📊 ESTADÍSTICAS -->
+    <!-- ========================= -->
+    <ion-card class="estadisticas-card">
+
+      <ion-card-header>
+        <ion-card-title>📊 Mi actividad</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <div class="estadisticas-grid">
+
+          <!-- 🥾 EVENTOS CREADOS -->
+          <div class="estadistica-box">
+
+            <div class="estadistica-icon-container">
+              <ion-icon name="walk-outline"></ion-icon>
+            </div>
+
+            <div class="estadistica-info">
+              <strong>{{ eventosCreados }}</strong>
+              <span>Eventos creados</span>
+            </div>
+
+          </div>
+
+          <!-- 📅 ESTE MES -->
+          <div class="estadistica-box">
+
+            <div class="estadistica-icon-container">
+              <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+
+            <div class="estadistica-info">
+              <strong>{{ eventosCreadosMes }}</strong>
+              <span>Eventos creados este mes</span>
+            </div>
+
+          </div>
+
+          <!-- ⏱️ TIEMPO EN LA APP -->
+          <div class="estadistica-box estadistica-tiempo">
+
+            <div class="estadistica-icon-container">
+              <ion-icon name="time-outline"></ion-icon>
+            </div>
+
+            <div class="estadistica-info">
+              <strong>{{ tiempoMiembro }}</strong>
+              <span>Miembro desde</span>
+            </div>
+
+          </div>
+
+        </div>
 
       </ion-card-content>
 

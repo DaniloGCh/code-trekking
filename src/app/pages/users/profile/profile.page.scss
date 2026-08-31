@@ -422,3 +422,151 @@ ion-button[fill="outline"],
   margin: 0;
   line-height: 1.5;
 }
+
+/* ================================ */
+/* 📊 ESTADÍSTICAS DEL PERFIL      */
+/* ================================ */
+
+.estadisticas-card {
+  background: #14191f;
+  border-radius: 16px;
+
+  /* Borde gris suave */
+  border: 1px solid #3a4148;
+
+  margin: 16px;
+  box-shadow: none;
+}
+
+/* Título */
+
+.estadisticas-card ion-card-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ================================ */
+/* 📊 CONTENEDOR                    */
+/* ================================ */
+
+.estadisticas-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 12px;
+}
+
+/* ================================ */
+/* 🃏 MINI CARDS                    */
+/* ================================ */
+
+.estadistica-box {
+  background: #1a2027;
+
+  border: 1px solid #343b42;
+  border-radius: 14px;
+
+  padding: 16px 12px;
+
+  min-height: 120px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+/* ================================ */
+/* 🟢 ICONO                         */
+/* ================================ */
+
+.estadistica-icon-container {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 248, 103, 0.10);
+
+  border: 1px solid rgba(0, 248, 103, 0.25);
+
+  margin-bottom: 10px;
+}
+
+.estadistica-icon-container ion-icon {
+  font-size: 23px;
+  color: rgb(0, 248, 103);
+}
+
+/* ================================ */
+/* 🔢 INFORMACIÓN                   */
+/* ================================ */
+
+.estadistica-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+}
+
+.estadistica-info strong {
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  margin-bottom: 5px;
+}
+
+.estadistica-info span {
+  color: #9ba3aa;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ================================ */
+/* ⏱️ CARD TIEMPO                   */
+/* ================================ */
+
+.estadistica-tiempo {
+  grid-column: 1 / -1;
+
+  min-height: 100px;
+}
+
+.estadistica-tiempo .estadistica-info strong {
+  font-size: 18px;
+}
+
+/* ================================ */
+/* 📱 RESPONSIVE                    */
+/* ================================ */
+
+@media (max-width: 360px) {
+
+  .estadisticas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .estadistica-tiempo {
+    grid-column: auto;
+  }
+
+}

@@ -53,6 +53,12 @@ export class ProfilePage implements OnInit {
   authReady = false;
   hideHeader = false;
   lastScrollTop = 0;
+  // =========================
+  // 📊 ESTADÍSTICAS
+  // =========================
+  eventosCreados = 0;
+  eventosCreadosMes = 0;
+  tiempoMiembro = '';
 
   // =========================
   // 😊 ESTADOS DE ÁNIMO
@@ -75,6 +81,8 @@ export class ProfilePage implements OnInit {
 
       if (user) {
         this.userData = await this.authService.getCurrentUserData();
+        this.cargarEstadisticas();
+        this.calcularTiempoMiembro();
 
         // ✅ Cargar foto desde localStorage
         const fotoGuardada = this.fotoService.cargarFoto(user.uid);
@@ -88,6 +96,91 @@ export class ProfilePage implements OnInit {
         this.favoritos = [];
       }
     });
+  }
+
+  // =========================
+  // 📊 ESTADÍSTICAS DEL USUARIO
+  // =========================
+  private cargarEstadisticas() {
+
+    if (!this.userData) {
+      this.eventosCreados = 0;
+      this.eventosCreadosMes = 0;
+      return;
+    }
+
+    const estadisticas = this.userData.estadisticas;
+
+    this.eventosCreados = estadisticas?.eventosCreados ?? 0;
+
+    const mesActual = new Date().toISOString().substring(0, 7);
+
+    // Si las estadísticas pertenecen a otro mes,
+    // mostramos 0 para el mes actual.
+    if (estadisticas?.ultimoMes === mesActual) {
+      this.eventosCreadosMes = estadisticas.eventosCreadosMes ?? 0;
+    } else {
+      this.eventosCreadosMes = 0;
+    }
+  }
+
+  // =========================
+  // ⏱️ TIEMPO COMO MIEMBRO
+  // =========================
+  private calcularTiempoMiembro() {
+
+    const currentUser = this.auth.currentUser;
+
+    if (!currentUser?.metadata.creationTime) {
+      this.tiempoMiembro = 'No disponible';
+      return;
+    }
+
+    const fechaRegistro = new Date(currentUser.metadata.creationTime);
+    const ahora = new Date();
+
+    let años = ahora.getFullYear() - fechaRegistro.getFullYear();
+    let meses = ahora.getMonth() - fechaRegistro.getMonth();
+
+    if (meses < 0) {
+      años--;
+      meses += 12;
+    }
+
+    // Ajustar si todavía no se cumple el día del mes
+    if (ahora.getDate() < fechaRegistro.getDate()) {
+      meses--;
+
+      if (meses < 0) {
+        años--;
+        meses = 11;
+      }
+    }
+
+    if (años > 0) {
+      if (meses > 0) {
+        this.tiempoMiembro =
+          `${años} año${años !== 1 ? 's' : ''} y ${meses} mes${meses !== 1 ? 'es' : ''}`;
+      } else {
+        this.tiempoMiembro =
+          `${años} año${años !== 1 ? 's' : ''}`;
+      }
+
+    } else if (meses > 0) {
+
+      this.tiempoMiembro =
+        `${meses} mes${meses !== 1 ? 'es' : ''}`;
+
+    } else {
+
+      const diferenciaDias = Math.floor(
+        (ahora.getTime() - fechaRegistro.getTime()) /
+        (1000 * 60 * 60 * 24)
+      );
+
+      this.tiempoMiembro =
+        `${Math.max(0, diferenciaDias)} día${diferenciaDias !== 1 ? 's' : ''}`;
+    }
   }
 
   // =========================
@@ -526,6 +619,33 @@ export class ProfilePage implements OnInit {
       / (1000 * 60 * 60 * 24)
     );
     return Math.max(0, 90 - diasTranscurridos);
+  }
+
+  // =========================
+  // 🔐 SEGURIDAD DEL CORREO
+  // =========================
+  ocultarEmail(email: string): string {
+    if (!email || !email.includes('@')) {
+      return 'Correo no disponible';
+    }
+
+    const [usuario, dominio] = email.split('@');
+
+    // Si el usuario tiene solo 1 carácter
+    if (usuario.length === 1) {
+      return `${usuario}***@${dominio}`;
+    }
+
+    // Si tiene 2 caracteres, mostramos ambos
+    if (usuario.length === 2) {
+      return `${usuario[0]}*${usuario[1]}@${dominio}`;
+    }
+
+    // Caso normal
+    const primeraLetra = usuario.charAt(0);
+    const ultimaLetra = usuario.charAt(usuario.length - 1);
+
+    return `${primeraLetra}***${ultimaLetra}@${dominio}`;
   }
 
   // =========================

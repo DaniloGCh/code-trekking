@@ -46,6 +46,16 @@ export interface ContactoEmergencia {
   telefono: string; // Define el número telefónico del contacto de emergencia
 }
 
+
+// =========================
+// 📊 ESTADÍSTICAS USUARIO
+// =========================
+export interface EstadisticasUsuario {
+  eventosCreados: number;
+  eventosCreadosMes: number;
+  ultimoMes: string;
+}
+
 // =========================
 // 👤 MODELO USUARIO
 // =========================
@@ -64,6 +74,8 @@ export interface UserData {
   terminosAceptados?: boolean; // Indicador booleano que confirma si el usuario aceptó los términos
   fechaAceptacionTerminos?: string; // Marca de tiempo ISO del momento en que aceptó los términos
   versionTerminos?: string; // Versión legal de los términos aceptados por el usuario
+  // 📊 ESTADÍSTICAS
+  estadisticas?: EstadisticasUsuario;
 }
 
 
@@ -135,19 +147,26 @@ export class AuthService {
     );
 
     // 💾 Crear documento en Firestore
-    await setDoc(userRef, { // Escribe el documento inicial con el perfil del usuario
-      uid, // Almacena el identificador único
-      email, // Almacena el correo electrónico
-      nombre: nombreSeguro, // Guarda el nombre previamente limpiado
-      rol, // Guarda el rol del usuario
-      fotoBase64: '', // Inicializa el campo de foto de perfil como una cadena vacía
-      estado: '', // Inicializa el campo estado como una cadena vacía
-      creadoEn: new Date().toISOString(), // Almacena la fecha de creación en formato ISO
+    await setDoc(userRef, {
+      uid,
+      email,
+      nombre: nombreSeguro,
+      rol,
+      fotoBase64: '',
+      estado: '',
+      // 📅 Fecha de creación del documento
+      creadoEn: new Date().toISOString(),
+      // 📊 Estadísticas iniciales
+      estadisticas: {
+        eventosCreados: 0,
+        eventosCreadosMes: 0,
+        ultimoMes: new Date().toISOString().substring(0, 7)
+      },
       // 📄 TÉRMINOS Y CONDICIONES
-      terminosAceptados: terminosAceptados, // Guarda la confirmación booleana de términos
-      fechaAceptacionTerminos: new Date().toISOString(), // Marca de tiempo exacta del registro legal
-      versionTerminos: '1.0' // Establece la versión de la política vigente
-    } as UserData); // Cast de tipo para garantizar congruencia con la interfaz UserData
+      terminosAceptados: terminosAceptados,
+      fechaAceptacionTerminos: new Date().toISOString(),
+      versionTerminos: '1.0'
+    } as UserData);
   }
 
   // =========================

@@ -33,7 +33,7 @@ import { Auth, authState } from '@angular/fire/auth';
 // =========================
 // 🔹 RXJS
 // =========================
-import { Observable, of , BehaviorSubject} from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 // =========================
@@ -52,7 +52,7 @@ export class EventoService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
 
-    // 🔴 NOTIFICADOR GLOBAL (NUEVO)
+  // 🔴 NOTIFICADOR GLOBAL (NUEVO)
   private foroVistoSubject = new BehaviorSubject<void>(undefined);
   foroVisto$ = this.foroVistoSubject.asObservable();
 
@@ -104,9 +104,9 @@ export class EventoService {
     const docRef = await addDoc(ref, nuevoEvento);
     return docRef.id;
 
-    
+
   }
-  
+
 
   // =========================
   // 📌 MIS EVENTOS
@@ -139,50 +139,47 @@ export class EventoService {
   // =========================
   // 🔗 UNIRSE CON CÓDIGO
   // =========================
-// =========================
-// 🔗 UNIRSE CON CÓDIGO
-// =========================
-async unirseConCodigo(codigo: string): Promise<Evento | null> {
+  async unirseConCodigo(codigo: string): Promise<Evento | null> {
 
-  const currentUser = this.auth.currentUser;
-  if (!currentUser) throw new Error('No hay usuario autenticado');
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) throw new Error('No hay usuario autenticado');
 
-  const ref = collection(this.firestore, 'eventos');
-  const q = query(ref, where('codigoInvitacion', '==', codigo.toUpperCase().trim()));
+    const ref = collection(this.firestore, 'eventos');
+    const q = query(ref, where('codigoInvitacion', '==', codigo.toUpperCase().trim()));
 
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) throw new Error('codigo-invalido');
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) throw new Error('codigo-invalido');
 
-  const docEvent = snapshot.docs[0];
-  const evento = { id: docEvent.id, ...docEvent.data() } as Evento;
+    const docEvent = snapshot.docs[0];
+    const evento = { id: docEvent.id, ...docEvent.data() } as Evento;
 
-  // 🚫 VALIDAR SI YA FINALIZÓ
-  const fechaEvento = evento.fecha.toDate
-    ? evento.fecha.toDate()
-    : new Date(evento.fecha);
+    // 🚫 VALIDAR SI YA FINALIZÓ
+    const fechaEvento = evento.fecha.toDate
+      ? evento.fecha.toDate()
+      : new Date(evento.fecha);
 
-  const ahora = new Date();
+    const ahora = new Date();
 
-  if (fechaEvento < ahora) {
-    throw new Error('evento-finalizado'); // 🔥 nuevo error
+    if (fechaEvento < ahora) {
+      throw new Error('evento-finalizado'); // 🔥 nuevo error
+    }
+
+    // 🚫 VALIDAR SI YA ES PARTICIPANTE
+    if (evento.participantes.includes(currentUser.uid)) {
+      throw new Error('ya-participante');
+    }
+
+    const userSnap = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
+    const nombre = (userSnap.data() as any)?.nombre || 'Usuario';
+
+    // ✅ RECIÉN AQUÍ SE UNE
+    await updateDoc(doc(this.firestore, `eventos/${docEvent.id}`), {
+      participantes: arrayUnion(currentUser.uid),
+      participantesInfo: arrayUnion({ uid: currentUser.uid, nombre })
+    });
+
+    return evento;
   }
-
-  // 🚫 VALIDAR SI YA ES PARTICIPANTE
-  if (evento.participantes.includes(currentUser.uid)) {
-    throw new Error('ya-participante');
-  }
-
-  const userSnap = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
-  const nombre = (userSnap.data() as any)?.nombre || 'Usuario';
-
-  // ✅ RECIÉN AQUÍ SE UNE
-  await updateDoc(doc(this.firestore, `eventos/${docEvent.id}`), {
-    participantes: arrayUnion(currentUser.uid),
-    participantesInfo: arrayUnion({ uid: currentUser.uid, nombre })
-  });
-
-  return evento;
-}
 
   // =========================
   // 🗑️ ELIMINAR EVENTO
@@ -231,29 +228,29 @@ async unirseConCodigo(codigo: string): Promise<Evento | null> {
     })) as MensajeForo[];
   }
 
- async enviarMensaje(eventoId: string, mensaje: Omit<MensajeForo, 'id'>): Promise<void> {
-  const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
+  async enviarMensaje(eventoId: string, mensaje: Omit<MensajeForo, 'id'>): Promise<void> {
+    const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
 
-// Asignar fecha oficial del servidor
-  const mensajeConFechaServidor = {
-  ...mensaje,
-    creadoEn: serverTimestamp() // 👈 Asegura sincronización global exacta
-  };
+    // Asignar fecha oficial del servidor
+    const mensajeConFechaServidor = {
+      ...mensaje,
+      creadoEn: serverTimestamp() // 👈 Asegura sincronización global exacta
+    };
 
-  // 📩 Guardar mensaje en el foro
-  await addDoc(ref, mensajeConFechaServidor);
+    // 📩 Guardar mensaje en el foro
+    await addDoc(ref, mensajeConFechaServidor);
 
-  // 🔥 ACTUALIZAR ÚLTIMO MENSAJE EN EL EVENTO (ESTILO WHATSAPP)
-  const eventoRef = doc(this.firestore, `eventos/${eventoId}`);
+    // 🔥 ACTUALIZAR ÚLTIMO MENSAJE EN EL EVENTO (ESTILO WHATSAPP)
+    const eventoRef = doc(this.firestore, `eventos/${eventoId}`);
 
-  await updateDoc(eventoRef, {
-    ultimoMensaje: {
-      texto: mensaje.texto,
-      autorNombre: mensaje.autorNombre,
-      creadoEn: serverTimestamp() // 👈 También usar serverTimestamp aquí
-    }
-  });
-}
+    await updateDoc(eventoRef, {
+      ultimoMensaje: {
+        texto: mensaje.texto,
+        autorNombre: mensaje.autorNombre,
+        creadoEn: serverTimestamp() // 👈 También usar serverTimestamp aquí
+      }
+    });
+  }
 
   async eliminarMensaje(eventoId: string, mensajeId: string): Promise<void> {
     const ref = doc(this.firestore, `eventos/${eventoId}/foro/${mensajeId}`);
@@ -263,29 +260,29 @@ async unirseConCodigo(codigo: string): Promise<Evento | null> {
   // =========================
   // 🔔 MENSAJES NUEVOS
   // =========================
-async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
-  const key = `foro_ultima_visita_${eventoId}_${uid}`;
-  const ultimaVisita = localStorage.getItem(key);
+  async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
+    const key = `foro_ultima_visita_${eventoId}_${uid}`;
+    const ultimaVisita = localStorage.getItem(key);
 
-  const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
-  const snap = await getDocs(query(ref));
+    const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
+    const snap = await getDocs(query(ref));
 
-  const mensajes = snap.docs.map(d => d.data());
+    const mensajes = snap.docs.map(d => d.data());
 
-  return mensajes.filter(m => {
-    const esMio = m['autorUid'] === uid;
-    if (esMio || !m['creadoEn']) return false;
+    return mensajes.filter(m => {
+      const esMio = m['autorUid'] === uid;
+      if (esMio || !m['creadoEn']) return false;
 
-    // Convertir Timestamp de Firestore o Date a milisegundos
-    const fechaMensaje = m['creadoEn']?.toDate 
-      ? m['creadoEn'].toDate().getTime() 
-      : new Date(m['creadoEn']).getTime();
+      // Convertir Timestamp de Firestore o Date a milisegundos
+      const fechaMensaje = m['creadoEn']?.toDate
+        ? m['creadoEn'].toDate().getTime()
+        : new Date(m['creadoEn']).getTime();
 
-    const fechaVisita = ultimaVisita ? new Date(ultimaVisita).getTime() : 0;
+      const fechaVisita = ultimaVisita ? new Date(ultimaVisita).getTime() : 0;
 
-    return fechaMensaje > fechaVisita;
-  }).length;
-}
+      return fechaMensaje > fechaVisita;
+    }).length;
+  }
 
   // async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
 
@@ -313,18 +310,18 @@ async contarMensajesNuevos(eventoId: string, uid: string): Promise<number> {
   marcarForoVisto(eventoId: string, uid: string): void {
     const key = `foro_ultima_visita_${eventoId}_${uid}`;
     localStorage.setItem(key, new Date().toISOString());
-        // 🔥 AVISA A TODA LA APP
+    // 🔥 AVISA A TODA LA APP
     this.foroVistoSubject.next();
   }
 
 
   getMensajesForoRealtime(eventoId: string): Observable<MensajeForo[]> {
-  const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
-  const q = query(ref, orderBy('creadoEn', 'asc'));
+    const ref = collection(this.firestore, `eventos/${eventoId}/foro`);
+    const q = query(ref, orderBy('creadoEn', 'asc'));
 
-  return collectionData(q, { idField: 'id',serverTimestamps:'estimate' }) as Observable<MensajeForo[]>;
-}
+    return collectionData(q, { idField: 'id', serverTimestamps: 'estimate' }) as Observable<MensajeForo[]>;
+  }
 
 
-  
+
 }
