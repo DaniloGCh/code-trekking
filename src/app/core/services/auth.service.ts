@@ -247,6 +247,70 @@ export class AuthService {
   }
 
   // =========================
+  // 📊 INCREMENTAR ESTADÍSTICAS DE EVENTOS
+  // =========================
+  async incrementarEventosCreados(): Promise<void> {
+
+    const currentUser = this.auth.currentUser;
+
+    // Verificar sesión
+    if (!currentUser) {
+      throw new Error('No hay usuario autenticado');
+    }
+
+    const userRef = doc(
+      this.firestore,
+      `usuarios/${currentUser.uid}`
+    );
+
+    const userSnap = await getDoc(userRef);
+
+    // Verificar que exista el documento del usuario
+    if (!userSnap.exists()) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    const userData = userSnap.data() as UserData;
+
+    // 📅 Mes actual en formato YYYY-MM
+    const mesActual = new Date()
+      .toISOString()
+      .substring(0, 7);
+
+    // 📊 Estadísticas actuales
+    const estadisticasActuales = userData.estadisticas ?? {
+      eventosCreados: 0,
+      eventosCreadosMes: 0,
+      ultimoMes: mesActual
+    };
+
+    // 📅 Contador mensual
+    let eventosCreadosMes =
+      estadisticasActuales.eventosCreadosMes ?? 0;
+
+    // 🔄 Si cambió el mes, reiniciar contador mensual
+    if (estadisticasActuales.ultimoMes !== mesActual) {
+      eventosCreadosMes = 0;
+    }
+
+    // 📈 Actualizar estadísticas
+    await updateDoc(userRef, {
+
+      // Total histórico
+      'estadisticas.eventosCreados':
+        (estadisticasActuales.eventosCreados ?? 0) + 1,
+
+      // Total del mes actual
+      'estadisticas.eventosCreadosMes':
+        eventosCreadosMes + 1,
+
+      // Guardar mes actual
+      'estadisticas.ultimoMes':
+        mesActual
+    });
+  }
+
+  // =========================
   // ✏️ ACTUALIZAR ROL
   // =========================
   async updateUserRole(uid: string, nuevoRol: 'admin' | 'user'): Promise<void> {

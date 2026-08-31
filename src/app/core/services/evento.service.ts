@@ -21,7 +21,8 @@ import {
   orderBy,
   arrayUnion,
   arrayRemove,
-  serverTimestamp
+  serverTimestamp,
+  increment
 } from '@angular/fire/firestore';
 
 
@@ -81,30 +82,140 @@ export class EventoService {
   // =========================
   // ➕ CREAR EVENTO
   // =========================
+  // async crearEvento(
+  //   evento: Omit<Evento, 'id' | 'codigoInvitacion' | 'participantes' | 'participantesInfo' | 'creadoEn'>
+  // ): Promise<string> {
+
+  //   const currentUser = this.auth.currentUser;
+  //   if (!currentUser) throw new Error('No hay usuario autenticado');
+
+  //   const userSnap = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
+  //   const nombre = (userSnap.data() as any)?.nombre || 'Usuario';
+
+  //   const ref = collection(this.firestore, 'eventos');
+
+  //   const nuevoEvento: Omit<Evento, 'id'> = {
+  //     ...evento,
+  //     codigoInvitacion: this.generarCodigo(),
+  //     participantes: [currentUser.uid],
+  //     participantesInfo: [{ uid: currentUser.uid, nombre }],
+  //     creadoEn: new Date(),
+  //   };
+
+  //   const docRef = await addDoc(ref, nuevoEvento);
+  //   return docRef.id;
+
+
+  // }
+
+  // =========================
+  // ➕ CREAR EVENTO
+  // =========================
   async crearEvento(
     evento: Omit<Evento, 'id' | 'codigoInvitacion' | 'participantes' | 'participantesInfo' | 'creadoEn'>
   ): Promise<string> {
 
     const currentUser = this.auth.currentUser;
-    if (!currentUser) throw new Error('No hay usuario autenticado');
 
-    const userSnap = await getDoc(doc(this.firestore, `usuarios/${currentUser.uid}`));
-    const nombre = (userSnap.data() as any)?.nombre || 'Usuario';
+    if (!currentUser) {
+      throw new Error('No hay usuario autenticado');
+    }
 
-    const ref = collection(this.firestore, 'eventos');
+    // =========================
+    // 👤 OBTENER DATOS DEL USUARIO
+    // =========================
+    const userRef = doc(
+      this.firestore,
+      `usuarios/${currentUser.uid}`
+    );
+
+    const userSnap = await getDoc(userRef);
+
+    const userData = userSnap.data() as any;
+
+    const nombre = userData?.nombre || 'Usuario';
+
+    // =========================
+    // 📅 MES ACTUAL
+    // =========================
+    const mesActual = new Date()
+      .toISOString()
+      .substring(0, 7);
+
+    // =========================
+    // 📊 ESTADÍSTICAS ACTUALES
+    // =========================
+    const estadisticasActuales = userData?.estadisticas || {};
+
+    const ultimoMes = estadisticasActuales?.ultimoMes;
+
+    // =========================
+    // 📊 CALCULAR ESTADÍSTICAS
+    // =========================
+    let eventosCreadosMes: number;
+
+    if (ultimoMes === mesActual) {
+
+      // Mismo mes → aumentar en 1
+      eventosCreadosMes =
+        (estadisticasActuales?.eventosCreadosMes || 0) + 1;
+
+    } else {
+
+      // Nuevo mes → comenzar nuevamente desde 1
+      eventosCreadosMes = 1;
+    }
+
+    // =========================
+    // 📅 CREAR EVENTO
+    // =========================
+    const ref = collection(
+      this.firestore,
+      'eventos'
+    );
 
     const nuevoEvento: Omit<Evento, 'id'> = {
+
       ...evento,
+
       codigoInvitacion: this.generarCodigo(),
-      participantes: [currentUser.uid],
-      participantesInfo: [{ uid: currentUser.uid, nombre }],
+
+      participantes: [
+        currentUser.uid
+      ],
+
+      participantesInfo: [
+        {
+          uid: currentUser.uid,
+          nombre
+        }
+      ],
+
       creadoEn: new Date(),
     };
 
-    const docRef = await addDoc(ref, nuevoEvento);
+    // =========================
+    // 💾 GUARDAR EVENTO
+    // =========================
+    const docRef = await addDoc(
+      ref,
+      nuevoEvento
+    );
+
+    // =========================
+    // 📊 ACTUALIZAR ESTADÍSTICAS
+    // =========================
+    await updateDoc(userRef, {
+
+      'estadisticas.eventosCreados': increment(1),
+
+      'estadisticas.eventosCreadosMes': eventosCreadosMes,
+
+      'estadisticas.ultimoMes': mesActual
+
+    });
+
     return docRef.id;
-
-
   }
 
 
