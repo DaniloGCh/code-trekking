@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { EventoService } from 'src/app/core/services/evento.service';
-import { AuthService } from 'src/app/core/services/auth.service';
+import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
 import { Evento } from 'src/app/core/models/evento.model';
 
@@ -50,6 +50,7 @@ export class EventosPage implements OnInit {
     }))
   );
 
+  userData: UserData | null = null;
   currentUid: string | null = this.auth.currentUser?.uid || null;
   evento: Evento | null     = null;
   esCreadoPor               = false;
@@ -70,15 +71,21 @@ export class EventosPage implements OnInit {
 
     await this.loadFavoritos();
 
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.subscribe(async user => {
       this.currentUid = user?.uid || null;
+
+      if (user) {
+        // 🔹 Solución: Obtener datos del usuario para activar la directiva *ngIf="userData"
+        this.userData = await this.authService.getCurrentUserData();
+      } else {
+        this.userData = null;
+      }
 
       this.misEventos$.subscribe(async eventos => {
         if (!this.currentUid) return;
 
         for (const ev of eventos) {
           if (!ev.id) continue;
-          // ✅ Validar ID antes de usar
           if (!this.security.isValidFirestoreId(ev.id)) continue;
 
           const cantidad = await this.eventoService.contarMensajesNuevos(
@@ -92,7 +99,6 @@ export class EventosPage implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) return;
 
-    // ✅ Validar ID de ruta
     if (!this.security.isValidFirestoreId(id)) {
       await this.showToast('ID de evento inválido', 'danger');
       return;
@@ -102,7 +108,7 @@ export class EventosPage implements OnInit {
     await loading.present();
 
     try {
-      this.evento     = await this.eventoService.getEventoById(id);
+      this.evento      = await this.eventoService.getEventoById(id);
       this.esCreadoPor = this.evento?.creadoPor.uid === this.currentUid;
       await loading.dismiss();
     } catch {
@@ -110,6 +116,10 @@ export class EventosPage implements OnInit {
       await this.showToast('Error al cargar el evento', 'danger');
       this.goBack();
     }
+  }
+
+  goProfile() {
+    this.router.navigateByUrl('/profile');
   }
 
   // =========================
@@ -132,7 +142,6 @@ export class EventosPage implements OnInit {
       return;
     }
 
-    // ✅ Rate limiting: máx 5 intentos por minuto
     if (!this.security.checkRateLimit('unirse-codigo', 5, 60000)) {
       await this.showToast('Demasiados intentos. Espera un momento.', 'warning');
       return;
@@ -159,7 +168,6 @@ export class EventosPage implements OnInit {
               return false;
             }
 
-            // ✅ Validar formato del código TRK-XXXXXX
             const codigoLimpio = data.codigo.trim().toUpperCase();
             const codigoRegex  = /^TRK-[A-Z0-9]{6}$/;
 
@@ -168,7 +176,6 @@ export class EventosPage implements OnInit {
               return false;
             }
 
-            // ✅ Validar XSS en código
             if (!this.security.isSafeText(codigoLimpio, 10)) {
               await this.showToast('Código contiene caracteres no permitidos', 'warning');
               return false;
@@ -182,7 +189,6 @@ export class EventosPage implements OnInit {
               await loading.dismiss();
               this.security.resetRateLimit('unirse-codigo');
 
-              // ✅ Sanitizar nombre antes de mostrar
               const nombreSeguro = this.security.sanitizeInput(evento?.nombre || '');
               await this.showToast(`¡Te uniste a ${nombreSeguro}!`, 'success');
 
@@ -214,7 +220,6 @@ export class EventosPage implements OnInit {
   // 👁️ VER EVENTO
   // =========================
   verEvento(eventoId: string) {
-    // ✅ Validar ID antes de navegar
     if (!eventoId || !this.security.isValidFirestoreId(eventoId)) return;
     this.router.navigateByUrl(`/tabs/evento-detalle/${eventoId}`);
   }
@@ -223,7 +228,6 @@ export class EventosPage implements OnInit {
   // 🗑️ ELIMINAR EVENTO
   // =========================
   async onEliminarEvento(evento: Evento) {
-    // ✅ Solo el creador puede eliminar
     if (evento.creadoPor.uid !== this.currentUid) {
       await this.showToast('No tienes permisos para eliminar este evento', 'danger');
       return;
@@ -287,13 +291,11 @@ export class EventosPage implements OnInit {
       return;
     }
 
-    // ✅ Validar ID del evento
     if (!evento.id || !this.security.isValidFirestoreId(evento.id)) {
       await this.showToast('Evento inválido', 'danger');
       return;
     }
 
-    // ✅ Rate limiting para favoritos
     if (!this.security.checkRateLimit('toggle-favorito', 10, 60000)) {
       await this.showToast('Demasiados cambios. Espera un momento.', 'warning');
       return;
@@ -307,7 +309,6 @@ export class EventosPage implements OnInit {
         this.favoritos = this.favoritos.filter(id => id !== evento.id);
         await this.showToast('Eliminado de favoritos', 'medium');
       } else {
-        // ✅ Sanitizar nombre antes de guardar
         await setDoc(favRef, {
           eventoId: evento.id,
           nombre:   this.security.sanitizeInput(evento.nombre),
@@ -327,7 +328,6 @@ export class EventosPage implements OnInit {
   irAlForo(evento: Evento) {
     if (!evento.id || !evento.creadoPor?.uid) return;
 
-    // ✅ Validar IDs antes de navegar
     if (!this.security.isValidFirestoreId(evento.id)) return;
 
     if (this.currentUid) {

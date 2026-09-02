@@ -5,20 +5,15 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   AlertController, ToastController,
-  LoadingController, ActionSheetController
+  LoadingController, ActionSheetController, ModalController
 } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Firestore, collection, getDocs, deleteDoc, doc } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs, deleteDoc, doc, getDoc } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
 import { FotoService } from 'src/app/core/services/foto.service';
-
-// ✅ Agrega el import
-import { ModalController } from '@ionic/angular';
-
-
 
 @Component({
   selector: 'app-profile',
@@ -41,8 +36,6 @@ export class ProfilePage implements OnInit {
   private loadingCtrl = inject(LoadingController);
   private actionSheetCtrl = inject(ActionSheetController);
   private firestore = inject(Firestore);
-
-  // ✅ Inyecta ModalController
   private modalCtrl = inject(ModalController);
 
   // =========================
@@ -53,6 +46,7 @@ export class ProfilePage implements OnInit {
   authReady = false;
   hideHeader = false;
   lastScrollTop = 0;
+
   // =========================
   // 📊 ESTADÍSTICAS
   // =========================
@@ -73,29 +67,41 @@ export class ProfilePage implements OnInit {
   ];
 
   // =========================
-  // 🚀 INIT
+  // 🚀 INIT & CICLOS DE VIDA
   // =========================
   async ngOnInit() {
     this.authService.currentUser$.subscribe(async user => {
       this.authReady = true;
 
       if (user) {
-        this.userData = await this.authService.getCurrentUserData();
-        this.cargarEstadisticas();
-        this.calcularTiempoMiembro();
-
-        // ✅ Cargar foto desde localStorage
-        const fotoGuardada = this.fotoService.cargarFoto(user.uid);
-        if (fotoGuardada && this.userData) {
-          this.userData.fotoBase64 = fotoGuardada;
-        }
-
-        await this.loadFavoritos();
+        await this.cargarPerfilUsuario(user);
       } else {
         this.userData = null;
         this.favoritos = [];
       }
     });
+  }
+
+  // Permite recargar datos si la vista vuelve a ponerse en foco
+  async ionViewWillEnter() {
+    const user = this.auth.currentUser;
+    if (user) {
+      await this.cargarPerfilUsuario(user);
+    }
+  }
+
+  private async cargarPerfilUsuario(user: any) {
+    this.userData = await this.authService.getCurrentUserData();
+    this.cargarEstadisticas();
+    this.calcularTiempoMiembro();
+
+    // Cargar foto desde localStorage
+    const fotoGuardada = this.fotoService.cargarFoto(user.uid);
+    if (fotoGuardada && this.userData) {
+      this.userData.fotoBase64 = fotoGuardada;
+    }
+
+    await this.loadFavoritos();
   }
 
   // =========================
@@ -120,37 +126,31 @@ export class ProfilePage implements OnInit {
         placeholder: 'Ej: Estudiante de informática',
         maxLength: 50
       },
-
       lugarSonado: {
         titulo: '🗺️ Lugar que siempre quise visitar',
         placeholder: 'Ej: Torres del Paine',
         maxLength: 80
       },
-
       mascotas: {
         titulo: '🐾 Mascotas',
         placeholder: 'Ej: Tengo 2 perros',
         maxLength: 80
       },
-
       actividadesFavoritas: {
         titulo: '🥾 Actividades favoritas',
         placeholder: 'Ej: Trekking, camping y fotografía',
         maxLength: 100
       },
-
       trekkingFavorito: {
         titulo: '🏔️ Trekking favorito',
         placeholder: 'Ej: Parque Nacional Conguillío',
         maxLength: 100
       },
-
       proximoDesafio: {
         titulo: '🎯 Próximo desafío',
         placeholder: 'Ej: Subir mi primer volcán',
         maxLength: 100
       },
-
       sobreMi: {
         titulo: '✍️ Sobre mí',
         placeholder: 'Cuéntanos algo sobre ti',
@@ -159,12 +159,10 @@ export class ProfilePage implements OnInit {
     };
 
     const config = configuracion[campo];
-
     const valorActual = this.userData[campo] || '';
 
     const alert = await this.alertCtrl.create({
       header: config.titulo,
-
       inputs: [
         {
           name: 'valor',
@@ -176,23 +174,18 @@ export class ProfilePage implements OnInit {
           }
         }
       ],
-
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel'
         },
-
         {
           text: valorActual ? 'Guardar' : 'Agregar',
-
           handler: async (data) => {
-
             const valor = data.valor?.trim() || '';
 
             // Permitir dejar el campo vacío
             if (!valor) {
-
               await this.authService.updateProfile({
                 [campo]: ''
               });
@@ -200,26 +193,22 @@ export class ProfilePage implements OnInit {
               if (this.userData) {
                 this.userData[campo] = '';
               }
-
               return true;
             }
 
-            // 🔐 Validación de seguridad
+            // Validación de seguridad
             if (!this.security.isSafeText(valor, config.maxLength)) {
-
               await this.showToast(
                 'El contenido contiene caracteres no permitidos',
                 'warning'
               );
-
               return false;
             }
 
-            // 🧹 Sanitización
+            // Sanitización
             const valorSeguro = this.security.sanitizeInput(valor);
 
             try {
-
               await this.authService.updateProfile({
                 [campo]: valorSeguro
               });
@@ -232,16 +221,13 @@ export class ProfilePage implements OnInit {
                 'Información actualizada correctamente',
                 'success'
               );
-
               return true;
 
             } catch {
-
               await this.showToast(
                 'Error al actualizar la información',
                 'danger'
               );
-
               return false;
             }
           }
@@ -256,7 +242,6 @@ export class ProfilePage implements OnInit {
   // 📊 ESTADÍSTICAS DEL USUARIO
   // =========================
   private cargarEstadisticas() {
-
     if (!this.userData) {
       this.eventosCreados = 0;
       this.eventosCreadosMes = 0;
@@ -264,13 +249,10 @@ export class ProfilePage implements OnInit {
     }
 
     const estadisticas = this.userData.estadisticas;
-
     this.eventosCreados = estadisticas?.eventosCreados ?? 0;
 
     const mesActual = new Date().toISOString().substring(0, 7);
 
-    // Si las estadísticas pertenecen a otro mes,
-    // mostramos 0 para el mes actual.
     if (estadisticas?.ultimoMes === mesActual) {
       this.eventosCreadosMes = estadisticas.eventosCreadosMes ?? 0;
     } else {
@@ -282,7 +264,6 @@ export class ProfilePage implements OnInit {
   // ⏱️ TIEMPO COMO MIEMBRO
   // =========================
   private calcularTiempoMiembro() {
-
     const currentUser = this.auth.currentUser;
 
     if (!currentUser?.metadata.creationTime) {
@@ -301,10 +282,8 @@ export class ProfilePage implements OnInit {
       meses += 12;
     }
 
-    // Ajustar si todavía no se cumple el día del mes
     if (ahora.getDate() < fechaRegistro.getDate()) {
       meses--;
-
       if (meses < 0) {
         años--;
         meses = 11;
@@ -312,28 +291,16 @@ export class ProfilePage implements OnInit {
     }
 
     if (años > 0) {
-      if (meses > 0) {
-        this.tiempoMiembro =
-          `${años} año${años !== 1 ? 's' : ''} y ${meses} mes${meses !== 1 ? 'es' : ''}`;
-      } else {
-        this.tiempoMiembro =
-          `${años} año${años !== 1 ? 's' : ''}`;
-      }
-
+      this.tiempoMiembro = meses > 0
+        ? `${años} año${años !== 1 ? 's' : ''} y ${meses} mes${meses !== 1 ? 'es' : ''}`
+        : `${años} año${años !== 1 ? 's' : ''}`;
     } else if (meses > 0) {
-
-      this.tiempoMiembro =
-        `${meses} mes${meses !== 1 ? 'es' : ''}`;
-
+      this.tiempoMiembro = `${meses} mes${meses !== 1 ? 'es' : ''}`;
     } else {
-
       const diferenciaDias = Math.floor(
-        (ahora.getTime() - fechaRegistro.getTime()) /
-        (1000 * 60 * 60 * 24)
+        (ahora.getTime() - fechaRegistro.getTime()) / (1000 * 60 * 60 * 24)
       );
-
-      this.tiempoMiembro =
-        `${Math.max(0, diferenciaDias)} día${diferenciaDias !== 1 ? 's' : ''}`;
+      this.tiempoMiembro = `${Math.max(0, diferenciaDias)} día${diferenciaDias !== 1 ? 's' : ''}`;
     }
   }
 
@@ -364,21 +331,18 @@ export class ProfilePage implements OnInit {
   private async takePicture(source: CameraSource) {
     try {
       const image = await Camera.getPhoto({
-        quality: 90,           // ✅ Alta calidad inicial, comprimimos después
-        allowEditing: true,    // ✅ Permite ajustar el ángulo antes de confirmar
+        quality: 90,
+        allowEditing: true,
         resultType: CameraResultType.Base64,
         source,
-
-        // ✅ Opciones adicionales para mejor experiencia de edición
-        correctOrientation: true, // ✅ Corrige orientación automáticamente
-        presentationStyle: 'fullscreen', // ✅ Editor en pantalla completa
+        correctOrientation: true,
+        presentationStyle: 'fullscreen',
       });
 
       if (!image.base64String) return;
 
       const base64Original = `data:image/jpeg;base64,${image.base64String}`;
 
-      // ✅ Validar foto
       const validacion = this.fotoService.validarFoto(base64Original);
       if (!validacion.valid) {
         await this.showToast(validacion.message, 'warning');
@@ -389,17 +353,13 @@ export class ProfilePage implements OnInit {
       await loading.present();
 
       try {
-        // ✅ Comprimir foto automáticamente
         const base64Comprimida = await this.fotoService.comprimirFoto(base64Original);
 
         const uid = this.auth.currentUser?.uid;
         if (!uid) throw new Error('No autenticado');
 
-        // ✅ Guardar en localStorage (preparado para Firebase Storage)
         const fotoGuardada = await this.fotoService.guardarFoto(uid, base64Comprimida);
 
-        // ✅ Actualizar referencia en Firestore (solo uid, no el base64)
-        // 🔥 Cuando migres a Storage, guarda aquí la URL de descarga
         await this.authService.updateProfile({ fotoBase64: fotoGuardada });
 
         if (this.userData) this.userData.fotoBase64 = fotoGuardada;
@@ -421,7 +381,7 @@ export class ProfilePage implements OnInit {
   // ⭐ FAVORITOS
   // =========================
   async loadFavoritos() {
-    const user = this.auth.currentUser; // ✅ Usar auth inyectado, no acceso privado
+    const user = this.auth.currentUser;
     if (!user) return;
 
     try {
@@ -437,7 +397,6 @@ export class ProfilePage implements OnInit {
     const user = this.auth.currentUser;
     if (!user) return;
 
-    // ✅ Validar eventoId
     if (!eventoId || !this.security.isSafeText(eventoId, 50)) {
       await this.showToast('ID de favorito inválido', 'danger');
       return;
@@ -453,10 +412,44 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  verEvento(id: string) {
-    // ✅ Validar ID antes de navegar
+  async verEvento(id: string) {
     if (!id || !this.security.isSafeText(id, 50)) return;
-    this.router.navigateByUrl(`/tabs/evento-detalle/${id}`);
+
+    const loading = await this.loadingCtrl.create({ message: 'Verificando evento...' });
+    await loading.present();
+
+    try {
+      // 🔍 Verificar si el evento existe en Firestore
+      const eventoRef = doc(this.firestore, `eventos/${id}`);
+      const eventoSnap = await getDoc(eventoRef);
+
+      await loading.dismiss();
+
+      if (!eventoSnap.exists()) {
+        const alert = await this.alertCtrl.create({
+          header: 'Evento no disponible',
+          message: 'Este evento ha sido eliminado. Se removerá de tus favoritos.',
+          buttons: [
+            {
+              text: 'Entendido',
+              handler: async () => {
+                await this.removeFavorito(id);
+              }
+            }
+          ]
+        });
+
+        await alert.present();
+        return;
+      }
+
+      // 🚀 Si el evento existe, navegar
+      this.router.navigateByUrl(`/tabs/evento-detalle/${id}`);
+
+    } catch (error) {
+      await loading.dismiss();
+      await this.showToast('Error al consultar el evento', 'danger');
+    }
   }
 
   // =========================
@@ -531,7 +524,6 @@ export class ProfilePage implements OnInit {
               return false;
             }
 
-            // ✅ Validar XSS en estado personalizado
             if (!this.security.isSafeText(data.estadoCustom, 50)) {
               await this.showToast('El estado contiene caracteres no permitidos', 'warning');
               return false;
@@ -586,7 +578,6 @@ export class ProfilePage implements OnInit {
       }
     }
 
-    // ✅ Rate limiting
     if (!this.security.checkRateLimit('cambio-nombre', 3, 3600000)) {
       await this.showToast('Demasiados intentos. Espera 1 hora.', 'warning');
       return;
@@ -621,7 +612,6 @@ export class ProfilePage implements OnInit {
               return false;
             }
 
-            // ✅ Validar XSS en respuesta
             if (!this.security.isSafeText(data.respuesta, 100)) {
               await this.showToast('La respuesta contiene caracteres no permitidos', 'warning');
               return false;
@@ -713,7 +703,6 @@ export class ProfilePage implements OnInit {
               return false;
             }
 
-            // ✅ Validar nombre seguro
             if (!this.security.isValidNombre(nuevoNombre)) {
               await this.showToast('El nombre solo puede contener letras y espacios', 'warning');
               return false;
@@ -736,7 +725,6 @@ export class ProfilePage implements OnInit {
                 return false;
               }
 
-              // ✅ Sanitizar antes de guardar
               const nombreSeguro = this.security.sanitizeInput(nuevoNombre);
 
               await this.authService.updateProfile({
@@ -785,17 +773,14 @@ export class ProfilePage implements OnInit {
 
     const [usuario, dominio] = email.split('@');
 
-    // Si el usuario tiene solo 1 carácter
     if (usuario.length === 1) {
       return `${usuario}***@${dominio}`;
     }
 
-    // Si tiene 2 caracteres, mostramos ambos
     if (usuario.length === 2) {
       return `${usuario[0]}*${usuario[1]}@${dominio}`;
     }
 
-    // Caso normal
     const primeraLetra = usuario.charAt(0);
     const ultimaLetra = usuario.charAt(usuario.length - 1);
 

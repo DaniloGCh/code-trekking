@@ -4,23 +4,64 @@
 <ion-header [class.hidden]="hideHeader">
   <ion-toolbar class="transparent-toolbar">
 
-    <!-- 🔹 TÍTULO -->
-    <ion-title>Galeria</ion-title>
+    <!-- ✅ HEADER EN MODO SELECCIÓN MÚLTIPLE -->
+    <ng-container *ngIf="selectionMode; else headerNormal">
 
-    <!-- 🔘 ACCIONES DERECHA -->
-    <ion-buttons slot="end">
+      <ion-buttons slot="start">
+        <ion-button (click)="salirModoSeleccion()">
+          <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
 
-      <!-- profile -->
-      <ion-button *ngIf="userData" (click)="goProfile()">
-        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
-      </ion-button>
+      <ion-title>{{ fotosSeleccionadas.size }} seleccionada(s)</ion-title>
 
-      <!-- 🚪 Logout (usuario logueado) -->
-      <ion-button *ngIf="userData" (click)="onLogout()">
-        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
-      </ion-button>
+      <ion-buttons slot="end">
+        <ion-button (click)="toggleSeleccionarTodas()">
+          <ion-icon slot="icon-only" [name]="todasSeleccionadas ? 'checkmark-done-outline' : 'checkbox-outline'"></ion-icon>
+        </ion-button>
+        <ion-button (click)="confirmarEliminarSeleccionadas()" [disabled]="fotosSeleccionadas.size === 0">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
 
-    </ion-buttons>
+    </ng-container>
+
+    <!-- 🔹 HEADER NORMAL -->
+    <ng-template #headerNormal>
+
+      <ion-title>Galeria</ion-title>
+
+      <!-- 🔘 ACCIONES DERECHA -->
+      <ion-buttons slot="end">
+
+        <!-- profile -->
+        <ion-button *ngIf="userData" (click)="goProfile()">
+          <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+        </ion-button>
+
+                <!-- ✅ Entrar a modo selección (solo si se está viendo la galería y hay fotos) -->
+        <ion-button *ngIf="mostrarGaleria && fotos.length > 0" (click)="entrarModoSeleccion()">
+          <ion-icon slot="icon-only" name="checkbox-outline"></ion-icon>
+        </ion-button>
+
+        <!-- ✅ NUEVO: ver planes / renovar (solo si YA tiene suscripción activa) -->
+        <ion-button *ngIf="suscripcionActiva" (click)="toggleVistaPlanes()">
+          <ion-icon slot="icon-only" [name]="mostrarGaleria ? 'card-outline' : 'images-outline'"></ion-icon>
+        </ion-button>
+
+        <!-- 📷 Subir/tomar foto (solo si se está viendo la galería) -->
+        <ion-button *ngIf="mostrarGaleria" (click)="onAgregarFoto()">
+          <ion-icon slot="icon-only" name="camera-outline"></ion-icon>
+        </ion-button>
+
+        <!-- 🚪 Logout (usuario logueado) -->
+        <!-- <ion-button *ngIf="userData" (click)="onLogout()">
+          <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+        </ion-button> -->
+
+      </ion-buttons>
+
+    </ng-template>
 
   </ion-toolbar>
 </ion-header>
@@ -30,165 +71,253 @@
 <!-- ========================= -->
 <ion-content [fullscreen]="true" (ionScroll)="onScroll($event)" [scrollEvents]="true" class="ion-padding">
 
-  <!-- Encabezado de la Sección Premium -->
-  <div class="ion-text-center ion-margin-bottom ion-padding-top">
-    <ion-icon name="star" color="warning" style="font-size: 48px;"></ion-icon>
-    <h1 style="font-weight: bold; margin-top: 8px;">Consigue Premium y obtener acceso a Galeria </h1>
-    <p color="medium">
-      Elige el plan de suscripción perfecto para ti y desbloquea todas las funciones exclusivas.
+  <!-- ============================================================ -->
+  <!-- 🖼️ GALERÍA (mostrarGaleria = suscripción activa Y no está viendo planes manualmente) -->
+  <!-- ============================================================ -->
+  <ng-container *ngIf="mostrarGaleria; else planesTemplate">
+
+    <div class="galeria-grid" *ngIf="fotos.length > 0; else sinFotos">
+      <div
+        class="foto-item"
+        [class.seleccionada]="estaSeleccionada(foto)"
+        *ngFor="let foto of fotos; let i = index"
+        (click)="onClickFoto(foto, i)"
+        (press)="entrarModoSeleccion(foto)">
+
+        <img [src]="foto.imageUrl" loading="lazy" alt="foto" />
+
+        <div class="checkbox-overlay" *ngIf="selectionMode">
+          <ion-icon [name]="estaSeleccionada(foto) ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+        </div>
+
+        <button *ngIf="!selectionMode" class="btn-borrar-foto" title="Eliminar foto" aria-label="Eliminar foto" (click)="confirmarEliminarFotoDesdeGrid(foto, $event)">
+          <ion-icon name="trash-outline"></ion-icon>
+        </button>
+
+      </div>
+    </div>
+
+    <ng-template #sinFotos>
+      <div class="galeria-vacia ion-text-center">
+        <ion-icon name="images-outline" style="font-size: 48px;"></ion-icon>
+        <p>Aún no tienes fotos. Toca el ícono de cámara arriba para agregar la primera.</p>
+      </div>
+    </ng-template>
+
+  </ng-container>
+
+  <!-- ============================================================ -->
+  <!-- 💳 PLANES (sin suscripción activa, o suscrito viendo planes manualmente para renovar) -->
+  <!-- ============================================================ -->
+  <ng-template #planesTemplate>
+
+<!-- 💳 TARJETA DE ESTADO DE LA SUSCRIPCIÓN -->
+<div class="plan-banner" *ngIf="suscripcionActiva">
+  <div class="banner-icon">
+    <ion-icon name="checkmark-circle-outline"></ion-icon>
+  </div>
+  <div class="banner-info">
+    <h3>Tienes el {{ planActivoNombre }}</h3>
+    <p *ngIf="fechaFinSuscripcion">
+      Tu suscripción estará activa hasta el: 
+      <strong>{{ fechaFinSuscripcion | date:'dd/MM/yyyy' }}</strong>
     </p>
   </div>
+</div>
 
-  <!-- ========================= -->
-  <!-- 🪗 ACORDEÓN DE PLANES -->
-  <!-- ========================= -->
-  <ion-accordion-group value="meses-3">
+<!-- 🚫 SI NO TIENE SUSCRIPCIÓN ACTIVA -->
+<div class="no-acceso" *ngIf="!suscripcionActiva">
+  <ion-icon name="lock-closed-outline"></ion-icon>
+  <h2>Sin suscripción activa</h2>
+  <p>Suscríbete a un plan para disfrutar de tu galería de fotos.</p>
+</div>
 
-    <!-- PLAN MENSUAL -->
-    <ion-accordion class="premium-mensual" value="mensual">
-      <ion-item slot="header" color="light">
-        <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
-        <ion-label>
-          <h2>Plan Mensual</h2>
-          <p>Flexibilidad mes a mes</p>
-        </ion-label>
-      </ion-item>
+    <!-- Encabezado de la Sección Premium -->
+    <div class="ion-text-center ion-margin-bottom ion-padding-top">
+      <ion-icon name="star" color="warning" style="font-size: 48px;"></ion-icon>
+      <h1 style="font-weight: bold; margin-top: 8px;">Consigue Premium y obtener acceso a Galeria </h1>
+      <p color="medium">
+        Elige el plan de suscripción perfecto para ti y desbloquea todas las funciones exclusivas.
+      </p>
+    </div>
 
-      <div class="ion-padding" slot="content">
-                <div class="ion-text-center ion-margin-bottom">
-          <h3 style="font-weight: bold; margin: 0;">$4.000 </h3>
-          <p style="font-size: 13px; color: var(--ion-color-medium);">Pagando cada mes</p>
-          <ion-badge slot="end">Clasico</ion-badge>
+    <!-- ========================= -->
+    <!-- 🪗 ACORDEÓN DE PLANES -->
+    <!-- ========================= -->
+    <ion-accordion-group value="meses-3">
+
+      <!-- PLAN MENSUAL -->
+      <ion-accordion class="premium-mensual" value="mensual">
+        <ion-item slot="header" color="light">
+          <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>Plan Clasico (Mensual)</h2>
+            <p>Flexibilidad mes a mes</p>
+          </ion-label>
+        </ion-item>
+
+        <div class="ion-padding" slot="content">
+                  <div class="ion-text-center ion-margin-bottom">
+            <h3 style="font-weight: bold; margin: 0;">$4.000 </h3>
+            <p style="font-size: 13px; color: var(--ion-color-medium);">Pagando cada mes</p>
+            <ion-badge slot="end">Clasico</ion-badge>
+          </div>
+          <ion-list lines="none">
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Creación de 5 eventos grupales a la vez</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Acceso a galeria de 50GB, podras subir las fotos del evento</ion-label>
+            </ion-item>
+          </ion-list>
+
+          <ion-button expand="block" class="ion-margin-top" (click)="seleccionarPlan('mensual')">
+            <ion-icon name="card-outline" slot="start"></ion-icon>
+            Suscribirme por 1 Mes
+          </ion-button>
         </div>
-        <ion-list lines="none">
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Creación de 5 eventos grupales a la vez</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Acceso a galeria de 50GB, podras subir las fotos del evento</ion-label>
-          </ion-item>
-        </ion-list>
+      </ion-accordion>
 
-        <ion-button expand="block" class="ion-margin-top" (click)="seleccionarPlan('mensual')">
-          <ion-icon name="card-outline" slot="start"></ion-icon>
-          Suscribirme por 1 Mes
-        </ion-button>
-      </div>
-    </ion-accordion>
+      <!-- PLAN 3 MESES (Popular) -->
+      <ion-accordion class="premium-trimestral" value="meses-3">
+        <ion-item slot="header" color="light">
+          <ion-icon name="flash-outline" slot="start" color="warning"></ion-icon>
+          <ion-label>
+            <h2>Plan membresía organizador (4 Meses)</h2>
+            <p>Ahorra un 16.6%</p>
+          </ion-label>
+          
+        </ion-item>
 
-    <!-- PLAN 3 MESES (Popular) -->
-    <ion-accordion class="premium-trimestral" value="meses-3">
-      <ion-item slot="header" color="light">
-        <ion-icon name="flash-outline" slot="start" color="warning"></ion-icon>
-        <ion-label>
-          <h2>Plan trimestral Membresía organizador (4 Meses)</h2>
-          <p>Ahorra un 16.6%</p>
-        </ion-label>
-        
-      </ion-item>
+        <div class="ion-padding" slot="content">
+          <div class="ion-text-center ion-margin-bottom">
+            <h3 style="font-weight: bold; margin: 0;">$13.350</h3>
+            <p style="font-size: 13px; color: var(--ion-color-medium);">paga de una vez $13.350 / en el plan clasico pagarias un total de  <small style="font-size: 14px; font-weight: normal; text-decoration: line-through; color: gray;">$16.000</small></p>
+            <p style="font-size: 13px; color: var(--ion-color-medium);">Ahorra cada mes: De <small style="font-size: 14px; font-weight: normal; text-decoration: line-through; color: gray;">$4.000</small> baja a $3.337 / mes.</p>
+            <ion-badge slot="end">Popular</ion-badge>
+          </div>
 
-      <div class="ion-padding" slot="content">
-        <div class="ion-text-center ion-margin-bottom">
-          <h3 style="font-weight: bold; margin: 0;">$13.350 <small style="font-size: 14px; font-weight: normal; text-decoration: line-through; color: gray;">$16.000</small></h3>
-          <p style="font-size: 13px; color: var(--ion-color-medium);">Pagando $3.337 / mes</p>
-          <ion-badge slot="end">Popular</ion-badge>
+          <ion-list lines="none"> 
+             <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Plan para guías o clubes que crean múltiples eventos</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Acceso a galeria de 100GB, podras subir las fotos del evento</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Insignia de perfil "Senderista Premium"</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Creación de 15 eventos grupales a la vez</ion-label>
+            </ion-item>
+          </ion-list>
+
+          <ion-button expand="block" class="ion-margin-top" (click)="seleccionarPlan('trimestral')">
+            <ion-icon name="star-outline" slot="start"></ion-icon>
+            Obtener 4 Meses Premium
+          </ion-button>
         </div>
+      </ion-accordion>
 
-        <ion-list lines="none"> 
-           <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Plan para guías o clubes que crean múltiples eventos</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Acceso a galeria de 100GB, podras subir las fotos del evento</ion-label>
-          </ion-item>
-          <!-- <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Mapas offline para descargar</ion-label>
-          </ion-item> -->
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Insignia de perfil "Senderista Premium"</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Creación de 15 eventos grupales a la vez</ion-label>
-          </ion-item>
-        </ion-list>
+      <!-- PLAN ANUAL -->
+      <ion-accordion class="premium-anual" value="anual">
+        <ion-item slot="header" color="light">
+          <ion-icon name="trophy-outline" slot="start" color="tertiary"></ion-icon>
+          <ion-label>
+            <h2>Plan Anual (12 Meses)</h2>
+            <p>Ahorra un 18.7% — Mejor Valor</p>
+          </ion-label>
 
-        <ion-button expand="block" class="ion-margin-top" (click)="seleccionarPlan('trimestral')">
-          <ion-icon name="star-outline" slot="start"></ion-icon>
-          Obtener 4 Meses Premium
-        </ion-button>
-      </div>
-    </ion-accordion>
+        </ion-item>
 
-    <!-- PLAN ANUAL -->
-    <ion-accordion class="premium-anual" value="anual">
-      <ion-item slot="header" color="light">
-        <ion-icon name="trophy-outline" slot="start" color="tertiary"></ion-icon>
-        <ion-label>
-          <h2>Plan Anual (12 Meses)</h2>
-          <p>Ahorra un 18.7% — Mejor Valor</p>
-        </ion-label>
+        <div class="ion-padding" slot="content">
+          <div class="ion-text-center ion-margin-bottom">
+            <h3 style="font-weight: bold; margin: 0;">$39.000</h3>
+            <p style="font-size: 13px; color: var(--ion-color-medium);">paga de una vez $39.000 / en el plan clasico pagarias un total de  <small style="font-size: 14px; font-weight: normal; text-decoration: line-through; color: gray;">$48.000</small></p>
+            <p style="font-size: 13px; color: var(--ion-color-medium);">Ahorra cada mes: De <small style="font-size: 14px; font-weight: normal; text-decoration: line-through; color: gray;">$4.000</small> baja a $3.250 / mes</p>
+            <ion-badge slot="end">Ahorro Máximo</ion-badge>
+          </div>
 
-      </ion-item>
+          <ion-list lines="none">
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Plan para guías o clubes que crean múltiples eventos</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Creación de eventos  grupales ilimitados</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Acceso a galeria de 200GB, podras subir las fotos del evento</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Insignia de perfil "Senderista Premium"</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+              <ion-label class="ion-text-wrap">Descuentos exclusivos en Multiverso creaciones (Poleras con tu paisaje o animal favorito)</ion-label>
+            </ion-item>
+          </ion-list>
 
-      <div class="ion-padding" slot="content">
-        <div class="ion-text-center ion-margin-bottom">
-          <h3 style="font-weight: bold; margin: 0;">$39.000 <small style="font-size: 14px; font-weight: normal; text-decoration: line-through; color: gray;">$48.000</small></h3>
-          <p style="font-size: 13px; color: var(--ion-color-medium);">Pagando anualmente ($3.250 / mes)</p>
-          <ion-badge slot="end">Ahorro Máximo</ion-badge>
+          <ion-button expand="block" class="ion-margin-top" (click)="seleccionarPlan('anual')">
+            <ion-icon name="ribbon-outline" slot="start"></ion-icon>
+            Obtener 1 Año Premium.
+          </ion-button>
         </div>
+      </ion-accordion>
 
-        <ion-list lines="none">
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Plan para guías o clubes que crean múltiples eventos</ion-label>
-          </ion-item>
-          <!-- <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Soporte y asistencia prioritaria en ruta</ion-label>
-          </ion-item> -->
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Creación de eventos  grupales ilimitados</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Acceso a galeria de 200GB, podras subir las fotos del evento</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Insignia de perfil "Senderista Premium"</ion-label>
-          </ion-item>
-          <ion-item>
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-            <ion-label class="ion-text-wrap">Descuentos exclusivos en Multiverso creaciones (Poleras con tu paisaje o animal favorito)</ion-label>
-          </ion-item>
-        </ion-list>
+    </ion-accordion-group>
 
-        <ion-button expand="block" class="ion-margin-top" (click)="seleccionarPlan('anual')">
-          <ion-icon name="ribbon-outline" slot="start"></ion-icon>
-          Obtener 1 Año Premium.
-        </ion-button>
-      </div>
-    </ion-accordion>
+    <!-- Garantía / Nota de seguridad -->
+    <div class="ion-text-center ion-margin-top ion-padding-top">
+      <p style="font-size: 12px; color: var(--ion-color-medium);">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        Cancela tu suscripción en cualquier momento desde los ajustes de tu cuenta.
+      </p>
+    </div>
 
-  </ion-accordion-group>
-
-  <!-- Garantía / Nota de seguridad -->
-  <div class="ion-text-center ion-margin-top ion-padding-top">
-    <p style="font-size: 12px; color: var(--ion-color-medium);">
-      <ion-icon name="shield-checkmark-outline"></ion-icon>
-      Cancela tu suscripción en cualquier momento desde los ajustes de tu cuenta.
-    </p>
-  </div>
+  </ng-template>
 
 </ion-content>
+
+<!-- ========================= -->
+<!-- 🖼️ VISOR A PANTALLA COMPLETA (deslizable) -->
+<!-- ========================= -->
+<ion-modal [isOpen]="mostrarVisor" (didDismiss)="cerrarVisor()" class="visor-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar class="transparent-toolbar">
+        <ion-buttons slot="start">
+          <ion-button (click)="confirmarEliminarFotoDesdeVisor()">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrarVisor()">
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="visor-content">
+      <swiper-container *ngIf="mostrarVisor" [initial-slide]="fotoInicialIndex" zoom="true" (swiperslidechange)="onSlideChange($event)">
+        <swiper-slide *ngFor="let foto of fotos">
+          <div class="swiper-zoom-container">
+            <img [src]="foto.imageUrl" alt="foto" />
+          </div>
+        </swiper-slide>
+      </swiper-container>
+    </ion-content>
+  </ng-template>
+</ion-modal>
 
 <!-- 🚫 NO ACCESO -->
 <ng-template #noAcceso>

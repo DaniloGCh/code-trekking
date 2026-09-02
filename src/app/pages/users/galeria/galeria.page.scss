@@ -190,3 +190,208 @@ ion-accordion ion-button {
     border-radius: 6px; /* Redondea los bordes del botón */
   }
 }
+
+
+
+
+
+
+/* ==========================================================================
+   🖼️ GRID DE FOTOS
+   ========================================================================== */
+.galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.foto-item {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #14191f;
+  transition: transform 0.15s ease-in-out;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.foto-item.seleccionada {
+  transform: scale(0.94);
+
+  img {
+    opacity: 0.6;
+  }
+
+  outline: 3px solid rgb(0, 248, 103);
+  outline-offset: -3px;
+}
+
+.galeria-vacia {
+  margin-top: 60px;
+  color: var(--ion-color-medium);
+
+  ion-icon { margin-bottom: 12px; }
+}
+
+.checkbox-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+
+  ion-icon {
+    font-size: 22px;
+    color: rgb(0, 248, 103);
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+  }
+}
+
+.btn-borrar-foto {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 2;
+
+  ion-icon {
+    color: rgb(255, 90, 90);
+    font-size: 14px;
+    pointer-events: none;
+  }
+}
+
+.visor-modal {
+  --width: 100%;
+  --height: 100%;
+}
+
+.visor-content {
+  --background: #000;
+}
+
+.visor-content swiper-container {
+  width: 100%;
+  height: 100%;
+}
+
+.visor-content swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.visor-content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+
+
+
+/* ==========================================================================
+   💳 BANNER DE PLAN ACTIVO (Estilo Dark Glassmorphism con Neón)
+   ========================================================================== */
+.plan-banner {
+  background: linear-gradient(135deg, rgba(20, 25, 31, 0.95), rgba(10, 12, 16, 0.98));
+  border: 2px solid rgba(0, 248, 103, 0.35);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+
+  .banner-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0, 248, 103, 0.12);
+    border: 1px solid rgba(0, 248, 103, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    ion-icon {
+      font-size: 22px;
+      color: rgb(0, 248, 103);
+    }
+  }
+
+  .banner-info {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.01em;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: #94a3b8;
+
+      strong {
+        color: rgb(0, 248, 103);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+
+/* ==========================================================================
+   🚫 CONTENEDOR DE ERROR / SIN ACCESO (VERSIÓN COMPACTA)
+   ========================================================================== */
+.no-acceso {
+  text-align: center;
+  padding: 18px 16px; /* Relleno compacto */
+  background: #14191f;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 70, 70, 0.4);
+  margin-top: 12px;
+
+  ion-icon {
+    font-size: 32px; /* Tamaño de icono reducido */
+    color: rgb(255, 70, 70);
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin: 0 0 4px 0; /* Espaciado ajustado */
+  }
+
+  p {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+}

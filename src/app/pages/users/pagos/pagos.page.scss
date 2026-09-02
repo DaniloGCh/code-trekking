@@ -1,0 +1,108 @@
+.checkout-container {
+  --background: var(--ion-background-color, #121212);
+}
+
+.checkout-card {
+  max-width: 480px;
+  width: 100%;
+  margin: 10px auto 30px auto;
+  padding: 24px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
+}
+
+.resumen-plan {
+  .badge-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 12px;
+    background: rgba(255, 196, 9, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 32px;
+    }
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0;
+    color: var(--ion-text-color, #ffffff);
+  }
+
+  .precio-clp {
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin: 4px 0;
+    color: var(--ion-color-primary, #3880ff);
+  }
+
+  .precio-nota {
+    font-size: 0.78rem;
+    color: var(--ion-color-medium, #92949c);
+    margin: 0;
+    line-height: 1.3;
+  }
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 20px 0;
+}
+
+/* 🔹 FIX: Ajuste de dimensiones del SDK PayPal */
+.paypal-wrapper {
+  width: 100%;
+  min-height: 200px; /* Asegura altura suficiente para los 2 botones + footer de PayPal */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: visible; /* Evita que la tarjeta corte el contenido desplegado */
+
+  #paypal-button-container {
+    margin-top: 30px;
+    margin-bottom: -15px;
+    width: 100%;
+    min-height: 200px;
+    
+    ::ng-deep iframe {
+      width: 100%;
+      min-width: 100%;
+      min-height: 160px; /* Fuerza la altura nativa completa del iframe */
+      border-radius: 12px;
+      overflow: visible;
+      
+    }
+  }
+}
+
+.spinner-carga {
+  margin: 40px auto;
+  width: 38px;
+  height: 38px;
+}
+
+.error-box {
+  padding: 16px 8px;
+  
+  ion-icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: var(--ion-color-medium);
+    margin: 0 0 12px;
+  }
+}
