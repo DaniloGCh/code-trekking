@@ -23,7 +23,9 @@ const generateEnvFile = (isProduction: boolean) => `export const environment = {
   },
   weatherApiKey: '${process.env['WEATHER_API_KEY'] || ''}',
   orsKey: '${process.env['ORS_KEY'] || ''}',
-  thunderforestKey: '${process.env['THUNDERFOREST_KEY'] || ''}'
+  thunderforestKey: '${process.env['THUNDERFOREST_KEY'] || ''}',
+  paypalClientId: '${process.env['PAYPAL_CLIENT_ID'] || ''}',
+  paypalCurrency: '${process.env['PAYPAL_CURRENCY'] || 'USD'}'
 };
 `;
 
