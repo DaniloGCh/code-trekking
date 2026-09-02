@@ -9,6 +9,10 @@
 
     <!-- Acciones -->
     <ion-buttons slot="end">
+              <!-- profile -->
+        <ion-button *ngIf="userData" (click)="goProfile()">
+          <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+        </ion-button>
 
       <!-- 🔑 Unirse con código -->
       <ion-button (click)="onUnirseConCodigo()">

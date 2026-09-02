@@ -17,7 +17,6 @@ const routes: Routes = [
   {
     path: 'home',
     loadChildren: () => import('./pages/users/home/home.module').then(m => m.HomePageModule),
-    // canActivate: [authGuard]
   },
   {
     path: 'login',
@@ -42,7 +41,6 @@ const routes: Routes = [
   {
     path: 'eventos',
     loadChildren: () => import('./pages/users/eventos/eventos.module').then(m => m.EventosPageModule),
-    // canActivate: [authGuard]
   },
   {
     path: 'crear-evento',
@@ -74,11 +72,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/users/galeria/galeria.module').then(m => m.GaleriaPageModule),
     canActivate: [authGuard]
   },
-
-
-
-
-
+  {
+    path: 'pagos',
+    loadChildren: () => import('./pages/users/pagos/pagos.module').then(m => m.PagosPageModule),
+    canActivate: [authGuard]
+  },
 
 ];
 @NgModule({

@@ -1,0 +1,41 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="transparent-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Pago</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding checkout-container">
+
+  <div class="checkout-card">
+    <!-- Icono y Detalle del Plan -->
+    <div class="resumen-plan ion-text-center">
+      <div class="badge-icon">
+        <ion-icon name="star" color="warning"></ion-icon>
+      </div>
+      <h2>{{ plan.nombre }}</h2>
+      <p class="precio-clp">{{ plan.precioDisplay }}</p>
+      <p class="precio-nota">Cobro procesado a través de PayPal</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Contenedor PayPal con iframe estilizado -->
+    <div class="paypal-wrapper">
+      <div id="paypal-button-container" [hidden]="!sdkListo"></div>
+
+      <ion-spinner *ngIf="!sdkListo && !errorSdk" name="crescent" color="primary" class="spinner-carga"></ion-spinner>
+
+      <div *ngIf="errorSdk" class="error-box ion-text-center">
+        <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+        <p>No se pudo cargar la pasarela de pago. Revisa tu conexión e inténtalo nuevamente.</p>
+        <ion-button fill="clear" color="primary" size="small" (click)="volver()">Reintentar</ion-button>
+      </div>
+    </div>
+  </div>
+
+</ion-content>
