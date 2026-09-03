@@ -4,6 +4,9 @@ import { AlertController, LoadingController, ViewWillEnter } from '@ionic/angula
 import { AuthService } from 'src/app/core/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
+import { PaypalNativeService, RetornoPaypal } from 'src/app/core/services/paypal-native.service';
 
 type PlanKey = 'mensual' | 'trimestral' | 'anual';
 
@@ -26,10 +29,12 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private authService = inject(AuthService);
+  private paypalNativeService = inject(PaypalNativeService);
   private ngZone = inject(NgZone);
 
   private readonly TASA_CAMBIO_USD = 950;
   private routeSub?: Subscription;
+  private retornoSub?: Subscription;
 
   private readonly planes: Record<PlanKey, PlanInfo> = {
     mensual: { nombre: 'Plan Mensual', precioCLP: 4000, precioDisplay: '$4.000 CLP' },
@@ -42,13 +47,16 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   sdkListo = false;
   errorSdk = false;
+  pagandoNativo = false;
+
+  // 🔹 true en Android/iOS, false en navegador
+  readonly esNativo = Capacitor.getPlatform() !== 'web';
 
   get precioCalculadoUSD(): string {
     return (this.plan.precioCLP / this.TASA_CAMBIO_USD).toFixed(2);
   }
 
   ngOnInit() {
-    // 🔹 Escucha cambios reactivos en la URL por si la vista sigue viva en el stack de Ionic
     this.routeSub = this.route.queryParamMap.subscribe((params) => {
       const planParam = params.get('plan') as PlanKey | null;
       if (planParam && this.planes[planParam]) {
@@ -56,19 +64,30 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
         this.plan = this.planes[planParam];
       }
     });
+
+    if (this.esNativo) {
+      // No hay SDK que cargar en nativo: mostramos directamente el botón propio
+      this.sdkListo = true;
+
+      this.retornoSub = this.paypalNativeService.retorno$.subscribe((evento) => {
+        this.manejarRetornoNativo(evento);
+      });
+    }
   }
 
-  /* 🔹 Ciclo de vida de Ionic: Se dispara SIEMPRE que se entra a la pantalla */
   ionViewWillEnter() {
     this.actualizarPlanDesdeUrl();
-    
-    // Si la SDK ya estaba cargada previamente, renderiza de nuevo los botones con el nuevo plan
-    if ((window as any).paypal) {
+
+    if (!this.esNativo && (window as any).paypal) {
       this.renderBotonesPaypal();
     }
   }
 
   ngAfterViewInit() {
+    if (this.esNativo) {
+      return; // en nativo no cargamos el SDK JS de PayPal
+    }
+
     setTimeout(() => {
       this.cargarSdkPaypal()
         .then(() => this.renderBotonesPaypal())
@@ -82,9 +101,8 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   }
 
   ngOnDestroy() {
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
-    }
+    this.routeSub?.unsubscribe();
+    this.retornoSub?.unsubscribe();
   }
 
   private actualizarPlanDesdeUrl() {
@@ -94,6 +112,10 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       this.plan = this.planes[planParam];
     }
   }
+
+  // =========================================================
+  // 🌐 FLUJO WEB (SDK JS de PayPal, sin cambios)
+  // =========================================================
 
   private cargarSdkPaypal(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -165,6 +187,69 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
     this.sdkListo = true;
   }
+
+  // =========================================================
+  // 📱 FLUJO NATIVO (Android/iOS): navegador del sistema + deep link
+  // =========================================================
+
+  async pagarNativo() {
+    if (this.pagandoNativo) {
+      return;
+    }
+    this.pagandoNativo = true;
+
+    const loading = await this.loadingCtrl.create({ message: 'Conectando con PayPal...' });
+    await loading.present();
+
+    try {
+      const approveUrl = await this.paypalNativeService.crearOrden(
+        this.planKey,
+        this.precioCalculadoUSD,
+        environment.paypalCurrency
+      );
+      await loading.dismiss();
+      await Browser.open({ url: approveUrl });
+    } catch (err) {
+      console.error('[PagosPage] Error creando orden nativa:', err);
+      await loading.dismiss();
+      await this.mostrarError('No se pudo iniciar el pago con PayPal.');
+    } finally {
+      this.pagandoNativo = false;
+    }
+  }
+
+  private async manejarRetornoNativo(evento: RetornoPaypal) {
+    if (evento.status === 'cancel') {
+      return; // el usuario canceló en PayPal, no hacemos nada
+    }
+
+    if (!evento.orderId) {
+      await this.mostrarError('PayPal no devolvió un identificador de orden.');
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({ message: 'Confirmando tu pago...' });
+    await loading.present();
+
+    try {
+      const captura = await this.paypalNativeService.capturarOrden(evento.orderId);
+      await loading.dismiss();
+
+      if (captura.status === 'COMPLETED') {
+        await this.finalizarPago(captura.orderId);
+      } else {
+        await this.mostrarError('El pago no se completó.');
+      }
+    } catch (err) {
+      console.error('[PagosPage] Error capturando orden nativa:', err);
+      await loading.dismiss();
+      await this.mostrarError('Ocurrió un problema confirmando el pago.');
+    }
+  }
+
+  // =========================================================
+  // ✅ COMÚN A AMBOS FLUJOS
+  // =========================================================
 
   private async finalizarPago(ordenId: string) {
     const loading = await this.loadingCtrl.create({ message: 'Activando tu suscripción...' });
