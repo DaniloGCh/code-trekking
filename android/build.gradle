@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.9.1'
+        classpath 'com.android.tools.build:gradle:8.2.2'
         classpath 'com.google.gms:google-services:4.4.2'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25'
     }
@@ -19,22 +19,20 @@ allprojects {
     }
 }
 
-// Configuración robusta para forzar Java 21 en Java y Kotlin para TODOS los proyectos/plugins
+// Forzar Java 17 de forma global y segura en todos los plugins y submódulos
 subprojects {
     afterEvaluate { project ->
         if (project.hasProperty("android")) {
             android {
                 compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_21
-                    targetCompatibility = JavaVersion.VERSION_21
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
                 }
             }
         }
-        
-        // Forzar versión 21 en la compilación de Kotlin usando la API moderna
         tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-            compilerOptions {
-                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+            kotlinOptions {
+                jvmTarget = "17"
             }
         }
     }
