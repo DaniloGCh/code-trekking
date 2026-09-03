@@ -18,7 +18,6 @@ jobs:
         with:
           node-version: 22
 
-      # ☕ Se cambia a JDK 17 (Estándar oficial para Capacitor 8)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -48,12 +47,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
-      # 🚀 Se exporta la variable JAVA_HOME explícitamente antes de compilar
+      # 🚀 Limpieza de caché y compilación directa con el JAVA_HOME inyectado por setup-java
       - name: Build APK
         run: |
-          export JAVA_HOME=$JAVA_HOME_17_X64
           cd android
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew clean assembleDebug --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
