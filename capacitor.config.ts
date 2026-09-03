@@ -6,7 +6,13 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     androidScheme: 'https',
-    cleartext: true
+    cleartext: true,
+    // 🔐 Permitir navegación hacia PayPal
+    allowNavigation: [
+      '*.paypal.com',
+      '*.paypalobjects.com',
+      '*.sandbox.paypal.com'
+    ]
   }
 };
 
