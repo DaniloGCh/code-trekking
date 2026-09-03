@@ -18,16 +18,15 @@ jobs:
         with:
           node-version: 22
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: '17'
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Genera el archivo .env desde los Secrets de GitHub
       - name: Create .env file
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
@@ -35,23 +34,11 @@ jobs:
       - name: Build Angular/Ionic app
         run: npm run build
 
-      - name: Add Android platform (if not present)
-        run: npx cap add android || true
-
-      - name: Sync Capacitor
-        run: npx cap sync android
-
-      # 🔒 Forzamos AGP y el wrapper de Gradle DESPUÉS del sync,
-      # por si "cap add"/"cap sync" pisó los valores correctos.
-      - name: Forzar versión de Android Gradle Plugin y Gradle wrapper
+      - name: Recreate Android platform clean
         run: |
-          cd android
-          sed -i "s/classpath 'com.android.tools.build:gradle:[^']*'/classpath 'com.android.tools.build:gradle:8.13.0'/" build.gradle
-          sed -i "s#distributionUrl=.*#distributionUrl=https\\\://services.gradle.org/distributions/gradle-8.14.3-all.zip#" gradle/wrapper/gradle-wrapper.properties
-          echo "----- build.gradle -----"
-          cat build.gradle
-          echo "----- gradle-wrapper.properties -----"
-          cat gradle/wrapper/gradle-wrapper.properties
+          rm -rf android
+          npx cap add android
+          npx cap sync android
 
       - name: Accept Android SDK licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
