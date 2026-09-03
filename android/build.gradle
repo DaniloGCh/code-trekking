@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.9.1'
+        classpath 'com.android.tools.build:gradle:8.2.2'
         classpath 'com.google.gms:google-services:4.4.2'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25'
     }
@@ -16,6 +16,25 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// Forzar la configuración de Java 21 y JVM Target en TODOS los módulos (incluido :capacitor-camera)
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_21
+                    targetCompatibility JavaVersion.VERSION_21
+                }
+            }
+        }
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = "21"
+            }
+        }
     }
 }
 
