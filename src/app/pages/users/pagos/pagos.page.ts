@@ -5,6 +5,10 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
 
+import { Capacitor } from '@capacitor/core';
+import { App, URLOpenListenerEvent, PluginListenerHandle } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
+
 type PlanKey = 'mensual' | 'trimestral' | 'anual';
 
 interface PlanInfo {
@@ -30,6 +34,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   private readonly TASA_CAMBIO_USD = 950;
   private routeSub?: Subscription;
+  private appUrlListener?: PluginListenerHandle;
 
   private readonly planes: Record<PlanKey, PlanInfo> = {
     mensual: { nombre: 'Plan Mensual', precioCLP: 4000, precioDisplay: '$4.000 CLP' },
@@ -40,8 +45,12 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   planKey: PlanKey = 'mensual';
   plan: PlanInfo = this.planes.mensual;
 
+  /** true en Android/iOS empaquetados con Capacitor; false en navegador web */
+  readonly esNativo = Capacitor.isNativePlatform();
+
   sdkListo = false;
   errorSdk = false;
+  procesandoRetorno = false;
 
   get precioCalculadoUSD(): string {
     return (this.plan.precioCLP / this.TASA_CAMBIO_USD).toFixed(2);
@@ -56,19 +65,32 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
         this.plan = this.planes[planParam];
       }
     });
+
+    // 🔹 En nativo, escuchamos el deep link de retorno del checkout de PayPal
+    if (this.esNativo) {
+      this.registrarListenerRetorno();
+    }
   }
 
   /* 🔹 Ciclo de vida de Ionic: Se dispara SIEMPRE que se entra a la pantalla */
   ionViewWillEnter() {
     this.actualizarPlanDesdeUrl();
-    
-    // Si la SDK ya estaba cargada previamente, renderiza de nuevo los botones con el nuevo plan
-    if ((window as any).paypal) {
+
+    // Si la SDK ya estaba cargada previamente (solo flujo web), renderiza de nuevo los botones
+    if (!this.esNativo && (window as any).paypal) {
       this.renderBotonesPaypal();
     }
   }
 
   ngAfterViewInit() {
+    if (this.esNativo) {
+      // En nativo no cargamos el SDK dentro del WebView: PayPal necesita un
+      // contexto de navegador real (cookies/popups) que el WebView bloquea.
+      // El botón "Pagar con PayPal" del template llama a pagarNativo().
+      this.sdkListo = true;
+      return;
+    }
+
     setTimeout(() => {
       this.cargarSdkPaypal()
         .then(() => this.renderBotonesPaypal())
@@ -85,6 +107,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
     if (this.routeSub) {
       this.routeSub.unsubscribe();
     }
+    this.appUrlListener?.remove();
   }
 
   private actualizarPlanDesdeUrl() {
@@ -94,6 +117,10 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       this.plan = this.planes[planParam];
     }
   }
+
+  // ===========================================================
+  // 🌐 FLUJO WEB (navegador de escritorio/móvil, sin Capacitor)
+  // ===========================================================
 
   private cargarSdkPaypal(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -165,6 +192,62 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
     this.sdkListo = true;
   }
+
+  // ===========================================================
+  // 📱 FLUJO NATIVO (Android/iOS vía Capacitor)
+  // ===========================================================
+
+  /** Llamado desde el botón "Pagar con PayPal" cuando esNativo === true */
+  async pagarNativo() {
+    if (!environment.paypalCheckoutUrl) {
+      await this.mostrarError('Falta configurar la URL de checkout (PAYPAL_CHECKOUT_URL).');
+      return;
+    }
+
+    const url = `${environment.paypalCheckoutUrl}` +
+      `?plan=${encodeURIComponent(this.planKey)}` +
+      `&nombre=${encodeURIComponent(this.plan.nombre)}` +
+      `&amount=${encodeURIComponent(this.precioCalculadoUSD)}` +
+      `&currency=${encodeURIComponent(environment.paypalCurrency)}` +
+      `&scheme=${encodeURIComponent(environment.appUrlScheme)}`;
+
+    await Browser.open({ url, presentationStyle: 'popover' });
+  }
+
+  private registrarListenerRetorno() {
+    App.addListener('appUrlOpen', (data: URLOpenListenerEvent) => {
+      if (!data?.url?.startsWith(`${environment.appUrlScheme}://payment-return`)) {
+        return;
+      }
+
+      Browser.close().catch(() => { /* puede que ya esté cerrado */ });
+
+      const queryString = data.url.split('?')[1] ?? '';
+      const params = new URLSearchParams(queryString);
+      const status = params.get('status');
+      const orderId = params.get('orderId');
+      const planParam = params.get('plan') as PlanKey | null;
+
+      this.ngZone.run(async () => {
+        if (planParam && this.planes[planParam]) {
+          this.planKey = planParam;
+          this.plan = this.planes[planParam];
+        }
+
+        if (status === 'success' && orderId) {
+          await this.finalizarPago(orderId);
+        } else {
+          await this.mostrarError('El pago fue cancelado o no se completó.');
+        }
+      });
+    }).then((handle) => {
+      this.appUrlListener = handle;
+    });
+  }
+
+  // ===========================================================
+  // ✅ COMÚN A AMBOS FLUJOS
+  // ===========================================================
 
   private async finalizarPago(ordenId: string) {
     const loading = await this.loadingCtrl.create({ message: 'Activando tu suscripción...' });
