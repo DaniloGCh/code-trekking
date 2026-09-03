@@ -61,6 +61,16 @@
 	<array>
 	<string>location</string>
 	</array>
+	
+	<key>CFBundleURLTypes</key>
+	<array>
+	<dict>
+		<key>CFBundleURLSchemes</key>
+		<array>
+		<string>codetrekking</string>
+		</array>
+	</dict>
+	</array>
 
 	<!-- Deep link de retorno del checkout de PayPal (ver checkout-web/index.html) -->
 	<key>CFBundleURLTypes</key>

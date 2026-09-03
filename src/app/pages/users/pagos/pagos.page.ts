@@ -29,6 +29,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private authService = inject(AuthService);
+  private paypalNativeService = inject(PaypalNativeService);
   private ngZone = inject(NgZone);
 
   private readonly TASA_CAMBIO_USD = 950;
@@ -56,7 +57,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   }
 
   ngOnInit() {
-    // 🔹 Escucha cambios reactivos en la URL por si la vista sigue viva en el stack de Ionic
     this.routeSub = this.route.queryParamMap.subscribe((params) => {
       const planParam = params.get('plan') as PlanKey | null;
       if (planParam && this.planes[planParam]) {
@@ -71,7 +71,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
     }
   }
 
-  /* 🔹 Ciclo de vida de Ionic: Se dispara SIEMPRE que se entra a la pantalla */
   ionViewWillEnter() {
     this.actualizarPlanDesdeUrl();
 
