@@ -27,7 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      # Genera el archivo .env desde los Secrets de GitHub
       - name: Create .env file
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
@@ -41,13 +40,15 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Accept Android SDK licenses
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+      # 🤖 Instala explícitamente SDK 36 y acepta licencias
+      - name: Install Android SDK 36
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
-      # 🚀 Limpieza de caché y compilación directa con el JAVA_HOME inyectado por setup-java
       - name: Build APK
         run: |
           cd android
