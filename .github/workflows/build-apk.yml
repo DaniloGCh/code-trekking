@@ -40,19 +40,17 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # 🤖 Instala explícitamente SDK 36 y acepta licencias
-      - name: Install Android SDK 36
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
+      # 🔍 Compilación con logs detallados para capturar la causa exacta si falla
       - name: Build APK
         run: |
           cd android
-          ./gradlew clean assembleDebug --stacktrace
+          ./gradlew clean assembleDebug --stacktrace --info
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
