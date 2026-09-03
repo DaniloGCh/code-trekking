@@ -9,7 +9,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 🔓 Permite que la SDK de PayPal abra el popup de inicio de sesión en el WebView
+        // Habilitar popups y JavaScript
         WebSettings webSettings = this.bridge.getWebView().getSettings();
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setMultipleWindows(true);

@@ -18,11 +18,12 @@ jobs:
         with:
           node-version: 22
 
-      - name: Set up JDK 21
+      # ☕ Se cambia a JDK 17 (Estándar oficial para Capacitor 8)
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: '17'
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
@@ -47,8 +48,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
+      # 🚀 Se exporta la variable JAVA_HOME explícitamente antes de compilar
       - name: Build APK
         run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
           cd android
           ./gradlew assembleDebug --stacktrace
 
