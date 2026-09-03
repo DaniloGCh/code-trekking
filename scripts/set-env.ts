@@ -26,7 +26,8 @@ const generateEnvFile = (isProduction: boolean) => `export const environment = {
   thunderforestKey: '${process.env['THUNDERFOREST_KEY'] || ''}',
   paypalClientId: '${process.env['PAYPAL_CLIENT_ID'] || ''}',
   paypalCurrency: '${process.env['PAYPAL_CURRENCY'] || 'USD'}',
-  paypalClientSecretSandbox: '${process.env['PAYPAL_CLIENT_SECRET_SANDBOX'] || ''}'
+  paypalCheckoutUrl: '${process.env['PAYPAL_CHECKOUT_URL'] || ''}',
+  appUrlScheme: '${process.env['APP_URL_SCHEME'] || 'codetrekking'}'
 };
 `;
 

@@ -24,11 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Deep link de retorno del checkout de PayPal (ver checkout-web/index.html) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="codetrekking" />
+                <data android:scheme="codetrekking" android:host="payment-return" />
             </intent-filter>
 
         </activity>

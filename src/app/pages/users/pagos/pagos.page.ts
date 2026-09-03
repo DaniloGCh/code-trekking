@@ -4,9 +4,9 @@ import { AlertController, LoadingController, ViewWillEnter } from '@ionic/angula
 import { AuthService } from 'src/app/core/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
-import { Capacitor } from '@capacitor/core';
+import { App, URLOpenListenerEvent } from '@capacitor/app';
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
-import { PaypalNativeService, RetornoPaypal } from 'src/app/core/services/paypal-native.service';
 
 type PlanKey = 'mensual' | 'trimestral' | 'anual';
 
@@ -34,7 +34,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   private readonly TASA_CAMBIO_USD = 950;
   private routeSub?: Subscription;
-  private retornoSub?: Subscription;
+  private appUrlListener?: PluginListenerHandle;
 
   private readonly planes: Record<PlanKey, PlanInfo> = {
     mensual: { nombre: 'Plan Mensual', precioCLP: 4000, precioDisplay: '$4.000 CLP' },
@@ -45,12 +45,12 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   planKey: PlanKey = 'mensual';
   plan: PlanInfo = this.planes.mensual;
 
+  /** true en Android/iOS empaquetados con Capacitor; false en navegador web */
+  readonly esNativo = Capacitor.isNativePlatform();
+
   sdkListo = false;
   errorSdk = false;
-  pagandoNativo = false;
-
-  // 🔹 true en Android/iOS, false en navegador
-  readonly esNativo = Capacitor.getPlatform() !== 'web';
+  procesandoRetorno = false;
 
   get precioCalculadoUSD(): string {
     return (this.plan.precioCLP / this.TASA_CAMBIO_USD).toFixed(2);
@@ -65,19 +65,16 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       }
     });
 
+    // 🔹 En nativo, escuchamos el deep link de retorno del checkout de PayPal
     if (this.esNativo) {
-      // No hay SDK que cargar en nativo: mostramos directamente el botón propio
-      this.sdkListo = true;
-
-      this.retornoSub = this.paypalNativeService.retorno$.subscribe((evento) => {
-        this.manejarRetornoNativo(evento);
-      });
+      this.registrarListenerRetorno();
     }
   }
 
   ionViewWillEnter() {
     this.actualizarPlanDesdeUrl();
 
+    // Si la SDK ya estaba cargada previamente (solo flujo web), renderiza de nuevo los botones
     if (!this.esNativo && (window as any).paypal) {
       this.renderBotonesPaypal();
     }
@@ -85,7 +82,11 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   ngAfterViewInit() {
     if (this.esNativo) {
-      return; // en nativo no cargamos el SDK JS de PayPal
+      // En nativo no cargamos el SDK dentro del WebView: PayPal necesita un
+      // contexto de navegador real (cookies/popups) que el WebView bloquea.
+      // El botón "Pagar con PayPal" del template llama a pagarNativo().
+      this.sdkListo = true;
+      return;
     }
 
     setTimeout(() => {
@@ -101,8 +102,10 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   }
 
   ngOnDestroy() {
-    this.routeSub?.unsubscribe();
-    this.retornoSub?.unsubscribe();
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
+    this.appUrlListener?.remove();
   }
 
   private actualizarPlanDesdeUrl() {
@@ -113,9 +116,9 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
     }
   }
 
-  // =========================================================
-  // 🌐 FLUJO WEB (SDK JS de PayPal, sin cambios)
-  // =========================================================
+  // ===========================================================
+  // 🌐 FLUJO WEB (navegador de escritorio/móvil, sin Capacitor)
+  // ===========================================================
 
   private cargarSdkPaypal(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -188,68 +191,61 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
     this.sdkListo = true;
   }
 
-  // =========================================================
-  // 📱 FLUJO NATIVO (Android/iOS): navegador del sistema + deep link
-  // =========================================================
+  // ===========================================================
+  // 📱 FLUJO NATIVO (Android/iOS vía Capacitor)
+  // ===========================================================
 
+  /** Llamado desde el botón "Pagar con PayPal" cuando esNativo === true */
   async pagarNativo() {
-    if (this.pagandoNativo) {
+    if (!environment.paypalCheckoutUrl) {
+      await this.mostrarError('Falta configurar la URL de checkout (PAYPAL_CHECKOUT_URL).');
       return;
     }
-    this.pagandoNativo = true;
 
-    const loading = await this.loadingCtrl.create({ message: 'Conectando con PayPal...' });
-    await loading.present();
+    const url = `${environment.paypalCheckoutUrl}` +
+      `?plan=${encodeURIComponent(this.planKey)}` +
+      `&nombre=${encodeURIComponent(this.plan.nombre)}` +
+      `&amount=${encodeURIComponent(this.precioCalculadoUSD)}` +
+      `&currency=${encodeURIComponent(environment.paypalCurrency)}` +
+      `&scheme=${encodeURIComponent(environment.appUrlScheme)}`;
 
-    try {
-      const approveUrl = await this.paypalNativeService.crearOrden(
-        this.planKey,
-        this.precioCalculadoUSD,
-        environment.paypalCurrency
-      );
-      await loading.dismiss();
-      await Browser.open({ url: approveUrl });
-    } catch (err) {
-      console.error('[PagosPage] Error creando orden nativa:', err);
-      await loading.dismiss();
-      await this.mostrarError('No se pudo iniciar el pago con PayPal.');
-    } finally {
-      this.pagandoNativo = false;
-    }
+    await Browser.open({ url, presentationStyle: 'popover' });
   }
 
-  private async manejarRetornoNativo(evento: RetornoPaypal) {
-    if (evento.status === 'cancel') {
-      return; // el usuario canceló en PayPal, no hacemos nada
-    }
-
-    if (!evento.orderId) {
-      await this.mostrarError('PayPal no devolvió un identificador de orden.');
-      return;
-    }
-
-    const loading = await this.loadingCtrl.create({ message: 'Confirmando tu pago...' });
-    await loading.present();
-
-    try {
-      const captura = await this.paypalNativeService.capturarOrden(evento.orderId);
-      await loading.dismiss();
-
-      if (captura.status === 'COMPLETED') {
-        await this.finalizarPago(captura.orderId);
-      } else {
-        await this.mostrarError('El pago no se completó.');
+  private registrarListenerRetorno() {
+    App.addListener('appUrlOpen', (data: URLOpenListenerEvent) => {
+      if (!data?.url?.startsWith(`${environment.appUrlScheme}://payment-return`)) {
+        return;
       }
-    } catch (err) {
-      console.error('[PagosPage] Error capturando orden nativa:', err);
-      await loading.dismiss();
-      await this.mostrarError('Ocurrió un problema confirmando el pago.');
-    }
+
+      Browser.close().catch(() => { /* puede que ya esté cerrado */ });
+
+      const queryString = data.url.split('?')[1] ?? '';
+      const params = new URLSearchParams(queryString);
+      const status = params.get('status');
+      const orderId = params.get('orderId');
+      const planParam = params.get('plan') as PlanKey | null;
+
+      this.ngZone.run(async () => {
+        if (planParam && this.planes[planParam]) {
+          this.planKey = planParam;
+          this.plan = this.planes[planParam];
+        }
+
+        if (status === 'success' && orderId) {
+          await this.finalizarPago(orderId);
+        } else {
+          await this.mostrarError('El pago fue cancelado o no se completó.');
+        }
+      });
+    }).then((handle) => {
+      this.appUrlListener = handle;
+    });
   }
 
-  // =========================================================
+  // ===========================================================
   // ✅ COMÚN A AMBOS FLUJOS
-  // =========================================================
+  // ===========================================================
 
   private async finalizarPago(ordenId: string) {
     const loading = await this.loadingCtrl.create({ message: 'Activando tu suscripción...' });

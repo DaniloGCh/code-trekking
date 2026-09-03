@@ -24,7 +24,20 @@
 
     <div class="divider"></div>
 
-    <div class="paypal-wrapper">
+    <!-- 📱 Flujo nativo (Android/iOS): abre el checkout en el navegador del sistema -->
+    <div class="paypal-wrapper" *ngIf="esNativo">
+      <ion-button expand="block" color="warning" (click)="pagarNativo()">
+        <ion-icon slot="start" name="logo-paypal"></ion-icon>
+        Pagar con PayPal
+      </ion-button>
+      <p class="precio-nota" style="margin-top: 10px;">
+        Se abrirá el navegador para completar el pago de forma segura y volverás automáticamente a la app.
+      </p>
+    </div>
+
+    <!-- 🌐 Flujo web: botones inline del SDK de PayPal -->
+    <div class="paypal-wrapper" *ngIf="!esNativo">
+      <div id="paypal-button-container" [hidden]="!sdkListo"></div>
 
       <!-- 🌐 Flujo web: botones embebidos del SDK de PayPal -->
       <ng-container *ngIf="!esNativo">

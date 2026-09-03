@@ -72,5 +72,18 @@
 	</dict>
 	</array>
 
+	<!-- Deep link de retorno del checkout de PayPal (ver checkout-web/index.html) -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.codetrekking.paymentreturn</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>codetrekking</string>
+			</array>
+		</dict>
+	</array>
+
 </dict>
 </plist>
