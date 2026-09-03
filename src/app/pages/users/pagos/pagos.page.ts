@@ -4,9 +4,8 @@ import { AlertController, LoadingController, ViewWillEnter } from '@ionic/angula
 import { AuthService } from 'src/app/core/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
-
-import { Capacitor } from '@capacitor/core';
-import { App, URLOpenListenerEvent, PluginListenerHandle } from '@capacitor/app';
+import { App, URLOpenListenerEvent } from '@capacitor/app';
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 
 type PlanKey = 'mensual' | 'trimestral' | 'anual';
