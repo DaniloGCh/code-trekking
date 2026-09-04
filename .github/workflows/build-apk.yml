@@ -18,12 +18,12 @@ jobs:
         with:
           node-version: 22
 
-      # ☕ JDK 17 (Estándar de oro para Capacitor y Kotlin)
-      - name: Set up JDK 17
+    # ☕ JDK 21 (requerido por los plugins nativos de Capacitor 8.x)
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
