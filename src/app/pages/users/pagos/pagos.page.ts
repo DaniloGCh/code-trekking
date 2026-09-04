@@ -4,8 +4,9 @@ import { AlertController, LoadingController, ViewWillEnter } from '@ionic/angula
 import { AuthService } from 'src/app/core/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
-import { App, URLOpenListenerEvent } from '@capacitor/app';
+
 import { Capacitor, PluginListenerHandle } from '@capacitor/core';
+import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 
 type PlanKey = 'mensual' | 'trimestral' | 'anual';
@@ -29,7 +30,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private authService = inject(AuthService);
-  private paypalNativeService = inject(PaypalNativeService);
   private ngZone = inject(NgZone);
 
   private readonly TASA_CAMBIO_USD = 950;
@@ -65,7 +65,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       }
     });
 
-    // 🔹 En nativo, escuchamos el deep link de retorno del checkout de PayPal
     if (this.esNativo) {
       this.registrarListenerRetorno();
     }
@@ -74,7 +73,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   ionViewWillEnter() {
     this.actualizarPlanDesdeUrl();
 
-    // Si la SDK ya estaba cargada previamente (solo flujo web), renderiza de nuevo los botones
     if (!this.esNativo && (window as any).paypal) {
       this.renderBotonesPaypal();
     }
@@ -82,9 +80,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   ngAfterViewInit() {
     if (this.esNativo) {
-      // En nativo no cargamos el SDK dentro del WebView: PayPal necesita un
-      // contexto de navegador real (cookies/popups) que el WebView bloquea.
-      // El botón "Pagar con PayPal" del template llama a pagarNativo().
       this.sdkListo = true;
       return;
     }
@@ -115,10 +110,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       this.plan = this.planes[planParam];
     }
   }
-
-  // ===========================================================
-  // 🌐 FLUJO WEB (navegador de escritorio/móvil, sin Capacitor)
-  // ===========================================================
 
   private cargarSdkPaypal(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -191,10 +182,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
     this.sdkListo = true;
   }
 
-  // ===========================================================
-  // 📱 FLUJO NATIVO (Android/iOS vía Capacitor)
-  // ===========================================================
-
   /** Llamado desde el botón "Pagar con PayPal" cuando esNativo === true */
   async pagarNativo() {
     if (!environment.paypalCheckoutUrl) {
@@ -242,10 +229,6 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       this.appUrlListener = handle;
     });
   }
-
-  // ===========================================================
-  // ✅ COMÚN A AMBOS FLUJOS
-  // ===========================================================
 
   private async finalizarPago(ordenId: string) {
     const loading = await this.loadingCtrl.create({ message: 'Activando tu suscripción...' });
