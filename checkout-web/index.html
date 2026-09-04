@@ -5,60 +5,142 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Code-Trekking · Pago</title>
   <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #121212;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      color: #ffffff;
-      padding: 16px;
-    }
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 28px 20px;
-      text-align: center;
-    }
-    .badge {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 12px;
-      border-radius: 50%;
-      background: rgba(255, 196, 9, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-    }
-    h1 { font-size: 1.25rem; margin: 0 0 4px; }
-    .precio { font-size: 1.1rem; color: #ffd60a; margin: 0 0 4px; font-weight: 700; }
-    .nota { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 0 0 20px; }
-    #paypal-button-container { min-height: 45px; }
-    .estado { font-size: 0.85rem; margin-top: 16px; color: rgba(255,255,255,0.7); }
-    .error-box { display: none; margin-top: 16px; color: #ff6b6b; font-size: 0.85rem; }
-    .volver {
-      display: inline-block;
-      margin-top: 18px;
-      color: rgba(255,255,255,0.55);
-      font-size: 0.8rem;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-    .spinner {
-      width: 22px; height: 22px; margin: 10px auto 0;
-      border: 3px solid rgba(255,255,255,0.15);
-      border-top-color: #ffd60a;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+* { 
+  box-sizing: border-box; /* Incluye rellenos y bordes en el cálculo de dimensiones de todos los elementos */
+}
+
+body {
+  margin: 0; /* Elimina los márgenes predeterminados del navegador */
+  min-height: 100vh; /* Asegura que el cuerpo de la página cubra el 100% del alto de la pantalla */
+  display: flex; /* Habilita el modelo Flexbox para la maquetación */
+  align-items: center; /* Centra el contenido verticalmente */
+  justify-content: center; /* Centra el contenido horizontalmente */
+  background: #121212; /* Fondo de pantalla oscuro profundo */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; /* Tipografía limpia y nativa del sistema */
+  color: #ffffff; /* Color principal del texto en blanco */
+  padding: 16px; /* Relleno externo para evitar que la tarjeta toque los bordes en pantallas móviles */
+}
+
+/* ==========================================================================
+   💳 TARJETA PRINCIPAL (GLASSMORPHISM)
+   ========================================================================== */
+.card {
+  width: 100%; /* Ajuste responsivo al 100% del ancho disponible */
+  max-width: 420px; /* Límite de ancho para mantener proporción de tarjeta en pantallas grandes */
+  background: rgba(23, 27, 34, 0.85); /* Fondo oscuro semitransparente estilo cristal */
+  backdrop-filter: blur(16px); /* Aplica el filtro de desenfoque al fondo translúcido */
+  -webkit-backdrop-filter: blur(16px); /* Compatibilidad del filtro de desenfoque en navegadores Safari */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Borde sutil brillante translúcido */
+  border-radius: 20px; /* Esquinas redondeadas y suavizadas */
+  padding: 32px 24px; /* Relleno interno amplio para dar espacio a los componentes */
+  text-align: center; /* Centra todo el texto de la tarjeta */
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); /* Sombra difuminada para elevar la tarjeta visualmente */
+}
+
+/* ==========================================================================
+   ⭐ BADGE E ICONO DE PLAN
+   ========================================================================== */
+.badge {
+  width: 56px; /* Ancho fijo del contenedor del icono */
+  height: 56px; /* Altura fija del contenedor del icono */
+  margin: 0 auto 16px; /* Centrado horizontal con 16px de margen inferior */
+  border-radius: 50%; /* Transforma el contenedor en un círculo perfecto */
+  background: rgba(255, 196, 9, 0.12); /* Fondo suave con tinte amarillo */
+  display: flex; /* Flexbox para alineación interna */
+  align-items: center; /* Centrado vertical del icono/emoji */
+  justify-content: center; /* Centrado horizontal del icono/emoji */
+  font-size: 28px; /* Tamaño del icono/emoji de estrella */
+}
+
+/* ==========================================================================
+   📌 ENCABEZADOS Y TEXTOS DEL PLAN
+   ========================================================================== */
+h1 { 
+  font-size: 1.5rem; /* Tamaño de texto para el título del plan */
+  font-weight: 800; /* Negrita pronunciada */
+  margin: 0 0 6px; /* Margen inferior estrecho de 6px */
+  color: #ffffff; /* Texto brillante en blanco */
+}
+
+.precio { 
+  font-size: 1.85rem; /* Tamaño amplio de texto para la cifra de precio */
+  color: #3880ff; /* Color de realce amarillo neón */
+  margin: 0 0 8px; /* Margen inferior de 8px */
+  font-weight: 900; /* Negrita de máximo grosor para destacar el monto */
+}
+
+.nota { 
+  font-size: 0.8rem; /* Tamaño de fuente secundario para aclaraciones */
+  color: #94a3b8; /* Tono de texto gris moderado */
+  margin: 0 0 24px; /* Espaciado antes del contenedor del SDK */
+  line-height: 1.4; /* Interlineado confortable para facilitar lectura */
+}
+
+/* ==========================================================================
+   🟡 CONTENEDOR DE PAYPAL
+   ========================================================================== */
+#paypal-button-container {
+  width: 100%; /* Ajusta el contenedor de PayPal al ancho disponible */
+  min-height: 150px; /* Define una altura mínima reservada mientras carga */
+  margin-top: 10px; /* Margen superior ligero */
+}
+
+/* ==========================================================================
+   🔄 CARGADOR (SPINNER ANIMADO)
+   ========================================================================== */
+.spinner {
+  width: 36px; /* Ancho del spinner de carga */
+  height: 36px; /* Altura del spinner de carga */
+  margin: 20px auto; /* Centrado horizontal con márgenes verticales */
+  border: 3px solid rgba(255, 196, 9, 0.15); /* Pista circular del cargador */
+  border-top-color: #ffc409; /* Parte activa del anillo de carga en color amarillo */
+  border-radius: 50%; /* Transforma en círculo */
+  animation: spin 0.8s linear infinite; /* Aplica la animación de rotación continua */
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); } /* Animación que realiza un giro completo de 360° */
+}
+
+/* ==========================================================================
+   ⚠️ ALERTAS Y ESTADOS DE NOTIFICACIÓN
+   ========================================================================== */
+.estado { 
+  font-size: 0.85rem; /* Tamaño de fuente para mensajes de progreso o estado */
+  margin-top: 16px; /* Separación superior de 16px */
+  color: #e2e8f0; /* Color gris suave legible */
+}
+
+.error-box { 
+  display: none; /* Oculto por defecto hasta que un evento de JS lo active */
+  padding: 14px 16px; /* Relleno interno para dar apariencia de tarjeta informativa */
+  background: rgba(235, 68, 90, 0.1); /* Fondo translúcido de color rojo tenue */
+  border: 1px solid rgba(235, 68, 90, 0.3); /* Borde rojizo claro */
+  border-radius: 12px; /* Redondeado de esquinas */
+  color: #ff6b6b; /* Texto en color rojo vibrante para alertas */
+  font-size: 0.85rem; /* Tamaño de texto de la alerta */
+  line-height: 1.4; /* Interlineado legible */
+  margin-top: 16px; /* Separación superior de 16px */
+}
+
+/* ==========================================================================
+   🔙 ENLACE VOLVER
+   ========================================================================== */
+.volver {
+  display: inline-block; /* Convierte en bloque en línea para habilitar efectos de transformación */
+  margin-top: 20px; /* Margen superior amplio */
+  color: #94a3b8; /* Color gris atenuado */
+  font-size: 0.85rem; /* Tamaño de fuente secundario */
+  font-weight: 600; /* Peso de texto seminegrita */
+  text-decoration: none; /* Elimina la línea de subrayado estática por defecto */
+  transition: all 0.2s ease; /* Transición suave al pasar el cursor o pulsar */
+  cursor: pointer; /* Cambia el cursor al formato de puntero al ponerse encima */
+}
+
+.volver:hover {
+  color: #ffffff; /* Transición a texto blanco brillante durante hover */
+  text-decoration: underline; /* Añade subrayado dinámico durante hover */
+}
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -67,7 +149,7 @@
     <div class="badge">⭐</div>
     <h1 id="plan-nombre">Plan</h1>
     <p class="precio" id="plan-precio">$0 USD</p>
-    <p class="nota">Cobro procesado a través de PayPal (sandbox)</p>
+    <p class="nota">Cobro procesado a través de PayPal</p>
 
     <div id="paypal-button-container"></div>
     <div class="spinner" id="spinner"></div>

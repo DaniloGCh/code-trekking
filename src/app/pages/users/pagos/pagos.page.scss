@@ -1,3 +1,7 @@
+* { 
+  box-sizing: border-box; /* Incluye rellenos y bordes en el cálculo de dimensiones de todos los elementos */
+}
+
 .checkout-container {
   --background: var(--ion-background-color, #121212);
 }
