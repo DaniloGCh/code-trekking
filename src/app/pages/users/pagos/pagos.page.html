@@ -39,19 +39,7 @@
     <div class="paypal-wrapper" *ngIf="!esNativo">
       <div id="paypal-button-container" [hidden]="!sdkListo"></div>
 
-      <!-- 🌐 Flujo web: botones embebidos del SDK de PayPal -->
-      <ng-container *ngIf="!esNativo">
-        <div id="paypal-button-container" [hidden]="!sdkListo"></div>
-        <ion-spinner *ngIf="!sdkListo && !errorSdk" name="crescent" color="primary" class="spinner-carga"></ion-spinner>
-      </ng-container>
-
-      <!-- 📱 Flujo nativo (Android/iOS): abre PayPal en el navegador del sistema -->
-      <ng-container *ngIf="esNativo">
-        <ion-button expand="block" color="warning" [disabled]="pagandoNativo" (click)="pagarNativo()">
-          <ion-icon slot="start" name="logo-paypal"></ion-icon>
-          {{ pagandoNativo ? 'Conectando...' : 'Pagar con PayPal' }}
-        </ion-button>
-      </ng-container>
+      <ion-spinner *ngIf="!sdkListo && !errorSdk" name="crescent" color="primary" class="spinner-carga"></ion-spinner>
 
       <div *ngIf="errorSdk" class="error-box ion-text-center">
         <ion-icon name="alert-circle-outline" color="danger"></ion-icon>

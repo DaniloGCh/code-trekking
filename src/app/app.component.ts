@@ -1,12 +1,10 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { App, URLOpenListenerEvent } from '@capacitor/app';
-import { Browser } from '@capacitor/browser';
+import { App } from '@capacitor/app';
 import { Router } from '@angular/router';
 
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 import { TimeService } from 'src/app/core/services/time.service';
-import { PaypalNativeService, PlanKey } from 'src/app/core/services/paypal-native.service';
 
 @Component({
   selector: 'app-root',
@@ -18,14 +16,11 @@ export class AppComponent
   implements OnInit, OnDestroy {
 
   private backButtonListener: any;
-  private appUrlListener: any;
 
   constructor(
     private weatherGlobal: WeatherGlobalService,
     private timeService: TimeService,
-    private router: Router,
-    private zone: NgZone,
-    private paypalNativeService: PaypalNativeService
+    private router: Router
   ) {}
 
 
@@ -54,35 +49,6 @@ export class AppComponent
       }
     }
   );
-
-  // 💳 Retorno del checkout de PayPal (Android/iOS) vía deep link codetrekking://
-  this.appUrlListener = await App.addListener(
-    'appUrlOpen',
-    (event: URLOpenListenerEvent) => {
-      this.zone.run(async () => {
-        let url: URL;
-        try {
-          url = new URL(event.url);
-        } catch {
-          return;
-        }
-
-        if (url.protocol !== 'codetrekking:') {
-          return; // no es un link nuestro, lo ignoramos
-        }
-
-        await Browser.close();
-
-        if (url.hostname === 'payment-success') {
-          const orderId = url.searchParams.get('token') ?? undefined;
-          const planKey = (url.searchParams.get('plan') ?? undefined) as PlanKey | undefined;
-          this.paypalNativeService.notificarRetorno({ status: 'success', orderId, planKey });
-        } else if (url.hostname === 'payment-cancel') {
-          this.paypalNativeService.notificarRetorno({ status: 'cancel' });
-        }
-      });
-    }
-  );
 }
 
 
@@ -97,9 +63,6 @@ export class AppComponent
 
 
     await this.backButtonListener
-      ?.remove();
-
-    await this.appUrlListener
       ?.remove();
   }
 
