@@ -66,27 +66,42 @@ script.onload = () => {
       document.getElementById('estado').textContent = 'Confirmando pago...';
 
       // El pago ya quedó aprobado en este punto (PayPal ya movió el dinero).
-      // No dependemos de que capture() resuelva para volver a la app: si tarda
-      // más de 4s o se cuelga (algo que puede pasar en el navegador in-app),
-      // volvemos igual usando el orderID que el SDK ya nos entrega aquí.
-      let yaVolvio = false;
-      const volverConExito = (origen) => {
-        logDebug(`Volviendo a la app (origen: ${origen}).`); // 🐞 DEBUG TEMPORAL — borrar esta línea
-        if (yaVolvio) return;
-        yaVolvio = true;
+      // No dependemos de que capture() resuelva para mostrar el botón de
+      // retorno: si tarda más de 4s o se cuelga, lo mostramos igual usando
+      // el orderID que el SDK ya nos entrega aquí.
+      let yaMostrado = false;
+      const mostrarBotonRetorno = (origen) => {
+        logDebug(`Mostrando botón de retorno (origen: ${origen}).`); // 🐞 DEBUG TEMPORAL — borrar esta línea
+        if (yaMostrado) return;
+        yaMostrado = true;
+
+        // Intento automático: puede funcionar en algunos navegadores/versiones,
+        // pero Chrome suele bloquear la navegación a un esquema personalizado
+        // (codetrekking://) si no viene de un toque directo del usuario.
         irApp('success', data.orderID);
+
+        // Camino garantizado: un botón visible que el usuario toca. Un tap
+        // real siempre cuenta como gesto del usuario, así que esto sí abre
+        // la app aunque el intento automático de arriba haya sido bloqueado.
+        document.getElementById('estado').textContent = 'Pago aprobado.';
+        const boton = document.getElementById('btn-volver-exito');
+        boton.style.display = 'block';
+        boton.onclick = () => {
+          logDebug('Botón de retorno tocado por el usuario.'); // 🐞 DEBUG TEMPORAL — borrar esta línea
+          irApp('success', data.orderID);
+        };
       };
 
-      const timeoutFallback = setTimeout(() => volverConExito('timeout 4s'), 4000);
+      const timeoutFallback = setTimeout(() => mostrarBotonRetorno('timeout 4s'), 4000);
 
       return actions.order.capture().then(() => {
         clearTimeout(timeoutFallback);
-        volverConExito('capture resuelto');
+        mostrarBotonRetorno('capture resuelto');
       }).catch((err) => {
         clearTimeout(timeoutFallback);
         logDebug(`capture() rechazado: ${err && err.message ? err.message : err}`); // 🐞 DEBUG TEMPORAL — borrar esta línea
         console.error('Error al capturar la orden (el pago puede haberse aprobado igual):', err);
-        volverConExito('capture rechazado');
+        mostrarBotonRetorno('capture rechazado');
       });
     },
 
