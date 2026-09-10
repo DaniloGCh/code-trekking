@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, NgZone, EnvironmentInjector, runInInjectionContext, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, NgZone, EnvironmentInjector, runInInjectionContext, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService, UserData, SuscripcionData } from 'src/app/core/services/auth.service';
 import { GaleriaFotosService, FotoGaleria } from 'src/app/core/services/galeria-fotos.service';
@@ -26,6 +26,7 @@ export class GaleriaPage implements OnInit, OnDestroy {
   private ngZone = inject(NgZone);
   private injector = inject(EnvironmentInjector);
   private cdr = inject(ChangeDetectorRef);
+    @ViewChild('swiperVisor') swiperVisorRef?: ElementRef;
 
   userData: UserData | null = null;
   suscripcionActiva = false;
@@ -42,6 +43,10 @@ export class GaleriaPage implements OnInit, OnDestroy {
   mostrarVisor = false;
   fotoInicialIndex = 0;
   currentVisorIndex = 0;
+
+
+  visorListo = false;
+  
 
   selectionMode = false;
   fotosSeleccionadas = new Set<string>();
@@ -249,11 +254,44 @@ export class GaleriaPage implements OnInit, OnDestroy {
   abrirFoto(index: number) {
     this.fotoInicialIndex = index;
     this.currentVisorIndex = index;
+    this.visorListo = false;
     this.mostrarVisor = true;
   }
 
   cerrarVisor() {
     this.mostrarVisor = false;
+  }
+  onVisorPresentado() {
+    this.posicionarSwiper();
+  }
+
+  /**
+   * El swiper puede tardar un instante en inicializarse internamente después
+   * de que el modal termina de presentarse (varía de una apertura a otra).
+   * Reintentamos brevemente hasta lograr posicionarlo antes de mostrarlo;
+   * si tras varios intentos no se pudo, lo mostramos igual para no dejarlo
+   * oculto para siempre.
+   */
+  private posicionarSwiper(intentosRestantes = 6) {
+    const swiperEl: any = this.swiperVisorRef?.nativeElement;
+
+    if (swiperEl?.swiper) {
+      swiperEl.swiper.slideTo(this.fotoInicialIndex, 0);
+      this.ngZone.run(() => {
+        this.visorListo = true;
+        this.cdr.detectChanges();
+      });
+      return;
+    }
+
+    if (intentosRestantes > 0) {
+      setTimeout(() => this.posicionarSwiper(intentosRestantes - 1), 30);
+    } else {
+      this.ngZone.run(() => {
+        this.visorListo = true;
+        this.cdr.detectChanges();
+      });
+    }
   }
 
   onSlideChange(event: any) {

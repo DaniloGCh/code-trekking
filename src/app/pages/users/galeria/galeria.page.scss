@@ -192,7 +192,15 @@ ion-accordion ion-button {
 }
 
 
+// 🖼️ Oculta el visor hasta que el swiper ya esté posicionado en la foto
+// correcta, para evitar el salto visual desde la primera foto.
+.visor-oculto {
+  opacity: 0;
+}
 
+swiper-container {
+  transition: opacity 0.10s ease;
+}
 
 
 

@@ -286,7 +286,7 @@
 <!-- ========================= -->
 <!-- 🖼️ VISOR A PANTALLA COMPLETA (deslizable) -->
 <!-- ========================= -->
-<ion-modal [isOpen]="mostrarVisor" (didDismiss)="cerrarVisor()" class="visor-modal">
+<ion-modal [isOpen]="mostrarVisor" (didPresent)="onVisorPresentado()" (didDismiss)="cerrarVisor()" class="visor-modal">
   <ng-template>
     <ion-header>
       <ion-toolbar class="transparent-toolbar">
@@ -303,7 +303,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content class="visor-content">
-      <swiper-container *ngIf="mostrarVisor" [initial-slide]="fotoInicialIndex" zoom="true" (swiperslidechange)="onSlideChange($event)">
+      <swiper-container #swiperVisor *ngIf="mostrarVisor" [class.visor-oculto]="!visorListo" zoom="true" (swiperslidechange)="onSlideChange($event)">
         <swiper-slide *ngFor="let foto of fotos">
           <div class="swiper-zoom-container">
             <img [src]="foto.imageUrl" alt="foto" />
