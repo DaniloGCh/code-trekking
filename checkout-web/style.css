@@ -157,35 +157,3 @@ h1 {
   50% { box-shadow: 0 0 0 8px rgba(255, 196, 9, 0); }
 }
 
-
-/* ==========================================================================
-   🐞 DEBUG TEMPORAL — borrar este bloque completo cuando ya no se necesite
-   ========================================================================== */
-.debug-box {
-  width: 100%;
-  max-width: 420px;
-  margin-top: 12px;
-  padding: 10px 12px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px dashed rgba(255, 196, 9, 0.5);
-  border-radius: 10px;
-  font-family: monospace;
-  font-size: 0.7rem;
-  color: #ffc409;
-  text-align: left;
-  max-height: 160px;
-  overflow-y: auto;
-}
-
-.debug-box strong {
-  display: block;
-  margin-bottom: 4px;
-  color: #ffffff;
-}
-
-.debug-box div {
-  white-space: pre-wrap;
-  word-break: break-all;
-  line-height: 1.4;
-}
-/* 🐞 FIN DEBUG TEMPORAL */
