@@ -135,7 +135,27 @@ h1 {
   text-decoration: underline; /* Añade subrayado dinámico durante hover */
 }
 
+/* ==========================================================================
+   ✅ BOTÓN DE RETORNO MANUAL (tras aprobar el pago)
+   ========================================================================== */
+.btn-volver-exito {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: #ffc409;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  animation: pulse 1.4s ease-in-out infinite;
+}
 
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 196, 9, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(255, 196, 9, 0); }
+}
 
 
 /* ==========================================================================
