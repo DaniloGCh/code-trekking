@@ -34,11 +34,9 @@ const generateEnvFile = (isProduction: boolean) => `export const environment = {
 // 2. Generar environment.ts
 writeFile(targetPathDev, generateEnvFile(false), (err: any) => {
   if (err) console.error('Error generando environment.ts:', err);
-  else console.log('✅ Archivo environment.ts generado con éxito');
 });
 
 // 3. Generar environment.prod.ts
 writeFile(targetPathProd, generateEnvFile(true), (err: any) => {
   if (err) console.error('Error generando environment.prod.ts:', err);
-  else console.log('✅ Archivo environment.prod.ts generado con éxito');
 });

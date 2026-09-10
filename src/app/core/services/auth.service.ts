@@ -387,7 +387,7 @@ export class AuthService {
     return isNaN(dateObj.getTime()) ? null : dateObj;
   }
 
-  // 🔹 Función modificada para sumar tiempo acumulativo y montos
+  // 🔹 Función para sumar tiempo acumulativo y montos
   async activarSuscripcion(
     plan: 'mensual' | 'trimestral' | 'anual',
     ordenId: string
