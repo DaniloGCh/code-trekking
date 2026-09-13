@@ -7,10 +7,9 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { Auth } from '@angular/fire/auth';
 
-// ✅ Importa e inyecta SecurityService
+// ✅ Servicios adicionales inyectados
 import { SecurityService } from 'src/app/core/services/security.service';
-
-
+import { AuthService, UserData } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-mapa',
@@ -24,8 +23,21 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
-  private auth = inject(Auth); // ✅ Para verificar sesión
+  private auth = inject(Auth); 
   private security = inject(SecurityService);
+  private authService = inject(AuthService);
+
+  // =========================
+  // 👤 USUARIO & AUTH STATE
+  // =========================
+  userData: UserData | null = null;
+  private authSub?: Subscription;
+
+  // =========================
+  // 🧭 CONTROL HEADER OCULTO AL SCROLL
+  // =========================
+  isHeaderHidden = false;
+  private lastScrollTop = 0;
 
   // =========================
   // 🗺️ MAPA
@@ -64,7 +76,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   get coordenadasFormateadas(): string {
     const pos = this.estado.posicionActual;
     if (!pos) return 'Sin señal GPS';
-    // ✅ Mostrar solo 4 decimales por privacidad (~11m de precisión)
     return `${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)}`;
   }
 
@@ -79,9 +90,24 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   perfilRuta: 'hike' | 'foot' | 'car' = 'hike';
   instrucciones: { instruccion: string; distancia: string }[] = [];
 
-
-  // ✅ Límite de puntos en ruta para evitar abuso de API
   private readonly MAX_PUNTOS_RUTA = 2;
+
+  // =========================
+  // 📜 EVENTO SCROLL
+  // =========================
+  onScroll(event: any) {
+    const scrollTop = event.detail.scrollTop;
+
+    // Si baja más de 30px oculta el header
+    if (scrollTop > this.lastScrollTop && scrollTop > 30) {
+      this.isHeaderHidden = true;
+    } else if (scrollTop < this.lastScrollTop) {
+      // Si sube vuelve a mostrarlo
+      this.isHeaderHidden = false;
+    }
+
+    this.lastScrollTop = scrollTop;
+  }
 
   // =========================
   // 🚀 INIT
@@ -92,9 +118,17 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       return;
     }
 
+    this.authSub = this.authService.currentUser$.subscribe(async user => {
+      if (user) {
+        this.userData = await this.authService.getCurrentUserData();
+      } else {
+        this.userData = null;
+      }
+    });
+
     setTimeout(() => {
       this.initMap();
-      this.trackingService.iniciarWatcherPosicion(); // ✅ Ya usa BackgroundGeolocation
+      this.trackingService.iniciarWatcherPosicion();
       this.suscribirseAlEstado();
     }, 300);
   }
@@ -170,7 +204,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       if (estado.posicionActual) {
         const { lat, lng } = estado.posicionActual;
 
-        // ✅ Validar coordenadas antes de usar
         if (!this.security.isValidCoordinates(lat, lng)) return;
 
         if (!this.userMarker) {
@@ -260,60 +293,29 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     await alert.present();
   }
 
-  // ✅ Exportar GPX con advertencia de privacidad
   async exportGPX() {
     if (this.routePoints.length === 0) {
-      await this.showToast(
-        'No hay puntos de ruta para exportar',
-        'warning'
-      );
+      await this.showToast('No hay puntos de ruta para exportar', 'warning');
       return;
     }
 
     const alert = await this.alertCtrl.create({
       header: '⚠️ Privacidad',
-
-      message:
-        'El archivo GPX contendrá tus coordenadas GPS exactas. ¿Deseas continuar?',
-
+      message: 'El archivo GPX contendrá tus coordenadas GPS exactas. ¿Deseas continuar?',
       buttons: [
-
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Exportar',
-
           handler: async () => {
-
             try {
-
               await this.trackingService.exportarGPX();
-
-              await this.showToast(
-                'GPX generado correctamente',
-                'success'
-              );
-
+              await this.showToast('GPX generado correctamente', 'success');
             } catch (error) {
-
-              console.error(
-                '❌ Error exportando GPX:',
-                error
-              );
-
-              await this.showToast(
-                'No se pudo exportar la ruta',
-                'danger'
-              );
-
+              console.error('❌ Error exportando GPX:', error);
+              await this.showToast('No se pudo exportar la ruta', 'danger');
             }
-
           }
         }
-
       ]
     });
 
@@ -350,7 +352,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
 
     const punto = e.latlng;
 
-    // ✅ Validar coordenadas del click
     if (!this.security.isValidCoordinates(punto.lat, punto.lng)) {
       this.showToast('Coordenadas inválidas', 'danger');
       return;
@@ -380,7 +381,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // ✅ Validar coordenadas antes de usar
     if (!this.security.isValidCoordinates(pos.lat, pos.lng)) {
       await this.showToast('Coordenadas GPS inválidas', 'danger');
       return;
@@ -401,8 +401,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   private async trazarRuta(origen: L.LatLng, destino: L.LatLng) {
-
-    // ✅ Validar ambos puntos antes de llamar a la API
     if (!this.security.isValidCoordinates(origen.lat, origen.lng) ||
       !this.security.isValidCoordinates(destino.lat, destino.lng)) {
       await this.showToast('Coordenadas inválidas para trazar ruta', 'danger');
@@ -410,7 +408,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // ✅ Verificar que los puntos no sean el mismo
     if (origen.lat === destino.lat && origen.lng === destino.lng) {
       await this.showToast('El origen y destino no pueden ser el mismo punto', 'warning');
       this.limpiarRutaTrazada();
@@ -435,7 +432,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     }
 
     try {
-      // ✅ Verificar que la API key existe
       if (!environment.orsKey) {
         await this.showToast('Servicio de rutas no disponible', 'danger');
         return;
@@ -448,7 +444,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
         `&end=${destino.lng},${destino.lat}`
       );
 
-      // ✅ Verificar respuesta HTTP
       if (!response.ok) {
         throw new Error(`HTTP error: ${response.status}`);
       }
@@ -471,7 +466,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
       const coordenadas = feature.geometry.coordinates;
       const resumen = feature.properties.summary;
 
-      // ✅ Validar coordenadas de la respuesta
       const latLngs: L.LatLng[] = coordenadas
         .filter((c: number[]) => this.security.isValidCoordinates(c[1], c[0]))
         .map((c: number[]) => L.latLng(c[1], c[0]));
@@ -605,9 +599,6 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     });
   }
 
-  // =========================
-  // 🍞 TOAST
-  // =========================
   private async showToast(message: string, color: string = 'success') {
     const toast = await this.toastCtrl.create({
       message,
@@ -619,19 +610,42 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   }
 
   // =========================
-  // 🧭 NAVEGACIÓN
+  // 🧭 ACCIONES DE NAVEGACIÓN Y AUTH
   // =========================
   goHome() {
     this.router.navigateByUrl('/tabs/home');
   }
 
+  goProfile() {
+    this.router.navigateByUrl('/profile');
+  }
+
+  async onLogout() {
+    const alert = await this.alertCtrl.create({
+      header: 'Cerrar sesión',
+      message: '¿Estás seguro que deseas cerrar sesión?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Cerrar sesión',
+          role: 'confirm',
+          handler: async () => {
+            await this.authService.logout();
+            this.router.navigateByUrl('/login', { replaceUrl: true });
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   // =========================
   // 🧹 DESTROY
   // =========================
-  // ✅ Actualiza ngOnDestroy para usar async
   async ngOnDestroy() {
     this.trackingSub?.unsubscribe();
-    await this.trackingService.detenerWatcherPosicion(); // ✅ Limpia correctamente
+    this.authSub?.unsubscribe();
+    await this.trackingService.detenerWatcherPosicion();
     if (this.map) this.map.remove();
   }
 }

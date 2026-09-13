@@ -1,11 +1,44 @@
 /* ==========================================================================
-   🗺️ CONTENEDOR PRINCIPAL DEL MAPA
+   🗺️ CONTENEDOR PRINCIPAL DEL MAPA Y FUENTES
    ========================================================================== */
 ion-content {
   --background: #0a0c10; /* Establece el fondo oscuro base del contenedor Ionic mientras carga el mapa */
   font-family: 'Lexend', sans-serif; /* Define la tipografía 'Lexend' como la fuente principal */
 }
 
+/* ==========================================================================
+   🧭 HEADER Y BARRA DE NAVEGACIÓN (NUEVO - Agregado desde Home)
+   ========================================================================== */
+ion-header {
+  transition: transform 0.3s ease-in-out;
+}
+
+ion-header.hidden {
+  transform: translateY(-100%);
+}
+
+ion-toolbar.transparent-toolbar {
+  --background: #0a0c10; /* Fondo totalmente sólido para la barra */
+  --color: rgb(0, 248, 103); /* Color neón para títulos/letras */
+}
+
+/* Grosor del título del header */
+ion-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1rem;
+}
+
+/* Estilo y color de los botones de la derecha (Perfil, Dashboard, Logout) */
+ion-buttons ion-button {
+  --color: rgb(0, 248, 103); /* Color neón para los iconos del header */
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   🗺️ CONTENEDOR Y LIENZO DEL MAPA
+   ========================================================================== */
 .map-container {
   position: relative; /* Define una base de posicionamiento relativo para alinear los controles flotantes hijos */
   width: 100%; /* Ocupa el 100% del ancho disponible en la pantalla */
@@ -30,22 +63,21 @@ ion-content {
   --border-radius: 50%; /* Hace que el botón sea completamente circular */
   width: 46px; /* Define el ancho del botón en 46 píxeles */
   height: 46px; /* Define el alto del botón en 46 píxeles */
-
   margin: 0; /* Elimina cualquier margen externo asignado por defecto */
 }
 
 /* ==========================================================================
-   🗺️ SELECTOR FLOTANTE TIPO DE MAPA (ACCORDION DE ICONOS)
+   🗺️ SELECTOR FLOTANTE TIPO DE MAPA (ACCORDION DE ICONOS) - CORREGIDO
    ========================================================================== */
 .map-type-selector {
-  position: absolute; /* Posiciona el selector de tipo de mapa de forma absoluta */
-  top: 16px; /* Lo sitúa a 16 píxeles desde la parte superior del mapa */
-  right: 16px; /* Lo sitúa a 16 píxeles desde la esquina derecha del mapa */
-  z-index: 1000; /* Asegura que el selector flote por encima del visor del mapa */
-  display: flex; /* Activa el modelo de caja flexible */
-  flex-direction: column; /* Organiza los elementos desplegables verticalmente en columna */
-  align-items: flex-end; /* Alinea los botones al borde derecho */
-  gap: 6px; /* Añade una separación de 6 píxeles entre el botón disparador y las opciones */
+  position: absolute;
+  top: 65px ;
+  right: 16px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column-reverse; /* Hace que el desplegable abra hacia arriba para no tapar el botón inferior */
+  align-items: flex-end;
+  gap: 6px;
 }
 
 .map-type-toggle {
@@ -71,7 +103,6 @@ ion-content {
   border-radius: 12px; /* Bordes redondeados del contenedor desplegable */
   border: 2px solid rgba(255, 255, 255, 0.1); /* Borde fino decorativo */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); /* Sombra intensa para resaltar sobre el mapa */
-  backdrop-filter: blur(8px); /* Aplica un desenfoque de fondo estilo cristal esmerilado */
 }
 
 .map-type-options.visible {
@@ -174,7 +205,7 @@ ion-content {
 }
 
 /* ==========================================================================
-   🗺️ SECCIÓN Y CONTROL DE TRAZADO DE RUTAS
+   MAPA SECCIÓN Y CONTROL DE TRAZADO DE RUTAS
    ========================================================================== */
 .ruta-section {
   padding: 0 14px 24px 14px; /* Relleno inferior y lateral para no pegar al final de la pantalla */
@@ -290,3 +321,17 @@ ion-content {
   color: #94a3b8; /* Muestra datos secundarios como metros/kms en gris claro */
   font-size: 0.7rem; /* Texto secundario en tamaño reducido */
 }
+
+ion-header {
+  transition: transform 0.3s ease-in-out;
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+ion-header.hidden {
+  transform: translateY(-100%);
+}
+
