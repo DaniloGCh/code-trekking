@@ -7,7 +7,6 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { Auth } from '@angular/fire/auth';
 
-// ✅ Servicios adicionales inyectados
 import { SecurityService } from 'src/app/core/services/security.service';
 import { AuthService, UserData } from 'src/app/core/services/auth.service';
 
@@ -98,15 +97,27 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   onScroll(event: any) {
     const scrollTop = event.detail.scrollTop;
 
-    // Si baja más de 30px oculta el header
     if (scrollTop > this.lastScrollTop && scrollTop > 30) {
-      this.isHeaderHidden = true;
+      if (!this.isHeaderHidden) {
+        this.isHeaderHidden = true;
+        this.notificarRedimencionMapa();
+      }
     } else if (scrollTop < this.lastScrollTop) {
-      // Si sube vuelve a mostrarlo
-      this.isHeaderHidden = false;
+      if (this.isHeaderHidden) {
+        this.isHeaderHidden = false;
+        this.notificarRedimencionMapa();
+      }
     }
 
     this.lastScrollTop = scrollTop;
+  }
+
+  private notificarRedimencionMapa() {
+    setTimeout(() => {
+      if (this.map) {
+        this.map.invalidateSize();
+      }
+    }, 300);
   }
 
   // =========================
