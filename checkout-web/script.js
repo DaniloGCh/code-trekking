@@ -5,13 +5,31 @@
 // -----------------------------------------------------------------
 const DEFAULT_CLIENT_ID = 'BAAkG8JqKXqUzfnXl09GeQQLTolLDITfQ1Wz09QnQC1t9DOCfoykcXbJb5kyOUN5olr6iZ80W7zQgFppAA';
 
+// -----------------------------------------------------------------
+// 🔒 Precios oficiales por plan (misma fuente que
+// pagos.page.ts / auth.service.ts). El monto a cobrar NUNCA se toma
+// del query param `amount` de la URL, porque esta página se abre en
+// el navegador del sistema y cualquiera puede editar la barra de
+// direcciones antes de pagar. El único dato de confianza es `plan`,
+// y de ahí se recalcula el precio siempre en este script.
+// -----------------------------------------------------------------
+const TASA_CAMBIO_USD = 950;
+const PRECIOS_CLP = {
+  mensual: 4000,
+  trimestral: 13350,
+  anual: 39000
+};
+
 const params = new URLSearchParams(window.location.search);
-const plan = params.get('plan') || 'mensual';
+const planParam = params.get('plan') || 'mensual';
+const plan = Object.prototype.hasOwnProperty.call(PRECIOS_CLP, planParam) ? planParam : 'mensual';
 const nombre = params.get('nombre') || 'Plan';
-const amount = params.get('amount') || '0.00';
 const currency = params.get('currency') || 'USD';
 const scheme = params.get('scheme') || 'codetrekking';
 const clientId = params.get('client_id') || DEFAULT_CLIENT_ID;
+
+// Monto real a cobrar: SIEMPRE calculado desde PRECIOS_CLP, nunca desde la URL.
+const amount = (PRECIOS_CLP[plan] / TASA_CAMBIO_USD).toFixed(2);
 
 document.getElementById('plan-nombre').textContent = nombre;
 document.getElementById('plan-precio').textContent = `$${amount} ${currency}`;
@@ -19,7 +37,8 @@ document.getElementById('volver-link').href = `${scheme}://payment-return?status
 
 function irApp(status, orderId) {
   const url = `${scheme}://payment-return?status=${status}&plan=${encodeURIComponent(plan)}` +
-    (orderId ? `&orderId=${encodeURIComponent(orderId)}` : '');
+    (orderId ? `&orderId=${encodeURIComponent(orderId)}` : '') +
+    `&monto=${encodeURIComponent(amount)}`;
   window.location.href = url;
 }
 
