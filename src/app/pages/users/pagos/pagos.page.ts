@@ -41,9 +41,11 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
    */
   private tasaCLPxUSD = this.tipoCambioService.TASA_RESPALDO;
 
-  /** Tolerancia permitida al comparar el monto cobrado vs. el esperado,
-   *  ya que pagos.page.ts y checkout-web/script.js consultan la tasa de
-   *  cambio por separado y pueden obtener valores levemente distintos. */
+  /** Tolerancia mínima para absorber la diferencia entre dos consultas
+   *  independientes de tipo de cambio (pagos.page.ts y checkout-web
+   *  consultan la API por separado). NUNCA se usa para aceptar un pago
+   *  menor al esperado, solo para no rechazar por céntimos de diferencia
+   *  en el tipo de cambio. */
   private readonly TOLERANCIA_MONTO = 0.03; // 3%
 
   private routeSub?: Subscription;
@@ -51,7 +53,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   private readonly planes: Record<PlanKey, PlanInfo> = {
     mensual: { nombre: 'Plan Mensual', precioCLP: 4000, precioDisplay: '$4.000 CLP' },
-    trimestral: { nombre: 'Plan Trimestral (4 Meses)', precioCLP: 13350, precioDisplay: '$13.350 CLP' },
+    trimestral: { nombre: 'Plan Trimestral (3 Meses)', precioCLP: 10000, precioDisplay: '$10.000 CLP' },
     anual: { nombre: 'Plan Anual (12 Meses)', precioCLP: 39000, precioDisplay: '$39.000 CLP' }
   };
 
@@ -67,6 +69,41 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   get precioCalculadoUSD(): string {
     return (this.plan.precioCLP / this.tasaCLPxUSD).toFixed(2);
+  }
+
+  /**
+   * 🔒 Único punto de verdad para validar un pago: acepta el monto SOLO
+   * si es igual o mayor al precio esperado del plan indicado (con un
+   * margen mínimo para no rechazar por diferencias de céntimos entre dos
+   * consultas de tipo de cambio distintas). Si no hay monto para
+   * verificar, se rechaza por defecto (fail-closed) — nunca se activa
+   * una suscripción "a ciegas".
+   * Se usa igual para los 3 planes (mensual, trimestral, anual) y para
+   * los 2 flujos de pago (botón web embebido y retorno desde checkout-web).
+   */
+  private montoEsSuficiente(montoCapturado: string | number | null | undefined, planAVerificar: PlanKey): boolean {
+    if (montoCapturado === null || montoCapturado === undefined || montoCapturado === '') {
+      return false;
+    }
+    const recibido = typeof montoCapturado === 'number' ? montoCapturado : parseFloat(montoCapturado);
+    if (!isFinite(recibido)) {
+      return false;
+    }
+
+    const precioClp = this.planes[planAVerificar].precioCLP;
+    const esperado = precioClp / this.tasaCLPxUSD;
+    const minimoAceptado = esperado * (1 - this.TOLERANCIA_MONTO);
+
+    return recibido >= minimoAceptado;
+  }
+
+  /** Extrae el monto realmente capturado por PayPal desde la respuesta de order.capture(). */
+  private extraerMontoCapturado(orden: any): string | null {
+    try {
+      return orden?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value ?? null;
+    } catch {
+      return null;
+    }
   }
 
   ngOnInit() {
@@ -181,6 +218,16 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       onApprove: (_data: any, actions: any) => {
         return actions.order.capture().then((orden: any) => {
           this.ngZone.run(async () => {
+            const montoCapturado = this.extraerMontoCapturado(orden);
+            if (!this.montoEsSuficiente(montoCapturado, this.planKey)) {
+              console.error(
+                `[PagosPage] Monto capturado (${montoCapturado}) insuficiente para el plan ${this.planKey} (esperado >= ${this.precioCalculadoUSD}).`
+              );
+              await this.mostrarError(
+                'El monto pagado no cubre el precio del plan. Contacta a soporte con tu comprobante de PayPal antes de reintentar.'
+              );
+              return;
+            }
             await this.finalizarPago(orden.id);
           });
         }).catch((err: any) => {
@@ -245,26 +292,16 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
         }
 
         if (status === 'success' && orderId) {
-          // 🔒 Verificación de monto con tolerancia: checkout-web calcula el
-          // precio consultando su propia tasa de cambio (independiente de
-          // esta página), así que ambos montos pueden diferir por céntimos
-          // si las dos consultas cayeron en momentos distintos. Se acepta
-          // una diferencia de hasta TOLERANCIA_MONTO; fuera de ese rango,
-          // se bloquea la activación.
-          if (montoRecibido !== null) {
-            const recibido = parseFloat(montoRecibido);
-            const esperado = parseFloat(this.precioCalculadoUSD);
-            const difProporcional = esperado > 0 ? Math.abs(recibido - esperado) / esperado : 1;
-
-            if (!isFinite(recibido) || difProporcional > this.TOLERANCIA_MONTO) {
-              console.error(
-                `[PagosPage] Monto cobrado (${montoRecibido}) se aleja demasiado del esperado (${this.precioCalculadoUSD}) para el plan ${this.planKey}.`
-              );
-              await this.mostrarError(
-                'El monto cobrado no coincide con el precio del plan. Contacta a soporte con tu comprobante de PayPal antes de reintentar.'
-              );
-              return;
-            }
+          // 🔒 Mismo criterio que el flujo web: se exige monto igual o
+          // mayor al precio del plan (ver montoEsSuficiente).
+          if (!this.montoEsSuficiente(montoRecibido, this.planKey)) {
+            console.error(
+              `[PagosPage] Monto recibido (${montoRecibido}) insuficiente para el plan ${this.planKey} (esperado >= ${this.precioCalculadoUSD}).`
+            );
+            await this.mostrarError(
+              'El monto cobrado no cubre el precio del plan. Contacta a soporte con tu comprobante de PayPal antes de reintentar.'
+            );
+            return;
           }
           await this.finalizarPago(orderId);
         } else {

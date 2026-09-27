@@ -15,7 +15,7 @@ const DEFAULT_CLIENT_ID = 'BAAkG8JqKXqUzfnXl09GeQQLTolLDITfQ1Wz09QnQC1t9DOCfoykc
 // -----------------------------------------------------------------
 const PRECIOS_CLP = {
   mensual: 4000,
-  trimestral: 13350,
+  trimestral: 10000,
   anual: 39000
 };
 
@@ -82,9 +82,12 @@ function mostrarError(msg) {
 // -----------------------------------------------------------------
 obtenerTasaClpPorUsd().then((tasaClpPorUsd) => {
   const amount = (PRECIOS_CLP[plan] / tasaClpPorUsd).toFixed(2);
+  const montoClpFormateado = PRECIOS_CLP[plan].toLocaleString('es-CL');
 
   document.getElementById('plan-nombre').textContent = nombre;
-  document.getElementById('plan-precio').textContent = `$${amount} ${currency}`;
+  document.getElementById('plan-precio').textContent = `$${montoClpFormateado} CLP`;
+  document.getElementById('plan-precio-usd').textContent =
+    `Cobro real vía PayPal: $${amount} ${currency} (tipo de cambio del día)`;
 
   const script = document.createElement('script');
   script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}`;

@@ -135,7 +135,7 @@ export class AuthService {
 
   private static readonly MONTOS_POR_PLAN: Record<string, number> = {
     mensual: 4000,
-    trimestral: 13350,
+    trimestral: 10000,
     anual: 39000
   };
 
