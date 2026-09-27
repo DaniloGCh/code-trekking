@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, inject, NgZone, OnDestroy } from '@an
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, LoadingController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { TipoCambioService } from 'src/app/core/services/tipo-cambio.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
 
@@ -30,9 +31,21 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private authService = inject(AuthService);
+  private tipoCambioService = inject(TipoCambioService);
   private ngZone = inject(NgZone);
 
-  private readonly TASA_CAMBIO_USD = 950;
+  /**
+   * Tasa CLP por 1 USD. Arranca con la tasa de respaldo del servicio y se
+   * reemplaza por la tasa real apenas responde la API (ver ngOnInit). Así
+   * el botón de pago nunca queda bloqueado esperando la red.
+   */
+  private tasaCLPxUSD = this.tipoCambioService.TASA_RESPALDO;
+
+  /** Tolerancia permitida al comparar el monto cobrado vs. el esperado,
+   *  ya que pagos.page.ts y checkout-web/script.js consultan la tasa de
+   *  cambio por separado y pueden obtener valores levemente distintos. */
+  private readonly TOLERANCIA_MONTO = 0.03; // 3%
+
   private routeSub?: Subscription;
   private appUrlListener?: PluginListenerHandle;
 
@@ -53,7 +66,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   procesandoRetorno = false;
 
   get precioCalculadoUSD(): string {
-    return (this.plan.precioCLP / this.TASA_CAMBIO_USD).toFixed(2);
+    return (this.plan.precioCLP / this.tasaCLPxUSD).toFixed(2);
   }
 
   ngOnInit() {
@@ -63,6 +76,14 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
         this.planKey = planParam;
         this.plan = this.planes[planParam];
       }
+    });
+
+    // Consulta la tasa real apenas se abre la página; mientras tanto se usa
+    // la tasa de respaldo, así el usuario nunca ve la página bloqueada.
+    this.tipoCambioService.obtenerTasaClpPorUsd().then((tasa) => {
+      this.ngZone.run(() => {
+        this.tasaCLPxUSD = tasa;
+      });
     });
 
     if (this.esNativo) {
@@ -189,6 +210,9 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       return;
     }
 
+    // Nota: se envía `amount` solo como referencia/registro; checkout-web
+    // vuelve a calcular el monto real por su cuenta (ver script.js) y no
+    // confía en este valor para cobrar.
     const url = `${environment.paypalCheckoutUrl}` +
       `?plan=${encodeURIComponent(this.planKey)}` +
       `&nombre=${encodeURIComponent(this.plan.nombre)}` +
@@ -221,19 +245,26 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
         }
 
         if (status === 'success' && orderId) {
-          // 🔒 Verificación de monto: el checkout-web ya calcula el precio
-          // desde su propia tabla (no desde la URL), pero igual se valida
-          // aquí que lo cobrado coincida con el precio esperado del plan
-          // antes de activar la suscripción, como segunda capa de defensa.
-          const montoEsperado = this.precioCalculadoUSD;
-          if (montoRecibido !== null && montoRecibido !== montoEsperado) {
-            console.error(
-              `[PagosPage] Monto cobrado (${montoRecibido}) no coincide con el esperado (${montoEsperado}) para el plan ${this.planKey}.`
-            );
-            await this.mostrarError(
-              'El monto cobrado no coincide con el precio del plan. Contacta a soporte con tu comprobante de PayPal antes de reintentar.'
-            );
-            return;
+          // 🔒 Verificación de monto con tolerancia: checkout-web calcula el
+          // precio consultando su propia tasa de cambio (independiente de
+          // esta página), así que ambos montos pueden diferir por céntimos
+          // si las dos consultas cayeron en momentos distintos. Se acepta
+          // una diferencia de hasta TOLERANCIA_MONTO; fuera de ese rango,
+          // se bloquea la activación.
+          if (montoRecibido !== null) {
+            const recibido = parseFloat(montoRecibido);
+            const esperado = parseFloat(this.precioCalculadoUSD);
+            const difProporcional = esperado > 0 ? Math.abs(recibido - esperado) / esperado : 1;
+
+            if (!isFinite(recibido) || difProporcional > this.TOLERANCIA_MONTO) {
+              console.error(
+                `[PagosPage] Monto cobrado (${montoRecibido}) se aleja demasiado del esperado (${this.precioCalculadoUSD}) para el plan ${this.planKey}.`
+              );
+              await this.mostrarError(
+                'El monto cobrado no coincide con el precio del plan. Contacta a soporte con tu comprobante de PayPal antes de reintentar.'
+              );
+              return;
+            }
           }
           await this.finalizarPago(orderId);
         } else {
