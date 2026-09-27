@@ -212,6 +212,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
       const status = params.get('status');
       const orderId = params.get('orderId');
       const planParam = params.get('plan') as PlanKey | null;
+      const montoRecibido = params.get('monto');
 
       this.ngZone.run(async () => {
         if (planParam && this.planes[planParam]) {
@@ -220,6 +221,20 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
         }
 
         if (status === 'success' && orderId) {
+          // 🔒 Verificación de monto: el checkout-web ya calcula el precio
+          // desde su propia tabla (no desde la URL), pero igual se valida
+          // aquí que lo cobrado coincida con el precio esperado del plan
+          // antes de activar la suscripción, como segunda capa de defensa.
+          const montoEsperado = this.precioCalculadoUSD;
+          if (montoRecibido !== null && montoRecibido !== montoEsperado) {
+            console.error(
+              `[PagosPage] Monto cobrado (${montoRecibido}) no coincide con el esperado (${montoEsperado}) para el plan ${this.planKey}.`
+            );
+            await this.mostrarError(
+              'El monto cobrado no coincide con el precio del plan. Contacta a soporte con tu comprobante de PayPal antes de reintentar.'
+            );
+            return;
+          }
           await this.finalizarPago(orderId);
         } else {
           await this.mostrarError('El pago fue cancelado o no se completó.');
