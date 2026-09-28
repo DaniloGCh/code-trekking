@@ -387,6 +387,26 @@ export class AuthService {
     return isNaN(dateObj.getTime()) ? null : dateObj;
   }
 
+  
+   //Suma meses a una fecha sin desbordar al mes siguiente. Si el día no
+   //existe en el mes destino (ej. 31 de enero + 1 mes), usa el último día
+   //de ese mes (28/29 de febrero). Conserva la hora original.
+   
+  private static sumarMeses(fecha: Date, meses: number): Date {
+    const resultado = new Date(fecha);
+    const diaOriginal = resultado.getDate();
+
+    // Se fija el día 1 antes de cambiar de mes para evitar el desborde
+    resultado.setDate(1);
+    resultado.setMonth(resultado.getMonth() + meses);
+
+    // Último día del mes destino
+    const ultimoDia = new Date(resultado.getFullYear(), resultado.getMonth() + 1, 0).getDate();
+    resultado.setDate(Math.min(diaOriginal, ultimoDia));
+
+    return resultado;
+  }
+
   // 🔹 Función para sumar tiempo acumulativo y montos
   async activarSuscripcion(
     plan: 'mensual' | 'trimestral' | 'anual',
@@ -424,9 +444,8 @@ export class AuthService {
       }
     }
 
-    // Calculamos la nueva fecha sumando los meses
-    const nuevaFechaVencimiento = new Date(fechaBase);
-    nuevaFechaVencimiento.setMonth(nuevaFechaVencimiento.getMonth() + mesesASumar);
+    // Calculamos la nueva fecha sumando los meses (sin desbordar al mes siguiente)
+    const nuevaFechaVencimiento = AuthService.sumarMeses(fechaBase, mesesASumar);
 
     const isoVencimiento = nuevaFechaVencimiento.toISOString();
     const montoAcumulado = (subActual?.monto || 0) + montoNuevo;
