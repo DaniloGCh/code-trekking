@@ -129,7 +129,7 @@ export class AuthService {
 
   private static readonly MESES_POR_PLAN: Record<string, number> = {
     mensual: 1,
-    trimestral: 4,
+    trimestral: 3,
     anual: 12
   };
 
