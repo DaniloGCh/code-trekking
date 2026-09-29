@@ -77,6 +77,20 @@ const routes: Routes = [
     loadChildren: () => import('./pages/users/pagos/pagos.module').then(m => m.PagosPageModule),
     canActivate: [authGuard]
   },
+  {
+    path: 'error',
+    loadChildren: () => import('./pages/error/error-page/error-page.module').then(m => m.ErrorPagePageModule)
+  },
+
+
+
+
+  // ⚠️ Debe ser SIEMPRE la última ruta: captura cualquier URL que no
+  // coincida con ninguna de las anteriores (rutas inexistentes / mal escritas).
+  {
+    path: '**',
+    loadChildren: () => import('./pages/error/not-found/not-found.module').then(m => m.NotFoundPageModule)
+  },
 
 ];
 @NgModule({
