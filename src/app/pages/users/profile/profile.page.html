@@ -379,6 +379,67 @@
       </ion-card-content>
 
     </ion-card>
+  
+    <!-- ========================= -->
+    <!-- 💳 HISTORIAL DE PAGOS -->
+    <!-- ========================= -->
+    <ion-accordion-group class="accordion_pagos">
+
+      <ion-accordion value="pagos">
+
+        <!-- 📌 HEADER -->
+        <ion-item slot="header">
+          <ion-icon name="card" slot="start" color="tertiary"></ion-icon>
+          <ion-label>Historial de pagos</ion-label>
+        </ion-item>
+
+        <!-- 📦 CONTENIDO -->
+        <div slot="content">
+
+          <div class="refresh-container">
+            <ion-button fill="clear" size="small" (click)="loadPagos()">
+              <ion-icon name="refresh-outline" slot="start" class="icon-green"></ion-icon>
+            </ion-button>
+          </div>
+
+          <!-- 🚫 VACÍO -->
+          <ion-list *ngIf="pagos.length === 0">
+            <ion-item>
+              <ion-label class="ion-text-center" color="medium">
+                <p>Aún no tienes pagos registrados</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+
+          <!-- 📋 TABLA -->
+          <div class="tabla-pagos-wrapper" *ngIf="pagos.length > 0">
+            <table class="tabla-pagos">
+              <thead>
+                <tr>
+                  <th>ID Orden</th>
+                  <th>Plan</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Monto pagado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let pago of pagos">
+                  <td class="col-orden">{{ pago.ordenId }}</td>
+                  <td>{{ pago.plan }}</td>
+                  <td>{{ pago.fecha }}</td>
+                  <td>{{ pago.hora }}</td>
+                  <td>{{ pago.monto }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </ion-accordion>
+
+    </ion-accordion-group>
 
     <!-- ========================= -->
     <!-- ⭐ FAVORITOS -->

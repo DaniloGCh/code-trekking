@@ -3,17 +3,24 @@
 // =========================
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  AlertController, ToastController,
-  LoadingController, ActionSheetController, ModalController
-} from '@ionic/angular';
+import {AlertController, ToastController,LoadingController, ActionSheetController, ModalController} from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Firestore, collection, getDocs, deleteDoc, doc, getDoc } from '@angular/fire/firestore';
-import { Auth } from '@angular/fire/auth';
+import { Firestore, collection, getDocs, deleteDoc, doc, getDoc, query, orderBy } from '@angular/fire/firestore';
 
-import { AuthService, UserData } from 'src/app/core/services/auth.service';
+import { Auth } from '@angular/fire/auth';
+import { AuthService, UserData, RegistroPago } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
 import { FotoService } from 'src/app/core/services/foto.service';
+
+
+/** Fila ya formateada para mostrar en la tabla de historial de pagos. */
+interface PagoDisplay {
+  ordenId: string;
+  plan: string;
+  fecha: string;
+  hora: string;
+  monto: string;
+}
 
 @Component({
   selector: 'app-profile',
@@ -21,6 +28,8 @@ import { FotoService } from 'src/app/core/services/foto.service';
   styleUrls: ['./profile.page.scss'],
   standalone: false,
 })
+
+
 export class ProfilePage implements OnInit {
 
   // =========================
@@ -43,10 +52,12 @@ export class ProfilePage implements OnInit {
   // =========================
   userData: UserData | null = null;
   favoritos: any[] = [];
+  pagos: PagoDisplay[] = [];
   authReady = false;
   hideHeader = false;
   lastScrollTop = 0;
 
+  
   // =========================
   // 📊 ESTADÍSTICAS
   // =========================
@@ -54,6 +65,8 @@ export class ProfilePage implements OnInit {
   eventosCreadosMes = 0;
   tiempoMiembro = '';
 
+
+  
   // =========================
   // 😊 ESTADOS DE ÁNIMO
   // =========================
@@ -102,6 +115,7 @@ export class ProfilePage implements OnInit {
     }
 
     await this.loadFavoritos();
+    await this.loadPagos();
   }
 
   // =========================
@@ -391,6 +405,39 @@ export class ProfilePage implements OnInit {
     } catch {
       await this.showToast('Error al cargar favoritos', 'danger');
     }
+  }
+
+  // =========================
+  // 💳 HISTORIAL DE PAGOS
+  // =========================
+  async loadPagos() {
+    const user = this.auth.currentUser;
+    if (!user) return;
+
+    try {
+      const ref = collection(this.firestore, `usuarios/${user.uid}/pagos`);
+      const q = query(ref, orderBy('fechaPago', 'desc'));
+      const snap = await getDocs(q);
+      this.pagos = snap.docs.map(d => this.formatearPago(d.data() as RegistroPago));
+    } catch {
+      await this.showToast('Error al cargar el historial de pagos', 'danger');
+    }
+  }
+
+    private formatearPago(pago: RegistroPago): PagoDisplay {
+    const fechaPago = new Date(pago.fechaPago);
+
+    return {
+      ordenId: pago.ordenId,
+      plan: pago.plan.charAt(0).toUpperCase() + pago.plan.slice(1),
+      fecha: fechaPago.toLocaleDateString('es-CL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }),
+      hora: `${String(fechaPago.getHours()).padStart(2, '0')}:${String(fechaPago.getMinutes()).padStart(2, '0')}`,
+      monto: `$${pago.monto.toLocaleString('es-CL')} CLP`
+    };
   }
 
   async removeFavorito(eventoId: string) {

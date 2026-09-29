@@ -45,6 +45,10 @@ import {
 // 🔐 Interceptor
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
+// 🧯 Manejo global de errores (evita pantallas negras / código en pantalla)
+import { ErrorHandler } from '@angular/core';
+import { GlobalErrorHandler } from './core/global-error-handler';
+
 // 📦 Swiper
 import { register } from 'swiper/element/bundle';
 
@@ -95,6 +99,12 @@ register();
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
+    },
+
+    // 🧯 Captura cualquier error no controlado en toda la app
+    {
+      provide: ErrorHandler,
+      useClass: GlobalErrorHandler
     }
 
   ],

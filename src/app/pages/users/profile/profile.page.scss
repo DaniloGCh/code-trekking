@@ -211,6 +211,71 @@ ion-list ion-item h3 {
   margin: 0; /* Quita márgenes por defecto */
 }
 
+
+/* ==========================================================================
+   💳 ACORDEÓN DE HISTORIAL DE PAGOS
+   ========================================================================== */
+.accordion_pagos {
+  margin: 16px;
+}
+
+.accordion_pagos ion-accordion {
+  background: #14191f;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.accordion_pagos ion-item[slot="header"] {
+  --background: #14191f;
+  --color: #ffffff;
+  font-weight: 700;
+}
+
+.accordion_pagos div[slot="content"] {
+  background: #0d1117;
+}
+
+/* Tabla de pagos: scroll horizontal en pantallas angostas para que el
+   ID de orden (largo) no rompa el diseño en celulares. */
+.tabla-pagos-wrapper {
+  overflow-x: auto;
+  margin: 0 8px 12px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tabla-pagos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.tabla-pagos thead th {
+  background: #1c232c;
+  color: rgb(0, 248, 103);
+  text-align: left;
+  padding: 8px 10px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.tabla-pagos tbody td {
+  background: #14191f;
+  color: #ffffff;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tabla-pagos .col-orden {
+  color: rgba(255, 255, 255, 0.65);
+  font-family: monospace;
+  font-size: 0.78rem;
+}
+
+
+
 /* ==========================================================================
    ⭐ ACORDEÓN DE FAVORITOS
    ========================================================================== */

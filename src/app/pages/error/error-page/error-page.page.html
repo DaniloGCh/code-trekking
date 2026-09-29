@@ -1,0 +1,21 @@
+<ion-content class="ion-padding" [fullscreen]="true">
+  <div class="error-container">
+
+    <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+
+    <h2>Algo salió mal</h2>
+    <p>{{ mensaje }}</p>
+    <p class="codigo">Código de referencia: <strong>{{ codigo }}</strong></p>
+
+    <ion-button expand="block" (click)="reintentar()">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Reintentar
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" (click)="volverAlInicio()">
+      <ion-icon name="home-outline" slot="start"></ion-icon>
+      Volver al inicio
+    </ion-button>
+
+  </div>
+</ion-content>
