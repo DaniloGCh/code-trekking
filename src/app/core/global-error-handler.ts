@@ -2,7 +2,7 @@
 import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { generarCodigoError, esErrorDeCarga } from './utils/error-utils';
+import { generarCodigoError, esErrorDeCarga, esErrorDePermisosPorSesionCerrada } from './utils/error-utils';
 
 /**
  * Captura cualquier error no atrapado en la app (en cualquier componente,
@@ -18,8 +18,7 @@ import { generarCodigoError, esErrorDeCarga } from './utils/error-utils';
  *    (chunk load error), en vez de lo anterior avisa y recarga solo.
  *
  * Funciona igual en navegador (PC) y en la app nativa (Android/iOS): el
- * ToastController y el Router de Ionic/Angular se comportan igual en las
- * dos plataformas.
+ * ToastController de Ionic se comporta igual en las dos plataformas.
  *
  * Se registra en app.module.ts:
  *   { provide: ErrorHandler, useClass: GlobalErrorHandler }
@@ -39,8 +38,15 @@ export class GlobalErrorHandler implements ErrorHandler {
     // 🔒 El detalle técnico SOLO va a la consola, nunca se muestra en pantalla.
     console.error(`[GlobalErrorHandler] ${codigo}`, error);
 
+    // Rechazos de permisos de Firestore justo al cerrar sesión: es un
+    // efecto secundario esperado, no un bug real. Se registra pero no se
+    // interrumpe al usuario (la app ya navegó a donde correspondía).
+    if (esErrorDePermisosPorSesionCerrada(error)) {
+      return;
+    }
+
     // Los errores del router/zona pueden ocurrir fuera de Angular; ngZone.run
-    // asegura que la UI (toast, navegación) se actualice correctamente.
+    // asegura que la UI (toast) se actualice correctamente.
     this.ngZone.run(() => {
       if (esErrorDeCarga(error)) {
         this.avisarYRecargar();

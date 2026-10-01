@@ -1,3 +1,6 @@
+
+ //no-auth.guard
+ 
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
@@ -15,10 +18,10 @@ export const noAuthGuard: CanActivateFn = () => {
   // =========================
   // 🔐 VALIDACIÓN DE ACCESO INVERSO
   // =========================
-  return new Promise((resolve) => {
+return new Promise((resolve) => {
 
-    onAuthStateChanged(auth, async (user) => {
-
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      unsubscribe();
       // =========================
       // ❌ SIN SESIÓN
       // =========================
@@ -31,13 +34,11 @@ export const noAuthGuard: CanActivateFn = () => {
       // 👤 CON SESIÓN → REDIRECCIÓN SEGÚN ROL
       // =========================
       const rol = await authService.getUserRole();
-
       if (rol === 'admin') {
         router.navigateByUrl('/dashboard', { replaceUrl: true });
       } else {
         router.navigateByUrl('/tabs/home', { replaceUrl: true });
       }
-
       resolve(false);
     });
   });

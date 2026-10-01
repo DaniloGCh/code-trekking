@@ -86,7 +86,7 @@ export class LoginPage {
       await loading.dismiss();
 
       if (rol === 'admin') {
-        this.router.navigateByUrl('/admin/dashboard', { replaceUrl: true });
+        this.router.navigateByUrl('/dashboard', { replaceUrl: true });
       } else {
         this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
       }
