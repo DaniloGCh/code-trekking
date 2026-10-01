@@ -1,3 +1,5 @@
+// tabs.page.ts
+
 import { Component, OnInit, inject } from '@angular/core';
 import { EventoService } from '../core/services/evento.service';
 import { AuthService, UserData } from '../core/services/auth.service';
@@ -51,20 +53,39 @@ export class TabsPage implements OnInit {
   async recalcularIndicador() {
     if (!this.currentUid) return;
 
+    // Se captura el uid en una constante local: si el usuario cierra sesión
+    // mientras este bucle está corriendo, this.currentUid cambia a null,
+    // pero el resto de este chequeo debe seguir usando el uid con el que
+    // arrancó (o simplemente cortar limpio, ver el catch más abajo).
+    const uidAlIniciar = this.currentUid;
+
     this.misEventos$.subscribe(async (eventos) => {
       this.hayMensajesNuevos = false;
 
       for (const ev of eventos) {
         if (!ev.id) continue;
 
-        const cantidad = await this.eventoService.contarMensajesNuevos(
-          ev.id,
-          this.currentUid!
-        );
+        // Si la sesión se cerró mientras se revisaban los eventos, no tiene
+        // sentido seguir consultando Firestore (las reglas de seguridad
+        // van a rechazar la lectura porque ya no hay usuario autenticado).
+        if (this.currentUid !== uidAlIniciar) return;
 
-        if (cantidad > 0) {
-          this.hayMensajesNuevos = true;
-          break;
+        try {
+          const cantidad = await this.eventoService.contarMensajesNuevos(
+            ev.id,
+            uidAlIniciar
+          );
+
+          if (cantidad > 0) {
+            this.hayMensajesNuevos = true;
+            break;
+          }
+        } catch (error) {
+          // Lectura rechazada (ej. sesión cerrada a mitad de camino): se
+          // corta el chequeo en silencio, no es un error que deba
+          // interrumpir al usuario ni mostrarse en pantalla.
+          console.warn('[TabsPage] No se pudo revisar mensajes nuevos:', error);
+          return;
         }
       }
     });

@@ -1,3 +1,4 @@
+// src/app/app.component.ts
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { App } from '@capacitor/app';
@@ -6,7 +7,7 @@ import { ToastController } from '@ionic/angular';
 
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 import { TimeService } from 'src/app/core/services/time.service';
-import { generarCodigoError, esErrorDeCarga } from 'src/app/core/utils/error-utils';
+import { generarCodigoError, esErrorDeCarga, esErrorDePermisosPorSesionCerrada } from 'src/app/core/utils/error-utils';
 
 @Component({
   selector: 'app-root',
@@ -92,6 +93,10 @@ export class AppComponent
     // 🔒 Detalle técnico solo en consola, nunca en pantalla.
     console.error(`[AppComponent] Error de navegación ${codigo} en "${event.url}"`, event.error);
 
+    if (esErrorDePermisosPorSesionCerrada(event.error)) {
+      return;
+    }
+
     if (esErrorDeCarga(event.error)) {
       const toast = await this.toastCtrl.create({
         message: 'Hay una nueva versión de la app disponible. Actualizando…',
@@ -104,7 +109,8 @@ export class AppComponent
       return;
     }
 
-    // 🔒 Igual que en GlobalErrorHandler: navegación dura, no router.navigate().
+    // 🔒 Navegación "dura", igual que en GlobalErrorHandler: evita que la
+    // app quede pegada si el error ocurrió en medio de una navegación.
     window.location.href = `/error?codigo=${encodeURIComponent(codigo)}`;
   }
 

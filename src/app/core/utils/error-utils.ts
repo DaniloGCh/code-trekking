@@ -23,3 +23,19 @@ export function esErrorDeCarga(error: any): boolean {
     || mensaje.includes('importmodule')
     || mensaje.includes('load failed');
 }
+/**
+ * Detecta si el error es un "Missing or insufficient permissions" de
+ * Firestore/Firebase. Esto ocurre de forma esperada (no es un bug real)
+ * cuando una escucha en vivo (collectionData/onSnapshot) sigue activa en
+ * el instante exacto en que se cierra sesión: las reglas de seguridad
+ * dejan de cumplirse antes de que el listener alcance a desuscribirse.
+ * Estos errores se registran en consola pero no deben interrumpir ni
+ * asustar al usuario con una pantalla de error, porque la app ya
+ * navegó a donde correspondía (login / home).
+ */
+export function esErrorDePermisosPorSesionCerrada(error: any): boolean {
+  const mensaje = String(error?.message ?? error ?? '').toLowerCase();
+  const codigo = String(error?.code ?? '').toLowerCase();
+  return codigo.includes('permission-denied')
+    || mensaje.includes('missing or insufficient permissions');
+}
