@@ -357,9 +357,13 @@ export class ProfilePage implements OnInit {
 
       const base64Original = `data:image/jpeg;base64,${image.base64String}`;
 
-      const validacion = this.fotoService.validarFoto(base64Original);
-      if (!validacion.valid) {
-        await this.showToast(validacion.message, 'warning');
+      // 🔒 Antes de comprimir solo se valida el FORMATO (que sea una imagen
+      // real, de un tipo permitido) — el tamaño se revisa después de
+      // comprimir, porque para eso existe la compresión: para poder
+      // aceptar fotos grandes de la cámara y reducirlas, no rechazarlas.
+      const validacionFormato = this.fotoService.validarFormato(base64Original);
+      if (!validacionFormato.valid) {
+        await this.showToast(validacionFormato.message, 'warning');
         return;
       }
 
@@ -368,6 +372,15 @@ export class ProfilePage implements OnInit {
 
       try {
         const base64Comprimida = await this.fotoService.comprimirFoto(base64Original);
+
+        // 🔒 Validación final (formato + tamaño) sobre la imagen YA
+        // comprimida, como última verificación de seguridad.
+        const validacionFinal = this.fotoService.validarFoto(base64Comprimida);
+        if (!validacionFinal.valid) {
+          await loading.dismiss();
+          await this.showToast(validacionFinal.message, 'warning');
+          return;
+        }
 
         const uid = this.auth.currentUser?.uid;
         if (!uid) throw new Error('No autenticado');

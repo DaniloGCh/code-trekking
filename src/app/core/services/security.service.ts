@@ -142,9 +142,14 @@ export class SecurityService {
   // 🛡️ VALIDAR TELÉFONO
   // =========================
   isValidPhone(phone: string): boolean {
-    // Acepta formatos: +56912345678, 912345678, +1234567890
-    const regex = /^\+?[\d\s\-]{8,15}$/;
-    return regex.test(phone.trim());
+    // Se quitan espacios y guiones antes de validar, para aceptar que la
+    // persona lo escriba con separadores (+56 9 8180 0532), pero el
+    // resultado debe ser EXACTAMENTE un celular chileno válido:
+    //   +569XXXXXXXX  (12 caracteres: +56, 9 y 8 dígitos)
+    //   9XXXXXXXX     (9 caracteres: 9 y 8 dígitos, sin código de país)
+    const limpio = phone.trim().replace(/[\s\-]/g, '');
+    const regex = /^(\+569\d{8}|9\d{8})$/;
+    return regex.test(limpio);
   }
 
   // =========================
