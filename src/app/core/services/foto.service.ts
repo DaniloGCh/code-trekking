@@ -24,17 +24,20 @@ export class FotoService {
   private readonly STORAGE_KEY = 'user_profile_photo';
 
   // =========================
-  // ✅ VALIDAR FOTO
+  // ✅ VALIDAR FORMATO (antes de comprimir)
   // =========================
-  validarFoto(base64: string): { valid: boolean; message: string } {
+  // Solo revisa que sea una imagen real y de un tipo permitido. A propósito
+  // NO valida el tamaño acá: el tamaño se valida después de comprimir (ver
+  // validarFoto), porque el objetivo de comprimir es justamente aceptar
+  // fotos grandes de la cámara y reducirlas — si se rechazara por tamaño
+  // antes de comprimir, esa compresión nunca llegaría a ejecutarse.
+  validarFormato(base64: string): { valid: boolean; message: string } {
     if (!base64) return { valid: false, message: 'No se recibió imagen' };
 
-    // ✅ Validar que sea un Base64 real
     if (!base64.startsWith('data:image/')) {
       return { valid: false, message: 'Formato de imagen no válido' };
     }
 
-    // ✅ Validar tipo de imagen
     const tipoMatch = base64.match(/data:([^;]+);base64,/);
     if (!tipoMatch) return { valid: false, message: 'Tipo de imagen no detectado' };
 
@@ -43,7 +46,19 @@ export class FotoService {
       return { valid: false, message: 'Solo se permiten imágenes JPG, PNG o WebP' };
     }
 
-    // ✅ Validar tamaño
+    return { valid: true, message: '' };
+  }
+
+  // =========================
+  // ✅ VALIDAR FOTO (formato + tamaño)
+  // =========================
+  // Se usa DESPUÉS de comprimir, sobre el resultado ya comprimido: ahí el
+  // límite de tamaño sí tiene sentido como última verificación de
+  // seguridad (una imagen comprimida rara vez debería superarlo).
+  validarFoto(base64: string): { valid: boolean; message: string } {
+    const formato = this.validarFormato(base64);
+    if (!formato.valid) return formato;
+
     const sizeBytes = (base64.length * 3) / 4;
     const sizeMB = sizeBytes / (1024 * 1024);
 

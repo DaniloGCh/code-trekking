@@ -26,6 +26,7 @@ import {
 } from 'src/app/core/models/evento.model';
 
 import { SessionService } from 'src/app/core/services/session.service';
+import { SecurityService } from 'src/app/core/services/security.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -55,7 +56,7 @@ export class DashboardPage implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private sanitizer = inject(DomSanitizer);
   private sessionService = inject(SessionService);
-
+  private security = inject(SecurityService);
   @ViewChild('accordionAdmin') accordionGroup?: IonAccordionGroup;
   @ViewChild('accordionUsuarios') accordionUsuarios?: IonAccordionGroup;
 
@@ -454,13 +455,34 @@ export class DashboardPage implements OnInit, OnDestroy {
   async onGuardarLugar() {
     if (this.lugarForm.invalid) { this.lugarForm.markAllAsTouched(); return; }
 
+    const v = this.lugarForm.value;
+
+    // 🔒 Coordenadas GPS: deben estar dentro de un rango real
+    // (latitud -90..90, longitud -180..180). Antes no se validaba nada
+    // acá y se podía guardar un lugar con coordenadas imposibles.
+    if (v.latitud && v.longitud) {
+      const latOk = this.security.isValidCoordinates(Number(v.latitud), Number(v.longitud));
+      if (!latOk) {
+        await this.showToast('Las coordenadas ingresadas no son válidas. Revisa latitud/longitud.', 'danger');
+        return;
+      }
+    }
+
+    // 🔒 URL del mapa de ruta: solo se acepta HTTPS y del dominio permitido
+    // (wikiloc.com). Antes solo se recortaba el texto (trim), sin validar
+    // que realmente fuera un enlace de Wikiloc.
+    const urlIngresada = (v.mapaRutaUrl || '').trim();
+    if (urlIngresada && !this.security.isSafeUrl(urlIngresada)) {
+      await this.showToast('La URL del mapa de ruta debe ser un enlace de Wikiloc (https://wikiloc.com/...).', 'danger');
+      return;
+    }
+
     const loading = await this.loadingCtrl.create({
       message: this.lugarEditando ? 'Actualizando...' : 'Agregando...'
     });
     await loading.present();
 
     try {
-      const v = this.lugarForm.value;
       const datos: Omit<Lugar, 'id'> = {
         nombre: v.nombre.trim(),
         informacion: v.informacion.trim(),
@@ -490,6 +512,8 @@ export class DashboardPage implements OnInit, OnDestroy {
 
       if (this.lugarEditando) {
         await this.lugarService.editarLugar(this.lugarEditando.id!, datos);
+
+
         await this.showToast('Lugar actualizado', 'success');
       } else {
         await this.lugarService.agregarLugar(datos);
