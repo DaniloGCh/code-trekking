@@ -461,7 +461,7 @@ export class DashboardPage implements OnInit, OnDestroy {
     // (latitud -90..90, longitud -180..180). Antes no se validaba nada
     // acá y se podía guardar un lugar con coordenadas imposibles.
     if (v.latitud && v.longitud) {
-      const latOk = this.security.isValidCoordinates((v.latitud), (v.longitud));
+      const latOk = this.security.isValidCoordinates(Number(v.latitud), Number(v.longitud));
       if (!latOk) {
         await this.showToast('Las coordenadas ingresadas no son válidas. Revisa latitud/longitud.', 'danger');
         return;
@@ -488,14 +488,14 @@ export class DashboardPage implements OnInit, OnDestroy {
         informacion: v.informacion.trim(),
         altitud: v.altitud,
         dificultad: v.dificultad,
-        distanciaKm: (v.distanciaKm),
+        distanciaKm: Number(v.distanciaKm),
         tiempoEstimadoHoras: v.tiempoEstimadoHoras,
         equipamiento: v.equipamiento,
         DireccionPuntoInicio: (v.DireccionPuntoInicio || '').trim(),
-        latitud: v.latitud ? (v.latitud) : undefined,
-        longitud: v.longitud ? (v.longitud) : undefined,
+        latitud: v.latitud ? Number(v.latitud) : undefined,
+        longitud: v.longitud ? Number(v.longitud) : undefined,
         requierePagoEntrada: v.requierePagoEntrada,
-        valorEntrada: v.requierePagoEntrada ? (v.valorEntrada || 0) : undefined,
+        valorEntrada: v.requierePagoEntrada ? Number(v.valorEntrada || 0) : undefined,
         requierePermiso: v.requierePermiso,
         requiereRegistroAcceso: v.requiereRegistroAcceso,
         requiereGuiaMontana: v.requiereGuiaMontana,
