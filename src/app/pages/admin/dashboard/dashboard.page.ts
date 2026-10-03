@@ -461,7 +461,7 @@ export class DashboardPage implements OnInit, OnDestroy {
     // (latitud -90..90, longitud -180..180). Antes no se validaba nada
     // acá y se podía guardar un lugar con coordenadas imposibles.
     if (v.latitud && v.longitud) {
-      const latOk = this.security.isValidCoordinates(Number(v.latitud), Number(v.longitud));
+      const latOk = this.security.isValidCoordinates((v.latitud), (v.longitud));
       if (!latOk) {
         await this.showToast('Las coordenadas ingresadas no son válidas. Revisa latitud/longitud.', 'danger');
         return;
