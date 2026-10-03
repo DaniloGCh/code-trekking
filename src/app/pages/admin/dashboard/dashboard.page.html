@@ -309,14 +309,26 @@
                       <ion-col size="6">
                         <ion-item>
                           <ion-label position="floating">Latitud</ion-label>
-                          <ion-input type="text" formControlName="latitud"></ion-input>
+                          <ion-input type="text" formControlName="latitud"
+                            placeholder="-33.448900"
+                            (ionInput)="formatearCoordenada($event, 'latitud')"></ion-input>
+                          <ion-button slot="end" fill="clear" size="small"
+                            (click)="toggleSignoCoordenada('latitud')">
+                            <ion-icon name="swap-horizontal-outline" slot="icon-only"></ion-icon>
+                          </ion-button>
                         </ion-item>
                       </ion-col>
 
                       <ion-col size="6">
                         <ion-item>
                           <ion-label position="floating">Longitud</ion-label>
-                          <ion-input type="text" formControlName="longitud"></ion-input>
+                          <ion-input type="text" formControlName="longitud"
+                            placeholder="-70.669300"
+                            (ionInput)="formatearCoordenada($event, 'longitud')"></ion-input>
+                          <ion-button slot="end" fill="clear" size="small"
+                            (click)="toggleSignoCoordenada('longitud')">
+                            <ion-icon name="swap-horizontal-outline" slot="icon-only"></ion-icon>
+                          </ion-button>
                         </ion-item>
                       </ion-col>
 
@@ -336,7 +348,7 @@
 
                       <ion-col size="6">
                         <ion-item>
-                          <ion-label position="floating">Distancia (km)</ion-label>
+                          <ion-label position="floating">Distancia (km)... punto (.) para separar decimales</ion-label>
                           <ion-input type="text" formControlName="distanciaKm"></ion-input>
                         </ion-item>
                       </ion-col>
@@ -405,7 +417,7 @@
 
                   <!-- 💰 VALOR ENTRADA (CONDICIONAL) -->
                   <ion-item *ngIf="lugarForm.get('requierePagoEntrada')?.value">
-                    <ion-label position="floating">Valor entrada ($)</ion-label>
+                    <ion-label position="floating">Valor entrada ($)... valor sin puntos</ion-label>
                     <ion-input type="number" formControlName="valorEntrada"></ion-input>
                   </ion-item>
 
