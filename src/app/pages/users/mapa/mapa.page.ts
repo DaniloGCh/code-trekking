@@ -88,6 +88,10 @@ export class MapaPage implements AfterViewInit, OnDestroy {
   mostrarInstrucciones = false;
   perfilRuta: 'hike' | 'foot' | 'car' = 'hike';
   instrucciones: { instruccion: string; distancia: string }[] = [];
+  // 📊 Distancia/tiempo de la ruta trazada (origen→destino), panel fijo
+  // en vez del toast que desaparecía a los pocos segundos.
+  rutaDistanciaKm: number | null = null;
+  rutaTiempoMin: number | null = null;
 
   private readonly MAX_PUNTOS_RUTA = 2;
 
@@ -411,6 +415,19 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     await this.showToast('Toca el mapa para marcar tu destino', 'primary');
   }
 
+  // Se llama desde los botones de "Sendero / Caminata / Auto". Si ya hay
+  // una ruta trazada (origen y destino marcados), la recalcula al vuelo
+  // con el nuevo perfil, en vez de esperar a que el usuario la vuelva a
+  // trazar a mano.
+  seleccionarPerfilRuta(perfil: 'hike' | 'foot' | 'car') {
+    if (this.perfilRuta === perfil) return;
+    this.perfilRuta = perfil;
+
+    if (this.puntosRuta.length === this.MAX_PUNTOS_RUTA) {
+      this.trazarRuta(this.puntosRuta[0], this.puntosRuta[1]);
+    }
+  }
+
   private async trazarRuta(origen: L.LatLng, destino: L.LatLng) {
     if (!this.security.isValidCoordinates(origen.lat, origen.lng) ||
       !this.security.isValidCoordinates(destino.lat, destino.lng)) {
@@ -510,9 +527,9 @@ export class MapaPage implements AfterViewInit, OnDestroy {
           : `${(paso.distance / 1000).toFixed(1)} km`
       }));
 
-      const distancia = (resumen.distance / 1000).toFixed(2);
-      const tiempo = Math.round(resumen.duration / 60);
-      await this.showToast(`🥾 ${distancia} km · ~${tiempo} min`, 'success');
+      // 📊 Panel fijo (ya no un toast que desaparece a los pocos segundos)
+      this.rutaDistanciaKm = resumen.distance / 1000;
+      this.rutaTiempoMin = Math.round(resumen.duration / 60);
 
       this.trackingService.guardarRutaTrazada(
         latLngs.map(ll => ({ lat: ll.lat, lng: ll.lng })),
@@ -590,6 +607,8 @@ export class MapaPage implements AfterViewInit, OnDestroy {
     this.marcadoresRuta = [];
     this.puntosRuta = [];
     this.instrucciones = [];
+    this.rutaDistanciaKm = null;
+    this.rutaTiempoMin = null;
     this.mostrarInstrucciones = false;
     this.modoRuta = false;
     this.map.off('click');

@@ -130,9 +130,28 @@
       </h4>
 
       <div class="perfil-selector">
-        <button class="perfil-btn" [class.active]="perfilRuta === 'hike'" (click)="perfilRuta = 'hike'">🥾 Sendero</button>
-        <button class="perfil-btn" [class.active]="perfilRuta === 'foot'" (click)="perfilRuta = 'foot'">🚶 Caminata</button>
-        <button class="perfil-btn" [class.active]="perfilRuta === 'car'" (click)="perfilRuta = 'car'">🚗 Auto</button>
+        <button class="perfil-btn" [class.active]="perfilRuta === 'hike'" (click)="seleccionarPerfilRuta('hike')">🥾 Sendero</button>
+        <button class="perfil-btn" [class.active]="perfilRuta === 'foot'" (click)="seleccionarPerfilRuta('foot')">🚶 Caminata</button>
+        <button class="perfil-btn" [class.active]="perfilRuta === 'car'" (click)="seleccionarPerfilRuta('car')">🚗 Auto</button>
+      </div>
+
+      <!-- 📊 PANEL FIJO: distancia/tiempo de la ruta trazada -->
+      <div class="stats-panel" *ngIf="rutaDistanciaKm !== null">
+        <div class="stat-item">
+          <ion-icon name="map-outline" color="primary"></ion-icon>
+          <div>
+            <small>Distancia</small>
+            <strong>{{ rutaDistanciaKm | number:'1.2-2' }} km</strong>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <ion-icon name="time-outline" color="primary"></ion-icon>
+          <div>
+            <small>Tiempo estimado</small>
+            <strong>~{{ rutaTiempoMin }} min</strong>
+          </div>
+        </div>
       </div>
 
       <div class="ruta-buttons">
