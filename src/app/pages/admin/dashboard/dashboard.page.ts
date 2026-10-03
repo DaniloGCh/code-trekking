@@ -452,6 +452,56 @@ export class DashboardPage implements OnInit, OnDestroy {
     this.scrollToElement('form-lugar');
   }
 
+  // =========================
+  // 🧭 COORDENADAS: signo negativo sin depender del teclado
+  // =========================
+  // Algunos teclados numéricos de Android (inputmode="decimal") no
+  // incluyen la tecla "-", así que el signo se maneja con este botón en
+  // vez de depender de que el teclado la tenga.
+  toggleSignoCoordenada(campo: 'latitud' | 'longitud') {
+    const control = this.lugarForm.get(campo);
+    if (!control) return;
+
+    const valorActual = (control.value ?? '').toString().trim();
+    if (!valorActual) return;
+
+    const nuevoValor = valorActual.startsWith('-')
+      ? valorActual.substring(1)
+      : '-' + valorActual;
+
+    control.setValue(nuevoValor);
+  }
+
+  // Filtra lo que se escribe en Latitud/Longitud: solo dígitos, un signo
+  // negativo al inicio (si ya estaba puesto por el botón ±) y hasta 6
+  // decimales — la precisión estándar de GPS (~11 cm), igual que ya se
+  // usa para mostrar coordenadas en el mapa.
+  formatearCoordenada(event: any, campo: 'latitud' | 'longitud') {
+    // 🔒 En ion-input, el valor real viene en event.detail.value, no en
+    // event.target.value (eso es lo que hacía que el recorte de
+    // decimales no se reflejara en pantalla).
+    const valorOriginal: string = event.detail?.value ?? '';
+    const esNegativo = valorOriginal.trim().startsWith('-');
+
+    let limpio = valorOriginal.replace(/[^0-9.]/g, '');
+
+    const partes = limpio.split('.');
+    if (partes.length > 2) {
+      limpio = partes[0] + '.' + partes.slice(1).join('');
+    }
+
+    const [entero, decimales] = limpio.split('.');
+    limpio = decimales !== undefined ? `${entero}.${decimales.slice(0, 6)}` : entero;
+
+    const resultado = esNegativo && limpio ? '-' + limpio : limpio;
+
+    // Al actualizar el FormControl (sin emitEvent:false), el binding de
+    // formControlName refresca solo el texto que se ve en el ion-input.
+    if (resultado !== valorOriginal) {
+      this.lugarForm.get(campo)?.setValue(resultado);
+    }
+  }
+
   async onGuardarLugar() {
     if (this.lugarForm.invalid) { this.lugarForm.markAllAsTouched(); return; }
 
