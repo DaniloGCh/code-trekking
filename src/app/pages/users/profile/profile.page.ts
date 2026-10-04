@@ -210,6 +210,17 @@ export class ProfilePage implements OnInit {
               return true;
             }
 
+            // 🔒 Límite de caracteres reforzado: el maxlength nativo del
+            // AlertController no siempre bloquea texto pegado de golpe, así
+            // que se valida también acá antes de guardar, con aviso claro.
+            if (valor.length > config.maxLength) {
+              await this.showToast(
+                `Máximo ${config.maxLength} caracteres (escribiste ${valor.length}). Acorta el texto para guardar.`,
+                'warning'
+              );
+              return false;
+            }
+
             // Validación de seguridad
             if (!this.security.isSafeText(valor, config.maxLength)) {
               await this.showToast(
@@ -222,28 +233,15 @@ export class ProfilePage implements OnInit {
             // Sanitización
             const valorSeguro = this.security.sanitizeInput(valor);
 
-            try {
-              await this.authService.updateProfile({
-                [campo]: valorSeguro
-              });
+            await this.authService.updateProfile({
+              [campo]: valorSeguro
+            });
 
-              if (this.userData) {
-                this.userData[campo] = valorSeguro;
-              }
-
-              await this.showToast(
-                'Información actualizada correctamente',
-                'success'
-              );
-              return true;
-
-            } catch {
-              await this.showToast(
-                'Error al actualizar la información',
-                'danger'
-              );
-              return false;
+            if (this.userData) {
+              this.userData[campo] = valorSeguro;
             }
+
+            return true;
           }
         }
       ]
