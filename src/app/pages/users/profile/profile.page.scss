@@ -687,6 +687,39 @@ font-size: 18px; /* Tamaño del lápiz */
 }
 
 /* ================================ */
+/* 🔧 ANTI-DESBORDE (texto largo)   */
+/* ================================ */
+/* Aplica a las 6 cajas de Sobre mí + Aventura (comparten estas clases):
+   evita que un texto largo (sobre todo sin espacios) empuje o esconda
+   el botón de editar, y evita que se salga del recuadro. */
+
+.sobre-mi-item {
+align-items: flex-start; /* ícono y botón quedan arriba cuando el texto ocupa varias líneas, en vez de centrados raro */
+}
+
+.sobre-mi-item ion-label {
+min-width: 0; /* clave en flexbox: permite que el label se achique y el texto salte de línea en vez de empujar todo lo demás fuera de la caja */
+overflow: hidden;
+}
+
+.sobre-mi-item ion-label p,
+.sobre-mi-item ion-label h3 {
+overflow-wrap: anywhere; /* corta palabras muy largas sin espacios para que nunca se desborden */
+word-break: break-word;
+}
+
+.sobre-mi-item .icon-green {
+flex-shrink: 0; /* el ícono de la izquierda nunca se achica */
+margin-top: 2px;
+}
+
+.sobre-mi-item ion-button {
+flex-shrink: 0; /* el botón de editar nunca se achica ni desaparece, pase lo que pase con el texto */
+align-self: flex-start;
+margin-top: 2px;
+}
+
+/* ================================ */
 /* 💤 CAMPO VACÍO                   */
 /* ================================ */
 
