@@ -30,6 +30,8 @@ export class GaleriaPage implements OnInit, OnDestroy {
 
   userData: UserData | null = null;
   suscripcionActiva = false;
+  // ⏳ true mientras se verifica la suscripción (evita mostrar los planes por un instante)
+  cargandoSuscripcion = true;
   diasGracia: number | null = null;
 
   planActivoNombre: string = '';
@@ -67,6 +69,7 @@ export class GaleriaPage implements OnInit, OnDestroy {
   async ionViewWillEnter() {
     this.verPlanesManualmente = false;
     this.suscripcionActiva = false; // Limpia estado previo
+    this.cargandoSuscripcion = true;
     await this.cargarTodoElEstado();
   }
 
@@ -75,24 +78,30 @@ export class GaleriaPage implements OnInit, OnDestroy {
   }
 
   private async cargarTodoElEstado() {
-    await runInInjectionContext(this.injector, async () => {
-      this.userData = await this.authService.getCurrentUserData();
-      if (!this.userData) return;
+    try {
+      await runInInjectionContext(this.injector, async () => {
+        this.userData = await this.authService.getCurrentUserData();
+        if (!this.userData) return;
 
-      const sub = await this.authService.verificarYActualizarSuscripcion();
+        const sub = await this.authService.verificarYActualizarSuscripcion();
 
+        this.ngZone.run(() => {
+          this.aplicarEstadoSuscripcion(sub);
+
+          if (this.suscripcionActiva) {
+            this.verPlanesManualmente = false;
+            this.escucharFotos(this.userData!.uid);
+          }
+        });
+      });
+    } finally {
+      // Se oculta la carga aunque la verificación falle, para no dejar la pantalla pegada
       this.ngZone.run(() => {
-        this.aplicarEstadoSuscripcion(sub);
-
-        if (this.suscripcionActiva) {
-          this.verPlanesManualmente = false;
-          this.escucharFotos(this.userData!.uid);
-        }
-
+        this.cargandoSuscripcion = false;
         this.cdr.markForCheck();
         this.cdr.detectChanges();
       });
-    });
+    }
   }
 
   private aplicarEstadoSuscripcion(sub: SuscripcionData | null) {

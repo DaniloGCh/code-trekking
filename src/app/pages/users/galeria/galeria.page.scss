@@ -403,3 +403,31 @@ swiper-container {
   }
 
 }
+// =========================
+// ⏳ CARGA DE SUSCRIPCIÓN
+// =========================
+.carga-suscripcion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 60vh;
+  text-align: center;
+
+  .carga-logo {
+    width: 96px;
+    height: 96px;
+    animation: pulso-logo 1.6s ease-in-out infinite;
+  }
+
+  p {
+    margin: 0;
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulso-logo {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.06); opacity: 0.85; }
+}

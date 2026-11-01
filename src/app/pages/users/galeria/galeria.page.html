@@ -69,6 +69,14 @@
   <!-- ============================================================ -->
   <!-- 🖼️ GALERÍA (mostrarGaleria = suscripción activa Y no está viendo planes manualmente) -->
   <!-- ============================================================ -->
+  <!-- ⏳ CARGA: mientras se verifica la suscripción no se muestran los planes -->
+  <div class="carga-suscripcion" *ngIf="cargandoSuscripcion">
+    <img src="assets/icons/icon-512.webp" alt="Code Trekking" class="carga-logo" />
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Verificando suscripción...</p>
+  </div>
+
+  <ng-container *ngIf="!cargandoSuscripcion">
   <ng-container *ngIf="mostrarGaleria; else planesTemplate">
 
     <div class="galeria-grid" *ngIf="fotos.length > 0; else sinFotos">
@@ -99,6 +107,7 @@
       </div>
     </ng-template>
 
+  </ng-container>
   </ng-container>
 
   <!-- ============================================================ -->
