@@ -29,12 +29,12 @@ import {
   setDoc,
   getDoc,
   getDocFromServer,
-  getDocs,
   collection,
   collectionData,
   updateDoc,
   deleteDoc,
-  addDoc
+  addDoc,
+  runTransaction
 } from '@angular/fire/firestore';
 
 // =========================
@@ -380,20 +380,72 @@ export class AuthService {
     );
 
     await reauthenticateWithCredential(currentUser, credential);
+    // Libera el nombre en el índice (si no existe o no es suyo, las reglas lo rechazan)
+    if (userData.nombre) {
+      await deleteDoc(this.refIndiceNombre(userData.nombre)).catch(() => {});
+    }
     await deleteDoc(userRef);
     await deleteUser(currentUser);
   }
 
+  // =========================
+  // 🏷️ ÍNDICE DE NOMBRES (nombresUsuario/{clave} -> { uid })
+  // =========================
+  // Las reglas de Firestore no permiten a un usuario leer toda la colección
+  // 'usuarios' (expondría correos y respuestas de seguridad), así que la
+  // unicidad se verifica contra este índice, que solo guarda el uid.
+
   async isNombreDisponible(nombre: string, excluirUid?: string): Promise<boolean> {
-    const usuariosRef = collection(this.firestore, 'usuarios');
-    const snapshot = await getDocs(usuariosRef);
-    const clave = this.claveNombre(nombre);
-    // Se ignora el documento del propio usuario (excluirUid) para que pueda
-    // cambiar solo mayúsculas de su nombre actual sin chocar consigo mismo.
-    return !snapshot.docs.some(d =>
-      d.id !== excluirUid &&
-      this.claveNombre((d.data() as UserData).nombre || '') === clave
-    );
+    const snap = await getDoc(this.refIndiceNombre(nombre));
+    // Si el nombre ya es del propio usuario (excluirUid) se considera disponible,
+    // así puede cambiar solo mayúsculas de su nombre actual.
+    return !snap.exists() || snap.data()['uid'] === excluirUid;
+  }
+
+  // Reserva el nombre nuevo en el índice, libera el anterior y actualiza el perfil
+  // en una sola transacción, para que dos usuarios no tomen el mismo nombre a la vez.
+  async cambiarNombreUsuario(nombreSeguro: string, nombreAnterior: string): Promise<void> {
+    const uid = this.auth.currentUser?.uid;
+    if (!uid) throw new Error('No autenticado');
+
+    const refNuevo = this.refIndiceNombre(nombreSeguro);
+    const refAnterior = nombreAnterior ? this.refIndiceNombre(nombreAnterior) : null;
+    const userRef = doc(this.firestore, `usuarios/${uid}`);
+
+    await runTransaction(this.firestore, async (tx) => {
+      const nuevo = await tx.get(refNuevo);
+      const anterior = refAnterior ? await tx.get(refAnterior) : null;
+
+      if (nuevo.exists() && nuevo.data()['uid'] !== uid) {
+        throw new Error('nombre-en-uso');
+      }
+
+      if (refAnterior && anterior?.exists() && refAnterior.id !== refNuevo.id && anterior.data()['uid'] === uid) {
+        tx.delete(refAnterior);
+      }
+      if (!nuevo.exists()) {
+        tx.set(refNuevo, { uid });
+      }
+      tx.update(userRef, {
+        nombre: nombreSeguro,
+        ultimoCambioNombre: new Date().toISOString()
+      });
+    });
+  }
+
+  // Registra en el índice el nombre actual de usuarios creados antes de que
+  // existiera el índice. Si otro usuario ya lo tiene registrado, no hace nada.
+  async asegurarNombreEnIndice(userData: UserData): Promise<void> {
+    if (!userData?.nombre || !userData.uid) return;
+    const ref = this.refIndiceNombre(userData.nombre);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      await setDoc(ref, { uid: userData.uid });
+    }
+  }
+
+  private refIndiceNombre(nombre: string) {
+    return doc(this.firestore, `nombresUsuario/${this.claveNombre(nombre)}`);
   }
 
   // Normaliza un nombre (crudo o ya sanitizado) a la misma forma para comparar
