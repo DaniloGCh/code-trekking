@@ -341,3 +341,27 @@ ion-grid ion-col {
 .stat-card.eventos{
   color: #a855f7; /* Color a juego con el borde */
 }
+/* =========================
+   📄 EDITOR DE TÉRMINOS POR SECCIONES
+   ========================= */
+.terminos-ayuda {
+  margin: 0 0 10px; /* Separación con la lista de secciones */
+  font-size: 0.8rem; /* Texto de ayuda compacto */
+  color: #94a3b8; /* Gris secundario */
+  line-height: 1.5;
+}
+
+.terminos-seccion-acciones {
+  display: flex; /* Botones en fila */
+  justify-content: flex-end; /* Alineados a la derecha */
+  flex-wrap: wrap; /* Se acomodan en pantallas angostas */
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.terminos-herramientas {
+  display: flex; /* Botones en fila */
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}

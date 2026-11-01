@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, ToastController, LoadingController, IonAccordionGroup } from '@ionic/angular';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AlertController, ToastController, LoadingController, ModalController, IonAccordionGroup } from '@ionic/angular';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Auth, EmailAuthProvider, reauthenticateWithCredential } from '@angular/fire/auth';
 import { Firestore, collection, collectionData } from '@angular/fire/firestore';
@@ -27,6 +27,10 @@ import {
 
 import { SessionService } from 'src/app/core/services/session.service';
 import { SecurityService } from 'src/app/core/services/security.service';
+import { SeccionTerminos, TerminosService, TerminosVigentes } from 'src/app/core/services/terminos.service';
+import { TerminosControlService } from 'src/app/core/services/terminos-control.service';
+import { TerminosModalComponent } from 'src/app/components/terminos-modal/terminos-modal.component';
+import { TERMINOS_BASE_INTRODUCCION, TERMINOS_BASE_SECCIONES } from 'src/app/components/terminos-modal/terminos-base';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,6 +61,9 @@ export class DashboardPage implements OnInit, OnDestroy {
   private sanitizer = inject(DomSanitizer);
   private sessionService = inject(SessionService);
   private security = inject(SecurityService);
+  private terminosService = inject(TerminosService);
+  private terminosControl = inject(TerminosControlService);
+  private modalCtrl = inject(ModalController);
   @ViewChild('accordionAdmin') accordionGroup?: IonAccordionGroup;
   @ViewChild('accordionUsuarios') accordionUsuarios?: IonAccordionGroup;
 
@@ -192,6 +199,22 @@ export class DashboardPage implements OnInit, OnDestroy {
   });
 
   // =========================
+  // 📄 TÉRMINOS Y CONDICIONES
+  // =========================
+  terminosVigentes: TerminosVigentes | null = null;
+  mostrarFormTerminos = false;
+
+  /** Sección abierta en el editor (valor del ion-accordion). */
+  seccionTerminosAbierta?: string;
+
+  terminosForm: FormGroup = this.fb.group({
+    version: ['', [Validators.required, Validators.pattern(TerminosService.FORMATO_VERSION)]],
+    resumenCambios: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
+    introduccion: ['', [Validators.maxLength(2000)]],
+    secciones: this.fb.array([]),
+  });
+
+  // =========================
   // 🎒 EQUIPAMIENTO
   // =========================
   equipamientoOpciones = [
@@ -240,6 +263,14 @@ export class DashboardPage implements OnInit, OnDestroy {
   get mOrden() { return this.manualForm.get('orden'); }
 
   // =========================
+  // 📌 GETTERS - TÉRMINOS
+  // =========================
+  get tVersion() { return this.terminosForm.get('version'); }
+  get tResumen() { return this.terminosForm.get('resumenCambios'); }
+  get tIntroduccion() { return this.terminosForm.get('introduccion'); }
+  get tSecciones() { return this.terminosForm.get('secciones') as FormArray; }
+
+  // =========================
   // 📌 GETTERS - KIT PA
   // =========================
   get paNombre() { return this.paForm.get('nombre'); }
@@ -286,6 +317,8 @@ export class DashboardPage implements OnInit, OnDestroy {
       }
       control?.updateValueAndValidity();
     });
+
+    this.cargarTerminosVigentes();
 
     this.eventos$.subscribe(eventos => {
       this.totalEventos = eventos.length;
@@ -785,6 +818,235 @@ export class DashboardPage implements OnInit, OnDestroy {
   // =========================
   // 👥 USUARIOS
   // =========================
+  // =========================
+  // 📄 TÉRMINOS Y CONDICIONES
+  // =========================
+  async cargarTerminosVigentes() {
+    this.terminosVigentes = await this.terminosService.obtenerVigentes();
+  }
+
+  onNuevaVersionTerminos() {
+    this.terminosForm.reset({ version: '', resumenCambios: '', introduccion: '' });
+
+    // Se parte de los términos ya escritos: los publicados o, si no hay, el texto base
+    const vigentes = this.terminosVigentes;
+    if (vigentes?.secciones?.length) {
+      this.cargarSeccionesEnEditor(vigentes.introduccion ?? '', vigentes.secciones);
+    } else {
+      this.cargarSeccionesEnEditor(TERMINOS_BASE_INTRODUCCION, TERMINOS_BASE_SECCIONES);
+    }
+
+    this.mostrarFormTerminos = true;
+  }
+
+  onCancelarFormTerminos() {
+    this.mostrarFormTerminos = false;
+    this.seccionTerminosAbierta = undefined;
+    this.tSecciones.clear();
+    this.terminosForm.reset();
+  }
+
+  /** Reemplaza el borrador por el texto base (versión 1.0). */
+  async onRestaurarTextoBaseTerminos() {
+    const alert = await this.alertCtrl.create({
+      header: 'Restaurar texto base',
+      message: 'Se reemplazarán las secciones del borrador por el texto original (versión 1.0). ¿Continuar?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Restaurar',
+          handler: () => this.cargarSeccionesEnEditor(TERMINOS_BASE_INTRODUCCION, TERMINOS_BASE_SECCIONES)
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private cargarSeccionesEnEditor(introduccion: string, secciones: SeccionTerminos[]) {
+    this.terminosForm.patchValue({ introduccion });
+    this.tSecciones.clear();
+    secciones.forEach(seccion => this.tSecciones.push(this.crearSeccionTerminosForm(seccion)));
+    this.seccionTerminosAbierta = undefined;
+  }
+
+  private crearSeccionTerminosForm(seccion?: SeccionTerminos): FormGroup {
+    return this.fb.group({
+      numero: [seccion?.numero ?? '', [Validators.maxLength(10)]],
+      titulo: [seccion?.titulo ?? '', [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      contenido: [seccion?.contenido ?? '', [Validators.required, Validators.minLength(10), Validators.maxLength(10000)]],
+    });
+  }
+
+  onAgregarSeccionTerminos() {
+    // Siguiente número correlativo a partir de la última sección numerada
+    const numeros = this.tSecciones.controls
+      .map(control => parseInt(control.value.numero, 10))
+      .filter(numero => !isNaN(numero));
+    const siguiente = numeros.length ? Math.max(...numeros) + 1 : 0;
+
+    this.tSecciones.push(this.crearSeccionTerminosForm({
+      numero: String(siguiente).padStart(2, '0'),
+      titulo: '',
+      contenido: ''
+    }));
+
+    this.seccionTerminosAbierta = `seccion-${this.tSecciones.length - 1}`;
+  }
+
+  async onEliminarSeccionTerminos(index: number) {
+    if (this.tSecciones.length <= 1) {
+      await this.showToast('Los términos deben tener al menos una sección.', 'warning');
+      return;
+    }
+
+    const titulo = this.tSecciones.at(index)?.value.titulo || 'sin título';
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar sección',
+      message: `¿Eliminar la sección "${this.security.sanitizeInput(titulo)}" del borrador?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          handler: () => {
+            this.tSecciones.removeAt(index);
+            this.seccionTerminosAbierta = undefined;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  onMoverSeccionTerminos(index: number, direccion: -1 | 1) {
+    const destino = index + direccion;
+    if (destino < 0 || destino >= this.tSecciones.length) return;
+
+    const control = this.tSecciones.at(index);
+    this.tSecciones.removeAt(index);
+    this.tSecciones.insert(destino, control);
+    this.seccionTerminosAbierta = `seccion-${destino}`;
+  }
+
+  onCambioSeccionTerminos(event: any) {
+    this.seccionTerminosAbierta = event.detail.value ?? undefined;
+  }
+
+  /** Texto del borrador, limpio y listo para guardar o previsualizar. */
+  private obtenerBorradorTerminos(): { introduccion: string; secciones: SeccionTerminos[] } {
+    return {
+      introduccion: String(this.terminosForm.value.introduccion ?? '').trim(),
+      secciones: this.tSecciones.controls.map(control => ({
+        numero: String(control.value.numero ?? '').trim(),
+        titulo: String(control.value.titulo ?? '').trim(),
+        contenido: String(control.value.contenido ?? '').trim(),
+      }))
+    };
+  }
+
+  async onVistaPreviaTerminos() {
+    const borrador = this.obtenerBorradorTerminos();
+    const modal = await this.modalCtrl.create({
+      component: TerminosModalComponent,
+      componentProps: {
+        vistaPrevia: {
+          version: String(this.terminosForm.value.version ?? '').trim(),
+          fechaPublicacion: null,
+          introduccion: borrador.introduccion,
+          secciones: borrador.secciones
+        } as TerminosVigentes
+      },
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      cssClass: 'terminos-modal'
+    });
+    await modal.present();
+  }
+
+  async onVerTerminosVigentes() {
+    await this.terminosControl.abrirConsulta();
+  }
+
+  async onPublicarTerminos() {
+    if (this.terminosForm.invalid) { this.terminosForm.markAllAsTouched(); return; }
+
+    const version = String(this.terminosForm.value.version).trim();
+    const resumenCambios = String(this.terminosForm.value.resumenCambios).trim();
+    const { introduccion, secciones } = this.obtenerBorradorTerminos();
+
+    if (!secciones.length) {
+      await this.showToast('Los términos deben tener al menos una sección.', 'warning');
+      return;
+    }
+
+    const versionActual = this.terminosVigentes?.version ?? TerminosService.VERSION_BASE;
+    if (TerminosService.compararVersiones(version, versionActual) <= 0) {
+      await this.showToast(`La nueva versión debe ser mayor a la vigente (${versionActual}).`, 'warning');
+      return;
+    }
+
+    if (!this.security.isSafeText(resumenCambios, 1000) || (introduccion && !this.security.isSafeText(introduccion, 2000))) {
+      await this.showToast('El resumen o la introducción contienen caracteres o código no permitidos.', 'danger');
+      return;
+    }
+
+    const seccionInsegura = secciones.find(s =>
+      (s.numero && !this.security.isSafeText(s.numero, 10)) ||
+      !this.security.isSafeText(s.titulo, 150) ||
+      !this.security.isSafeText(s.contenido, 10000)
+    );
+    if (seccionInsegura) {
+      await this.showToast(`La sección "${seccionInsegura.titulo}" contiene caracteres o código no permitidos.`, 'danger');
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Publicar términos',
+      message: `Se publicará la versión ${version}. Los usuarios sin pago vigente deberán aceptarla para seguir usando la app y los usuarios con pago vigente recibirán un aviso. ¿Continuar?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Publicar',
+          handler: async () => {
+            const loading = await this.loadingCtrl.create({ message: 'Publicando...' });
+            await loading.present();
+
+            try {
+              await this.terminosService.publicarNuevaVersion({ version, resumenCambios, introduccion, secciones });
+              await this.cargarTerminosVigentes();
+              this.onCancelarFormTerminos();
+              await this.showToast(`Versión ${version} publicada`, 'success');
+            } catch (error: any) {
+              console.error('[DashboardPage] Error al publicar los términos:', error);
+              const messages: Record<string, string> = {
+                'version-invalida': 'La versión debe tener el formato 1.1 o 2.0.1.',
+                'version-no-mayor': 'La nueva versión debe ser mayor a la vigente.',
+                'sin-secciones': 'Los términos deben tener al menos una sección.',
+                'permission-denied': 'Sin permisos para publicar: revisa que las reglas de Firestore para "configuracion/terminos" estén publicadas.',
+              };
+              await this.showToast(messages[error?.message] || messages[error?.code] || 'Error al publicar los términos', 'danger');
+            } finally {
+              await loading.dismiss();
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  formatearFechaTerminos(fecha?: string | null): string {
+    if (!fecha) return 'Versión base (sin publicación)';
+    return new Date(fecha).toLocaleString('es-CL', {
+      timeZone: 'America/Santiago',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
+
   async onChangeRole(user: UserData) {
     const nuevoRol = user.rol === 'admin' ? 'user' : 'admin';
     const alert = await this.alertCtrl.create({

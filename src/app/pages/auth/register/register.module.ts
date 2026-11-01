@@ -5,7 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { RouterModule, Routes } from '@angular/router';
 
 import { RegisterPage } from './register.page';
-import { TerminosModalComponent } from 'src/app/components/terminos-modal/terminos-modal.component';
+import { TerminosModalModule } from 'src/app/components/terminos-modal/terminos-modal.module';
 
 
 // =========================
@@ -25,13 +25,13 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     RegisterPage,
-    TerminosModalComponent 
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     IonicModule,
     RouterModule.forChild(routes),
+    TerminosModalModule,
   ]
 })
 export class RegisterPageModule {}

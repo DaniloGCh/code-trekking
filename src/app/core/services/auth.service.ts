@@ -42,6 +42,7 @@ import {
 // =========================
 import { Observable } from 'rxjs';
 import { SecurityService } from './security.service';
+import { TerminosService, AceptacionTerminos } from './terminos.service';
 import { environment } from 'src/environments/environment';
 
 export interface ContactoEmergencia {
@@ -111,6 +112,7 @@ export interface UserData {
   terminosAceptados?: boolean;
   fechaAceptacionTerminos?: string;
   versionTerminos?: string;
+  historialTerminos?: AceptacionTerminos[];
 
   suscripcion?: SuscripcionData;
 }
@@ -123,6 +125,7 @@ export class AuthService {
   private auth = inject(Auth);
   private firestore = inject(Firestore);
   private security = inject(SecurityService);
+  private terminosService = inject(TerminosService);
 
   private loginAttempts = 0;
   private lastLoginAttempt = 0;
@@ -179,6 +182,13 @@ export class AuthService {
 
     const uid = credential.user.uid;
 
+    // 📄 Se registra la aceptación de la versión vigente al momento del registro
+    const vigentes = await this.terminosService.obtenerVigentes();
+    const aceptacion: AceptacionTerminos = {
+      version: vigentes.version,
+      fecha: new Date().toISOString()
+    };
+
     const userRef = doc(
       this.firestore,
       `usuarios/${uid}`
@@ -198,8 +208,9 @@ export class AuthService {
         ultimoMes: new Date().toISOString().substring(0, 7)
       },
       terminosAceptados: terminosAceptados,
-      fechaAceptacionTerminos: new Date().toISOString(),
-      versionTerminos: '1.0'
+      fechaAceptacionTerminos: aceptacion.fecha,
+      versionTerminos: aceptacion.version,
+      historialTerminos: [aceptacion]
     } as UserData);
   }
 

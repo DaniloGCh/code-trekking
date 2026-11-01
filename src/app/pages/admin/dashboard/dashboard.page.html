@@ -1052,6 +1052,180 @@
 
             </ion-accordion-group>
 
+
+            <!-- ========================= -->
+            <!-- 📄 TÉRMINOS Y CONDICIONES -->
+            <!-- ========================= -->
+            <h3 class="section-title">
+              Términos y condiciones
+              <ion-button fill="clear" size="small" (click)="onNuevaVersionTerminos()" *ngIf="!mostrarFormTerminos">
+                <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+                Nueva versión
+              </ion-button>
+            </h3>
+
+            <!-- VERSIÓN VIGENTE -->
+            <ion-list>
+              <ion-item>
+                <ion-icon name="document-text-outline" slot="start" color="success"></ion-icon>
+                <ion-label class="ion-text-wrap">
+                  <h3>Versión vigente: {{ terminosVigentes?.version || '...' }}</h3>
+                  <p>Publicada: {{ formatearFechaTerminos(terminosVigentes?.fechaPublicacion) }}</p>
+                  <p *ngIf="terminosVigentes?.resumenCambios">Cambios: {{ terminosVigentes?.resumenCambios }}</p>
+                </ion-label>
+                <ion-button slot="end" fill="clear" color="primary" (click)="onVerTerminosVigentes()">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </ion-list>
+
+            <!-- FORMULARIO NUEVA VERSIÓN -->
+            <ion-card id="form-terminos" *ngIf="mostrarFormTerminos" class="form-card">
+              <ion-card-header>
+                <ion-card-title>➕ Publicar nueva versión</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                <form [formGroup]="terminosForm" (ngSubmit)="onPublicarTerminos()">
+
+                  <!-- VERSIÓN -->
+                  <ion-item [class.ion-invalid]="tVersion?.invalid && tVersion?.touched">
+                    <ion-label position="floating">Nueva versión (ej: 1.1)</ion-label>
+                    <ion-input formControlName="version" inputmode="decimal"></ion-input>
+                    <ion-note slot="error">
+                      <span *ngIf="tVersion?.errors?.['required']">La versión es requerida</span>
+                      <span *ngIf="tVersion?.errors?.['pattern']">Formato válido: 1.1 o 2.0.1</span>
+                    </ion-note>
+                  </ion-item>
+
+                  <!-- RESUMEN DE CAMBIOS -->
+                  <ion-item [class.ion-invalid]="tResumen?.invalid && tResumen?.touched">
+                    <ion-label position="floating">Resumen de cambios</ion-label>
+                    <ion-textarea formControlName="resumenCambios" rows="3"></ion-textarea>
+                    <ion-note slot="error">
+                      <span *ngIf="tResumen?.errors?.['required']">El resumen es requerido</span>
+                      <span *ngIf="tResumen?.errors?.['minlength']">Mínimo 10 caracteres</span>
+                      <span *ngIf="tResumen?.errors?.['maxlength']">Máximo 1000 caracteres</span>
+                    </ion-note>
+                  </ion-item>
+
+                  <!-- INTRODUCCIÓN -->
+                  <ion-item [class.ion-invalid]="tIntroduccion?.invalid && tIntroduccion?.touched">
+                    <ion-label position="floating">Introducción (opcional)</ion-label>
+                    <ion-textarea formControlName="introduccion" rows="3" [autoGrow]="true"></ion-textarea>
+                    <ion-note slot="error">
+                      <span *ngIf="tIntroduccion?.errors?.['maxlength']">Máximo 2000 caracteres</span>
+                    </ion-note>
+                  </ion-item>
+
+                  <!-- SECCIONES -->
+                  <h3 class="section-title">
+                    Secciones ({{ tSecciones.length }})
+                    <ion-button fill="clear" size="small" (click)="onAgregarSeccionTerminos()">
+                      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+                      Agregar sección
+                    </ion-button>
+                  </h3>
+
+                  <p class="terminos-ayuda">
+                    Separa los párrafos con una línea en blanco · empieza una línea con
+                    <strong>- </strong> para crear una lista · escribe <strong>**texto**</strong> para negrita.
+                  </p>
+
+                  <ion-accordion-group formArrayName="secciones" [value]="seccionTerminosAbierta"
+                    (ionChange)="onCambioSeccionTerminos($event)">
+
+                    <ion-accordion *ngFor="let seccion of tSecciones.controls; let i = index; let primera = first; let ultima = last"
+                      [value]="'seccion-' + i" [formGroupName]="i">
+
+                      <!-- HEADER -->
+                      <ion-item slot="header">
+                        <ion-icon slot="start" [name]="seccion.invalid ? 'alert-circle-outline' : 'document-text-outline'"
+                          [color]="seccion.invalid ? 'danger' : 'success'"></ion-icon>
+                        <ion-label class="ion-text-wrap">
+                          <h3>{{ seccion.value.numero ? seccion.value.numero + ' · ' : '' }}{{ seccion.value.titulo || 'Nueva sección' }}</h3>
+                        </ion-label>
+                      </ion-item>
+
+                      <!-- CONTENT -->
+                      <div slot="content" class="ion-padding">
+
+                        <ion-item>
+                          <ion-label position="floating">Número / etiqueta (opcional, ej: 25)</ion-label>
+                          <ion-input formControlName="numero" maxlength="10"></ion-input>
+                        </ion-item>
+
+                        <ion-item [class.ion-invalid]="seccion.get('titulo')?.invalid && seccion.get('titulo')?.touched">
+                          <ion-label position="floating">Título de la sección</ion-label>
+                          <ion-input formControlName="titulo"></ion-input>
+                          <ion-note slot="error">
+                            <span *ngIf="seccion.get('titulo')?.errors?.['required']">El título es requerido</span>
+                            <span *ngIf="seccion.get('titulo')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+                            <span *ngIf="seccion.get('titulo')?.errors?.['maxlength']">Máximo 150 caracteres</span>
+                          </ion-note>
+                        </ion-item>
+
+                        <ion-item [class.ion-invalid]="seccion.get('contenido')?.invalid && seccion.get('contenido')?.touched">
+                          <ion-label position="floating">Contenido de la sección</ion-label>
+                          <ion-textarea formControlName="contenido" rows="8" [autoGrow]="true"></ion-textarea>
+                          <ion-note slot="error">
+                            <span *ngIf="seccion.get('contenido')?.errors?.['required']">El contenido es requerido</span>
+                            <span *ngIf="seccion.get('contenido')?.errors?.['minlength']">Mínimo 10 caracteres</span>
+                            <span *ngIf="seccion.get('contenido')?.errors?.['maxlength']">Máximo 10.000 caracteres</span>
+                          </ion-note>
+                        </ion-item>
+
+                        <!-- ACCIONES DE LA SECCIÓN -->
+                        <div class="terminos-seccion-acciones">
+                          <ion-button fill="clear" size="small" color="medium" [disabled]="primera"
+                            (click)="onMoverSeccionTerminos(i, -1)">
+                            <ion-icon name="arrow-up-outline" slot="icon-only"></ion-icon>
+                          </ion-button>
+                          <ion-button fill="clear" size="small" color="medium" [disabled]="ultima"
+                            (click)="onMoverSeccionTerminos(i, 1)">
+                            <ion-icon name="arrow-down-outline" slot="icon-only"></ion-icon>
+                          </ion-button>
+                          <ion-button fill="clear" size="small" color="danger" (click)="onEliminarSeccionTerminos(i)">
+                            <ion-icon name="trash-outline" slot="start"></ion-icon>
+                            Eliminar sección
+                          </ion-button>
+                        </div>
+
+                      </div>
+
+                    </ion-accordion>
+
+                  </ion-accordion-group>
+
+                  <!-- HERRAMIENTAS DEL BORRADOR -->
+                  <div class="terminos-herramientas">
+                    <ion-button fill="clear" size="small" (click)="onVistaPreviaTerminos()">
+                      <ion-icon name="eye-outline" slot="start"></ion-icon>
+                      Vista previa
+                    </ion-button>
+                    <ion-button fill="clear" size="small" color="medium" (click)="onRestaurarTextoBaseTerminos()">
+                      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                      Restaurar texto base
+                    </ion-button>
+                  </div>
+
+                  <!-- BOTONES -->
+                  <div class="form-buttons">
+                    <ion-button expand="block" type="submit" [disabled]="terminosForm.invalid">
+                      <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+                      Publicar versión
+                    </ion-button>
+
+                    <ion-button expand="block" fill="outline" color="medium" (click)="onCancelarFormTerminos()">
+                      <ion-icon name="close-outline" slot="start"></ion-icon>
+                      Cancelar
+                    </ion-button>
+                  </div>
+
+                </form>
+              </ion-card-content>
+            </ion-card>
+
           </div>
 
         </div>

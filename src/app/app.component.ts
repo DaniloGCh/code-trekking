@@ -2,11 +2,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { App } from '@capacitor/app';
-import { NavigationError, Router } from '@angular/router';
+import { NavigationEnd, NavigationError, Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 
 import { WeatherGlobalService } from 'src/app/core/services/weather-global.service';
 import { TimeService } from 'src/app/core/services/time.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { TerminosControlService } from 'src/app/core/services/terminos-control.service';
 import { generarCodigoError, esErrorDeCarga, esErrorDePermisosPorSesionCerrada } from 'src/app/core/utils/error-utils';
 
 @Component({
@@ -20,12 +22,16 @@ export class AppComponent
 
   private backButtonListener: any;
   private routerEventsSub: any;
+  private authSub: any;
+  private uidActual: string | null = null;
 
   constructor(
     private weatherGlobal: WeatherGlobalService,
     private timeService: TimeService,
     private router: Router,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private authService: AuthService,
+    private terminosControl: TerminosControlService
   ) {}
 
 
@@ -63,6 +69,24 @@ export class AppComponent
     if (event instanceof NavigationError) {
       this.manejarErrorDeNavegacion(event);
     }
+
+    // 📄 Re-aceptación de términos al navegar (nueva versión publicada)
+    if (event instanceof NavigationEnd) {
+      this.terminosControl.verificarAlNavegar(event.urlAfterRedirects);
+    }
+  });
+
+  // 📄 Re-aceptación de términos al iniciar sesión / abrir la app con sesión activa
+  this.authSub = this.authService.currentUser$.subscribe((user) => {
+    const uid = user?.uid ?? null;
+    if (uid === this.uidActual) return;
+    this.uidActual = uid;
+
+    if (uid) {
+      this.terminosControl.verificarAlNavegar(this.router.url);
+    } else {
+      this.terminosControl.reiniciarSesion();
+    }
   });
 }
 
@@ -81,6 +105,7 @@ export class AppComponent
       ?.remove();
 
     this.routerEventsSub?.unsubscribe();
+    this.authSub?.unsubscribe();
   }
 
   // =========================================================

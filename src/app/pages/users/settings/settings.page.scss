@@ -355,3 +355,8 @@ ion-card[color="light"] ion-label h3 {
   color: #ff4d4d; /* Forza el texto del título en color rojo neón */
 
 }
+
+/* Aviso de nueva versión publicada desde la aceptación */
+.estado-nueva-version {
+  margin-bottom: 12px; /* Separación con la información de la versión aceptada */
+}

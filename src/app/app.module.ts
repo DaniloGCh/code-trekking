@@ -35,6 +35,7 @@ import { environment } from '../environments/environment';
 
 // 🧩 Componentes
 import { ManualSupervivenciaComponent } from './components/manual-supervivencia/manual-supervivencia.component';
+import { TerminosModalModule } from './components/terminos-modal/terminos-modal.module';
 
 // 🌐 HTTP
 import {
@@ -66,7 +67,8 @@ register();
     BrowserModule,
     HttpClientModule,
     IonicModule.forRoot(),
-    AppRoutingModule
+    AppRoutingModule,
+    TerminosModalModule
   ],
 
   providers: [

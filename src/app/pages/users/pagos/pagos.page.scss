@@ -112,3 +112,24 @@
     margin: 0 0 12px;
   }
 }
+/* Aviso: términos vigentes pendientes antes de pagar */
+.terminos-pago {
+  display: flex; /* Columna centrada */
+  flex-direction: column;
+  align-items: center;
+  gap: 6px; /* Separación entre elementos */
+  margin-bottom: 16px; /* Separación con el botón de pago */
+  padding: 12px; /* Relleno interno */
+  border: 1px solid rgba(245, 158, 11, 0.45); /* Borde ámbar de advertencia */
+  border-radius: 12px; /* Esquinas redondeadas */
+  text-align: center;
+
+  ion-icon {
+    font-size: 26px; /* Tamaño del icono */
+  }
+
+  p {
+    margin: 0; /* Sin margen por defecto */
+    font-size: 0.9rem; /* Texto compacto */
+  }
+}

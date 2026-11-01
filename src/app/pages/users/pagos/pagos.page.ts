@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, LoadingController, ViewWillEnter } from '@ionic/angular';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { TipoCambioService } from 'src/app/core/services/tipo-cambio.service';
+import { TerminosControlService } from 'src/app/core/services/terminos-control.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
 
@@ -33,6 +34,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   private authService = inject(AuthService);
   private tipoCambioService = inject(TipoCambioService);
   private ngZone = inject(NgZone);
+  private terminosControl = inject(TerminosControlService);
 
   /**
    * Tasa CLP por 1 USD. Arranca con la tasa de respaldo del servicio y se
@@ -66,6 +68,13 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
   sdkListo = false;
   errorSdk = false;
   procesandoRetorno = false;
+
+  /**
+   * 📄 El usuario aceptó la versión vigente de los términos (o es admin).
+   * Mientras sea false no se inicia ningún pago ni se abre PayPal.
+   */
+  terminosAlDia = false;
+  verificandoTerminos = true;
 
   get precioCalculadoUSD(): string {
     return (this.plan.precioCLP / this.tasaCLPxUSD).toFixed(2);
@@ -130,6 +139,7 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   ionViewWillEnter() {
     this.actualizarPlanDesdeUrl();
+    this.cargarEstadoTerminos();
 
     if (!this.esNativo && (window as any).paypal) {
       this.renderBotonesPaypal();
@@ -169,6 +179,45 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
     }
   }
 
+  // =========================
+  // 📄 TÉRMINOS ANTES DE PAGAR
+  // =========================
+
+  private async cargarEstadoTerminos() {
+    this.verificandoTerminos = true;
+    try {
+      const estado = await this.terminosControl.obtenerEstado();
+      this.ngZone.run(() => {
+        this.terminosAlDia = !!estado?.alDia;
+      });
+    } catch (err) {
+      console.error('[PagosPage] No se pudo verificar los términos:', err);
+      this.terminosAlDia = false;
+    } finally {
+      this.verificandoTerminos = false;
+    }
+  }
+
+  /** Exige aceptar la versión vigente. true = ya puede iniciar el pago. */
+  async solicitarAceptacionTerminos(): Promise<boolean> {
+    const aceptado = await this.terminosControl.asegurarAceptacionParaPagar();
+
+    this.ngZone.run(() => {
+      this.terminosAlDia = aceptado;
+    });
+
+    if (!aceptado) {
+      const alert = await this.alertCtrl.create({
+        header: 'Términos y condiciones',
+        message: 'Debes aceptar la versión vigente de los términos y condiciones antes de pagar un plan.',
+        buttons: ['Entendido']
+      });
+      await alert.present();
+    }
+
+    return aceptado;
+  }
+
   private cargarSdkPaypal(): Promise<void> {
     return new Promise((resolve, reject) => {
       if ((window as any).paypal) {
@@ -201,6 +250,25 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
         color: 'gold',
         shape: 'rect',
         label: 'pay'
+      },
+
+      // 🔒 No abre PayPal hasta que el usuario acepte la versión vigente
+      onClick: (_data: any, actions: any) => {
+        if (this.terminosAlDia) {
+          return actions.resolve();
+        }
+        this.ngZone.run(async () => {
+          const aceptado = await this.solicitarAceptacionTerminos();
+          if (aceptado) {
+            const alert = await this.alertCtrl.create({
+              header: 'Términos aceptados',
+              message: 'Ya puedes continuar con el pago de tu plan.',
+              buttons: ['Aceptar']
+            });
+            await alert.present();
+          }
+        });
+        return actions.reject();
       },
 
       createOrder: (_data: any, actions: any) => {
@@ -252,6 +320,11 @@ export class PagosPage implements OnInit, AfterViewInit, ViewWillEnter, OnDestro
 
   /** Llamado desde el botón "Pagar con PayPal" cuando esNativo === true */
   async pagarNativo() {
+    // 🔒 No abre PayPal hasta que el usuario acepte la versión vigente
+    if (!(await this.solicitarAceptacionTerminos())) {
+      return;
+    }
+
     if (!environment.paypalCheckoutUrl) {
       await this.mostrarError('Falta configurar la URL de checkout (PAYPAL_CHECKOUT_URL).');
       return;
