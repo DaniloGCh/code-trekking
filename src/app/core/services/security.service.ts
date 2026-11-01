@@ -102,6 +102,53 @@ export class SecurityService {
   }
 
   // =========================
+  // 🛡️ RATE LIMITING PERSISTENTE (por usuario)
+  // =========================
+  // A diferencia de checkRateLimit (en memoria), guarda las marcas de tiempo
+  // en localStorage, así no se reinicia si Android cierra la app.
+  // Solo cuenta las acciones registradas con registrarAccionPersistente
+  // (ej. eventos creados con éxito), no los intentos.
+  checkPersistentRateLimit(
+    accion: string,
+    uid: string,
+    max: number,
+    ventanaMs: number
+  ): { permitido: boolean; minutosRestantes: number } {
+    const marcas = this.leerMarcas(accion, uid, ventanaMs);
+    if (marcas.length < max) return { permitido: true, minutosRestantes: 0 };
+
+    // Se libera un cupo cuando vence la marca que deja el conteo bajo el máximo
+    const liberaEn = marcas[marcas.length - max] + ventanaMs - Date.now();
+    return { permitido: false, minutosRestantes: Math.max(1, Math.ceil(liberaEn / 60000)) };
+  }
+
+  registrarAccionPersistente(accion: string, uid: string, ventanaMs: number) {
+    const marcas = this.leerMarcas(accion, uid, ventanaMs);
+    marcas.push(Date.now());
+    try {
+      localStorage.setItem(this.claveRateLimit(accion, uid), JSON.stringify(marcas));
+    } catch {
+      // Sin almacenamiento disponible: no se puede persistir el conteo
+    }
+  }
+
+  private leerMarcas(accion: string, uid: string, ventanaMs: number): number[] {
+    const desde = Date.now() - ventanaMs;
+    try {
+      const guardado = JSON.parse(localStorage.getItem(this.claveRateLimit(accion, uid)) || '[]');
+      return Array.isArray(guardado)
+        ? guardado.filter((t: unknown): t is number => typeof t === 'number' && t > desde).sort((a, b) => a - b)
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private claveRateLimit(accion: string, uid: string): string {
+    return `rate-limit:${accion}:${uid}`;
+  }
+
+  // =========================
   // 🛡️ VALIDAR URL SEGURA
   // =========================
   isSafeUrl(url: string): boolean {
@@ -160,6 +207,40 @@ export class SecurityService {
     // Solo letras, espacios, tildes y guiones
     const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-']+$/;
     return regex.test(nombre.trim());
+  }
+
+  // =========================
+  // 🛡️ NORMALIZAR NOMBRE
+  // =========================
+  // Limpia lo que agregan los teclados móviles antes de validar:
+  // tildes en forma descompuesta (NFD), apóstrofo tipográfico (’),
+  // espacios dobles / no separables y espacios al inicio o fin.
+  normalizeNombre(nombre: string): string {
+    if (!nombre) return '';
+    return nombre
+      .normalize('NFC')
+      .replace(/[‘’ʼ]/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // Revierte las entidades que genera sanitizeInput (se repite por si el
+  // texto quedó sanitizado dos veces, ej. nombres guardados en el registro)
+  decodeEntities(texto: string): string {
+    if (!texto) return '';
+    let actual = texto;
+    for (let i = 0; i < 3; i++) {
+      const decodificado = actual
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/gi, "'")
+        .replace(/&#x2F;/gi, '/')
+        .replace(/&amp;/g, '&');
+      if (decodificado === actual) break;
+      actual = decodificado;
+    }
+    return actual;
   }
 
   // =========================

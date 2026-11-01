@@ -6,9 +6,8 @@ import { Router } from '@angular/router';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
 import { AuthService, UserData, ContactoEmergencia } from 'src/app/core/services/auth.service';
 import { SecurityService } from 'src/app/core/services/security.service';
-// ✅ Agrega el import
-import { ModalController } from '@ionic/angular';
-import { TerminosModalComponent } from 'src/app/components/terminos-modal/terminos-modal.component';
+import { TerminosService, TerminosVigentes } from 'src/app/core/services/terminos.service';
+import { TerminosControlService } from 'src/app/core/services/terminos-control.service';
 
 @Component({
   selector: 'app-settings',
@@ -27,13 +26,19 @@ export class SettingsPage implements OnInit {
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private loadingCtrl = inject(LoadingController);
-  private modalCtrl = inject(ModalController);
+  private terminosService = inject(TerminosService);
+  private terminosControl = inject(TerminosControlService);
   // =========================
   // 📊 ESTADO
   // =========================
   userData: UserData | null = null;
   contactos: ContactoEmergencia[] = [];
   hideHeader = false;
+
+  // 📄 Términos: versión vigente vs. versión aceptada
+  terminosVigentes: TerminosVigentes | null = null;
+  aceptoVersionVigente = false;
+  esAdmin = false;
   lastScrollTop = 0;
 
   // =========================
@@ -42,6 +47,7 @@ export class SettingsPage implements OnInit {
   async ngOnInit() {
     this.userData = await this.authService.getCurrentUserData();
     this.contactos = this.userData?.contactosEmergencia || [];
+    await this.cargarEstadoTerminos();
   }
 
   // =========================
@@ -432,14 +438,21 @@ export class SettingsPage implements OnInit {
   // 📄 TÉRMINOS Y CONDICIONES
   // =========================
   async verTerminos() {
-    const modal = await this.modalCtrl.create({
-      component: TerminosModalComponent,
-      breakpoints: [0, 1],
-      initialBreakpoint: 1,
-      cssClass: 'terminos-modal'
-    });
+    const aceptado = await this.terminosControl.abrirConsulta();
 
-    await modal.present();
+    // 🔄 Refleja al instante la nueva versión y fecha aceptadas
+    if (aceptado && !this.aceptoVersionVigente) {
+      this.userData = await this.authService.getCurrentUserData();
+      await this.cargarEstadoTerminos();
+      await this.showToast('Términos aceptados correctamente', 'success');
+    }
+  }
+
+  private async cargarEstadoTerminos() {
+    this.terminosVigentes = await this.terminosService.obtenerVigentes();
+    this.esAdmin = this.terminosService.estaExento(this.userData);
+    this.aceptoVersionVigente =
+      this.terminosService.aceptoVersionVigente(this.userData, this.terminosVigentes);
   }
 
   formatearFechaTerminos(fecha?: string): string {

@@ -100,7 +100,7 @@
 
     <div class="section-title">
       <ion-icon name="shield-checkmark-outline" class="icon-terminos"></ion-icon>
-      <h3>Terminos y condiciones</h3>
+      <h3>Términos y condiciones</h3>
     </div>
     <ion-accordion-group class="terminos-accordion-group">
 
@@ -121,33 +121,68 @@
           <!-- ========================= -->
           <!-- ESTADO ACEPTADO -->
           <!-- ========================= -->
-          <div class="terminos-estado" *ngIf="userData.terminosAceptados; else noAceptados">
-            <div class="estado-aceptado">
-              <ion-icon name="checkmark-circle-outline">
-              </ion-icon>
-              <strong>
-                Estado: Aceptados
-              </strong>
-            </div>
-            <!-- FECHA DE ACEPTACIÓN -->
-            <div class="terminos-info" *ngIf="userData.fechaAceptacionTerminos">
-              <span>Aceptados el:</span>
-              <strong>
-                {{ formatearFechaTerminos(userData.fechaAceptacionTerminos!) }}
-              </strong>
-            </div>
-            <!-- VERSIÓN -->
-            <div class="terminos-info" *ngIf="userData.versionTerminos">
-              <span>Versión:</span>
-              <strong>
-                {{ userData.versionTerminos }}
-              </strong>
-            </div>
+          <!-- ========================= -->
+          <!-- 🛡️ ADMIN EXENTO -->
+          <!-- ========================= -->
+          <div class="estado-aceptado" *ngIf="esAdmin">
+            <ion-icon name="shield-checkmark-outline">
+            </ion-icon>
+            <strong>
+              Administras los términos: no necesitas aceptarlos
+            </strong>
+          </div>
+
+          <!-- VERSIÓN VIGENTE -->
+          <div class="terminos-info" *ngIf="terminosVigentes">
+            <span>Versión vigente:</span>
+            <strong>
+              {{ terminosVigentes.version }}
+            </strong>
+          </div>
+          <div class="terminos-info" *ngIf="terminosVigentes?.fechaPublicacion">
+            <span>Publicada el:</span>
+            <strong>
+              {{ formatearFechaTerminos(terminosVigentes?.fechaPublicacion!) }}
+            </strong>
+          </div>
+
+          <div class="terminos-estado" *ngIf="esAdmin || userData.terminosAceptados; else noAceptados">
+            <ng-container *ngIf="!esAdmin">
+              <div class="estado-aceptado" *ngIf="aceptoVersionVigente">
+                <ion-icon name="checkmark-circle-outline">
+                </ion-icon>
+                <strong>
+                  Estado: Aceptados
+                </strong>
+              </div>
+              <!-- ⚠️ NUEVA VERSIÓN DESDE LA ACEPTACIÓN -->
+              <div class="estado-no-aceptado estado-nueva-version" *ngIf="!aceptoVersionVigente && terminosVigentes">
+                <ion-icon name="alert-circle-outline">
+                </ion-icon>
+                <p>
+                  Se publicó la versión {{ terminosVigentes.version }} desde tu aceptación. Revísala y acéptala para mantenerte al día.
+                </p>
+              </div>
+              <!-- VERSIÓN ACEPTADA -->
+              <div class="terminos-info">
+                <span>Versión aceptada:</span>
+                <strong>
+                  {{ userData.versionTerminos || '1.0' }}
+                </strong>
+              </div>
+              <!-- FECHA DE ACEPTACIÓN -->
+              <div class="terminos-info" *ngIf="userData.fechaAceptacionTerminos">
+                <span>Aceptados el:</span>
+                <strong>
+                  {{ formatearFechaTerminos(userData.fechaAceptacionTerminos!) }}
+                </strong>
+              </div>
+            </ng-container>
             <!-- VER TÉRMINOS -->
             <ion-button expand="block" fill="outline" class="btn-ver-terminos" (click)="verTerminos()">
               <ion-icon name="document-text-outline" slot="start">
               </ion-icon>
-              Ver términos y condiciones
+              {{ !esAdmin && !aceptoVersionVigente ? 'Ver y aceptar la versión vigente' : 'Ver términos y condiciones' }}
             </ion-button>
           </div>
           <!-- ========================= -->

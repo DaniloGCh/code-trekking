@@ -24,6 +24,16 @@
 
     <div class="divider"></div>
 
+    <!-- 📄 Términos: se exige la versión vigente antes de pagar -->
+    <div class="terminos-pago" *ngIf="!verificandoTerminos && !terminosAlDia">
+      <ion-icon name="alert-circle-outline" color="warning"></ion-icon>
+      <p>Antes de pagar debes aceptar la versión vigente de los términos y condiciones.</p>
+      <ion-button expand="block" fill="outline" color="warning" (click)="solicitarAceptacionTerminos()">
+        <ion-icon slot="start" name="document-text-outline"></ion-icon>
+        Revisar y aceptar términos
+      </ion-button>
+    </div>
+
     <!-- 📱 Flujo nativo (Android/iOS): abre el checkout en el navegador del sistema -->
     <div class="paypal-wrapper" *ngIf="esNativo">
       <ion-button expand="block" color="warning" (click)="pagarNativo()">

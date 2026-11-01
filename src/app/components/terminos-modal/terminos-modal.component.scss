@@ -238,3 +238,78 @@ ion-title {
     padding: 22px; /* Incrementa el padding del bloque introductorio a 22px en pantallas grandes */
   }
 }
+/* ==========================================================================
+   🧾 ESTADO DE ACEPTACIÓN (VERSIÓN VIGENTE / ACEPTADA)
+   ========================================================================== */
+.estado-aceptacion {
+  max-width: 600px; /* Mismo ancho que las secciones */
+  margin: 0 auto 16px; /* Centrado con separación inferior */
+  padding: 0 20px; /* Relleno lateral */
+  display: flex; /* Columna de avisos */
+  flex-direction: column;
+  gap: 10px; /* Separación entre avisos */
+}
+
+.estado-fila {
+  display: flex; /* Icono y texto en fila */
+  align-items: flex-start; /* Icono alineado arriba */
+  gap: 10px; /* Separación icono-texto */
+  padding: 12px 14px; /* Relleno interno */
+  background: #14191f; /* Fondo de tarjeta */
+  border: 1px solid rgba(255, 255, 255, 0.08); /* Borde sutil */
+  border-radius: 12px; /* Esquinas redondeadas */
+  color: #cbd5f5; /* Texto claro */
+}
+
+.estado-fila ion-icon {
+  font-size: 22px; /* Tamaño del icono */
+  flex-shrink: 0; /* Evita que el icono se reduzca */
+  color: #94a3b8; /* Gris por defecto */
+}
+
+.estado-fila p {
+  margin: 0; /* Sin margen por defecto */
+  font-size: 0.86rem; /* Texto compacto */
+  line-height: 1.5; /* Lectura cómoda */
+}
+
+.estado-fila strong {
+  color: #ffffff; /* Resalta versión y fecha */
+}
+
+.estado-ok {
+  border-color: rgba(0, 248, 103, 0.3); /* Borde verde: al día */
+}
+
+.estado-ok ion-icon,
+.estado-admin ion-icon {
+  color: rgb(0, 248, 103); /* Verde neón */
+}
+
+.estado-alerta {
+  border-color: rgba(245, 158, 11, 0.45); /* Borde ámbar: requiere atención */
+}
+
+.estado-alerta ion-icon {
+  color: #f59e0b; /* Amarillo de advertencia */
+}
+
+/* Texto plano publicado por el admin: respeta saltos de línea */
+.texto-publicado {
+  display: block; /* Ocupa su propia línea */
+  white-space: pre-line; /* Conserva los párrafos escritos por el admin */
+  word-break: break-word; /* Evita desbordes con palabras largas */
+}
+
+/* Introducción en varios párrafos */
+.intro-text p {
+  margin: 0 0 12px; /* Separación entre párrafos */
+}
+
+/* Indicador de carga del texto */
+.carga-terminos {
+  display: flex; /* Centra el spinner */
+  justify-content: center;
+  padding: 40px 0; /* Espacio vertical */
+  color: rgb(0, 248, 103); /* Verde neón */
+}
