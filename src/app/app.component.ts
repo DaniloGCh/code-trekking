@@ -10,6 +10,7 @@ import { WeatherGlobalService } from 'src/app/core/services/weather-global.servi
 import { TimeService } from 'src/app/core/services/time.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { TerminosControlService } from 'src/app/core/services/terminos-control.service';
+import { BackButtonService } from 'src/app/core/services/back-button.service';
 import { generarCodigoError, esErrorDeCarga, esErrorDePermisosPorSesionCerrada } from 'src/app/core/utils/error-utils';
 
 @Component({
@@ -26,6 +27,7 @@ export class AppComponent
   private authSub: any;
   private uidActual: string | null = null;
   private ngZone = inject(NgZone);
+  private backButton = inject(BackButtonService);
 
   // ⏳ Pantalla de carga inicial
   cargandoApp = true;
@@ -62,6 +64,10 @@ export class AppComponent
   this.backButtonListener = await App.addListener(
     'backButton',
     ({ canGoBack }) => {
+      // Si la página actual cerró algo propio (ej. visor de fotos), no se navega
+      const manejado = this.ngZone.run(() => this.backButton.manejar());
+      if (manejado) return;
+
       if (canGoBack) {
         window.history.back();
       } else {

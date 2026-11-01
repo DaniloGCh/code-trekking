@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService, UserData, SuscripcionData } from 'src/app/core/services/auth.service';
 import { GaleriaFotosService, FotoGaleria } from 'src/app/core/services/galeria-fotos.service';
 import { FotoService } from 'src/app/core/services/foto.service';
+import { BackButtonService } from 'src/app/core/services/back-button.service';
 import { AlertController, LoadingController, ActionSheetController, ToastController } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Subscription } from 'rxjs';
@@ -26,6 +27,8 @@ export class GaleriaPage implements OnInit, OnDestroy {
   private ngZone = inject(NgZone);
   private injector = inject(EnvironmentInjector);
   private cdr = inject(ChangeDetectorRef);
+  private backButton = inject(BackButtonService);
+  private quitarBackButton?: () => void;
     @ViewChild('swiperVisor') swiperVisorRef?: ElementRef;
 
   userData: UserData | null = null;
@@ -73,8 +76,31 @@ export class GaleriaPage implements OnInit, OnDestroy {
     await this.cargarTodoElEstado();
   }
 
+  // 📱 Botón atrás de Android: primero cierra el visor o el modo selección,
+  // en vez de volver a la página anterior
+  ionViewDidEnter() {
+    this.quitarBackButton?.();
+    this.quitarBackButton = this.backButton.registrar(() => {
+      if (this.mostrarVisor) {
+        this.cerrarVisor();
+        return true;
+      }
+      if (this.selectionMode) {
+        this.salirModoSeleccion();
+        return true;
+      }
+      return false;
+    });
+  }
+
+  ionViewWillLeave() {
+    this.quitarBackButton?.();
+    this.quitarBackButton = undefined;
+  }
+
   ngOnDestroy() {
     this.fotosSub?.unsubscribe();
+    this.quitarBackButton?.();
   }
 
   private async cargarTodoElEstado() {
