@@ -28,7 +28,6 @@ import {
   doc,
   setDoc,
   getDoc,
-  getDocFromServer,
   collection,
   collectionData,
   updateDoc,
@@ -44,6 +43,7 @@ import { Observable } from 'rxjs';
 import { SecurityService } from './security.service';
 import { TerminosService, AceptacionTerminos } from './terminos.service';
 import { environment } from 'src/environments/environment';
+import { leerDocPreferirServidor } from '../utils/firestore-utils';
 
 export interface ContactoEmergencia {
   nombre: string;
@@ -237,14 +237,9 @@ export class AuthService {
 
     const userRef = doc(this.firestore, `usuarios/${currentUser.uid}`);
     
-    try {
-      // 🔹 Forzamos la descarga desde Firestore (sin usar caché)
-      const userSnap = await getDocFromServer(userRef);
-      return userSnap.exists() ? (userSnap.data() as UserData) : null;
-    } catch {
-      const userSnap = await getDoc(userRef);
-      return userSnap.exists() ? (userSnap.data() as UserData) : null;
-    }
+    // 🔹 Desde el servidor si hay internet; sin conexión, la copia guardada
+    const userSnap = await leerDocPreferirServidor(userRef);
+    return userSnap.exists() ? (userSnap.data() as UserData) : null;
   }
 
   async getUserRole(): Promise<'admin' | 'user' | null> {
@@ -495,12 +490,7 @@ export class AuthService {
     const userRef = doc(this.firestore, `usuarios/${currentUser.uid}`);
     
     // Obtenemos el documento síncrono desde el servidor
-    let userSnap;
-    try {
-      userSnap = await getDocFromServer(userRef);
-    } catch {
-      userSnap = await getDoc(userRef);
-    }
+    const userSnap = await leerDocPreferirServidor(userRef);
 
     const userData = userSnap.exists() ? (userSnap.data() as UserData) : null;
     const subActual = userData?.suscripcion;
@@ -556,13 +546,8 @@ export class AuthService {
 
     const userRef = doc(this.firestore, `usuarios/${currentUser.uid}`);
     
-    let userSnap;
-    try {
-      // 🔹 Forzamos la descarga desde Firestore
-      userSnap = await getDocFromServer(userRef);
-    } catch {
-      userSnap = await getDoc(userRef);
-    }
+    // 🔹 Desde el servidor si hay internet; sin conexión, la copia guardada
+    const userSnap = await leerDocPreferirServidor(userRef);
 
     if (!userSnap.exists()) return null;
 

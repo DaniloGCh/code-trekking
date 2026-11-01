@@ -2,7 +2,7 @@
 import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { generarCodigoError, esErrorDeCarga, esErrorDePermisosPorSesionCerrada } from './utils/error-utils';
+import { generarCodigoError, esErrorDeCarga, esErrorDeConexion, esErrorDePermisosPorSesionCerrada } from './utils/error-utils';
 
 /**
  * Captura cualquier error no atrapado en la app (en cualquier componente,
@@ -48,6 +48,13 @@ export class GlobalErrorHandler implements ErrorHandler {
     // Los errores del router/zona pueden ocurrir fuera de Angular; ngZone.run
     // asegura que la UI (toast) se actualice correctamente.
     this.ngZone.run(() => {
+      // 📴 Sin internet: no es un bug, se avisa y la persona sigue donde
+      // estaba (va antes que esErrorDeCarga: recargar sin red deja la app
+      // en blanco).
+      if (esErrorDeConexion(error)) {
+        this.avisarSinConexion();
+        return;
+      }
       if (esErrorDeCarga(error)) {
         this.avisarYRecargar();
         return;
@@ -68,6 +75,29 @@ export class GlobalErrorHandler implements ErrorHandler {
       await toast.present();
     } finally {
       setTimeout(() => window.location.reload(), 1200);
+    }
+  }
+
+  // Sin red suelen fallar varias cosas a la vez; un solo aviso cada tanto
+  private ultimoAvisoSinConexion = 0;
+
+  private async avisarSinConexion() {
+    const ahora = Date.now();
+    if (ahora - this.ultimoAvisoSinConexion < 5000) return;
+    this.ultimoAvisoSinConexion = ahora;
+
+    try {
+      const toastCtrl = this.injector.get(ToastController);
+      const toast = await toastCtrl.create({
+        message: 'Sin conexión. Algunos datos pueden no estar actualizados.',
+        color: 'medium',
+        duration: 3000,
+        position: 'top',
+        icon: 'cloud-offline-outline'
+      });
+      await toast.present();
+    } catch {
+      // El detalle ya quedó en la consola
     }
   }
 

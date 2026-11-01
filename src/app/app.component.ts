@@ -11,7 +11,8 @@ import { TimeService } from 'src/app/core/services/time.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { TerminosControlService } from 'src/app/core/services/terminos-control.service';
 import { BackButtonService } from 'src/app/core/services/back-button.service';
-import { generarCodigoError, esErrorDeCarga, esErrorDePermisosPorSesionCerrada } from 'src/app/core/utils/error-utils';
+import { ConexionService } from 'src/app/core/services/conexion.service';
+import { generarCodigoError, esErrorDeCarga, esErrorDeConexion, esErrorDePermisosPorSesionCerrada } from 'src/app/core/utils/error-utils';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,9 @@ export class AppComponent
   private uidActual: string | null = null;
   private ngZone = inject(NgZone);
   private backButton = inject(BackButtonService);
+
+  // 📴 Banner "Sin conexión"
+  online$ = inject(ConexionService).online$;
 
   // ⏳ Pantalla de carga inicial
   cargandoApp = true;
@@ -174,6 +178,19 @@ export class AppComponent
     console.error(`[AppComponent] Error de navegación ${codigo} en "${event.url}"`, event.error);
 
     if (esErrorDePermisosPorSesionCerrada(event.error)) {
+      return;
+    }
+
+    // 📴 Sin internet: se queda en la pantalla actual (el banner ya avisa)
+    if (esErrorDeConexion(event.error)) {
+      const toast = await this.toastCtrl.create({
+        message: 'Sin conexión. Esta sección necesita internet para abrirse.',
+        color: 'medium',
+        duration: 2500,
+        position: 'top',
+        icon: 'cloud-offline-outline'
+      });
+      await toast.present();
       return;
     }
 

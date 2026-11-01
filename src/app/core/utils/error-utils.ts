@@ -39,3 +39,23 @@ export function esErrorDePermisosPorSesionCerrada(error: any): boolean {
   return codigo.includes('permission-denied')
     || mensaje.includes('missing or insufficient permissions');
 }
+
+/**
+ * Detecta si el error se debe a que no hay internet (o no se alcanza el
+ * servidor): Firestore sin conexión, Firebase Auth sin red, peticiones HTTP
+ * que no llegan (status 0) o fetch fallido. No es un bug de la app, así que
+ * se avisa "Sin conexión" en vez de mandar a la pantalla de error.
+ */
+export function esErrorDeConexion(error: any): boolean {
+  if (!navigator.onLine) return true;
+
+  const mensaje = String(error?.message ?? error ?? '').toLowerCase();
+  const codigo = String(error?.code ?? '').toLowerCase();
+  return codigo === 'unavailable'
+    || codigo.includes('network-request-failed')
+    || error?.status === 0
+    || mensaje.includes('client is offline')
+    || mensaje.includes('failed to fetch')
+    || mensaje.includes('network error')
+    || mensaje.includes('networkerror');
+}

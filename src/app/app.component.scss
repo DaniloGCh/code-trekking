@@ -44,3 +44,31 @@
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.06); }
 }
+
+// =========================
+// 📴 AVISO SIN CONEXIÓN
+// =========================
+.aviso-sin-conexion {
+  position: fixed;
+  left: 50%;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 99998;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 32px);
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(30, 30, 30, 0.92);
+  color: #f2efe4;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+
+  ion-icon {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    color: #f39a2b;
+  }
+}
