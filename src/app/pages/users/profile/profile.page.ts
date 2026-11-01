@@ -636,7 +636,9 @@ export class ProfilePage implements OnInit {
       }
     }
 
-    if (!this.security.checkRateLimit('cambio-nombre', 3, 3600000)) {
+    // La clave incluye el uid: el contador es en memoria y sin esto se
+    // compartía entre cuentas que inician sesión en el mismo dispositivo
+    if (!this.security.checkRateLimit(`cambio-nombre:${this.userData.uid}`, 3, 3600000)) {
       await this.showToast('Demasiados intentos. Espera 1 hora.', 'warning');
       return;
     }
