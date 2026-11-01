@@ -375,11 +375,13 @@ export class TrackingService {
       throw new Error('El dispositivo no permite compartir archivos');
     }
 
-    // Abrir menú nativo de compartir
+    // Abrir menú nativo de compartir.
+    // Se envía solo `files` (sin `text` ni `url`): si el intent lleva texto,
+    // WhatsApp comparte únicamente el texto y descarta el archivo adjunto.
+    // Directory.Cache está cubierto por <cache-path> en res/xml/file_paths.xml.
     await Share.share({
       title: 'Ruta de Trekking',
-      text: 'Ruta GPX exportada desde Trekking App',
-      url: archivo.uri,
+      files: [archivo.uri],
       dialogTitle: 'Compartir o guardar ruta GPX'
     });
   }
