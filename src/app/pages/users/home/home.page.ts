@@ -99,13 +99,17 @@ export class HomePage implements OnInit, OnDestroy {
       this.authService.currentUser$
         .subscribe(async user => {
 
-          this.authReady = true;
-
           if (user) {
 
-            this.userData =
-              await this.authService
-                .getCurrentUserData();
+            try {
+              this.userData =
+                await this.authService
+                  .getCurrentUserData();
+            } finally {
+              // ✅ Se marca listo después de tener los datos, así no se
+              // alcanza a ver "Iniciar sesión" con la sesión ya iniciada
+              this.authReady = true;
+            }
 
             this.consejoService
               .getConsejos()
@@ -125,6 +129,8 @@ export class HomePage implements OnInit, OnDestroy {
                 });
 
           } else {
+
+            this.authReady = true;
 
             this.userData =
               null;
