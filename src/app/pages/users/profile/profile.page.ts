@@ -105,6 +105,13 @@ export class ProfilePage implements OnInit {
 
   private async cargarPerfilUsuario(user: any) {
     this.userData = await this.authService.getCurrentUserData();
+
+    // Migración gradual: registra el nombre actual en el índice de nombres
+    if (this.userData) {
+      this.authService.asegurarNombreEnIndice(this.userData)
+        .catch(err => console.warn('No se pudo registrar el nombre en el índice:', err));
+    }
+
     this.cargarEstadisticas();
     this.calcularTiempoMiembro();
 
@@ -636,7 +643,9 @@ export class ProfilePage implements OnInit {
       }
     }
 
-    if (!this.security.checkRateLimit('cambio-nombre', 3, 3600000)) {
+    // La clave incluye el uid: el contador es en memoria y sin esto se
+    // compartía entre cuentas que inician sesión en el mismo dispositivo
+    if (!this.security.checkRateLimit(`cambio-nombre:${this.userData.uid}`, 3, 3600000)) {
       await this.showToast('Demasiados intentos. Espera 1 hora.', 'warning');
       return;
     }
@@ -801,10 +810,7 @@ export class ProfilePage implements OnInit {
                 return false;
               }
 
-              await this.authService.updateProfile({
-                nombre: nombreSeguro,
-                ultimoCambioNombre: new Date().toISOString()
-              });
+              await this.authService.cambiarNombreUsuario(nombreSeguro, this.userData?.nombre || '');
 
               if (this.userData) {
                 this.userData.nombre = nombreSeguro;
@@ -814,9 +820,19 @@ export class ProfilePage implements OnInit {
               await loading.dismiss();
               await this.showToast('Nombre actualizado correctamente', 'success');
 
-            } catch {
+            } catch (error: any) {
+              console.error('Error al cambiar nombre:', error);
               await loading.dismiss();
-              await this.showToast('Error al actualizar el nombre', 'danger');
+              if (error?.message === 'nombre-en-uso') {
+                await this.showToast('Este nombre ya está en uso', 'danger');
+                return false;
+              }
+              await this.showToast(
+                error?.code === 'permission-denied'
+                  ? 'Sin permisos para guardar el nombre. Intenta más tarde.'
+                  : 'Error al actualizar el nombre',
+                'danger'
+              );
             }
 
             return true;

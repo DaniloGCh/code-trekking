@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService, UserData, SuscripcionData } from 'src/app/core/services/auth.service';
 import { GaleriaFotosService, FotoGaleria } from 'src/app/core/services/galeria-fotos.service';
 import { FotoService } from 'src/app/core/services/foto.service';
+import { BackButtonService } from 'src/app/core/services/back-button.service';
 import { AlertController, LoadingController, ActionSheetController, ToastController } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Subscription } from 'rxjs';
@@ -26,10 +27,14 @@ export class GaleriaPage implements OnInit, OnDestroy {
   private ngZone = inject(NgZone);
   private injector = inject(EnvironmentInjector);
   private cdr = inject(ChangeDetectorRef);
+  private backButton = inject(BackButtonService);
+  private quitarBackButton?: () => void;
     @ViewChild('swiperVisor') swiperVisorRef?: ElementRef;
 
   userData: UserData | null = null;
   suscripcionActiva = false;
+  // ⏳ true mientras se verifica la suscripción (evita mostrar los planes por un instante)
+  cargandoSuscripcion = true;
   diasGracia: number | null = null;
 
   planActivoNombre: string = '';
@@ -67,32 +72,62 @@ export class GaleriaPage implements OnInit, OnDestroy {
   async ionViewWillEnter() {
     this.verPlanesManualmente = false;
     this.suscripcionActiva = false; // Limpia estado previo
+    this.cargandoSuscripcion = true;
     await this.cargarTodoElEstado();
+  }
+
+  // 📱 Botón atrás de Android: primero cierra el visor o el modo selección,
+  // en vez de volver a la página anterior
+  ionViewDidEnter() {
+    this.quitarBackButton?.();
+    this.quitarBackButton = this.backButton.registrar(() => {
+      if (this.mostrarVisor) {
+        this.cerrarVisor();
+        return true;
+      }
+      if (this.selectionMode) {
+        this.salirModoSeleccion();
+        return true;
+      }
+      return false;
+    });
+  }
+
+  ionViewWillLeave() {
+    this.quitarBackButton?.();
+    this.quitarBackButton = undefined;
   }
 
   ngOnDestroy() {
     this.fotosSub?.unsubscribe();
+    this.quitarBackButton?.();
   }
 
   private async cargarTodoElEstado() {
-    await runInInjectionContext(this.injector, async () => {
-      this.userData = await this.authService.getCurrentUserData();
-      if (!this.userData) return;
+    try {
+      await runInInjectionContext(this.injector, async () => {
+        this.userData = await this.authService.getCurrentUserData();
+        if (!this.userData) return;
 
-      const sub = await this.authService.verificarYActualizarSuscripcion();
+        const sub = await this.authService.verificarYActualizarSuscripcion();
 
+        this.ngZone.run(() => {
+          this.aplicarEstadoSuscripcion(sub);
+
+          if (this.suscripcionActiva) {
+            this.verPlanesManualmente = false;
+            this.escucharFotos(this.userData!.uid);
+          }
+        });
+      });
+    } finally {
+      // Se oculta la carga aunque la verificación falle, para no dejar la pantalla pegada
       this.ngZone.run(() => {
-        this.aplicarEstadoSuscripcion(sub);
-
-        if (this.suscripcionActiva) {
-          this.verPlanesManualmente = false;
-          this.escucharFotos(this.userData!.uid);
-        }
-
+        this.cargandoSuscripcion = false;
         this.cdr.markForCheck();
         this.cdr.detectChanges();
       });
-    });
+    }
   }
 
   private aplicarEstadoSuscripcion(sub: SuscripcionData | null) {

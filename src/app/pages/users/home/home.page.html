@@ -208,7 +208,12 @@
   <!-- ========================= -->
   <ng-template #noAuth>
 
-    <div class="welcome-container">
+    <!-- ⏳ Mientras se verifica la sesión no se muestra "Iniciar sesión" -->
+    <div class="carga-inicio" *ngIf="!authReady">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <div class="welcome-container" *ngIf="authReady">
 
       <!-- 👋 HEADER -->
       <div class="welcome-header">

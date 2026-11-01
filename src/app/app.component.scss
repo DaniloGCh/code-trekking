@@ -1,0 +1,46 @@
+// =========================
+// ⏳ PANTALLA DE CARGA INICIAL
+// =========================
+.splash-carga {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: radial-gradient(circle at center, #1f5c55 0%, #0f3b37 60%, #0a2a27 100%);
+  color: #f2efe4;
+  transition: opacity 0.4s ease;
+
+  &.saliendo {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .splash-logo {
+    width: 140px;
+    height: 140px;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.35));
+    animation: splash-pulso 1.6s ease-in-out infinite;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  ion-spinner {
+    --color: #f39a2b;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@keyframes splash-pulso {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}

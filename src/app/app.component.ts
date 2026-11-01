@@ -1,5 +1,6 @@
 // src/app/app.component.ts
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 
 import { App } from '@capacitor/app';
 import { NavigationEnd, NavigationError, Router } from '@angular/router';
@@ -9,6 +10,7 @@ import { WeatherGlobalService } from 'src/app/core/services/weather-global.servi
 import { TimeService } from 'src/app/core/services/time.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { TerminosControlService } from 'src/app/core/services/terminos-control.service';
+import { BackButtonService } from 'src/app/core/services/back-button.service';
 import { generarCodigoError, esErrorDeCarga, esErrorDePermisosPorSesionCerrada } from 'src/app/core/utils/error-utils';
 
 @Component({
@@ -24,6 +26,12 @@ export class AppComponent
   private routerEventsSub: any;
   private authSub: any;
   private uidActual: string | null = null;
+  private ngZone = inject(NgZone);
+  private backButton = inject(BackButtonService);
+
+  // ⏳ Pantalla de carga inicial
+  cargandoApp = true;
+  splashSaliendo = false;
 
   constructor(
     private weatherGlobal: WeatherGlobalService,
@@ -41,6 +49,9 @@ export class AppComponent
 
   async ngOnInit() {
 
+    // ⏳ Se inicia antes que todo lo demás (el clima puede demorar por permisos)
+    this.iniciarPantallaCarga();
+
     // 🕐 Reloj global
     this.timeService.startClock();
 
@@ -53,6 +64,10 @@ export class AppComponent
   this.backButtonListener = await App.addListener(
     'backButton',
     ({ canGoBack }) => {
+      // Si la página actual cerró algo propio (ej. visor de fotos), no se navega
+      const manejado = this.ngZone.run(() => this.backButton.manejar());
+      if (manejado) return;
+
       if (canGoBack) {
         window.history.back();
       } else {
@@ -89,6 +104,46 @@ export class AppComponent
     }
   });
 }
+
+
+  // =========================================================
+  // ⏳ PANTALLA DE CARGA INICIAL
+  // =========================================================
+  // Se mantiene visible hasta saber si hay sesión y, si la hay, hasta tener
+  // los datos del usuario. Así no se alcanza a ver la pantalla de
+  // "Iniciar sesión" cuando la sesión ya estaba iniciada.
+
+  private iniciarPantallaCarga() {
+    const inicio = Date.now();
+    let ocultada = false;
+
+    const ocultar = () => {
+      if (ocultada) return;
+      ocultada = true;
+
+      // Mínimo visible para que no parpadee si Firebase responde muy rápido
+      const espera = Math.max(0, 800 - (Date.now() - inicio));
+
+      this.ngZone.run(() => {
+        setTimeout(() => {
+          this.splashSaliendo = true; // animación de salida
+          setTimeout(() => (this.cargandoApp = false), 400);
+        }, espera);
+      });
+    };
+
+    // Seguridad: si Firebase no responde, no dejar la app tapada
+    setTimeout(ocultar, 8000);
+
+    firstValueFrom(this.authService.currentUser$)
+      .then(async (user) => {
+        if (user) {
+          await this.authService.getCurrentUserData().catch(() => null);
+        }
+        ocultar();
+      })
+      .catch(ocultar);
+  }
 
 
   // =========================================================

@@ -1,3 +1,10 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
+
+  <!-- ⏳ PANTALLA DE CARGA INICIAL: cubre la app mientras se verifica la sesión -->
+  <div class="splash-carga" *ngIf="cargandoApp" [class.saliendo]="splashSaliendo">
+    <img src="assets/icons/icon-512.webp" alt="Code Trekking" class="splash-logo" />
+    <h1>Code Trekking</h1>
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
 </ion-app>
