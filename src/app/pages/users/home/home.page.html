@@ -213,7 +213,24 @@
       <ion-spinner name="crescent"></ion-spinner>
     </div>
 
-    <div class="welcome-container" *ngIf="authReady">
+    <!-- ⚠️ Hay sesión pero no se pudieron cargar los datos del usuario -->
+    <div class="welcome-container" *ngIf="authReady && haySesion">
+      <div class="welcome-header">
+        <ion-icon name="cloud-offline-outline" class="avatar-icon"></ion-icon>
+        <h1>No pudimos cargar tus datos</h1>
+        <p>Revisa tu conexión e inténtalo nuevamente.</p>
+      </div>
+
+      <ion-button expand="block" class="btn-login" (click)="recargarDatosUsuario()">
+        Reintentar
+      </ion-button>
+
+      <ion-button expand="block" fill="outline" (click)="cerrarSesionSinDatos()">
+        Cerrar sesión
+      </ion-button>
+    </div>
+
+    <div class="welcome-container" *ngIf="authReady && !haySesion">
 
       <!-- 👋 HEADER -->
       <div class="welcome-header">

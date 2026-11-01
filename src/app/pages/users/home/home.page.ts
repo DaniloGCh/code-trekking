@@ -53,6 +53,8 @@ export class HomePage implements OnInit, OnDestroy {
   // 📊 ESTADO
   // =========================
   authReady = false;
+  // Hay sesión en Firebase Auth (puede existir antes que el documento del usuario)
+  haySesion = false;
   userData: UserData | null = null;
   misEventos: Evento[] = [];
   sosActivo = false;
@@ -99,12 +101,13 @@ export class HomePage implements OnInit, OnDestroy {
       this.authService.currentUser$
         .subscribe(async user => {
 
+          this.haySesion = !!user;
+
           if (user) {
 
             try {
               this.userData =
-                await this.authService
-                  .getCurrentUserData();
+                await this.obtenerDatosConReintentos();
             } finally {
               // ✅ Se marca listo después de tener los datos, así no se
               // alcanza a ver "Iniciar sesión" con la sesión ya iniciada
@@ -142,6 +145,43 @@ export class HomePage implements OnInit, OnDestroy {
               [];
           }
         });
+  }
+
+  // =========================
+  // 🔄 RECARGA AL VOLVER A INICIO
+  // =========================
+  // Al registrarse, Firebase inicia la sesión antes de que el registro cree
+  // el documento usuarios/{uid}. Si Inicio consultó en ese momento quedó con
+  // userData = null; al volver a Inicio se recargan los datos.
+  ionViewWillEnter() {
+    if (this.auth.currentUser && !this.userData) {
+      this.recargarDatosUsuario();
+    }
+  }
+
+  async recargarDatosUsuario() {
+    this.authReady = false;
+    try {
+      this.userData = await this.obtenerDatosConReintentos();
+    } finally {
+      this.authReady = true;
+    }
+  }
+
+  // Recién registrado, el documento puede tardar un momento en existir:
+  // se reintenta unas veces antes de darlo por no encontrado
+  private async obtenerDatosConReintentos(intentos = 5, esperaMs = 800): Promise<UserData | null> {
+    for (let i = 0; i < intentos; i++) {
+      const datos = await this.authService.getCurrentUserData().catch(() => null);
+      if (datos || !this.auth.currentUser) return datos;
+      await new Promise(resolve => setTimeout(resolve, esperaMs));
+    }
+    return null;
+  }
+
+  async cerrarSesionSinDatos() {
+    await this.authService.logout();
+    this.router.navigateByUrl('/tabs/home', { replaceUrl: true });
   }
 
   // =========================
