@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 
 // 🔥 Firebase
 import {
+  getApp,
   initializeApp,
   provideFirebaseApp
 } from '@angular/fire/app';
@@ -22,9 +23,15 @@ import {
 } from '@angular/fire/auth';
 
 import {
-  getFirestore,
+  initializeFirestore,
   provideFirestore
 } from '@angular/fire/firestore';
+
+// 📴 Caché persistente de Firestore (AngularFire no lo reexporta)
+import {
+  persistentLocalCache,
+  persistentMultipleTabManager
+} from 'firebase/firestore';
 
 import {
   getFunctions,
@@ -87,8 +94,14 @@ register();
       getAuth()
     ),
 
+    // 📴 Caché persistente en el dispositivo: sin internet se siguen
+    // mostrando los últimos datos descargados (perfil, eventos, etc.)
     provideFirestore(() =>
-      getFirestore()
+      initializeFirestore(getApp(), {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager()
+        })
+      })
     ),
 
     // 🔹 Cloud Functions (para la pasarela de pago nativa)

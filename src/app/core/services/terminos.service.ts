@@ -10,12 +10,11 @@ import { Auth } from '@angular/fire/auth';
 import {
   Firestore,
   doc,
-  getDoc,
-  getDocFromServer,
   setDoc,
   updateDoc,
   arrayUnion
 } from '@angular/fire/firestore';
+import { leerDocPreferirServidor } from '../utils/firestore-utils';
 
 // =========================
 // 📄 MODELO TÉRMINOS
@@ -95,13 +94,8 @@ export class TerminosService {
     const ref = doc(this.firestore, TerminosService.RUTA_DOC);
 
     try {
-      let snap;
-      try {
-        // 🔹 Desde el servidor para detectar al instante una versión recién publicada
-        snap = await getDocFromServer(ref);
-      } catch {
-        snap = await getDoc(ref);
-      }
+      // 🔹 Desde el servidor para detectar al instante una versión recién publicada
+      const snap = await leerDocPreferirServidor(ref);
 
       if (snap.exists()) {
         const data = snap.data() as TerminosVigentes;
