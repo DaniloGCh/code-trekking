@@ -4,7 +4,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastController, LoadingController } from '@ionic/angular';
+import { ToastController, LoadingController, AlertController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 
@@ -32,6 +32,7 @@ export class CrearEventoPage implements OnInit {
   private fb            = inject(FormBuilder);
   private toastCtrl     = inject(ToastController);
   private loadingCtrl   = inject(LoadingController);
+  private alertCtrl     = inject(AlertController);
 
   // =========================
   // 📊 ESTADO
@@ -181,9 +182,16 @@ export class CrearEventoPage implements OnInit {
       return;
     }
 
-    // ✅ Rate limiting: máx 5 eventos por hora
-    if (!this.security.checkRateLimit('crear-evento', 5, 3600000)) {
-      await this.showToast('Has creado demasiados eventos. Espera un momento.', 'warning');
+    // ✅ Rate limiting: máx 5 eventos creados por hora (persistente por usuario)
+    const uid = this.auth.currentUser.uid;
+    const limite = this.security.checkPersistentRateLimit('crear-evento', uid, 5, 3600000);
+    if (!limite.permitido) {
+      const alert = await this.alertCtrl.create({
+        header: '⏳ Límite alcanzado',
+        message: `Alcanzaste el límite de 5 eventos por hora. Intenta nuevamente en ${limite.minutosRestantes} minuto(s).`,
+        buttons: ['Entendido']
+      });
+      await alert.present();
       return;
     }
 
@@ -233,7 +241,9 @@ export class CrearEventoPage implements OnInit {
         privado: true,
       });
 
-      this.security.resetRateLimit('crear-evento');
+      // Se registra solo el evento creado con éxito (antes se reiniciaba el
+      // contador aquí, por eso el límite nunca se alcanzaba)
+      this.security.registrarAccionPersistente('crear-evento', uid, 3600000);
       await loading.dismiss();
       await this.showToast('¡Evento creado exitosamente!', 'success');
       this.router.navigateByUrl('/tabs/eventos', { replaceUrl: true });
