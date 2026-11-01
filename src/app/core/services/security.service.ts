@@ -163,6 +163,40 @@ export class SecurityService {
   }
 
   // =========================
+  // 🛡️ NORMALIZAR NOMBRE
+  // =========================
+  // Limpia lo que agregan los teclados móviles antes de validar:
+  // tildes en forma descompuesta (NFD), apóstrofo tipográfico (’),
+  // espacios dobles / no separables y espacios al inicio o fin.
+  normalizeNombre(nombre: string): string {
+    if (!nombre) return '';
+    return nombre
+      .normalize('NFC')
+      .replace(/[‘’ʼ]/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // Revierte las entidades que genera sanitizeInput (se repite por si el
+  // texto quedó sanitizado dos veces, ej. nombres guardados en el registro)
+  decodeEntities(texto: string): string {
+    if (!texto) return '';
+    let actual = texto;
+    for (let i = 0; i < 3; i++) {
+      const decodificado = actual
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/gi, "'")
+        .replace(/&#x2F;/gi, '/')
+        .replace(/&amp;/g, '&');
+      if (decodificado === actual) break;
+      actual = decodificado;
+    }
+    return actual;
+  }
+
+  // =========================
   // 🛡️ VALIDAR COORDENADAS GPS
   // =========================
   isValidCoordinates(lat: number, lng: number): boolean {

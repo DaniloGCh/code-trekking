@@ -384,11 +384,22 @@ export class AuthService {
     await deleteUser(currentUser);
   }
 
-  async isNombreDisponible(nombre: string): Promise<boolean> {
+  async isNombreDisponible(nombre: string, excluirUid?: string): Promise<boolean> {
     const usuariosRef = collection(this.firestore, 'usuarios');
     const snapshot = await getDocs(usuariosRef);
-    const nombres = snapshot.docs.map(d => (d.data() as UserData).nombre?.toLowerCase().trim());
-    return !nombres.includes(nombre.toLowerCase().trim());
+    const clave = this.claveNombre(nombre);
+    // Se ignora el documento del propio usuario (excluirUid) para que pueda
+    // cambiar solo mayúsculas de su nombre actual sin chocar consigo mismo.
+    return !snapshot.docs.some(d =>
+      d.id !== excluirUid &&
+      this.claveNombre((d.data() as UserData).nombre || '') === clave
+    );
+  }
+
+  // Normaliza un nombre (crudo o ya sanitizado) a la misma forma para comparar
+  private claveNombre(nombre: string): string {
+    const limpio = this.security.normalizeNombre(this.security.decodeEntities(nombre));
+    return this.security.sanitizeInput(limpio).toLowerCase();
   }
 
   private parseFecha(raw: any): Date | null {

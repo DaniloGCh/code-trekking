@@ -744,7 +744,8 @@ export class ProfilePage implements OnInit {
         {
           name: 'nombre',
           type: 'text',
-          value: this.userData?.nombre || '',
+          // Se muestra decodificado: el valor guardado tiene entidades HTML (&#x27;, &amp;...)
+          value: this.security.decodeEntities(this.userData?.nombre || ''),
           placeholder: 'Nuevo nombre de usuario',
           attributes: { maxlength: 30 }
         }
@@ -754,7 +755,8 @@ export class ProfilePage implements OnInit {
         {
           text: 'Guardar',
           handler: async (data) => {
-            const nuevoNombre = data.nombre?.trim();
+            // Trim, colapsa espacios dobles y limpia caracteres del teclado móvil
+            const nuevoNombre = this.security.normalizeNombre(data.nombre || '');
 
             if (!nuevoNombre || nuevoNombre.length < 3) {
               await this.showToast('El nombre debe tener mínimo 3 caracteres', 'warning');
@@ -766,7 +768,10 @@ export class ProfilePage implements OnInit {
               return false;
             }
 
-            if (nuevoNombre === this.userData?.nombre) {
+            // Se compara ya sanitizado, igual que como está guardado en Firestore
+            const nombreSeguro = this.security.sanitizeInput(nuevoNombre);
+
+            if (nombreSeguro === this.userData?.nombre) {
               await this.showToast('El nombre es igual al actual', 'warning');
               return false;
             }
@@ -775,15 +780,26 @@ export class ProfilePage implements OnInit {
             await loading.present();
 
             try {
-              const disponible = await this.authService.isNombreDisponible(nuevoNombre);
+              let disponible: boolean;
+              try {
+                disponible = await this.authService.isNombreDisponible(nuevoNombre, this.userData?.uid);
+              } catch (error: any) {
+                console.error('Error al verificar nombre en Firestore:', error);
+                await loading.dismiss();
+                await this.showToast(
+                  error?.code === 'permission-denied'
+                    ? 'Sin permisos para verificar el nombre. Intenta más tarde.'
+                    : 'No se pudo verificar la disponibilidad del nombre. Revisa tu conexión.',
+                  'danger'
+                );
+                return false;
+              }
 
               if (!disponible) {
                 await loading.dismiss();
                 await this.showToast('Este nombre ya está en uso', 'danger');
                 return false;
               }
-
-              const nombreSeguro = this.security.sanitizeInput(nuevoNombre);
 
               await this.authService.updateProfile({
                 nombre: nombreSeguro,
