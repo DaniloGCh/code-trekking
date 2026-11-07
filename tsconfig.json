@@ -23,7 +23,8 @@
       "dom"
     ],
     "types": [
-      "node"
+      "node",
+      "jasmine"
     ],
     "skipLibCheck": true,
     "useDefineForClassFields": false

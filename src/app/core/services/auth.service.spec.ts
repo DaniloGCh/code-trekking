@@ -8,6 +8,7 @@ import {
   connectFirestoreEmulator,
   disableNetwork,
   doc,
+  getDocFromCache,
   initializeFirestore,
   memoryLocalCache,
   setDoc,
@@ -225,6 +226,110 @@ describe('AuthService', () => {
     it('debería devolver null sin sesión', async () => {
       auth.currentUser = null;
       expect(await service.verificarYActualizarSuscripcion()).toBeNull();
+    });
+
+    const suscripcionQueVence = (diasDesdeVencimiento: number, extra: any = {}) => ({
+      activa: true,
+      plan: 'mensual',
+      fechaInicio: new Date(Date.now() - 40 * DIA_MS).toISOString(),
+      fechaVencimiento: new Date(Date.now() - diasDesdeVencimiento * DIA_MS).toISOString(),
+      ...extra
+    });
+
+    /** Sin servidor la promesa del update no termina: se revisa el documento en la caché. */
+    const esperarDesactivacion = async () => {
+      for (let i = 0; i < 300; i++) {
+        const snap = await getDocFromCache(doc(db, 'usuarios/u1'));
+        if (snap.get('suscripcion.activa') === false) return true;
+        await new Promise(r => setTimeout(r, 5));
+      }
+      return false;
+    };
+
+    it('debería mantener activa una suscripción que aún no vence, sin modificarla', async () => {
+      const suscripcion = suscripcionQueVence(-10);
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion });
+
+      expect((await service.verificarYActualizarSuscripcion())?.activa).toBeTrue();
+      expect((await getDocFromCache(doc(db, 'usuarios/u1'))).get('suscripcion.activa')).toBeTrue();
+    });
+
+    it('debería mantenerla activa hasta el último día de gracia', async () => {
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion: suscripcionQueVence(4.9) });
+      expect((await service.verificarYActualizarSuscripcion())?.activa).toBeTrue();
+    });
+
+    it('debería desactivarla en el perfil al terminar los 5 días de gracia', async () => {
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion: suscripcionQueVence(5.1) });
+
+      service.verificarYActualizarSuscripcion().catch(() => { /* cierre de Firestore */ });
+
+      expect(await esperarDesactivacion()).toBeTrue();
+    });
+
+    it('debería considerar fechaFin si no existe fechaVencimiento', async () => {
+      const suscripcion = suscripcionQueVence(6, { fechaVencimiento: '', fechaFin: new Date(Date.now() - 6 * DIA_MS).toISOString() });
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion });
+
+      service.verificarYActualizarSuscripcion().catch(() => { /* cierre de Firestore */ });
+
+      expect(await esperarDesactivacion()).toBeTrue();
+    });
+
+    it('debería aceptar la fecha guardada como Timestamp de Firestore', async () => {
+      const suscripcion = suscripcionQueVence(0, { fechaVencimiento: new Date(Date.now() - 6 * DIA_MS) });
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion });
+
+      service.verificarYActualizarSuscripcion().catch(() => { /* cierre de Firestore */ });
+
+      expect(await esperarDesactivacion()).toBeTrue();
+    });
+
+    it('debería devolver tal cual una suscripción ya inactiva', async () => {
+      const suscripcion = suscripcionQueVence(30, { activa: false });
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion });
+
+      expect(await service.verificarYActualizarSuscripcion()).toEqual(suscripcion as any);
+    });
+
+    it('debería devolver tal cual una suscripción sin fecha o con fecha inválida', async () => {
+      const sinFecha = suscripcionQueVence(0, { fechaVencimiento: '' });
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion: sinFecha });
+      expect(await service.verificarYActualizarSuscripcion()).toEqual(sinFecha as any);
+
+      const fechaInvalida = suscripcionQueVence(0, { fechaVencimiento: 'no-es-fecha' });
+      guardarEnCache('usuarios/u1', { uid: 'u1', suscripcion: fechaInvalida });
+      expect(await service.verificarYActualizarSuscripcion()).toEqual(fechaInvalida as any);
+    });
+  });
+
+  describe('diasRestantesDeGracia (otros formatos de fecha)', () => {
+    const base: any = { activa: true, plan: 'mensual', fechaInicio: '2025-12-10T12:00:00Z' };
+
+    beforeEach(() => {
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date('2026-01-12T12:00:00Z'));
+    });
+
+    it('debería usar fechaFin si no hay fechaVencimiento', () => {
+      expect(service.diasRestantesDeGracia({ ...base, fechaVencimiento: '', fechaFin: '2026-01-10T12:00:00Z' })).toBe(3);
+    });
+
+    it('debería aceptar la fecha como Timestamp de Firestore', () => {
+      const fecha = new Date('2026-01-10T12:00:00Z');
+      expect(service.diasRestantesDeGracia({ ...base, fechaVencimiento: { toDate: () => fecha } })).toBe(3);
+    });
+
+    it('debería devolver null sin ninguna fecha', () => {
+      expect(service.diasRestantesDeGracia({ ...base, fechaVencimiento: '' })).toBeNull();
+    });
+
+    it('debería devolver 1 durante las últimas horas de gracia', () => {
+      expect(service.diasRestantesDeGracia({ ...base, fechaVencimiento: '2026-01-07T13:00:00Z' })).toBe(1);
+    });
+
+    it('debería devolver null justo en el vencimiento', () => {
+      expect(service.diasRestantesDeGracia({ ...base, fechaVencimiento: '2026-01-12T12:00:00Z' })).toBeNull();
     });
   });
 });
